@@ -1,7 +1,7 @@
 import owncloud
 
 USER = 'GrimReaper'
-PASS = 'JKaKTV5stU4xbiz'
+PASS = ''
 
 oc = owncloud.Client('http://127.0.0.1/owncloud')
 oc.login(USER, PASS)
