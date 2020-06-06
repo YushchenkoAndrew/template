@@ -1,1 +1,1 @@
-<!-- Some simple project, created as template -->
+Some simple project, created as template
