@@ -1,41 +1,28 @@
+import pygame
 import time
 
 
 class Player:
 
-    SCREEN = 0
-    move_func = (-20, 0)
-
-    score = 0
-
-    def __init__(self):
-        print("Player create!")
-
-    def set_window(self, screen, move_func):
-        self.SCREEN = screen
-        self.move_func = move_func
-        self.set_key_press()
-
-    def set_key_press(self):
-        self.SCREEN.onkey(self.press_up, "Up")
-        self.SCREEN.onkey(self.press_down, "Down")
-        self.SCREEN.onkey(self.press_left, "Left")
-        self.SCREEN.onkey(self.press_right, "Right")
-        self.SCREEN.listen()
-
-    def press_up(self):
-        self.move_func((0, 20))
-
-    def press_down(self):
-        self.move_func((0, -20))
-
-    def press_left(self):
-        self.move_func((-20, 0))
-
-    def press_right(self):
-        self.move_func((20, 0))
-
-    def die(self, game_restart):
+    def __init__(self, i, snake):
+        # print("Player create!")
+        self.index = i
         self.score = 0
-        time.sleep(1)
-        game_restart()
+        self.snake = snake
+
+    def check_key_press(self, key):
+        if key == pygame.K_DOWN:
+            self.snake.command = (0, 20)
+        if key == pygame.K_UP:
+            self.snake.command = (0, -20)
+        if key == pygame.K_LEFT:
+            self.snake.command = (-20, 0)
+        if key == pygame.K_RIGHT:
+            self.snake.command = (20, 0)
+
+    def die(self):
+        self.score = 0
+        self.snake.game_restart()
+        # time.sleep(1)
+        # print("Player", self.index, self.score)
+        # game_restart()

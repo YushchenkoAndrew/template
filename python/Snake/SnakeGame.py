@@ -1,134 +1,78 @@
-import turtle
 import time
 import random
 import Player
 import ShowData
 import Snake
+import pygame
 
 
 class SnakeGame:
 
-    SCREEN = 0
-    player = 0
-    data = 0
-    snake = 0
-
-    border = turtle.Turtle()
-    turtle.delay(0)
-
-    WIDTH = 850
-    HEIGHT = 650
+    START_POINT = (420, 20)
+    WIDTH = 1050
+    HEIGHT = 640
     SPEED = 0
 
-    def __init__(self, player):
-        self.SCREEN = turtle.getscreen()
-        self.SCREEN.setup(width=self.WIDTH, height=self.HEIGHT)
-        turtle.bgcolor("black")
+    POPULATION = 1
 
-        self.data = ShowData.ShowData(player, self.set_Property)
-        self.snake = Snake.Snake(player, self.data, self.set_Property)
+    def __init__(self):
+        pygame.init()
 
-        self.snake.set_func(self.draw_filled_rect,
-                            self.draw_rect, self.border_rebuild)
+        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        self.screen.fill((0, 0, 0))
 
-        self.player = player
-        player.set_window(self.SCREEN, self.set_command)
+        self.snakes = []
+        self.players = []
 
-        self.set_Property(self.border)
+        for _ in range(self.POPULATION):
+            snake = Snake.Snake(self.screen, self.START_POINT)
+            player = Player.Player(0, snake)
+            snake.set_die_func(player.die)
 
-        self.create_basic_squares(self.border)
-        self.create_grid(turtle.Turtle())
-        self.initialize_new_game()
+            self.snakes.append(snake)
+            self.players.append(player)
 
-    def initialize_new_game(self):
-        self.snake.initialize_new_game()
-        self.data.show_score()
+        # Set FPS ???
+        self.clock = pygame.time.Clock()
 
-    def game_restart(self):
-        self.snake.game_restart()
-        self.initialize_new_game()
+        self.create_basic_squares()
+        self.create_grid(*self.START_POINT)
 
-    def set_Property(self, t):
-        t.speed(self.SPEED)
-        t.shape("circle")
-        t.shapesize(0.001, 0.001)
+    def create_basic_squares(self):
+        pygame.draw.rect(self.screen, (255, 255, 255),
+                         (*self.START_POINT, 600, 600), 1)
+        pygame.draw.rect(self.screen, (255, 255, 255), (20, 20, 380, 600), 1)
 
-    def draw_rect(self, t, dim=(10, 10)):
-        for i in range(4):
-            step = dim[0]
-            if i % 2 != 0:
-                step = dim[1]
-            t.fd(step)
+    def create_grid(self, x, y):
+        color = (180, 180, 180)
 
-            t.rt(90)
-
-    def draw_filled_rect(self, t, coord, color):
-        t.fillcolor(color)
-        t.penup()
-        t.goto(*coord)
-        t.pendown()
-
-        t.begin_fill()
-        self.draw_rect(t, (20, 20))
-        t.end_fill()
-
-    def create_basic_squares(self, t):
-        t.color("white", "white")
-        t.penup()
-        t.goto(-210, 305)
-        t.pendown()
-
-        self.draw_rect(t, (600, 600))
-
-        t.penup()
-        t.goto(-400, 305)
-        t.pendown()
-
-        self.draw_rect(t, (160, 600))
-
-    def create_grid(self, t):
-        self.set_Property(t)
-        t.penup()
-        t.goto(-210, 305)
-        t.color("gray")
-
-        for j in range(2):
-            for i in range(29):
-                direct = (-1) ** (i + j)
-
-                t.fd(20)
-                t.pendown()
-                t.rt(90 * direct)
-                t.fd(600)
-                t.penup()
-                t.lt(90 * direct)
-
-            t.fd(20)
-            t.lt(90)
-
-    def border_rebuild(self, coord):
-
-        wall = [i for i, j, k in zip(
-            coord, (-210, 305), (370, -275)) if i == j or i == k]
-        if (wall):
-            self.border.penup()
-            self.border.goto(-210, 305)
-            self.border.pendown()
-
-            self.draw_rect(self.border, (600, 600))
-
-    def set_command(self, coord):
-        self.snake.set_command(coord)
+        for dx in range(1, 30):
+            pygame.draw.line(self.screen, color,
+                             (x + dx * 20, y), (x + dx * 20, y + 600))
+            pygame.draw.line(self.screen, color,
+                             (x, y + dx * 20), (x + 600, y + dx * 20))
 
     def screen_update(self):
         while True:
-            self.snake.move()
-            self.SCREEN.update()
+            self.clock.tick(10)
 
-            time.sleep(0.1)
+            # self.player.check_key_press()
+
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    for player in self.players:
+                        player.check_key_press(event.key)
+
+                    if event.key == pygame.K_q:
+                        pygame.quit()
+                        return
+
+            for snake in self.snakes:
+                snake.move()
+
+            # Flip the display
+            pygame.display.flip()
 
 
-snake = SnakeGame(Player.Player())
+snake = SnakeGame()
 snake.screen_update()
-
-time.sleep(1)

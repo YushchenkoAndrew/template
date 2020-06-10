@@ -1,104 +1,115 @@
-import turtle
+import pygame
 import random
 import Player
 
 
 class Snake:
-    snake = turtle.Turtle()
-    apple = turtle.Turtle()
 
-    data = 0
-    player = 0
+    RED = (255, 0, 0)
+    WHITE = (255, 255, 255)
+    BLACK = (0, 0, 0)
+    GRAY = (180, 180, 180)
 
-    snake_list = [(10, 5), (30, 5), (50, 5), (50, 5)]
+    def __init__(self, screen, point):
 
-    command = (-20, 0)
-    prevComm = (0, 0)
+        self.screen = screen
+        self.START_POINT = point
 
-    # Function
-    draw_filled_rect = 0
-    draw_rect = 0
-    border_rebuild = 0
+        pygame.draw.rect(self.screen, (255, 255, 255),
+                         (*self.START_POINT, 600, 600), 1)
 
-    def __init__(self, player, data, set_Property):
+        self.snake_list = [(160, 160), (180, 160), (200, 160), (220, 160)]
+        self.command = (-20, 0)
 
-        self.player = player
-        self.data = data
-
-        set_Property(self.snake)
-        set_Property(self.apple)
-
-    def set_func(self, draw_filled_rect, draw_rect, border_rebuild):
-        self.draw_filled_rect = draw_filled_rect
-        self.draw_rect = draw_rect
-        self.border_rebuild = border_rebuild
-
-    def initialize_new_game(self):
         self.draw_apple()
         self.draw_snake()
 
     def game_restart(self):
-        self.snake.clear()
-        self.apple.clear()
-        self.snake_list = [(10, 5), (30, 5), (50, 5), (50, 5)]
+        self.snake_list.pop(0)
+        for snake in self.snake_list:
+            self.delete_shape(snake)
+
+        pygame.draw.rect(self.screen, (255, 255, 255),
+                         (*self.START_POINT, 600, 600), 1)
+
+        self.snake_list = [(160, 160), (180, 160), (200, 160), (220, 160)]
         self.command = (-20, 0)
-        self.initialize_new_game()
+
+        self.delete_shape(self.apple_position, False)
+        self.draw_apple()
 
     def rand_apple(self):
-        coord = (random.randrange(30) * 20 - 210,
-                 305 - random.randrange(30) * 20)
+        coord = [random.randrange(30) * 20 + i for i in self.START_POINT]
 
-        if coord in self.snake_list:
+        if len([i for i, j, k in zip(self.snake_list[0], coord, self.START_POINT) if abs(i - j + k) < 1]) == 2:
             coord = self.rand_apple()
+
+        self.apple_position = coord
 
         return coord
 
-    def draw_apple(self):
-        self.apple.color("red")
+    def rebuild_grid(self, coord):
+        pygame.draw.line(self.screen, self.GRAY, coord,
+                         (coord[0] + 20, coord[1]))
+        pygame.draw.line(self.screen, self.GRAY, coord,
+                         (coord[0], coord[1] + 20))
 
-        self.draw_filled_rect(self.apple, self.rand_apple(), "red")
+    def draw_apple(self):
+        pygame.draw.rect(self.screen, self.RED, (*self.rand_apple(), 20, 20))
+
+    def delete_shape(self, coord, change=True):
+        if change:
+            temp = [i + j for i,
+                    j in zip(coord, self.START_POINT)]
+        else:
+            temp = coord
+
+        pygame.draw.rect(self.screen, self.BLACK, (*temp, 20, 20))
+        self.rebuild_grid(temp)
 
     def draw_snake(self):
-        self.snake.pendown()
 
-        self.snake.color("gray")
+        temp = [i + j for i, j in zip(self.snake_list[0], self.START_POINT)]
 
-        self.draw_filled_rect(self.snake, self.snake_list[0], "white")
+        pygame.draw.rect(self.screen, self.WHITE, (*temp, 20, 20))
+        self.rebuild_grid(temp)
 
         # Delete tail
         if not self.eat_apple():
-            coord = self.snake_list.pop(-1)
-            self.draw_filled_rect(self.snake, coord, "black")
-            self.border_rebuild(coord)
+            self.delete_shape(self.snake_list.pop(-1))
 
-    def update(self, dx=0, dy=0):
+            if [i for i in self.snake_list[-1] if i <= 20 or i >= 560]:
+                pygame.draw.rect(self.screen, (255, 255, 255),
+                                 (*self.START_POINT, 600, 600), 1)
+
+    def update(self, dx=0, dy=0, end_update=False):
         temp = (dx + self.snake_list[0][0], dy + self.snake_list[0][1])
 
-        if (temp != self.snake_list[1]):
+        if (temp != self.snake_list[1] or end_update):
             self.snake_list.insert(0, temp)
             self.walls()
             self.prevComm = self.command
         else:
             self.command = self.prevComm
-            self.update(*self.command)
+            self.update(*self.command, True)
 
     def eat_apple(self):
 
-        if len([i for i, j in zip(self.snake_list[0], self.apple.position()) if abs(i - j) < 1]) == 2:
+        if len([i for i, j, k in zip(self.snake_list[0], self.apple_position, self.START_POINT) if abs(i - j + k) < 1]) == 2:
             self.draw_apple()
-            self.player.score += 1
-            self.data.show_score()
+            # self.player.score += 1
+            # self.data.show_score()
             return True
         return False
 
     def walls(self):
-        if ([i for i, j, k in zip(self.snake_list[0], (-230, 325), (390, -295)) if i == j or i == k] or self.snake_list[0] in self.snake_list[1:-1]):
-            self.data.show_death()
-            self.player.die(self.game_restart)
-            print("Stop!!")
+        if ([i for i in self.snake_list[0] if i < 0 or i > 580] or self.snake_list[0] in self.snake_list[1:-1]):
+            # self.data.show_death()
+            self.die()
+            # print("Stop!!")
 
-    def set_command(self, coord):
-        self.command = coord
+    def set_die_func(self, func):
+        self.die = func
 
     def move(self):
         self.update(*self.command)
