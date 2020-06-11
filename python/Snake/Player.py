@@ -42,19 +42,19 @@ class Player:
         if len(dist):
             return min(dist)
         else:
-            return -1
+            return 600
 
     def dist_to_body(self, coord, x, y, z=1):
         dist = []
         last = -1
         ignore = True
         for i, body in enumerate(self.snake.snake_list[1:-1]):
-            if (coord[x] - body[x]) * z > 0 and coord[y] == body[y]:
+            if (coord[x] - body[x]) * z >= 0 and coord[y] == body[y]:
                 if last + 1 != i:
                     ignore = False
 
                 if not ignore:
-                    dist.append((coord[x] - body[x]) * z)
+                    dist.append((coord[x] - body[x]) * z - 20)
                 last = i
         return dist
 
@@ -78,10 +78,10 @@ class Player:
         angle2 = (self.snake.apple_position[1] -
                   coord[1] - self.snake.START_POINT[1]) / dist
 
-        # south=not((coord[0], coord[1] - 20) in self.snake.snake_list[1:-1])
-        # south=not((coord[0], coord[1] + 20) in self.snake.snake_list[1:-1])
-        # west=not((coord[0] - 20, coord[1]) in self.snake.snake_list[1:-1])
-        # east=not((coord[0] + 20, coord[1]) in self.snake.snake_list[1:-1])
+        north *= not((coord[0], coord[1] - 20) in self.snake.snake_list[1:-1])
+        south *= not((coord[0], coord[1] + 20) in self.snake.snake_list[1:-1])
+        west *= not((coord[0] - 20, coord[1]) in self.snake.snake_list[1:-1])
+        east *= not((coord[0] + 20, coord[1]) in self.snake.snake_list[1:-1])
 
         return (coord[0], 600 - coord[0], coord[1], 600 - coord[1], north, south, west, east, dist, angle1, angle2)
 

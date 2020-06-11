@@ -46,7 +46,7 @@ class SnakeGame:
     def eval_genomes(self, genomes, config):
 
         for i, g in genomes:
-            net = neat.nn.FeedForwardNetwork.create(g, config)
+            net = neat.nn.RecurrentNetwork.create(g, config)
             self.nets.append(net)
             g.fitness = 0
             self.gen.append(g)

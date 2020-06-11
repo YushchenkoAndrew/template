@@ -25,7 +25,7 @@ class Snake:
                          (*self.START_POINT, 600, 600), 1)
 
         self.snake_list = [(160, 160), (180, 160), (200, 160),
-                           (220, 160), (240, 160), (260, 160)]
+                           (220, 160)]
 
         self.step_without_food = self.STARVE_STEP
 
