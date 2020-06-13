@@ -21,16 +21,19 @@ def run(config_file, game):
     # Create the population, which is the top-level object for a NEAT run.
     # p = neat.Population(config)
 
-    p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-358')
+    # p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-9885')
+    p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-10253')
 
     # Add a stdout reporter to show progress in the terminal.
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
-    p.add_reporter(neat.Checkpointer(100))
+    p.add_reporter(neat.Checkpointer(500))
+
+    game.set_population(p)
 
     # Run for up to 300 generations.
-    winner = p.run(game.eval_genomes, 1000)
+    winner = p.run(game.eval_genomes, 2000)
 
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))

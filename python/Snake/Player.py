@@ -25,16 +25,18 @@ class Player:
             self.snake.command = (20, 0)
 
     def neural_move(self, ways=(-1, -1, -1, -1)):
-        if (ways[0] > 0.8):
+        coord = self.snake.snake_list[0]
+
+        if (ways[0] > 0.8 and not(coord[0], coord[1] - 20) in self.snake.snake_list[1:-1]):
             self.snake.command = (0, -20)
             return
-        if (ways[1] > 0.8):
+        if (ways[1] > 0.8 and not(coord[0], coord[1] + 20) in self.snake.snake_list[1:-1]):
             self.snake.command = (0, 20)
             return
-        if (ways[2] > 0.8):
+        if (ways[2] > 0.8 and not(coord[0] - 20, coord[1]) in self.snake.snake_list[1:-1]):
             self.snake.command = (-20, 0)
             return
-        if (ways[3] > 0.8):
+        if (ways[3] > 0.8 and not(coord[0] + 20, coord[1]) in self.snake.snake_list[1:-1]):
             self.snake.command = (20, 0)
             return
 
@@ -83,7 +85,7 @@ class Player:
         west *= not((coord[0] - 20, coord[1]) in self.snake.snake_list[1:-1])
         east *= not((coord[0] + 20, coord[1]) in self.snake.snake_list[1:-1])
 
-        return (coord[0], 600 - coord[0], coord[1], 600 - coord[1], north, south, west, east, dist, angle1, angle2)
+        return (coord[0], 580 - coord[0], coord[1], 580 - coord[1], north, south, west, east, dist, angle1, angle2)
 
     def increse_score(self):
         self.score += 1

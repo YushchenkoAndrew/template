@@ -5,6 +5,7 @@ import ShowData
 import Snake
 import pygame
 import neat
+from neat.six_util import iteritems, itervalues
 
 
 class SnakeGame:
@@ -14,7 +15,7 @@ class SnakeGame:
     HEIGHT = 640
     SPEED = 30
 
-    STARVE_STEP = 1000
+    STARVE_STEP = 3000
 
     nets = []
     gen = []
@@ -47,6 +48,7 @@ class SnakeGame:
 
         for i, g in genomes:
             net = neat.nn.RecurrentNetwork.create(g, config)
+            # net = neat.nn.FeedForwardNetwork.create(g, config)
             self.nets.append(net)
             g.fitness = 0
             self.gen.append(g)
@@ -61,6 +63,9 @@ class SnakeGame:
         # print(len(self.nets), " ", len(self.players))
 
         self.screen_update()
+
+    def set_population(self, p):
+        self.population = p
 
     def create_basic_squares(self):
         pygame.draw.rect(self.screen, (255, 255, 255),
@@ -87,14 +92,14 @@ class SnakeGame:
                         player.check_key_press(event.key)
                         player.snake.STARVE_STEP = self.STARVE_STEP
 
-                    if event.key == pygame.K_d:
-                        self.STARVE_STEP += 2000
-                        print(
-                            f'\nSTARVE_STEP: {self.STARVE_STEP}\n')
-                    if event.key == pygame.K_a:
-                        self.STARVE_STEP -= 2000
-                        print(
-                            f'\nSTARVE_STEP: {self.STARVE_STEP}\n')
+                    # if event.key == pygame.K_d:
+                    #     self.STARVE_STEP += 2000
+                    #     print(
+                    #         f'\nSTARVE_STEP: {self.STARVE_STEP}\n')
+                    # if event.key == pygame.K_a:
+                    #     self.STARVE_STEP -= 2000
+                    #     print(
+                    #         f'\nSTARVE_STEP: {self.STARVE_STEP}\n')
 
                     if event.key == pygame.K_q:
                         pygame.quit()
@@ -115,30 +120,32 @@ class SnakeGame:
 
                     if player.get_apple:
                         player.get_apple = False
-                        if player.score < 25:
-                            self.gen[i].fitness += player.score
-                        else:
-                            self.gen[i].fitness += 25
+                        # if player.score < 25:
+                        # self.gen[i].fitness += player.score * 5
+                        # else:
+                        # self.gen[i].fitness += 25
 
-                    if player.snake_distance():
-                        self.gen[i].fitness += 0.8
+                    # if player.snake_distance():
+                    #     self.gen[i].fitness += 1
                         # print("+1")
-                    else:
-                        self.gen[i].fitness -= 0.2
+                    # else:
+                    #     self.gen[i].fitness -= 1
                         # print("-1")
 
-                    if (player.snake.STARVE_STEP - player.snake.step_without_food) % 20:
-                        self.gen[i].fitness += 0.2
+                    if (player.snake.STARVE_STEP - player.snake.step_without_food) % 10:
+                        self.gen[i].fitness += player.score * 0.11
 
                     player.snake.move()
 
                 else:
-                    if self.players[i].hit_body:
-                        self.gen[i].fitness -= 100
+                    # if self.players[i].hit_body:
+                    #     self.gen[i].fitness -= 1000
+                    if self.players[i].snake.step_without_food == 0:
+                        self.gen[i].fitness -= 20000
 
                     last_score = max(self.players.pop(i).score, last_score)
                     # self.gen[i].fitness -= 5 * last_score
-                    self.gen[i].fitness -= 100
+                    self.gen[i].fitness -= 3000
 
                     self.snakes.pop(i)
                     self.nets.pop(i)
@@ -147,6 +154,16 @@ class SnakeGame:
 
             if len(self.snakes) == 0:
                 self.total = max(self.total, last_score)
+
+                best = None
+                for g in itervalues(self.population.population):
+                    if best is None or g.fitness > best.fitness:
+                        best = g
+
+                net = best.size()
+
+                print(
+                    f'Species -- {self.population.species.get_species_id(best.key)} Nodes -- {net[0]}, num of conn -- {net[1]}\n')
                 print(f'Score -- {last_score}')
                 print(f'Total -- {self.total}\n')
                 return

@@ -12,7 +12,7 @@ class Snake:
 
     prevComm = (-20, 0)
 
-    STARVE_STEP = 2000
+    STARVE_STEP = 3000
 
     command = (-20, 0)
 
@@ -119,7 +119,11 @@ class Snake:
 
         if len([i for i, j, k in zip(self.snake_list[0], self.apple_position, self.START_POINT) if abs(i - j + k) < 1]) == 2:
             self.draw_apple()
-            self.step_without_food = self.STARVE_STEP
+            if len(self.snake_list) < 10:
+                self.step_without_food = self.STARVE_STEP
+            else:
+                self.step_without_food = self.STARVE_STEP * \
+                    len(self.snake_list) * 0.1
             self.increse_score()
             # self.player.score += 1
             # self.data.show_score()
