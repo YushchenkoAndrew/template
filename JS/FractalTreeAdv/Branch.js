@@ -4,23 +4,24 @@ function Branch(begin, end) {
   this.end = end;
   this.finished = false;
   this.leaves = [];
-  this.xoff = 0.1;
 
-  this.show = function () {
+  // Save value end for correct jitter
+  this.coords = end.copy();
+
+  this.show = function (dx) {
     stroke(255);
     line(this.begin.x, this.begin.y, this.end.x, this.end.y);
 
     for (let i = this.leaves.length - 1; i >= 0; i--) {
-      this.leaves[i].show();
+      this.leaves[i].show(dx);
       if (this.leaves[i].coord.y > 800) {
         this.leaves.splice(i, 1);
       }
     }
   };
 
-  this.jitter = function () {
-    this.end.x += -0.5 + noise(this.xoff);
-    this.xoff += 0.1;
+  this.jitter = function (dx) {
+    this.end.x = -10 + noise(dx) * 20 + this.coords.x;
   };
 
   this.branch = function () {

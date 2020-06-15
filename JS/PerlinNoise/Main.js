@@ -10,7 +10,7 @@ let pos = 0;
 function setup() {
   createCanvas(700, 700, WEBGL);
 
-  frameRate(10);
+  frameRate(20);
 }
 
 function draw() {
