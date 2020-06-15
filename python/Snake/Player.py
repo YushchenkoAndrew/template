@@ -27,16 +27,16 @@ class Player:
     def neural_move(self, ways=(-1, -1, -1, -1)):
         coord = self.snake.snake_list[0]
 
-        if (ways[0] > 0.8 and not(coord[0], coord[1] - 20) in self.snake.snake_list[1:-1]):
+        if ways[0] > 0.8:
             self.snake.command = (0, -20)
             return
-        if (ways[1] > 0.8 and not(coord[0], coord[1] + 20) in self.snake.snake_list[1:-1]):
+        if ways[1] > 0.8:
             self.snake.command = (0, 20)
             return
-        if (ways[2] > 0.8 and not(coord[0] - 20, coord[1]) in self.snake.snake_list[1:-1]):
+        if ways[2] > 0.8:
             self.snake.command = (-20, 0)
             return
-        if (ways[3] > 0.8 and not(coord[0] + 20, coord[1]) in self.snake.snake_list[1:-1]):
+        if ways[3] > 0.8:
             self.snake.command = (20, 0)
             return
 

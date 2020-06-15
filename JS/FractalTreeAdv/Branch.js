@@ -1,0 +1,55 @@
+function Branch(begin, end) {
+  // Coord of vector
+  this.begin = begin;
+  this.end = end;
+  this.finished = false;
+  this.leaves = [];
+  this.xoff = 0.1;
+
+  this.show = function () {
+    stroke(255);
+    line(this.begin.x, this.begin.y, this.end.x, this.end.y);
+
+    for (let i = this.leaves.length - 1; i >= 0; i--) {
+      this.leaves[i].show();
+      if (this.leaves[i].coord.y > 800) {
+        this.leaves.splice(i, 1);
+      }
+    }
+  };
+
+  this.jitter = function () {
+    this.end.x += -0.5 + noise(this.xoff);
+    this.xoff += 0.1;
+  };
+
+  this.branch = function () {
+    this.finished = true;
+    angle = random(PI / 32, PI / 3);
+
+    let right = p5.Vector.sub(this.end, this.begin);
+    let left = p5.Vector.sub(this.end, this.begin);
+
+    function createBranch(branch, angleDir) {
+      branch.mult(random(0.6, 0.8));
+      branch.rotate(random(PI / 32, PI / 3) * angleDir);
+      branch = p5.Vector.add(this.end, branch);
+
+      let newBranch = new Branch(this.end, branch);
+
+      if (branch.mag() < 4) {
+        newBranch.finished = true;
+      }
+      return newBranch;
+    }
+
+    return [
+      createBranch.call(this, right, 1),
+      createBranch.call(this, left, -1),
+    ];
+  };
+
+  this.leaf = function () {
+    this.leaves.push(new Leaf(this.end.copy(), 15, 0));
+  };
+}

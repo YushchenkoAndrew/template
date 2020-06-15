@@ -12,7 +12,7 @@ class Snake:
 
     prevComm = (-20, 0)
 
-    STARVE_STEP = 3000
+    STARVE_STEP = 200
 
     command = (-20, 0)
 
@@ -29,8 +29,9 @@ class Snake:
 
         self.step_without_food = self.STARVE_STEP
 
-        self.draw_apple()
-        self.draw_snake()
+        self.rand_apple()
+        self.draw_apple(False)
+        self.draw_snake(False)
 
     def game_restart(self):
         self.snake_list.pop(0)
@@ -76,8 +77,12 @@ class Snake:
         pygame.draw.line(self.screen, self.GRAY, coord,
                          (coord[0], coord[1] + 20))
 
-    def draw_apple(self):
-        pygame.draw.rect(self.screen, self.RED, (*self.rand_apple(), 20, 20))
+    def draw_apple(self, showFlag):
+        if showFlag:
+            pygame.draw.rect(self.screen, self.RED,
+                             (*self.apple_position, 20, 20))
+        # else:
+        #     self.delete_shape(self.apple_position, False)
 
     def delete_shape(self, coord, change=True):
         if change:
@@ -89,16 +94,19 @@ class Snake:
         pygame.draw.rect(self.screen, self.BLACK, (*temp, 20, 20))
         self.rebuild_grid(temp)
 
-    def draw_snake(self):
+    def draw_snake(self, showFlag):
 
         temp = [i + j for i, j in zip(self.snake_list[0], self.START_POINT)]
 
-        pygame.draw.rect(self.screen, self.WHITE, (*temp, 20, 20))
-        self.rebuild_grid(temp)
+        if showFlag:
+            pygame.draw.rect(self.screen, self.WHITE, (*temp, 20, 20))
+            self.rebuild_grid(temp)
 
         # Delete tail
-        if not self.eat_apple():
-            self.delete_shape(self.snake_list.pop(-1))
+        if not self.eat_apple(showFlag):
+            temp = self.snake_list.pop(-1)
+            if showFlag:
+                self.delete_shape(temp)
 
             if [i for i in self.snake_list[-1] if i <= 20 or i >= 560]:
                 pygame.draw.rect(self.screen, (255, 255, 255),
@@ -115,15 +123,13 @@ class Snake:
             self.command = self.prevComm
             self.update(*self.command, True)
 
-    def eat_apple(self):
+    def eat_apple(self, showFlag):
 
         if len([i for i, j, k in zip(self.snake_list[0], self.apple_position, self.START_POINT) if abs(i - j + k) < 1]) == 2:
-            self.draw_apple()
-            if len(self.snake_list) < 10:
-                self.step_without_food = self.STARVE_STEP
-            else:
-                self.step_without_food = self.STARVE_STEP * \
-                    len(self.snake_list) * 0.1
+            self.rand_apple()
+            self.draw_apple(showFlag)
+            self.step_without_food = self.STARVE_STEP + self.STARVE_STEP * \
+                len(self.snake_list) * 0.5
             self.increse_score()
             # self.player.score += 1
             # self.data.show_score()
@@ -140,8 +146,9 @@ class Snake:
         self.die = die
         self.increse_score = apple
 
-    def move(self):
+    def move(self, showFlag):
         self.step_without_food -= 1
         self.update(*self.command)
         if len(self.snake_list):
-            self.draw_snake()
+            self.draw_snake(showFlag)
+            self.draw_apple(showFlag)
