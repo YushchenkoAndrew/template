@@ -1,7 +1,7 @@
 // This algorithm: https://web.archive.org/web/20160418004149/http://freespace.virgin.net/hugo.elias/graphics/x_water.htm
 
-const N = 80;
-const scale = 6;
+const N = 50;
+const scale = 10;
 
 const damping = 0.95;
 
@@ -39,7 +39,8 @@ function draw() {
   //   loadPixels();
   noStroke();
 
-  if (rand) buff1[Math.floor(random(0, N))][Math.floor(random(0, N))] = 255;
+  if (rand)
+    buff1[Math.floor(random(10, N - 10))][Math.floor(random(10, N - 10))] = 255;
 
   for (let i = 1; i < N - 1; i++) {
     for (let j = 1; j < N - 1; j++) {
@@ -54,7 +55,7 @@ function draw() {
       buff2[i][j] *= damping;
 
       fill(color(Math.floor(buff2[i][j])));
-      rect(i * scale, j * scale, scale / 1.5, scale / 1.5);
+      rect(i * scale, j * scale, scale, scale);
       //   fill(0);
       //   set(i * 2, j * 2 + 1, color());
       //   set(i * 2 + 1, j * 2, color(Math.floor(buff2[i][j])));
