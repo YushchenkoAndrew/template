@@ -48,15 +48,14 @@ function cooling() {
   yStart += step;
 }
 
-function mouseDragged() {
-  if (mouseX / scale < N && mouseY / scale < N && mouseX > 0 && mouseY > 0) {
-    buff1[Math.floor(mouseX / scale)][Math.floor(mouseY / scale)] = 255;
-    buff1[Math.floor(mouseX / scale) + 1][Math.floor(mouseY / scale)] = 255;
-  }
-}
-
-function mouseClicked() {
-  if (mouseX / scale < N && mouseY / scale < N && mouseX > 0 && mouseY > 0) {
+function createPointFire() {
+  if (
+    mouseIsPressed &&
+    mouseX / scale < N &&
+    mouseY / scale < N &&
+    mouseX > 0 &&
+    mouseY > 0
+  ) {
     buff1[Math.floor(mouseX / scale)][Math.floor(mouseY / scale)] = 255;
     buff1[Math.floor(mouseX / scale) + 1][Math.floor(mouseY / scale)] = 255;
   }
@@ -66,6 +65,8 @@ function draw() {
   background(0);
   //   loadPixels();
   noStroke();
+
+  createPointFire();
 
   //   if (rand) buff1[Math.floor(random(0, N))][Math.floor(random(0, N))] = 255;
 
@@ -83,10 +84,14 @@ function draw() {
         buff2[i][j - 1] = 0;
       }
 
-      // buff2[i][j] *= damping;
+      if (random(0, 10) > 5 && buff2[i][j] >= 80) {
+        buff2[i][j - 1] = random(0, 255);
+      }
 
-      fill(color(Math.floor(buff2[i][j])));
-      //   fill(color(Math.floor(coolingMap[i][j])));
+      let temp = Math.floor(buff2[i][j]);
+
+      fill(color(temp != 0 ? 255 : 0, temp, temp / 2.8));
+      // fill(color(Math.floor(coolingMap[i][j])));
       rect(i * scale, j * scale, scale, scale);
     }
 
