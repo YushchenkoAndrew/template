@@ -2,9 +2,9 @@
 
 const N = 50;
 const scale = 10;
+const step = 0.08;
 
-const damping = 0.95;
-
+let xoff = 0;
 let yStart = 0;
 
 let rand = false;
@@ -24,27 +24,26 @@ function setup() {
     }
   }
 
-  cooling();
+  for (let i = 0; i < N; i++) {
+    xoff += step;
+    cooling(i);
+  }
+  yStart += step;
 
   print("Set value rand to True for creating random ripple");
 }
 
-function cooling() {
-  let xoff = 0;
-  let step = 0.08;
+function cooling(i = -1) {
+  if (i == -1) coolingMap.splice(0, 1);
 
-  coolingMap = [];
+  coolingMap.push([]);
+  let yoff = yStart;
 
-  for (let i = 0; i < N; i++) {
-    coolingMap.push([]);
-    xoff += step;
-    let yoff = yStart;
-
-    for (let j = 0; j < N; j++) {
-      coolingMap[i].push(noise(xoff, yoff) * 50);
-      yoff += step;
-    }
+  for (let j = 0; j < N; j++) {
+    coolingMap[i == -1 ? N - 1 : i].push(noise(xoff, yoff) * 50);
+    yoff += step;
   }
+
   yStart += step;
 }
 
