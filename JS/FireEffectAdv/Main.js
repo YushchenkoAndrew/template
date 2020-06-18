@@ -1,7 +1,7 @@
 // This algorithm: https://web.archive.org/web/20160418004150/http://freespace.virgin.net/hugo.elias/models/m_fire.htm
 
 const N = 500;
-const scale = 2;
+let scale = 2;
 const step = 0.08;
 const rangeAmount = 5;
 
