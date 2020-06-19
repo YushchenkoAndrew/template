@@ -12,26 +12,35 @@ class Ray {
     this.dir.normalize();
   }
 
+  shiftAngle(delta) {
+    this.angle -= delta;
+    this.dir.rotate(delta);
+  }
+
   intersect(border) {
     // Line line intersection: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
 
-    let p1 = new Point(border.begin.x, border.begin.y);
-    let p2 = new Point(border.end.x, border.end.y);
+    let x1 = border.begin.x;
+    let y1 = border.begin.y;
 
-    let p3 = new Point(this.pos.x, this.pos.y);
-    let p4 = new Point(this.pos.x + this.dir.x, this.pos.y + this.dir.y);
+    let x2 = border.end.x;
+    let y2 = border.end.y;
 
-    let temp = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x);
+    let x3 = this.pos.x;
+    let y3 = this.pos.y;
 
-    if (temp == 0) return;
+    let x4 = this.pos.x + this.dir.x;
+    let y4 = this.pos.y + this.dir.y;
 
-    let t =
-      ((p1.x - p3.x) * (p3.y - p4.y) - (p1.y - p3.y) * (p3.x - p4.x)) / temp;
-    let u =
-      -((p1.x - p2.x) * (p1.y - p3.y) - (p1.y - p2.y) * (p1.x - p3.x)) / temp;
+    let den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
 
-    if (t > 0 && t < 1 && u > 0) {
-      return new Point(p1.x + t * (p2.x - p1.x), p1.y + t * (p2.y - p1.y));
+    if (den == 0 || -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den < 0)
+      return;
+
+    let t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
+
+    if (t > 0 && t < 1) {
+      return new Point(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
     }
 
     return;
@@ -41,6 +50,7 @@ class Ray {
     fill(255);
     push();
     translate(this.pos.x, this.pos.y);
+    stroke(255);
     ellipse(0, 0, 15, 15);
     // line(0, 0, this.dir.x * 20, this.dir.y * 20);
     pop();
