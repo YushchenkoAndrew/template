@@ -6,18 +6,21 @@ class Point {
 }
 
 class Bound {
-  constructor(begin, end, c) {
+  constructor(begin, end, texture, c) {
     this.begin = createVector(begin.x, begin.y);
     this.end = createVector(end.x, end.y);
+
+    this.texture = [];
+    const n = 10;
+    const w = texture.width / n;
+    for (let i = 0; i < n; i++)
+      this.texture.push(texture.get(i * w, 0, w, texture.height));
+
     this.color = c || color(255);
   }
 
   show() {
     stroke(this.color);
     line(this.begin.x, this.begin.y, this.end.x, this.end.y);
-  }
-
-  getTexture(i) {
-    return color(245 * (1 - i / 10) + 10, i, i);
   }
 }

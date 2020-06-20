@@ -38,7 +38,6 @@ class Head {
         if (closestWall >= dist(this.pos.x, this.pos.y, point.x, point.y)) {
           closestWall = dist(this.pos.x, this.pos.y, point.x, point.y);
           wall = bound;
-          // wall.dist = closestWall;
           p = point;
         }
       }
