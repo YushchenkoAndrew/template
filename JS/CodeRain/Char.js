@@ -1,8 +1,10 @@
 class Char {
-  constructor(x, y, vel) {
-    this.x = x;
-    this.y = y;
+  constructor(point, vel, value = undefined) {
+    this.pos = point;
     this.value;
+    this.store = value;
+
+    this.setRandomChar();
 
     this.color = color(100, 255, 20);
 
@@ -17,15 +19,28 @@ class Char {
     this.value = String.fromCharCode(code);
   }
 
-  move() {
-    this.y = this.y >= H ? 0 : this.y + this.vel;
+  move(flag) {
+    this.pos.y = this.pos.y >= H ? 0 : this.pos.y + this.vel;
   }
 
-  show() {
+  show(stopFlag) {
     fill(this.color);
-    text(this.value, this.x, this.y);
+    text(this.value, this.pos.x, this.pos.y);
+
+    if (stopFlag && this.store) {
+      this.value = this.store;
+      return;
+    }
+
     this.move();
 
     if (frameCount % this.switchInterval == 0) this.setRandomChar();
+  }
+}
+
+class Point {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
   }
 }
