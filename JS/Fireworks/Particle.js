@@ -1,8 +1,8 @@
 class Particle {
-  constructor(x, y, vel = -25) {
-    this.pos = createVector(x, y);
-    this.vel = createVector(0, vel);
-    this.gravity = createVector(0, 0.5);
+  constructor(x, y, z, vel = -25) {
+    this.pos = createVector(x, y, z);
+    this.vel = createVector(0, vel, 0);
+    this.gravity = createVector(0, 0.5, 0);
   }
 
   move() {
@@ -11,6 +11,10 @@ class Particle {
   }
 
   show() {
-    ellipse(this.pos.x, this.pos.y, 5, 5);
+    // ellipse(this.pos.x, this.pos.y, 5, 5);
+    push();
+    translate(this.pos.x, this.pos.y, this.pos.z);
+    sphere(5);
+    pop();
   }
 }

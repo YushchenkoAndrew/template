@@ -1,6 +1,6 @@
 class Firework {
-  constructor(x, y, vel, c) {
-    this.particle = new Particle(x, y, vel);
+  constructor(x, y, z, vel, c) {
+    this.particle = new Particle(x, y, z, vel);
     this.color = c || color(255);
 
     this.explodePieces;
@@ -10,16 +10,25 @@ class Firework {
 
   exploding() {
     for (let i = 0; i < random(40, 100); i++) {
-      let p = new Particle(this.particle.pos.x, this.particle.pos.y);
-      p.vel = p5.Vector.random2D().mult(random(5, 12));
+      let p = new Particle(
+        this.particle.pos.x,
+        this.particle.pos.y,
+        this.particle.pos.z
+      );
+      p.vel = p5.Vector.random3D().mult(random(5, 12));
       this.explodePieces.push({ p: p, brDEC: random(2, 10), brightness: 255 });
     }
+  }
+
+  loadSound(sound) {
+    this.sound = sound;
   }
 
   move() {
     if (this.particle.vel.y < 0) this.particle.move();
     else {
       this.explodePieces = [];
+      if (this.sound) this.sound();
       this.exploding();
       this.particle = undefined;
     }
@@ -45,6 +54,11 @@ class Firework {
   }
 
   showPieces() {
+    if (this.sound && frameCount % 15 == 0) {
+      this.sound();
+      this.sound = undefined;
+    }
+
     for (let i = this.explodePieces.length - 1; i >= 0; i--) {
       this.calcBrightness(this.explodePieces[i].brightness);
 
@@ -53,7 +67,7 @@ class Firework {
 
       this.explodePieces[i].brightness -= this.explodePieces[i].brDEC;
 
-      if (this.explodePieces[i].brightness <= 50) {
+      if (this.explodePieces[i].brightness <= 100) {
         this.explodePieces.splice(i, 1);
       }
     }

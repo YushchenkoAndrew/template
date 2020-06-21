@@ -3,9 +3,19 @@ const H = 700;
 
 let fireworks = [];
 
+let angle = 0;
+
+let explosionSound;
+let playFlag = true;
+
+function preload() {
+  soundFormats("mp3", "ogg");
+  explosionSound = loadSound("Fireworks.mp3");
+}
+
 function setup() {
-  createCanvas(W, H);
-  // createCanvas(W, H, WEBGL);
+  // createCanvas(W, H);
+  createCanvas(W, H, WEBGL);
 
   for (let i = 0; i < 10; i++) {
     let c = color(
@@ -13,10 +23,27 @@ function setup() {
       round(random(0, 2555)),
       round(random(0, 255))
     );
-    fireworks.push(new Firework(random(10, W - 10), H, random(-17, -25), c));
+    fireworks.push(
+      new Firework(
+        random(-W / 2, W / 2),
+        H / 2,
+        random(-200, 200),
+        random(-25, -40),
+        c
+      )
+    );
+
+    // if (random(0, 1) >= 0.6)
+    fireworks[i].loadSound(playSound);
   }
 
   noStroke();
+  // translate(-100, -100, -100);
+}
+
+function playSound() {
+  explosionSound.play();
+  playFlag = !playFlag;
 }
 
 function createRandomFirework() {
@@ -25,11 +52,29 @@ function createRandomFirework() {
     round(random(0, 2555)),
     round(random(0, 255))
   );
-  fireworks.push(new Firework(random(10, W - 10), H, random(-17, -25), c));
+
+  let firework = new Firework(
+    random(-W / 2, W / 2),
+    H / 2,
+    random(-200, 200),
+    random(-25, -40),
+    c
+  );
+  fireworks.push(firework);
+  // if (random(0, 1) >= 0.6)
+  firework.loadSound(playSound);
 }
 
 function draw() {
-  background(0, 50);
+  background(0);
+
+  translate(00, H / 2, -1000);
+  // rotateX(PI / 4);
+  // rotateY(PI / 4);
+  // rotateZ(PI / 4);
+  rotateY(angle);
+
+  angle += 0.02;
 
   if (mouseIsPressed) createRandomFirework();
 
