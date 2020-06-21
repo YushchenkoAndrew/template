@@ -1,6 +1,6 @@
 class Firework {
-  constructor(x, y, z, vel, c) {
-    this.particle = new Particle(x, y, z, vel);
+  constructor(x, y, vel, c) {
+    this.particle = new Particle(x, y, vel);
     this.color = c || color(255);
 
     this.explodePieces;
@@ -10,12 +10,8 @@ class Firework {
 
   exploding() {
     for (let i = 0; i < random(40, 100); i++) {
-      let p = new Particle(
-        this.particle.pos.x,
-        this.particle.pos.y,
-        this.particle.pos.z
-      );
-      p.vel = p5.Vector.random3D().mult(random(5, 12));
+      let p = new Particle(this.particle.pos.x, this.particle.pos.y);
+      p.vel = p5.Vector.random2D().mult(random(5, 12));
       this.explodePieces.push({ p: p, brDEC: random(2, 10), brightness: 255 });
     }
   }
