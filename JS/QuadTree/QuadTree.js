@@ -22,9 +22,9 @@ class Rectangle {
     );
   }
 
-  show() {
+  show(color = 255) {
     noFill();
-    stroke(255);
+    stroke(color);
     rect(this.x, this.y, this.w, this.h);
   }
 
