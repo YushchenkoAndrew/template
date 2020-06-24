@@ -7,6 +7,8 @@ class Stream {
 
     this.vel = random(1, 5);
     this.shadowChar = random(2, this.length);
+
+    this.playFlag = false;
   }
 
   createLine(value) {
@@ -21,7 +23,7 @@ class Stream {
       this.createShadowEffect(i);
     }
 
-    if (random(0, 1) > 0.7 || value) this.highlightFirst();
+    if (random(0, 1) > 0.7) this.highlightFirst();
   }
 
   highlightFirst() {
@@ -46,9 +48,10 @@ class Stream {
   }
 
   show(stopFlag) {
-    for (let i = 0; i < this.length; i++) {
-      if (!this.chars[i]) return;
+    if (this.chars[0].store)
+      stopFlag = stopFlag && this.getY() <= H / 2 + textSize();
 
+    for (let i = 0; i < this.chars.length; i++) {
       this.chars[i].show(stopFlag);
 
       if (stopFlag && this.getY(i) >= H - textSize()) this.chars.splice(i, 1);

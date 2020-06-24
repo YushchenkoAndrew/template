@@ -19,7 +19,7 @@ class Char {
     this.value = String.fromCharCode(code);
   }
 
-  move(flag) {
+  move() {
     this.pos.y = this.pos.y >= H ? 0 : this.pos.y + this.vel;
   }
 
@@ -29,6 +29,9 @@ class Char {
 
     if (stopFlag && this.store) {
       this.value = this.store;
+      this.color = color(250, 255, 220);
+      this.pos.y = H / 2;
+
       return;
     }
 
