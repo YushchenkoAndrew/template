@@ -1,13 +1,14 @@
 class Circle {
-  constructor(x, y, index) {
+  constructor(x, y, index, color = 255) {
     this.x = x;
     this.y = y;
     this.index = index;
 
-    this.r = 0.5;
+    this.color = color;
 
-    this.step = random(0.2, 1);
-    // this.step = 0.5;
+    this.r = 2;
+
+    this.step = random(0.1, 1);
 
     this.growing = true;
   }
@@ -17,8 +18,8 @@ class Circle {
   }
 
   show() {
-    stroke(255);
-    noFill();
+    noStroke();
+    fill(this.color);
     ellipse(this.x, this.y, this.r * 2);
   }
 }

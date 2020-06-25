@@ -89,10 +89,10 @@ class QuadTree {
     this.bound.show();
 
     if (this.divided) {
-      this.northWest.show(showPoints);
-      this.northEast.show(showPoints);
-      this.southWest.show(showPoints);
-      this.southEast.show(showPoints);
+      this.northWest.show(showPoints, this.capacity);
+      this.northEast.show(showPoints, this.capacity);
+      this.southWest.show(showPoints, this.capacity);
+      this.southEast.show(showPoints, this.capacity);
     }
 
     if (!showPoints) return;
