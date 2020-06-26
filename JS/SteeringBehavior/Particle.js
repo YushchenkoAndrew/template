@@ -1,13 +1,27 @@
 class Particle {
-  constructor(pos, target) {
+  constructor(pos, target, fontSize = 100) {
     this.pos = pos;
     this.target = target;
     this.vel = p5.Vector.random2D();
     this.acc = createVector();
 
-    this.r = 10;
-    this.maxSpeed = 15;
-    this.maxForce = 2;
+    this.r = fontSize / 10;
+    this.desireR = 0;
+    this.growing = false;
+
+    this.maxSpeed = 40;
+    this.maxForce = 0.5;
+    this.explosionForce = 7;
+    this.maxDist = dist(0, 0, W, H);
+  }
+
+  setFontSize(f) {
+    this.desireR = f / 10;
+    this.growing = true;
+  }
+
+  grow() {
+    this.r += (this.desireR - this.r) / random(100, 200);
   }
 
   move() {
@@ -16,48 +30,55 @@ class Particle {
     this.acc.mult(0);
   }
 
-  applyBehavior() {
-    let mouse = createVector(mouseX, mouseY);
-    let force = this.flee(mouse);
-
-    force.mult(5);
-
+  applyBehavior(exp) {
+    // let force = this.flee(mouse);
+    let force = this.explosion(mouse, exp);
     this.applyForce(force);
 
-    // let force = this.seekTarget();
-    force = this.arrive();
-
+    force = this.seekTarget(this.target);
     this.applyForce(force);
+
+    if (this.growing) this.grow();
   }
 
-  seekTarget() {
-    let direction = p5.Vector.sub(this.target, this.pos);
+  explosion(target, exp) {
+    if (!mouseIsPressed && !exp) return this.emptyV;
+
+    let direction = p5.Vector.sub(target, this.pos);
     direction.setMag(this.maxSpeed);
 
+    if (exp) direction.mult(-1);
+
     let force = p5.Vector.sub(direction, this.vel);
-    force.limit(this.maxForce);
-    return force;
+
+    if (!exp) {
+      const angle = (direction.mag() / this.maxDist) * 6;
+      force.rotate(angle);
+
+      force.limit(this.maxForce / 3);
+    } else force.limit(this.explosionForce);
+
+    return force.mult(5);
   }
+
   flee(target) {
     let direction = p5.Vector.sub(target, this.pos);
 
-    if (direction.mag() < 200) {
-      direction.setMag(this.maxSpeed);
-      direction.mult(-1);
+    if (direction.mag() > 100) return this.emptyV;
 
-      let force = p5.Vector.sub(direction, this.vel);
-      force.limit(this.maxForce);
-      return force;
-    }
+    direction.setMag(this.maxSpeed);
+    direction.mult(-1);
 
-    return createVector(0, 0);
+    let force = p5.Vector.sub(direction, this.vel);
+    force.limit(this.maxForce);
+
+    return force.mult(5);
   }
 
-  arrive() {
-    let direction = p5.Vector.sub(this.target, this.pos);
+  seekTarget(target) {
+    let direction = p5.Vector.sub(target, this.pos);
 
-    const maxDist = dist(0, 0, W, H);
-    const speed = (direction.mag() / maxDist) * this.maxSpeed;
+    const speed = (direction.mag() / this.maxDist) * this.maxSpeed;
 
     direction.setMag(speed);
 
@@ -74,5 +95,14 @@ class Particle {
     fill(255);
     noStroke();
     ellipse(this.pos.x, this.pos.y, this.r);
+  }
+}
+
+class Data {
+  constructor(value, fontSize, y, x) {
+    this.x = x;
+    this.y = y;
+    this.fontSize = fontSize;
+    this.value = value;
   }
 }
