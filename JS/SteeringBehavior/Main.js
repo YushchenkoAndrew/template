@@ -2,7 +2,8 @@ const W = window.innerWidth;
 const H = window.innerHeight;
 
 let f;
-let behavior;
+let inform;
+let central;
 
 let mouse;
 
@@ -16,27 +17,50 @@ function setup() {
   fill(255);
 
   let input = [];
-  input.push(new Data("Press mouse to change Text!", 150, H - 20, W - 400));
+  input.push(
+    new Data("Press and hold mouse to change Text!", 150, H - 20, W - 600)
+  );
   input.push(
     new Data(
-      "When you release mouse You create an explosion",
+      "When you press/release mouse You create a some special effect",
       150,
       H - 20,
-      W - 600
+      W - 800
     )
   );
-  input.push(new Data("So have FUN!!!", 150, H - 20, W - 400));
+  input.push(
+    new Data("Press arrow left/right Key to chang effect", 150, H - 20, W - 700)
+  );
+  input.push(new Data("Explosion", 150, H - 20, W - 300));
+  input.push(new Data("Flee", 150, H - 20, W - 200));
+  input.push(new Data("Magnet", 150, H - 20, W - 200));
+  input.push(new Data("None.", 150, H - 20, W - 200));
+
+  inform = new SteeringBehavior(input, 3);
+
+  input = [];
+
+  input.push(new Data("Welcome", 150));
+  input.push(new Data("Tutorial", 150));
+  input.push(new Data("Have Fun!!", 150));
   input.push(new Data("Made by ..", 150));
+  input.push(new Data("Andrew Y.", 150));
   input.push(new Data("Andrew Y.", 150));
   input.push(new Data("This dude", 72, 100));
 
-  print(input);
+  central = new SteeringBehavior(input);
 
-  behavior = new SteeringBehavior(input);
+  print(input);
 }
 
 function mouseReleased() {
-  behavior.setExplosion();
+  inform.changeData();
+  central.changeData();
+}
+
+function keyPressed() {
+  inform.changeEffect(3);
+  central.changeEffect();
 }
 
 function draw() {
@@ -46,5 +70,6 @@ function draw() {
 
   mouse = createVector(mouseX, mouseY);
 
-  behavior.show();
+  central.show();
+  inform.show();
 }
