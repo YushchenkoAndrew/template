@@ -3,8 +3,8 @@ from PIL import Image
 
 var = sane.init()
 
-devices = var.get_devices()
-print("Devices: " + devices)
+devices = sane.get_devices()
+print("Devices: ", devices)
 
 # Open first device
 dev = sane.open(devices[0][0])

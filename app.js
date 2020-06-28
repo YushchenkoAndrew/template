@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 
-const HOST = "192.168.0.103";
+const HOST = "127.0.0.1";
 const PORT = 8000;
 
 // app.get("/", (req, res) => res.sendFile("index.html", { root: __dirname }));
