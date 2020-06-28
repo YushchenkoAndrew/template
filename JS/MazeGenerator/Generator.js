@@ -1,3 +1,6 @@
+// Algorithm: Recursive backtracker
+// Resource: https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker
+
 class Generator {
   constructor() {
     this.grid = [];
