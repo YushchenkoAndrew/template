@@ -20,6 +20,8 @@ class Generator {
   }
 
   subDivide() {
+    if (this.chamber.w - step < step || this.chamber.h - step < step) return;
+
     let dx = Math.floor(random(step, this.chamber.w - step));
     let dy = Math.floor(random(step, this.chamber.h - step));
 
@@ -34,16 +36,10 @@ class Generator {
     let sw = new Chamber(this.chamber.x, y, dx, h);
     let se = new Chamber(x, y, w, h);
 
-    if (dx >= step && dy >= step)
-      this.chambers["NW"].setValue(new Generator(nw));
-
-    if (w >= step && dy >= step)
-      this.chambers["NE"].setValue(new Generator(ne));
-
-    if (dx >= step && h >= step)
-      this.chambers["SW"].setValue(new Generator(sw));
-
-    if (w >= step && h >= step) this.chambers["SE"].setValue(new Generator(se));
+    this.chambers["NW"].setValue(new Generator(nw));
+    this.chambers["NE"].setValue(new Generator(ne));
+    this.chambers["SW"].setValue(new Generator(sw));
+    this.chambers["SE"].setValue(new Generator(se));
 
     this.divide = true;
   }

@@ -10,13 +10,10 @@ function setup() {
 
   gen = new Generator(new Chamber(0, 0, W, H));
 
+  gen.update();
   //   frameRate(1);
 
   console.log(gen);
-}
-
-function mouseClicked() {
-  gen.update();
 }
 
 function draw() {
