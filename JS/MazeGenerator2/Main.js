@@ -1,7 +1,7 @@
 const W = 700;
 const H = 700;
 
-const step = 50;
+const step = 10;
 
 let gen;
 
@@ -11,7 +11,6 @@ function setup() {
   gen = new Generator(new Chamber(0, 0, W, H));
 
   gen.update();
-  //   frameRate(1);
 
   console.log(gen);
 }
