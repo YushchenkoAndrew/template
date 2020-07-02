@@ -13,14 +13,20 @@ function setup() {
   createCanvas(W, H);
 
   let matrix = [
-    [0, 1, 1, 1],
-    [1, 0, 1, 0],
-    [1, 1, 0, 1],
-    [1, 0, 1, 0],
+    [0, 8, 0, 0, 0, 0, 15, 0],
+    [8, 0, 1, 1, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 5, 2, 2, 0, 0],
+    [0, 0, 0, 5, 0, 0, 0, 0],
+    [0, 0, 0, 2, 0, 0, 30, 3],
+    [15, 0, 0, 0, 0, 30, 0, 0],
+    [0, 0, 0, 0, 0, 3, 0, 2],
   ];
 
   textSize(fontSize);
   graph = new Graph(matrix, 300, 300);
+
+  graph.findPath(0, 7);
 }
 
 function doubleClicked() {
@@ -50,7 +56,10 @@ function mouseClicked() {
 function draw() {
   background(0);
 
-  if (select) graph.pos[node_index] = { x: mouseX, y: mouseY };
+  if (select) {
+    graph.pos[node_index].x = mouseX;
+    graph.pos[node_index].y = mouseY;
+  }
 
   graph.show();
 }
