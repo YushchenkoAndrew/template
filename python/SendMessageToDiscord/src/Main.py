@@ -1,7 +1,7 @@
 import requests #dependency
 import json
 
-url = "https://discordapp.com/api/webhooks/728349508546592788/ALQCrcU3OeeK5RQahzDF5GDj3F2oHPv9qOvnbyyr7IRkZuIx086ScyqaxStzr_GBswaj" #webhook url, from here: https://i.imgur.com/aT3AThK.png
+url = "" #webhook url, from here: https://i.imgur.com/aT3AThK.png
 
 data = {}
 #for all params, see https://discordapp.com/developers/docs/resources/webhook#execute-webhook
