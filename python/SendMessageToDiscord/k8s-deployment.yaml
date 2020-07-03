@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: k8stest-build
+spec:
+  replicas: 1
+  selector:
+    app: k8stest-build
+  template:
+    metadata:
+      labels:
+        app: k8stest-build
+      name: k8stest-build
+    spec:
+      containers:
+      - image: bullshifter/k8stest:demo
+        imagePullPolicy: Always
+        name: k8stest-build

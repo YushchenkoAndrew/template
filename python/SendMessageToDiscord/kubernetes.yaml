@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: discord-messenger-build
+spec:
+  replicas: 1
+  selector:
+    app: discord-messenger-build
+  template:
+    metadata:
+      labels:
+        app: discord-messenger-build
+      name: discord-messenger-build
+    spec:
+      containers:
+      - image: grimreapermortis/discord-messenger:demo
+        imagePullPolicy: Always
+        name: discord-messenger-build
