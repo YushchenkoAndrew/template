@@ -18,8 +18,11 @@ class Node {
     for (let neighbor of neighbors) if (neighbor) this.neighbors.push(neighbor);
   }
 
-  coords() {
-    return [this.j * scaleRow + scaleRow / 2, this.i * scaleCol + scaleCol / 2];
+  coords(shift = 1) {
+    return [
+      this.j * scaleRow + (scaleRow * shift) / 2,
+      this.i * scaleCol + (scaleCol * shift) / 2,
+    ];
   }
 
   show(color = 255) {
