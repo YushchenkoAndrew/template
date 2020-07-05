@@ -17,10 +17,11 @@ class PathFinding {
     this.end = this.grid[goal.i][goal.j];
     this.end.wall = false;
 
-    this.grid[start.i][start.j].g = 0;
-    this.grid[start.i][start.j].wall = false;
+    this.start = this.grid[start.i][start.j];
+    this.start.g = 0;
+    this.start.wall = false;
 
-    this.openSet = [this.grid[start.i][start.j]];
+    this.openSet = [this.start];
     this.closeSet = [];
   }
 
