@@ -1,3 +1,5 @@
+// Source: https://en.wikipedia.org/wiki/A*_search_algorithm#Pseudocode
+
 class PathFinding {
   constructor(start = { i: 0, j: 0 }, goal = { i: 1, j: 1 }) {
     this.grid = [];
@@ -85,9 +87,9 @@ class PathFinding {
       neighbor.h = this.h(neighbor, this.end);
       neighbor.f = neighbor.g + neighbor.h;
 
-      if (!this.openSet.includes(neighbor)) this.openSet.push(neighbor);
-
       neighbor.prev = current;
+
+      if (!this.openSet.includes(neighbor)) this.openSet.push(neighbor);
     }
 
     this.path = [];
@@ -128,14 +130,8 @@ class PathFinding {
   }
 
   showPath() {
-    // strokeWeight(scaleRow / 2);
-    // stroke(250, 0, 150);
-    // noFill();
-    // beginShape();
     for (let node of this.path) {
       node.show(color(0, 0, 255));
-      // vertex(...node.coords());
     }
-    // endShape();
   }
 }
