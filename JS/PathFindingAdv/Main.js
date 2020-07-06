@@ -3,9 +3,11 @@ const H = 700;
 
 const R = 15;
 
+const rate = W / H;
+
 const row = 40;
-const col = 40;
-const step = H / 20;
+const col = rate * row;
+const step = (H * 2) / row;
 
 const div = (row * step) / H;
 
@@ -51,8 +53,8 @@ function mouseClicked() {
 function draw() {
   background(0);
 
-  mouseCoords.i = Math.floor(((mouseY + scaleRow / 2) / H) * col);
-  mouseCoords.j = Math.floor(((mouseX + scaleCol / 2) / W) * row);
+  mouseCoords.i = Math.floor(((mouseY + scaleRow / 2) / H) * row);
+  mouseCoords.j = Math.floor(((mouseX + scaleCol / 2) / W) * col);
 
   map.show();
 

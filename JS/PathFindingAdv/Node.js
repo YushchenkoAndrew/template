@@ -20,14 +20,14 @@ class Node {
 
   coords(shift = 1) {
     return [
-      this.j * scaleRow + (scaleRow * shift) / 2,
-      this.i * scaleCol + (scaleCol * shift) / 2,
+      this.j * scaleCol + (scaleCol * shift) / 2,
+      this.i * scaleRow + (scaleRow * shift) / 2,
     ];
   }
 
   show(color = 255) {
     noStroke();
     fill(this.wall ? 0 : color);
-    ellipse(...this.coords(0), scaleCol, scaleRow);
+    ellipse(...this.coords(), scaleCol, scaleRow);
   }
 }
