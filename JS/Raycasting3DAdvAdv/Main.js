@@ -61,9 +61,9 @@ function mouseClicked() {
 
   current = 1;
 
-  console.log(scene.head.pos);
+  // console.log(scene.head.pos);
 
-  console.log(start);
+  // console.log(start);
 
   end = {
     i: mouseCoords.i,
@@ -88,8 +88,10 @@ function draw() {
     path.show();
 
     if (current < path.path.length) {
+      let index = Math.floor(current - 2);
+
       current = !scene.moveAI(
-        path.path[Math.floor(current - 1)],
+        index >= 0 ? path.path[index] : undefined,
         path.path[Math.floor(current)]
       )
         ? current

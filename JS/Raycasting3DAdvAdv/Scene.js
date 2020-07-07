@@ -62,39 +62,27 @@ class Scene {
     }
   }
 
-  moveAI(prev, curr) {
+  moveAI(prevMove, curr) {
     let next = createVector(...curr.coords(0));
     let dir = this.step.copy();
 
-    let rotation = p5.Vector.sub(this.head.pos, next);
-    let prevRot = p5.Vector.sub(next, createVector(...prev.coords(0)));
+    let rotation = p5.Vector.sub(next, this.head.pos);
+    let prev;
+
+    if (prevMove)
+      prev = p5.Vector.sub(this.head.pos, createVector(...prevMove.coords(0)));
+    else prev = createVector(0, 0);
 
     if (!rotation.mag()) return true;
 
     rotation.normalize();
-    prevRot.normalize();
+    if (prevMove) prev.normalize();
     dir.normalize();
 
-    // console.log(dir);
-    // console.log(rotation);
-
-    dir.sub(rotation);
-    // dir.normalize();
-
-    // console.log(dir);
-
-    // console.log(dir.mag());
+    dir.add(rotation);
 
     if (dir.mag() > 0.01) {
-      // dir.rotate(PI / 4);
-
-      // console.log(prevRot);
-
-      let rot;
-
-      rot = rotation.y;
-
-      if (!rot) rot = -rotation.x;
+      let rot = (rotation.y + rotation.x) * (prev.x || -prev.y || 1);
 
       this.head.rotate((PI / 64) * rot);
       this.step.rotate((PI / 64) * rot);
