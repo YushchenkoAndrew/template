@@ -1,4 +1,17 @@
 class Matrix {
+  add(A, B) {
+    if (A.length != B.length || A[0].length != B[0].length) return;
+
+    let result = [];
+
+    for (let i in A) {
+      result.push([]);
+      for (let j in B) result[i][j] = A[i][j] + B[i][j];
+    }
+
+    return result;
+  }
+
   mult(A, B) {
     if (A[0].length != B.length) return;
 
@@ -72,7 +85,7 @@ class Matrix {
     return result;
   }
 
-  rotationMatrixOW(angle, dimension = 4) {
+  rotationMatrixZW(angle, dimension = 4) {
     let result = matrix.diagonalMatrix(dimension);
 
     result[2][2] = Math.cos(angle);
@@ -80,6 +93,30 @@ class Matrix {
 
     result[2][3] = Math.sin(angle);
     result[3][2] = -Math.sin(angle);
+
+    return result;
+  }
+
+  rotationMatrixYW(angle, dimension = 4) {
+    let result = matrix.diagonalMatrix(dimension);
+
+    result[1][1] = Math.cos(angle);
+    result[3][3] = Math.cos(angle);
+
+    result[1][3] = Math.sin(angle);
+    result[3][1] = -Math.sin(angle);
+
+    return result;
+  }
+
+  rotationMatrixXW(angle, dimension = 4) {
+    let result = matrix.diagonalMatrix(dimension);
+
+    result[0][0] = Math.cos(angle);
+    result[3][3] = Math.cos(angle);
+
+    result[0][3] = Math.sin(angle);
+    result[3][0] = -Math.sin(angle);
 
     return result;
   }

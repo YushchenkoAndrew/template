@@ -1,6 +1,7 @@
 class HigherDimension {
   constructor() {
     this.points = [];
+    this.projection = [];
 
     for (let i = 0; i < 16; i++) {
       let x = R * (i & 1 ? -1 : 1);
@@ -19,55 +20,84 @@ class HigherDimension {
     }
   }
 
-  convertTo3D() {
-    stroke(255);
-    strokeWeight(32);
+  convertTo3D(points) {
+    for (let i in points) {
+      // Transformation Matrix
+      let T = matrix.diagonalMatrix(4, (SIZE * R) / (R * 4 - points[i].w));
+      T.splice(3, 1);
 
-    for (let p of this.points) {
-      let A = matrix.diagonalMatrix(4, 1 / (W / 2 - p.w));
+      if (!this.projection[i]) this.projection[i] = new Vector4D();
 
-      let vector = matrix.mult(A, p.getVector());
-
-      point(vector[0][0] * R * 4, vector[1][0] * R * 4, vector[2][0] * R * 4);
+      this.projection[i].setVector(matrix.mult(T, points[i].getVector()));
     }
-
-    strokeWeight(1);
   }
 
-  showBorder() {
-    fill(255, 10);
-    stroke(255);
+  convertTo2D(points) {
+    for (let i in points) {
+      // Transformation matrix
+      let T = matrix.diagonalMatrix(3, (SIZE * R) / (R * 4 - points[i].z));
+      T.splice(2, 1);
 
-    for (let i = 0; i < 4; i++) {
-      //   createSquare(this.points[i], this.points[(i + 1) % 4]);
-      //   createSquare(this.points[i + 4], this.points[((i + 1) % 4) + 4]);
-      //   createSquare(this.points[i], this.points[i + 4]);
-      createSquare(this.points[i], this.points[i + 4]);
-      createSquare(this.points[i], this.points[i + 4]);
+      if (!this.projection[i]) this.projection[i] = new Vector4D();
 
-      //   createSquare(this.points[(i % 2) + 4], this.points[(i % 4) + 4]);
-      //   createSquare(this.points[i], this.points[i + 4]);
+      this.projection[i].setVector(matrix.mult(T, points[i].getVector()));
+    }
+  }
+
+  showBorder(points) {
+    drawCube(points.slice(0, 8));
+    drawCube(points.slice(8));
+
+    drawCube([...points.slice(0, 4), ...points.slice(8, 12)]);
+    drawCube([...points.slice(4, 8), ...points.slice(12)]);
+
+    drawCube([...getEven(0, 16)]);
+    drawCube([...getEven(0, 16, 1)]);
+
+    drawCube([...getEven(0, 16, 0, 4), ...getEven(0, 16, 1, 4)]);
+    drawCube([...getEven(0, 16, 2, 4), ...getEven(0, 16, 3, 4)]);
+
+    function getEven(start, end, offset = 0, step = 2) {
+      let result = [];
+
+      for (let i = start; i < end; i += step) result.push(points[i + offset]);
+
+      return result;
     }
 
-    function createSquare(...points) {
+    function drawCube(points) {
+      drawSquare(points[0], points[1], points[3], points[2]);
+      drawSquare(points[0], points[1], points[5], points[4]);
+
+      drawSquare(points[4], points[5], points[7], points[6]);
+      drawSquare(points[2], points[3], points[7], points[6]);
+
+      drawSquare(points[1], points[3], points[7], points[5]);
+      drawSquare(points[0], points[2], points[6], points[4]);
+    }
+
+    function drawSquare(...point) {
+      stroke(255);
+      fill(255, 15);
       beginShape();
 
-      for (let p of points) vertex(...p.coords());
+      for (let p of point) vertex(...p.coords2D());
 
-      endShape();
+      endShape(CLOSE);
     }
   }
 
   show() {
-    stroke(255);
-    strokeWeight(32);
+    this.projection = [];
+    this.convertTo3D(this.points);
+    this.convertTo2D(this.projection);
 
-    // for (let p of this.points) {
-    //   point(p.x, p.y, p.z);
-    // }
+    fill(255);
 
-    strokeWeight(1);
+    for (let p of this.projection) {
+      circle(...p.coords2D(), 10);
+    }
 
-    this.showBorder();
+    this.showBorder(this.projection);
   }
 }
