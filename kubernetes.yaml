@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: webserver
-          image: grimreapermortis/webserver:demo
+          image: grimreapermortis/webserver:1.0.0
           ports:
             - containerPort: 8000
           imagePullPolicy: Always
