@@ -88,6 +88,8 @@ class Matrix {
   rotationMatrixZW(angle, dimension = 4) {
     let result = matrix.diagonalMatrix(dimension);
 
+    if (dimension < 4) return result;
+
     result[2][2] = Math.cos(angle);
     result[3][3] = Math.cos(angle);
 
@@ -100,6 +102,8 @@ class Matrix {
   rotationMatrixYW(angle, dimension = 4) {
     let result = matrix.diagonalMatrix(dimension);
 
+    if (dimension < 4) return result;
+
     result[1][1] = Math.cos(angle);
     result[3][3] = Math.cos(angle);
 
@@ -111,6 +115,8 @@ class Matrix {
 
   rotationMatrixXW(angle, dimension = 4) {
     let result = matrix.diagonalMatrix(dimension);
+
+    if (dimension < 4) return result;
 
     result[0][0] = Math.cos(angle);
     result[3][3] = Math.cos(angle);
