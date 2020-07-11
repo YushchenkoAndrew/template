@@ -22,8 +22,10 @@ function setup() {
   createCanvas(W, H);
 
   dimension = new HigherDimension();
-  // dimension.createEuclideanSpace(200, 200);
+  // dimension.createEuclideanSpace();
   dimension.createSphericalSpace();
+
+  dimension.drawLine();
 
   console.log(dimension.points);
 
@@ -91,12 +93,18 @@ function draw() {
   // angle += 0.05;
   //   rotateY(angle);
 
-  // if (frameCount % 100 == 0) {
+  // if (frameCount % 50 == 0) {
   //   dimension.points = [];
 
-  //   if (Math.floor(frameCount / 100) % 2 == 0)
+  //   if (Math.floor(frameCount / 50) % 2 == 0) {
   //     dimension.createEuclideanSpace(200, 200);
-  //   else dimension.createSphericalSpace();
+
+  //     console.log(`Euclidean ${dimension.points.length}`);
+  //   } else {
+  //     dimension.createSphericalSpace();
+
+  //     console.log(`Spherical ${dimension.points.length}`);
+  //   }
   // }
 
   mousePos.x = mouseX;

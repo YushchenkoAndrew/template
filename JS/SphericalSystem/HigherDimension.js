@@ -26,25 +26,41 @@ class HigherDimension {
     }
   }
 
-  createEuclideanSpace(width = 50, height = 50) {
-    let x = 25 / width;
-    let y = 25 / height;
+  createEuclideanSpace() {
+    const step = 20;
 
-    for (let i = -1; i < 1; i += y) {
-      for (let j = -1; j < 1; j += x) {
+    let dx = step / 200;
+    let dy = step / 200;
+
+    this.width = 2 / dx;
+    this.height = 2 / dy;
+
+    console.log(`${this.width} -- ${this.height}`);
+
+    for (let i = -1; i < 1; i += dy) {
+      for (let j = -1; j < 1; j += dx) {
         this.points.push(new Vector4D(j * 10, i * 10, 0));
       }
+    }
+
+    // console.log(height / step);
+
+    if (Math.round(height / 10 / step)) {
+      this.height++;
+
+      for (let j = -1; j < 1; j += dx)
+        this.points.push(new Vector4D(j * 10, 10, 0));
     }
   }
 
   createSphericalSpace() {
-    // let x = 25 / width;
-    // let y = 25 / height;
-
     const p = 10;
     let dx = 10 / 200;
 
-    for (let i = 0; i < 1; i += dx) {
+    this.width = 1 / dx;
+    this.height = 1 / dx;
+
+    for (let i = 0; i < 1 + dx; i += dx) {
       for (let j = 0; j < 1; j += dx) {
         let x = p * Math.sin(i * PI) * Math.cos(j * 2 * PI);
         let y = p * Math.sin(i * PI) * Math.sin(j * 2 * PI);
@@ -55,12 +71,27 @@ class HigherDimension {
     }
   }
 
+  drawLine() {
+    this.line = [];
+
+    const step = 20 / 200;
+
+    for (let i = -1; i < 1; i += step)
+      this.line.push(new Vector4D(0, i * 10, 0));
+  }
+
   rotate(rotationFunction, angle) {
     let rotationMatrix4D = rotationFunction.call(matrix, angle, 3);
 
     for (let i in this.points) {
       this.points[i].setVector(
         matrix.mult(rotationMatrix4D, this.points[i].getVector())
+      );
+    }
+
+    for (let i in this.line) {
+      this.line[i].setVector(
+        matrix.mult(rotationMatrix4D, this.line[i].getVector())
       );
     }
 
@@ -110,41 +141,24 @@ class HigherDimension {
   }
 
   showSpace(points) {
-    const height = 20;
-    const width = 20;
-
     stroke(255);
     fill(255, 40);
 
-    for (let i = 0; i < height - 1; i++) {
-      for (let j = 0; j < width - 1; j++) {
-        drawSquare(i, j);
+    for (let i = 0; i < this.height; i++) {
+      for (let j = 0; j < this.width - 1; j++) {
+        drawSquare.call(this, i, j);
       }
 
-      drawSquare(i, width - 1, 0);
-
-      // beginShape();
-
-      // vertex(...points[i * height].coords2D());
-      // vertex(...points[(i + 1) * height].coords2D());
-      // // // endShape(CLOSE);
-      // // // beginShape();
-
-      // vertex(...points[width - 1 + (i + 1) * height].coords2D());
-      // vertex(...points[width - 1 + i * height].coords2D());
-
-      // // vertex(...points[width / 2 - 1 + (i + 1) * height].coords2D());
-
-      // endShape(CLOSE);
+      drawSquare.call(this, i, this.width - 1, 0);
     }
 
     function drawSquare(i, j, k = 1) {
       beginShape();
 
-      vertex(...points[j + i * height].coords2D());
-      vertex(...points[j * k + k + i * height].coords2D());
-      vertex(...points[j * k + k + (i + 1) * height].coords2D());
-      vertex(...points[j + (i + 1) * height].coords2D());
+      vertex(...points[j + i * this.height].coords2D());
+      vertex(...points[j * k + k + i * this.height].coords2D());
+      vertex(...points[j * k + k + (i + 1) * this.height].coords2D());
+      vertex(...points[j + (i + 1) * this.height].coords2D());
 
       endShape(CLOSE);
     }
@@ -268,7 +282,11 @@ class HigherDimension {
   }
 
   show() {
+    this.showAxis();
+
     let resizedPoints = [];
+
+    let line = [];
 
     for (let i in this.points) {
       resizedPoints[i] = new Vector4D();
@@ -283,7 +301,7 @@ class HigherDimension {
 
     let projection = this.convertTo2D(resizedPoints);
 
-    this.showSpace(projection);
+    if (projection.length != 0) this.showSpace(projection);
 
     fill(255);
 
@@ -291,8 +309,22 @@ class HigherDimension {
       circle(...p.coords2D(), R / 50);
     }
 
-    // this.showBorder(this.projection);
+    for (let i in this.line) {
+      line[i] = new Vector4D();
 
-    this.showAxis();
+      line[i].setVector(
+        matrix.mult(matrix.diagonalMatrix(3, R / 10), this.line[i].getVector())
+      );
+    }
+
+    line = this.convertTo2D(line);
+
+    fill(color(255, 0, 0));
+
+    for (let p of line) {
+      circle(...p.coords2D(), R / 30);
+    }
+
+    // this.showBorder(this.projection);
   }
 }
