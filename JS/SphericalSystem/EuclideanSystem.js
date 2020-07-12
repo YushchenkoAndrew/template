@@ -46,7 +46,7 @@ class EuclideanSystem {
     }
   }
 
-  drawLine() {
+  drawLine(coords) {
     // this.points = [];
 
     const step = 20 / 200;

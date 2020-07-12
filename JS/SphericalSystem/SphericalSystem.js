@@ -39,13 +39,20 @@ class SphericalSystem {
     }
   }
 
-  drawLine() {
+  drawLine(coords) {
     // this.points = [];
 
-    const step = 20 / 200;
+    const p = 10;
+    let dx = 10 / 200;
 
-    for (let i = -1; i < 1; i += step)
-      this.points.push(new Vector4D(0, i * 10, 0));
+    // for (let i = 0; i < 1 + dx; i += dx) {
+    for (let j = 0; j < 1; j += dx) {
+      let x = p * Math.sin(dx * 8 * PI) * Math.cos(j * 2 * PI);
+      let y = p * Math.sin(dx * 8 * PI) * Math.sin(j * 2 * PI);
+      let z = p * Math.cos(dx * 8 * PI);
+
+      this.points.push(new Vector4D(x, y, z));
+    }
 
     return this.points;
   }

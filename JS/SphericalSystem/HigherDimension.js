@@ -3,12 +3,15 @@ class HigherDimension {
     this.points = [];
 
     this.system = system;
-    let size = this.system.createPlane();
 
-    this.width = size.w;
-    this.height = size.h;
+    if (this.system) {
+      let size = this.system.createPlane();
 
-    // this.system.drawLine();
+      this.width = size.w;
+      this.height = size.h;
+
+      this.system.drawLine();
+    }
 
     this.axis = [];
     // this.axisProjection = [];
@@ -245,16 +248,6 @@ class HigherDimension {
     }
 
     projection = this.convertTo2D(this.system.resize(this.system.points));
-
-    // for (let i in this.line) {
-    //   line[i] = new Vector4D();
-
-    //   line[i].setVector(
-    //     matrix.mult(matrix.diagonalMatrix(3, R / 10), this.line[i].getVector())
-    //   );
-    // }
-
-    // line = this.convertTo2D(line);
 
     fill(color(255, 0, 0));
 
