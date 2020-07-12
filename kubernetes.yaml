@@ -8,7 +8,7 @@ spec:
   externalIPs:
   - 192.168.0.104
   ports:
-    - port: 8000
+    - port: 80
       targetPort: 8000
   type: LoadBalancer
 ---
