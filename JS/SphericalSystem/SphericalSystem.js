@@ -1,4 +1,4 @@
-class EuclideanSystem {
+class SphericalSystem {
   constructor() {
     this.plane = [];
 
@@ -6,28 +6,21 @@ class EuclideanSystem {
   }
 
   createPlane() {
-    const step = 20;
+    const p = 10;
+    let dx = 10 / 200;
 
-    let dx = step / 200;
-    let dy = step / 200;
+    this.width = 1 / dx;
+    this.height = 1 / dx;
 
-    this.width = 2 / dx;
-    this.height = 2 / dy;
+    for (let i = 0; i < 1 + dx; i += dx) {
+      for (let j = 0; j < 1; j += dx) {
+        let x = p * Math.sin(i * PI) * Math.cos(j * 2 * PI);
+        let y = p * Math.sin(i * PI) * Math.sin(j * 2 * PI);
+        let z = p * Math.cos(i * PI);
 
-    for (let i = -1; i < 1; i += dy) {
-      for (let j = -1; j < 1; j += dx) {
-        this.plane.push(new Vector4D(j * 10, i * 10, 0));
+        this.plane.push(new Vector4D(x, y, z));
       }
     }
-
-    if (Math.round(height / 10 / step)) {
-      this.height++;
-
-      for (let j = -1; j < 1; j += dx)
-        this.plane.push(new Vector4D(j * 10, 10, 0));
-    }
-
-    console.log(this.plane);
 
     return { w: this.width, h: this.height };
   }

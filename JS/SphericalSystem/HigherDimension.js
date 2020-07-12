@@ -1,7 +1,14 @@
 class HigherDimension {
-  constructor() {
+  constructor(system) {
     this.points = [];
-    // this.projection = [];
+
+    this.system = system;
+    let size = this.system.createPlane();
+
+    this.width = size.w;
+    this.height = size.h;
+
+    // this.system.drawLine();
 
     this.axis = [];
     // this.axisProjection = [];
@@ -26,60 +33,6 @@ class HigherDimension {
     }
   }
 
-  createEuclideanSpace() {
-    const step = 20;
-
-    let dx = step / 200;
-    let dy = step / 200;
-
-    this.width = 2 / dx;
-    this.height = 2 / dy;
-
-    console.log(`${this.width} -- ${this.height}`);
-
-    for (let i = -1; i < 1; i += dy) {
-      for (let j = -1; j < 1; j += dx) {
-        this.points.push(new Vector4D(j * 10, i * 10, 0));
-      }
-    }
-
-    // console.log(height / step);
-
-    if (Math.round(height / 10 / step)) {
-      this.height++;
-
-      for (let j = -1; j < 1; j += dx)
-        this.points.push(new Vector4D(j * 10, 10, 0));
-    }
-  }
-
-  createSphericalSpace() {
-    const p = 10;
-    let dx = 10 / 200;
-
-    this.width = 1 / dx;
-    this.height = 1 / dx;
-
-    for (let i = 0; i < 1 + dx; i += dx) {
-      for (let j = 0; j < 1; j += dx) {
-        let x = p * Math.sin(i * PI) * Math.cos(j * 2 * PI);
-        let y = p * Math.sin(i * PI) * Math.sin(j * 2 * PI);
-        let z = p * Math.cos(i * PI);
-
-        this.points.push(new Vector4D(x, y, z));
-      }
-    }
-  }
-
-  drawLine() {
-    this.line = [];
-
-    const step = 20 / 200;
-
-    for (let i = -1; i < 1; i += step)
-      this.line.push(new Vector4D(0, i * 10, 0));
-  }
-
   rotate(rotationFunction, angle) {
     let rotationMatrix4D = rotationFunction.call(matrix, angle, 3);
 
@@ -89,12 +42,7 @@ class HigherDimension {
       );
     }
 
-    for (let i in this.line) {
-      this.line[i].setVector(
-        matrix.mult(rotationMatrix4D, this.line[i].getVector())
-      );
-    }
-
+    this.system.rotate(rotationFunction, angle);
     rotateAxis.apply(this);
 
     function rotateAxis() {
@@ -284,24 +232,11 @@ class HigherDimension {
   show() {
     this.showAxis();
 
-    let resizedPoints = [];
+    let projection = this.convertTo2D(this.system.resize(this.system.plane));
 
-    let line = [];
+    // if (projection.length != 0) this.showSpace(projection);
 
-    for (let i in this.points) {
-      resizedPoints[i] = new Vector4D();
-
-      resizedPoints[i].setVector(
-        matrix.mult(
-          matrix.diagonalMatrix(3, R / 10),
-          this.points[i].getVector()
-        )
-      );
-    }
-
-    let projection = this.convertTo2D(resizedPoints);
-
-    if (projection.length != 0) this.showSpace(projection);
+    this.showSpace(projection);
 
     fill(255);
 
@@ -309,19 +244,21 @@ class HigherDimension {
       circle(...p.coords2D(), R / 50);
     }
 
-    for (let i in this.line) {
-      line[i] = new Vector4D();
+    projection = this.convertTo2D(this.system.resize(this.system.points));
 
-      line[i].setVector(
-        matrix.mult(matrix.diagonalMatrix(3, R / 10), this.line[i].getVector())
-      );
-    }
+    // for (let i in this.line) {
+    //   line[i] = new Vector4D();
 
-    line = this.convertTo2D(line);
+    //   line[i].setVector(
+    //     matrix.mult(matrix.diagonalMatrix(3, R / 10), this.line[i].getVector())
+    //   );
+    // }
+
+    // line = this.convertTo2D(line);
 
     fill(color(255, 0, 0));
 
-    for (let p of line) {
+    for (let p of projection) {
       circle(...p.coords2D(), R / 30);
     }
 

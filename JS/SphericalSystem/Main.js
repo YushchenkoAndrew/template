@@ -21,11 +21,11 @@ let mouse;
 function setup() {
   createCanvas(W, H);
 
-  dimension = new HigherDimension();
+  dimension = new HigherDimension(new SphericalSystem());
   // dimension.createEuclideanSpace();
-  dimension.createSphericalSpace();
+  // dimension.createSphericalSpace();
 
-  dimension.drawLine();
+  // dimension.drawLine();
 
   console.log(dimension.points);
 
