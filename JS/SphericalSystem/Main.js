@@ -21,30 +21,27 @@ let mouse;
 function setup() {
   createCanvas(W, H);
 
+  matrix = new Matrix();
+
+  // dimension = new HigherDimension(new EuclideanSystem());
   dimension = new HigherDimension(new SphericalSystem());
-  // dimension.createEuclideanSpace();
-  // dimension.createSphericalSpace();
 
   // dimension.drawLine();
 
   console.log(dimension.points);
 
-  matrix = new Matrix();
-
-  selectedAxis.x.isSelected = true;
+  selectedAxis.x.isSelected = false;
   selectedAxis.x.rotationMatrix = matrix.rotationMatrixOX;
 
   selectedAxis.y.isSelected = true;
   selectedAxis.y.rotationMatrix = matrix.rotationMatrixOY;
 
-  selectedAxis.z.isSelected = true;
+  selectedAxis.z.isSelected = false;
   selectedAxis.z.rotationMatrix = matrix.rotationMatrixOZ;
 
   mouse = new MouseControl();
 
-  // hypercube.rotate(matrix.rotationMatrixOW(PI / 2));
-
-  // hypercube.rotate(matrix.rotationMatrixOX(PI / 6, 4));
+  // dimension.rotate(matrix.rotationMatrixOX, PI / 4);
   // hypercube.rotate(matrix.rotationMatrixOY(PI / 6, 4));
   // hypercube.rotate(matrix.rotationMatrixOZ(-PI / 2, 4));
   angle = 0.01;
@@ -64,6 +61,9 @@ function draw() {
   background(0);
 
   translate(W / 2, H / 2);
+
+  // Press 'q' for continue autorotation
+  if (keyIsDown(81)) autoRotation = true;
 
   // hypercube.rotate(matrix.rotationMatrixOY(-PI / 6, 4));
 

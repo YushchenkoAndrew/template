@@ -2,6 +2,9 @@ class EuclideanSystem {
   constructor() {
     this.plane = [];
 
+    // Transformation Matrix
+    this.T;
+
     this.points = [];
   }
 
@@ -36,7 +39,11 @@ class EuclideanSystem {
     let rotationMatrix = rotationFunction.call(matrix, angle, 3);
 
     this.plane = update(this.plane);
-    this.points = update(this.points);
+    for (let i in this.points) this.points[i] = update(this.points[i]);
+
+    // Save all Transformations
+    if (!this.T) this.T = rotationFunction.call(matrix, angle);
+    else this.T = matrix.mult(rotationFunction.call(matrix, angle), this.T);
 
     function update(points) {
       for (let i in points) {
@@ -47,12 +54,25 @@ class EuclideanSystem {
   }
 
   drawLine(coords) {
-    // this.points = [];
-
     const step = 20 / 200;
 
+    let x = ((coords.x - W / 2) / R) * 12.5;
+    let y = ((coords.y - H / 2) / R) * 12.5;
+
+    // y *= this.T[1][0] < 0 || this.T[0][1] < 0 ? -1 : 1;
+
+    let temp = matrix.mult(this.T, [[x], [y], [1]]);
+
+    this.points[0] = [];
+
     for (let i = -1; i < 1; i += step)
-      this.points.push(new Vector4D(0, i * 10, 0));
+      this.points[0].push(new Vector4D(temp[0][0], i * 10, 0));
+
+    for (let i in this.points[0]) {
+      this.points[0][i].setVector(
+        matrix.mult(this.T, this.points[0][i].getVector())
+      );
+    }
 
     return this.points;
   }

@@ -10,7 +10,7 @@ class HigherDimension {
       this.width = size.w;
       this.height = size.h;
 
-      this.system.drawLine();
+      // this.system.drawLine();
     }
 
     this.axis = [];
@@ -247,13 +247,28 @@ class HigherDimension {
       circle(...p.coords2D(), R / 50);
     }
 
-    projection = this.convertTo2D(this.system.resize(this.system.points));
+    this.system.drawLine({ x: mouseX, y: mouseY });
 
+    projection = this.convertTo2D(this.system.resize(this.system.points[0]));
+
+    noStroke();
     fill(color(255, 0, 0));
 
     for (let p of projection) {
       circle(...p.coords2D(), R / 30);
     }
+
+    noFill();
+    stroke(color(255, 0, 0));
+    strokeWeight(4);
+
+    beginShape();
+
+    for (let p of projection) vertex(...p.coords2D());
+
+    endShape(CLOSE);
+
+    strokeWeight(1);
 
     // this.showBorder(this.projection);
   }
