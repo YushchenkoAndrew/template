@@ -2,10 +2,13 @@ class EuclideanSystem {
   constructor() {
     this.plane = [];
 
+    this.dx = 20 / 200;
+
     // Transformation Matrix
     this.T;
 
     this.points = [];
+    this.index = 0;
   }
 
   createPlane() {
@@ -59,18 +62,22 @@ class EuclideanSystem {
     let x = ((coords.x - W / 2) / R) * 12.5;
     let y = ((coords.y - H / 2) / R) * 12.5;
 
-    // y *= this.T[1][0] < 0 || this.T[0][1] < 0 ? -1 : 1;
+    let temp = new Vector4D();
 
-    let temp = matrix.mult(this.T, [[x], [y], [1]]);
+    temp.setVector(matrix.mult(this.T, [[x], [y], [1]]));
 
-    this.points[0] = [];
+    // console.log(temp);
 
-    for (let i = -1; i < 1; i += step)
-      this.points[0].push(new Vector4D(temp[0][0], i * 10, 0));
+    this.points[this.index] = [];
 
-    for (let i in this.points[0]) {
-      this.points[0][i].setVector(
-        matrix.mult(this.T, this.points[0][i].getVector())
+    let j = 0;
+
+    for (let i = -1; i < 1; i += this.dx) {
+      this.points[this.index].push(new Vector4D(temp.x, i * 10, 0));
+
+      // for (let i in this.points[this.0
+      this.points[this.index][j].setVector(
+        matrix.mult(this.T, this.points[this.index][j++].getVector())
       );
     }
 

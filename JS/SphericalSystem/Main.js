@@ -23,14 +23,14 @@ function setup() {
 
   matrix = new Matrix();
 
-  // dimension = new HigherDimension(new EuclideanSystem());
-  dimension = new HigherDimension(new SphericalSystem());
+  dimension = new HigherDimension(new EuclideanSystem());
+  // dimension = new HigherDimension(new SphericalSystem());
 
   // dimension.drawLine();
 
   console.log(dimension.points);
 
-  selectedAxis.x.isSelected = false;
+  selectedAxis.x.isSelected = true;
   selectedAxis.x.rotationMatrix = matrix.rotationMatrixOX;
 
   selectedAxis.y.isSelected = true;
@@ -41,7 +41,7 @@ function setup() {
 
   mouse = new MouseControl();
 
-  // dimension.rotate(matrix.rotationMatrixOX, PI / 4);
+  // dimension.rotate(matrix.rotationMatrixOX, PI);
   // hypercube.rotate(matrix.rotationMatrixOY(PI / 6, 4));
   // hypercube.rotate(matrix.rotationMatrixOZ(-PI / 2, 4));
   angle = 0.01;
@@ -57,10 +57,17 @@ function mouseWheel(event) {
   mouse.resize(event.delta);
 }
 
+function doubleClicked() {
+  mouse.newLine();
+  console.log("Yep");
+}
+
 function draw() {
   background(0);
 
   translate(W / 2, H / 2);
+
+  mouse.rotateLine();
 
   // Press 'q' for continue autorotation
   if (keyIsDown(81)) autoRotation = true;

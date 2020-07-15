@@ -249,24 +249,26 @@ class HigherDimension {
 
     this.system.drawLine({ x: mouseX, y: mouseY });
 
-    projection = this.convertTo2D(this.system.resize(this.system.points[0]));
+    for (let i in this.system.points) {
+      projection = this.convertTo2D(this.system.resize(this.system.points[i]));
 
-    noStroke();
-    fill(color(255, 0, 0));
+      // noStroke();
+      stroke(color(255, 0, 0));
+      noFill();
+      // fill(color(255, 0, 0));
+      strokeWeight(4);
+      beginShape();
 
-    for (let p of projection) {
-      circle(...p.coords2D(), R / 30);
+      for (let p of projection) {
+        circle(...p.coords2D(), R / 30);
+        vertex(...p.coords2D());
+      }
+      endShape(CLOSE);
     }
+    // noFill();
+    // stroke(color(255, 0, 0));
 
-    noFill();
-    stroke(color(255, 0, 0));
-    strokeWeight(4);
-
-    beginShape();
-
-    for (let p of projection) vertex(...p.coords2D());
-
-    endShape(CLOSE);
+    // for (let p of projection) );
 
     strokeWeight(1);
 

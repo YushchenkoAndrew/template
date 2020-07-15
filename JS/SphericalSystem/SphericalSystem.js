@@ -52,13 +52,42 @@ class SphericalSystem {
     const p = 10;
     let dx = 10 / 200;
 
-    let x = -(coords.x - W / 2) * Math.sign(this.T[0][0]);
-    let y = -(coords.y - H / 2) * Math.sign(this.T[1][1]);
+    let x = mouseX - W / 2;
+    let y = mouseY - H / 2;
 
-    let temp = matrix.mult(this.T, [[x], [y], [1]]);
+    // let x = 10;
+    // let y = 10;
 
-    x = temp[0][0];
-    y = temp[1][0];
+    let mouseVector = new Vector4D();
+
+    // let temp = matrix.mult(this.T, [[x], [y], [1]]);
+
+    // x = temp[0][0];
+    // y = temp[1][0];
+
+    // console.log(temp);
+
+    // mouseVector.setVector(matrix.mult(this.T, [[x], [y], [1]]));
+    mouseVector.setVector([[x], [y], [0]]);
+
+    let temp2 = new Vector4D();
+
+    let reverse = matrix.getReversedMatrix(this.T);
+
+    temp2.setVector(matrix.mult(this.T, mouseVector.getVector()));
+
+    // console.log(temp2);
+    // console.log(mouseVector);
+
+    let temp = dimension.convertTo2D([mouseVector])[0];
+
+    x = temp.x;
+    y = temp.y;
+
+    // x = mouseVector.x;
+    // y = mouseVector.y;
+
+    // console.log(temp);
 
     // let teta = Math.atan((temp[2][0] / x) * 0.5) * 2;
 
@@ -66,7 +95,13 @@ class SphericalSystem {
     strokeWeight(5);
     line(0, 0, x, y);
 
+    stroke(color(0, 255, 0));
+    // strokeWeight(5);
+    line(0, 0, ...temp2.coords2D());
+
     // let phi = 0;
+
+    // noLoop();
 
     let phi = Math.atan(y / x);
 
@@ -83,6 +118,10 @@ class SphericalSystem {
       this.points[0][i].setVector(
         matrix.mult(this.T, this.points[0][i].getVector())
       );
+
+      // this.points[0][i].setVector(
+      //   matrix.mult(reverse, this.points[0][i].getVector())
+      // );
     }
 
     return this.points;
