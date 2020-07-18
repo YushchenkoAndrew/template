@@ -1,6 +1,6 @@
 #pragma once
-#include "utils.h"
-#include "generic/typelist.h"
+// #include "utils.h"
+// #include "generic/typelist.h"
 namespace HAL
 {
     // REGS
@@ -20,11 +20,11 @@ namespace HAL
         unsigned short Inen;
         unsigned short InenClear;
         unsigned short InenSet;
-        unsigned short Lock;
-        unsigned short Mux;
-        unsigned short Polarity;
-        unsigned short PolarityClear;
-        unsigned short PolaritySet;
+        unsigned long Lock;
+        unsigned long Mux;
+        unsigned short Pol;
+        unsigned short PolClear;
+        unsigned short PolSet;
     };
 
 #pragma pad()
@@ -101,10 +101,37 @@ namespace HAL
     {
     public:
         template <int Port>
-        GpioPin(Int2Type<Port>, int mask) : reg_(reinterpret_cast<PinRegList *>(GpioPort<Port>::RegAddres)),
-                                            mask_(mask)
+        // GpioPin(Int2Type<Port>, int mask) : reg_(reinterpret_cast<PinRegList *>(GpioPort<Port>::RegAddres)),
+        GpioPin(int Port, int mask) : reg_(reinterpret_cast<PinRegList *>(GpioPort<Port>::RegAddres)),
+                                      mask_(mask)
         {
         }
+
+        GpioPin(const GpioPin &pin) : reg_(pin.reg_), mask_(pin.mask_)
+        {
+        }
+
+        void InitOutput()
+        {
+            reg_->FerClear |= mask_;
+            reg_->DirSet = mask_;
+        }
+
+        void InitInput()
+        {
+            reg_->PolClear |= mask_;
+            reg_->DirClear = mask_;
+            reg_->InenSet |= mask_;
+        }
+
+        void Set() { reg_->Set = mask_; }
+        void Clear() { reg_->Clear = mask_; }
+        void Toggle() { reg_->Toggle = mask_; }
+
+        int Get() { return reg_->Value & mask_; }
+        int GetRaw() { return reg_->Value; }
+        int GetMask() { return mask_; }
+        volatile PinRegList *Reg() { return reg_; }
 
     private:
         volatile PinRegList *const reg_;

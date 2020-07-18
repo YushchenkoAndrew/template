@@ -14,12 +14,14 @@ enum Test
 template <int Port>
 struct SomeStruct;
 
+const int a = -1;
+
 template <>
 struct SomeStruct<'A'>
 {
     enum
     {
-        value = -1
+        value = a
     };
 };
 
