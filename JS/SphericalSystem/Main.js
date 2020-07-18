@@ -72,6 +72,18 @@ function draw() {
   // Press 'q' for continue autorotation
   if (keyIsDown(81)) autoRotation = true;
 
+  if (frameCount % 200 == 0) {
+    if (Math.floor(frameCount / 200) % 2 == 0) {
+      dimension = new HigherDimension(new EuclideanSystem());
+
+      console.log(`Euclidean ${dimension.points.length}`);
+    } else {
+      dimension = new HigherDimension(new SphericalSystem());
+
+      console.log(`Spherical ${dimension.points.length}`);
+    }
+  }
+
   // hypercube.rotate(matrix.rotationMatrixOY(-PI / 6, 4));
 
   // if (mouseIsPressed) {
@@ -81,9 +93,7 @@ function draw() {
 
   for (let k in selectedAxis)
     if (selectedAxis[k].isSelected && (mouseIsPressed || autoRotation)) {
-      let delta = k.includes("x")
-        ? ((mouseY - mousePos.y) / H) * 4
-        : ((mouseX - mousePos.x) / W) * 8;
+      let delta = k.includes("x") ? ((mouseY - mousePos.y) / H) * 4 : ((mouseX - mousePos.x) / W) * 8;
 
       delta = autoRotation ? angle : delta;
 
@@ -99,20 +109,6 @@ function draw() {
 
   // angle += 0.05;
   //   rotateY(angle);
-
-  // if (frameCount % 50 == 0) {
-  //   dimension.points = [];
-
-  //   if (Math.floor(frameCount / 50) % 2 == 0) {
-  //     dimension.createEuclideanSpace(200, 200);
-
-  //     console.log(`Euclidean ${dimension.points.length}`);
-  //   } else {
-  //     dimension.createSphericalSpace();
-
-  //     console.log(`Spherical ${dimension.points.length}`);
-  //   }
-  // }
 
   mousePos.x = mouseX;
   mousePos.y = mouseY;
