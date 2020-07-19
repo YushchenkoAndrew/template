@@ -7,24 +7,24 @@ namespace HAL
 #pragma pad(4)
     struct PinRegList
     {
-        unsigned short Value;
-        unsigned short Clear;
-        unsigned short Set;
-        unsigned short Toggle;
-        unsigned short Dir;
-        unsigned short DirClear;
-        unsigned short DirSet;
         unsigned short Fer;
-        unsigned short FerClear;
         unsigned short FerSet;
+        unsigned short FerClear;
+        unsigned short Value;
+        unsigned short Set;
+        unsigned short Clear;
+        unsigned short Dir;
+        unsigned short DirSet;
+        unsigned short DirClear;
         unsigned short Inen;
-        unsigned short InenClear;
         unsigned short InenSet;
-        unsigned long Lock;
+        unsigned short InenClear;
         unsigned long Mux;
+        unsigned short Toggle;
         unsigned short Pol;
-        unsigned short PolClear;
         unsigned short PolSet;
+        unsigned short PolClear;
+        unsigned long Lock;
     };
 
 #pragma pad()
@@ -38,7 +38,7 @@ namespace HAL
     {
         enum
         {
-            RegAddress = 0
+            RegAddress = PORTA_FER
         };
     };
 
@@ -47,7 +47,7 @@ namespace HAL
     {
         enum
         {
-            RegAddress = 0
+            RegAddress = PORTB_FER
         };
     };
 
@@ -56,7 +56,7 @@ namespace HAL
     {
         enum
         {
-            RegAddress = 0
+            RegAddress = PORTC_FER
         };
     };
 
@@ -65,7 +65,7 @@ namespace HAL
     {
         enum
         {
-            RegAddress = 0
+            RegAddress = PORTD_FER
         };
     };
 
@@ -74,7 +74,7 @@ namespace HAL
     {
         enum
         {
-            RegAddress = 0
+            RegAddress = PORTE_FER
         };
     };
 
@@ -83,7 +83,7 @@ namespace HAL
     {
         enum
         {
-            RegAddress = 0
+            RegAddress = PORTF_FER
         };
     };
 
@@ -92,8 +92,19 @@ namespace HAL
     {
         enum
         {
-            RegAddress = 0
+            RegAddress = PORTG_FER
         };
+    };
+
+    // Periferal Pin Init
+    template <char Port, int PinMask, int Mux = 0>
+    struct PeriferalPin
+    {
+        static inline void InitPeripheral()
+        {
+            volatile PinRegList *reg = reinterpret_cast<PinRegList *>(GpioPin<Port>::RegAddress);
+            reg->FerSet |= PinMask;
+        }
     };
 
     // GPIO
