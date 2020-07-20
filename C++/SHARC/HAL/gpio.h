@@ -1,6 +1,6 @@
 #pragma once
-// #include "utils.h"
-// #include "generic/typelist.h"
+#include "utils.h"
+#include "generic/typelist.h"
 namespace HAL
 {
     // REGS
@@ -103,7 +103,7 @@ namespace HAL
         static inline void InitPeripheral()
         {
             volatile PinRegList *reg = reinterpret_cast<PinRegList *>(GpioPin<Port>::RegAddress);
-            reg->FerSet |= PinMask;
+            reg->FerSet = PinMask;
         }
     };
 
@@ -112,9 +112,8 @@ namespace HAL
     {
     public:
         template <int Port>
-        // GpioPin(Int2Type<Port>, int mask) : reg_(reinterpret_cast<PinRegList *>(GpioPort<Port>::RegAddres)),
-        GpioPin(int Port, int mask) : reg_(reinterpret_cast<PinRegList *>(GpioPort<Port>::RegAddres)),
-                                      mask_(mask)
+        GpioPin(Int2Type<Port>, int mask) : reg_(reinterpret_cast<PinRegList *>(GpioPort<Port>::RegAddres)),
+                                            mask_(mask)
         {
         }
 
@@ -124,15 +123,15 @@ namespace HAL
 
         void InitOutput()
         {
-            reg_->FerClear |= mask_;
+            reg_->FerClear = mask_;
             reg_->DirSet = mask_;
         }
 
         void InitInput()
         {
-            reg_->PolClear |= mask_;
+            reg_->PolClear = mask_;
             reg_->DirClear = mask_;
-            reg_->InenSet |= mask_;
+            reg_->InenSet = mask_;
         }
 
         void Set() { reg_->Set = mask_; }
