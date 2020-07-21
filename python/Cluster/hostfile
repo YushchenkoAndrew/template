@@ -1,3 +1,2 @@
-localhost slots=1 max-slots=10
-192.168.0.104 slots=1 max-slots=10
-
+192.168.0.105
+192.168.0.104
