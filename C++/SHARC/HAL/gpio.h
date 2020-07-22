@@ -1,6 +1,7 @@
 #pragma once
-#include "utils.h"
-#include "generic/typelist.h"
+// #include "utils.h"
+// #include "Generic\typelist.h"
+
 namespace HAL
 {
     // REGS
@@ -96,6 +97,29 @@ namespace HAL
         };
     };
 
+    // Description:
+    //      _mux -- set a peripheral option
+    //      bit  -- recursion variable
+    template <unsigned short mask, int _mux, int bit>
+    struct MuxPeriferial
+    {
+        enum
+        {
+            Result = (((mask & (1 << bit)) ? (_mux << (bit * 2)) : 0) |
+                      MuxPeriferial<mask, _mux, (bit + 1)>::Result)
+        };
+    };
+
+    // This struct end recursion
+    template <unsigned short mask, int _mux>
+    struct MuxPeriferial<mask, _mux, 16>
+    {
+        enum
+        {
+            Result = 0
+        };
+    };
+
     // Periferal Pin Init
     template <char Port, int PinMask, int Mux = 0>
     struct PeriferalPin
@@ -104,6 +128,7 @@ namespace HAL
         {
             volatile PinRegList *reg = reinterpret_cast<PinRegList *>(GpioPin<Port>::RegAddress);
             reg->FerSet = PinMask;
+            reg->Mux = MuxPeriferial<PinMask, Mux, 0>::Result;
         }
     };
 
