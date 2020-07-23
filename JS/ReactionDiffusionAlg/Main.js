@@ -1,7 +1,7 @@
 const W = 700;
 const H = 700;
 
-const step = 20;
+const step = 10;
 
 let diffusion;
 
