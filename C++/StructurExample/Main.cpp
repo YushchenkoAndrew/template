@@ -20,6 +20,34 @@ struct MuxPeriferial<mask, _mux, 16>
     };
 };
 
+template <int T>
+struct Int2Type
+{
+#pragma always_inline
+    inline Int2Type()
+    {
+        std::cout << "Done"
+                  << "\n";
+    }
+#pragma always_inline
+    inline Int2Type(int)
+    {
+        std::cout << "Yep - Int2Type"
+                  << "\n";
+    } //solve some compiler bug
+};
+
+template <int i>
+void TypeTesting(Int2Type<i>)
+{
+    std::cout << "Int2Type  --  " << i << "\n";
+}
+
+void WithoutType(int i)
+{
+    std::cout << "Without Type  -- " << i << "\n";
+}
+
 int main()
 {
     int test = MuxPeriferial<0x0002, 3, 0>::Result;
@@ -28,6 +56,11 @@ int main()
 
     std::cout << "Test = " << test << "\n";
     std::cout << "a  = " << a << "\n";
+
+    int b = 5;
+
+    TypeTesting<5>(0);
+    WithoutType(5);
 
     return 0;
 }
