@@ -22,6 +22,7 @@ print("{0} \t rank - {1} \t size - {2}".format(name, rank, size))
 
 # Generated Array size
 LEN = 40
+MAX = 10**10
 
 
 # Start mode
@@ -31,20 +32,33 @@ time.sleep(1)
 
 # Main functions
 
-def ScatterData(array):
+# array  --  Unsorted array of data
+# range_ --  Range of array, have start and end
+def ScatterData(array, range_):
 	if rank == 0:
 		print('Generated random array:\n{0}\n'.format(array))
 	
-		pivot = array[rand.randrange(LEN)]		
+		step = len(range_) // size
+		index = iter(range(range_.start, range_.stop, step))
+
+		# Don't start from range_.start
+		next(index)
+		pivot = [next(index) for i in range(size - 1)]
+
+		# Show divided range
+		print("Divided range -- {0} \n".format(pivot))
+		
+		# Add MAX value for add data into last list in data
+		pivot.append(MAX)
 
 		# Divide array
-		data = [[], []]
-	
+		data = [[] for i in range(size)]
+
 		for i in array:
-			if i < pivot:
-				data[0].append(i)
-			else:
-				data[1].append(i)
+			for j in range(len(pivot)):
+				if i < pivot[j]:
+					data[j].append(i)
+					break
 	else:
 		data = None
 
@@ -52,15 +66,13 @@ def ScatterData(array):
 
 def GatherData(data):
 	data = comm.gather(data, root=0)
+	
 
 	if rank == 0:
-		if data[0][0] < data[1][0]:
-			result = data[0]
-			result.extend(data[1])
-		else:
-			result = data[1]
-			result.extend(data[0])
-
+		result = []
+		for i in data:
+			result.extend(i)
+	
 		print('Sorted array :\t', result)
 
 
@@ -112,7 +124,7 @@ def QuickSort(array, lo, hi):
 
 # Program operations
 
-data = ScatterData([rand.randrange(-LEN, LEN) for i in range(LEN)])
+data = ScatterData([rand.randrange(-LEN, LEN) for i in range(LEN)], range(-LEN, LEN))
 print('{0} \t get \t {1}'.format(name, data))
 
 QuickSort(data, 0, len(data) - 1)
