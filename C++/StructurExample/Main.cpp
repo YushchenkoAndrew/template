@@ -57,6 +57,12 @@ int main()
     std::cout << "Test = " << test << "\n";
     std::cout << "a  = " << a << "\n";
 
+    int null = NULL;
+
+    std::cout << "Test NULL = " << null << "\n";
+
+    std::cout << "Size of int = " << sizeof(int) << "\n";
+
     int b = 5;
 
     TypeTesting<5>(0);

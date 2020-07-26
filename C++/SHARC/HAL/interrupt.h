@@ -39,4 +39,65 @@ namespace HAL
             Uart2RcvError = 239, // RX
         };
     }
+
+    class CriticalSection
+    {
+    public:
+#pragma always_inline
+        inline CriticalSection()
+        {
+            Lock();
+        }
+
+#pragma always_inline
+        inline ~CriticalSection()
+        {
+            UnLock();
+        }
+
+#pragma always_inline
+        inline void Lock()
+        {
+        }
+
+#pragma always_inline
+        inline void UnLock()
+        {
+        }
+
+    private:
+        unsigned int mask_;
+    };
+
+    class InterruptControl
+    {
+    public:
+#pragma always_inline
+        inline InterruptControl(int id) : id_(id)
+        {
+        }
+
+#pragma always_inline
+        inline InterruptControl(const InterruptControl &ic) : id_(ic.id_)
+        {
+        }
+
+        void Enable() const
+        {
+            if (id_ != -1)
+            {
+                // *(PCIE0_MSI_IMSK0_[n] + ((id_ & ~31U) >> 4)) |= (0x00000001U << (id_ & 31));
+            }
+        }
+
+        void Disable() const
+        {
+            if (id_ != 1)
+            {
+            }
+        }
+
+    private:
+        const int id_;
+    };
 } // namespace HAL

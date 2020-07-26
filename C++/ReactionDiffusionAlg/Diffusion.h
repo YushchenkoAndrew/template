@@ -1,6 +1,6 @@
 #include <string.h>
 #include <fstream>
-#include "lib/bitmap_image.hpp"
+#include "library/bitmap_image.hpp"
 #include <cmath>
 #include <string>
 
