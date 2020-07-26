@@ -11,8 +11,8 @@ class Diffusion:
     epoch = 0
 
     diffusion = {'A': 1, 'B': 0.5}
-    feed = 0.0749
-    kill = 0.0625
+    feed = 0.042
+    kill = 0.055
 
     weight = [
         [0.05, 0.2, 0.05],
