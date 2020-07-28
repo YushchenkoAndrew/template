@@ -50,7 +50,7 @@ void WithoutType(int i)
 
 int main()
 {
-    int test = MuxPeriferial<0x0002, 3, 0>::Result;
+    int test = MuxPeriferial<0x0002, 1, 0>::Result;
 
     int a = MuxPeriferial<0x001, 1, 16>::Result;
 
