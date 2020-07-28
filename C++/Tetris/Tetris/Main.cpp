@@ -7,7 +7,7 @@ int main()
 	tetris.init();
 
 	tetris.show();
-
+	//delete &tetris;
 
 	return 0;
 }
