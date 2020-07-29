@@ -1,12 +1,21 @@
 #pragma once
 #include <thread>
 #include<Windows.h>
+#include<vector>
+#include<string>
+#include<math.h>
 
 namespace Game
 {
 	struct Position
 	{
 		int x;
+		int y;
+	};
+
+	struct Lines
+	{
+		int count;
 		int y;
 	};
 
@@ -17,8 +26,6 @@ namespace Game
 		enum {
 			W = 15,
 			H = 18,
-			ScreenWidth = 120,
-		    ScreenHeigth = 20,
 		};
 
 		Tetris()
@@ -35,6 +42,12 @@ namespace Game
 
 		void init()
 		{
+			CONSOLE_SCREEN_BUFFER_INFO csbi;
+			GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+
+			ScreenWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+			ScreenHeigth = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+
 			// Initialize Console Buffer
 			screen = new wchar_t[ScreenHeigth * ScreenWidth];
 			for (int i = 0; i < ScreenHeigth * ScreenWidth; i++)
@@ -120,13 +133,30 @@ namespace Game
 				keyHold = false;
 		}
 
+		void showUserHelper()
+		{
+			std::wstring score = L" Score:   " + std::to_wstring(plScore);
+			int scoreSize = (int)log10(plScore) + 1;
+
+			for (int i = 0; i < 23; i++) {
+				screen[ScreenWidth * 2 + 25 + i] = L"+========Cotrol:======+"[i];
+				screen[ScreenWidth * 3 + 25 + i] = L"|Arrow Down  -> Down  |"[i];
+				screen[ScreenWidth * 4 + 25 + i] = L"|Arrow Left  -> Left  |"[i];
+				screen[ScreenWidth * 5 + 25 + i] = L"|Arrow Right -> Right |"[i];
+				screen[ScreenWidth * 6 + 25 + i] = L"|Space Key   -> Rotate|"[i];
+				screen[ScreenWidth * 7 + 25 + i] = L"+---------------------+"[i];
+				screen[ScreenWidth * 12 + 25 + i]= score[i < score.length() ? i : 0];
+				
+			}
+		}
+
 	public:
 		void show()
 		{
 			while (!gameOver)
 			{
 				// Game Time (Time Clock)
-				std::this_thread::sleep_for(std::chrono::milliseconds(50));
+				std::this_thread::sleep_for(std::chrono::milliseconds(gameSpeed));
 
 				moveShapeDown = (++count == 20);
 
@@ -145,6 +175,25 @@ namespace Game
 							for (int j = 0; j < 4; j++)
 								if (shapes[currIndex][rotate(j, i, currRotation)] == 'X')
 									pField[j + pos.x + (i + pos.y) * W] = currIndex + 1;
+
+						// Check if current STOPED shape create a line in a pField
+						for (int i = 0; i < 4; i++)
+							if (i + pos.y < H - 1)		// Don't check last line - border line
+							{
+								bool isLine = true;
+								for (int j = 0; j < W; j++)
+									isLine &= pField[j + (i + pos.y) * W] != 0;
+
+								if (isLine)
+								{
+									for (int j = 1; j < W - 1; j++)
+										pField[j + (i + pos.y) * W] = 8;
+
+									stLines.push_back(Lines{ 0, i + pos.y });
+								}
+							}
+
+
 
 						// Set next Shape
 						pos = { W / 2 - 2, 0 };
@@ -165,18 +214,41 @@ namespace Game
 						screen[j + 2 + (i + 1) * ScreenWidth] = L" ABCDEFG=#"[pField[j + i * W]];
 
 				showCurrShape();
+				showUserHelper();
+
+				if (!stLines.empty())
+				{
+					for (int i = 0; i < stLines.size(); i++)
+					{
+						stLines[i].count++;
+
+						if (stLines[i].count >= 20)
+						{
+							for (int x = 1; x < W - 1; x++)		// Don't touch border
+								for (int y = stLines[i].y; y > 0; y--)
+									pField[y * W + x] = pField[(y - 1) * W + x];
+							
+							plScore += (55 - gameSpeed);
+							stLines.erase(stLines.begin() + i);
+							gameSpeed -= gameSpeed > 5 ? 5 : 0;
+						}
+					}
+				}
 
 					
 				// Display
 				WriteConsoleOutputCharacter(hConsole, screen, ScreenHeigth * ScreenWidth, { 0, 0 }, &dwBytesWritten);
 			}
 			CloseHandle(hConsole);
-			std::cout << "Game Over!" << std::endl;
+			std::cout << "Game Over! \n Your Score = " + std::to_string(plScore) + "\n Well done!"<< std::endl;
 		}
 
 		
 
 	private:
+		int ScreenWidth;
+		int ScreenHeigth;
+
 		std::string shapes[7];
 		unsigned char *pField = nullptr;
 
@@ -195,5 +267,8 @@ namespace Game
 		bool moveShapeDown;
 
 		bool gameOver = false;
+		int plScore = 0;
+		int gameSpeed = 50;
+		std::vector<Lines> stLines;
 	};
 }
