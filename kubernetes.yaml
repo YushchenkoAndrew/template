@@ -5,19 +5,19 @@ metadata:
 spec:
   selector:
     app: webserver
-  externalIPs:
-  - 192.168.0.104
   ports:
     - port: 80
       targetPort: 8000
   type: LoadBalancer
+  externalIPs:
+    - 192.168.0.104
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: webserver
 spec:
-  replicas: 2
+  replicas: 4
   selector:
     matchLabels:
       app: webserver
