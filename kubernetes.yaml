@@ -17,7 +17,7 @@ kind: Deployment
 metadata:
   name: webserver
 spec:
-  replicas: 4
+  replicas: 2
   selector:
     matchLabels:
       app: webserver
@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: webserver
-          image: grimreapermortis/webserver:1.0.0
+          image: grimreapermortis/webserver:1.0.1
           ports:
             - containerPort: 8000
           imagePullPolicy: Always

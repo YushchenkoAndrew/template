@@ -1,15 +1,13 @@
-FROM node:12
+FROM node:10-alpine
 
-WORKDIR /home/pi/Code/template
+WORKDIR $HOME/template/src
 
 COPY package*.json ./
-#RUN nmp install
+RUN npm install
 
 # Bundle app source
-#COPY . .
-COPY ./JS ./JS
-COPY ./node_modules ./node_modules
-COPY app.js .
+COPY . .
+RUN rm -r C++/
 
 
 EXPOSE 8000
