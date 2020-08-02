@@ -7,9 +7,11 @@
 #include <string.h>
 #include <unistd.h>
 
-std::vector<std::string> readFile(std::string name)
+#define MVECTOR std::vector<std::string>
+
+MVECTOR readFile(std::string name)
 {
-    std::vector<std::string> buffer;
+    MVECTOR buffer;
     std::ifstream file(name);
     if (!file)
         return buffer;
@@ -22,7 +24,7 @@ std::vector<std::string> readFile(std::string name)
 }
 
 template <bool dir = true>
-int getIndex(std::vector<std::string> &vect, std::string subString)
+int getIndex(MVECTOR &vect, std::string subString)
 {
     for (int i = 0; i < vect.size(); i++)
         if (vect[i].find(subString) != std::string::npos)
@@ -32,7 +34,7 @@ int getIndex(std::vector<std::string> &vect, std::string subString)
 }
 
 template <>
-int getIndex<false>(std::vector<std::string> &vect, std::string subString)
+int getIndex<false>(MVECTOR &vect, std::string subString)
 {
     for (int i = vect.size() - 1; i >= 0; i--)
         if (vect[i].find(subString) != std::string::npos)
@@ -41,12 +43,12 @@ int getIndex<false>(std::vector<std::string> &vect, std::string subString)
     return -1;
 }
 
-std::vector<std::string> Walker(std::string pattern)
+MVECTOR Walker(std::string pattern)
 {
     DIR *d;
     struct dirent *dir;
     d = opendir(".");
-    std::vector<std::string> path;
+    MVECTOR path;
     if (d)
     {
         while ((dir = readdir(d)) != NULL)
@@ -80,7 +82,7 @@ std::vector<std::string> Walker(std::string pattern)
 void Creeper(const char *root, std::string pattern)
 {
     auto files = Walker(pattern);
-    std::vector<std::string> replicate;
+    MVECTOR replicate;
     int begin;
     int end;
 
@@ -98,7 +100,7 @@ void Creeper(const char *root, std::string pattern)
 
     chdir(root);
     files = Walker(pattern);
-    std::vector<std::string> copyFile;
+    MVECTOR copyFile;
     std::string fileName;
 
     for (auto name : files)
@@ -117,14 +119,14 @@ void Creeper(const char *root, std::string pattern)
     std::cout << "Path: " + std::string(root) + fileName + "\n\n";
     std::cout << "I'm the creeper, catch me if you can \n";
 
-    copyFile.insert(copyFile.end(), replicate.begin() + begin, replicate.begin() + end + 1);
+    copyFile.insert(copyFile.begin(), replicate.begin() + begin, replicate.begin() + end + 1);
 
-    bool stop = false;
+    bool stop = true;
 
     std::ofstream file(fileName);
     for (auto line : copyFile)
     {
-        stop |= line.find("I'm the creeper") != std::string::npos;
+        stop &= line.find("Catch me if you can") == std::string::npos;
         if (!stop && line.find("return") != std::string::npos)
             file << "\tCreeper(\"" + std::string(root) + "\", \"" + pattern + "\");" << std::endl;
 
