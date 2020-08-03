@@ -10,9 +10,9 @@ namespace HAL
     template <int i>
     struct SpiRegList
     {
-        unsigned short Control;
-        unsigned short RcvControl; // RX
-        unsigned short XmtControl; // TX
+        unsigned long Control;
+        unsigned long RcvControl; // RX
+        unsigned long XmtControl; // TX
         unsigned short Clock;
         unsigned short Delay;
         unsigned short SlaveSelect;
@@ -25,20 +25,20 @@ namespace HAL
         unsigned short IntMaskClear;
         unsigned short IntMaskSet;
         int r1;
-        unsigned short Status;
+        unsigned long Status;
         unsigned short IntCondition;
         unsigned short IntClear;
-        unsigned short RcvFIFO; // RX
+        unsigned long RcvFIFO; // RX
         int r3;
-        unsigned short XmtFIFO; // TX
+        unsigned long XmtFIFO; // TX
     };
 
     template <>
     struct SpiRegList<2>
     {
-        unsigned short Control;
-        unsigned short RcvControl; // RX
-        unsigned short XmtControl; // TX
+        unsigned long Control;
+        unsigned long RcvControl; // RX
+        unsigned long XmtControl; // TX
         unsigned short Clock;
         unsigned short Delay;
         unsigned short SlaveSelect;
@@ -51,15 +51,15 @@ namespace HAL
         unsigned short IntMaskClear;
         unsigned short IntMaskSet;
         int r1;
-        unsigned short Status;
+        unsigned long Status;
         unsigned short IntCondition;
         unsigned short IntClear;
-        unsigned short RcvFIFO; // RX
+        unsigned long RcvFIFO; // RX
         int r3;
-        unsigned short XmtFIFO; // TX
+        unsigned long XmtFIFO; // TX
         int r4;
-        unsigned short MemoryReadHeader;
-        unsigned short SpiMemoryAddress;
+        unsigned long MemoryReadHeader;
+        unsigned long SpiMemoryAddress;
     };
 
 #pragma pad()

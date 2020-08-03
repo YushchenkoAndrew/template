@@ -2,6 +2,7 @@
 // #include "utils.h"
 // #include "Generic\TypeList.h"
 // #include "Generic\foreach.h"
+#include "CriticalSection.h"
 
 namespace HAL
 {
@@ -40,35 +41,6 @@ namespace HAL
         };
     }
 
-    class CriticalSection
-    {
-    public:
-#pragma always_inline
-        inline CriticalSection()
-        {
-            Lock();
-        }
-
-#pragma always_inline
-        inline ~CriticalSection()
-        {
-            UnLock();
-        }
-
-#pragma always_inline
-        inline void Lock()
-        {
-        }
-
-#pragma always_inline
-        inline void UnLock()
-        {
-        }
-
-    private:
-        unsigned int mask_;
-    };
-
     class InterruptControl
     {
     public:
@@ -86,6 +58,7 @@ namespace HAL
         {
             if (id_ != -1)
             {
+                CriticalSection cs;
                 // *(PCIE0_MSI_IMSK0_[n] + ((id_ & ~31U) >> 4)) |= (0x00000001U << (id_ & 31));
             }
         }
@@ -94,10 +67,16 @@ namespace HAL
         {
             if (id_ != 1)
             {
+                CriticalSection cs;
             }
         }
 
     private:
         const int id_;
+    };
+
+    template <int Id, typename Tag, class HandlerType>
+    class InterruptSource
+    {
     };
 } // namespace HAL

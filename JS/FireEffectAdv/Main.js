@@ -22,8 +22,7 @@ function setup() {
 
   qTree = new QuadTree(new Rectangle(0, 0, N, N));
 
-  for (let i = 0; i < rangeAmount; i++)
-    range.push(new Rectangle(100 * i, 200, 100, 100));
+  for (let i = 0; i < rangeAmount; i++) range.push(new Rectangle(100 * i, 200, 100, 100));
 
   for (let i = 0; i < N; i++) {
     xoff += step;
@@ -53,8 +52,8 @@ function changeRange() {
   if (mouseIsPressed) {
     for (let i = 0; i < rangeAmount; i++)
       if (range[i].contain(new Point(mouseX, mouseY))) {
-        range[i].x = mouseX - 50;
-        range[i].y = mouseY - 50;
+        range[i].x = mouseX - 50 > 0 && mouseX - 50 < N ? mouseX - 50 : range[i].x;
+        range[i].y = mouseY - 50 > 0 && mouseY - 50 < N ? mouseY - 50 : range[i].x;
         // print(range[i]);
       }
   }
@@ -97,9 +96,7 @@ function draw() {
 
     noStroke();
     let temp = Math.floor(p.data);
-    fill(
-      color(temp > 28 ? 255 : temp * 3, temp, temp / 2.8, showGrid ? 180 : 255)
-    );
+    fill(color(temp > 28 ? 255 : temp * 3, temp, temp / 2.8, showGrid ? 180 : 255));
     rect(p.x, p.y, scale, scale);
   }
   cooling();
@@ -109,14 +106,9 @@ function fireEffect(range, points, qTree) {
   let buff1 = new Array(Math.floor(range.h / scale));
 
   for (let p of points) {
-    if (buff1[Math.floor((p.x - range.x) / scale)] === undefined)
-      buff1[Math.floor((p.x - range.x) / scale)] = new Array(
-        Math.floor(range.w / scale)
-      );
+    if (buff1[Math.floor((p.x - range.x) / scale)] === undefined) buff1[Math.floor((p.x - range.x) / scale)] = new Array(Math.floor(range.w / scale));
 
-    buff1[Math.floor((p.x - range.x) / scale)][
-      Math.floor((p.y - range.y) / scale)
-    ] = p.data;
+    buff1[Math.floor((p.x - range.x) / scale)][Math.floor((p.y - range.y) / scale)] = p.data;
   }
 
   // print(buff1);
@@ -135,14 +127,11 @@ function fireEffect(range, points, qTree) {
         nb4 = buff1[i][j - 1] === undefined ? 0 : buff1[i][j - 1];
       }
 
-      if (buff1[i + 1] !== undefined)
-        nb1 = buff1[i + 1][j] === undefined ? 0 : buff1[i + 1][j];
+      if (buff1[i + 1] !== undefined) nb1 = buff1[i + 1][j] === undefined ? 0 : buff1[i + 1][j];
 
-      if (buff1[i - 1] !== undefined)
-        nb2 = buff1[i - 1][j] === undefined ? 0 : buff1[i - 1][j];
+      if (buff1[i - 1] !== undefined) nb2 = buff1[i - 1][j] === undefined ? 0 : buff1[i - 1][j];
 
-      let data =
-        (nb1 + nb2 + nb3 + nb4) / 4 - coolingMap[j + range.y][i + range.x];
+      let data = (nb1 + nb2 + nb3 + nb4) / 4 - coolingMap[j + range.y][i + range.x];
       // print(data);
 
       if (data > 0) {

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <bitset>
 
 template <unsigned short mask, int _mux, int bit>
 struct MuxPeriferial
@@ -62,6 +63,8 @@ int main()
     std::cout << "Test NULL = " << null << "\n";
 
     std::cout << "Size of int = " << sizeof(int) << "\n";
+
+    std::cout << "~1 = " << std::bitset<32>(~1) << "\n";
 
     int b = 5;
 

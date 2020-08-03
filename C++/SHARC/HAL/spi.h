@@ -65,6 +65,7 @@ namespace HAL
         int dataCount_;
     };
 
+    // class SpiTask : public boost::intrusive::slist_base_hook<boost::hook_check::link_mode>
     class SpiTask
     {
     public:
@@ -106,16 +107,31 @@ namespace HAL
             task_[taskCount_++].ReadWrite(xmt, rcv, size);
         }
 
+        // Firstly Func -- ReadOnly/ReadWrite should be called, in which size is setted
 #pragma always_inline
         template <typename T>
         inline void Rcv(T value)
         {
+            task_[rcvTask_].Rcv<T>(value, rcvOffset_); // Set data dipends on type size
+            rcvOffset_ += sizeof(T);
+            if (rcvOffset_ >= task_[rcvTask_].Size())
+            {
+                rcvOffset_ = 0;
+                rcvTask_++;
+            }
         }
 
 #pragma always_inline
         template <typename T>
         inline T Xmt()
         {
+            T value = task_[xmtTask_].Xmt<T>(xmtOffset_); // Get data dipends on type size
+            xmtOffset_ += sizeof(T);
+            if (xmtOffset_ >= task_[xmtTask_].Size())
+            {
+                xmtOffset_ = 0;
+                xmtTask_++;
+            }
         }
 
         inline void Reset()
@@ -125,6 +141,23 @@ namespace HAL
             xmtTask_ = 0;
             rcvOffset_ = 0;
             xmtOffset_ = 0;
+        }
+
+        inline void ForceRcvDone()
+        {
+            rcvTask_ = taskCount_; // Ignore type size
+        }
+
+        inline bool IsPendding()
+        {
+            return xmtTask_ < taskCount_; // Check if command complitted
+        }
+
+        inline void Done()
+        {
+            isDone_ = true;
+            if (callBack_ != NULL)
+                callBack_->operator()(); // Overload
         }
 
         inline void Wait()
@@ -151,8 +184,73 @@ namespace HAL
         volatile bool isDone_;
     };
 
+    template <int Port>
     class SpiMater
     {
-    };
+    public:
+        typedef boost::intrusive::slist<SpiTask, boost::intrusive::constant_time_size<false>,
+                                        boost::intrusive::cache_last<true>, boost::intrusive::linear<true>>
+            TaskList;
 
+        typedef SpiTask TaskType;
+        typedef TaskType::CallBackType CallBackType;
+        typedef Int2Type<0> XmtInterruptTag;
+        typedef Int2Type<1> RcvInterruptTag;
+        typedef Int2Type<2> StatusInterruptTag;
+        typedef SpiMater<Port> ThisType;
+
+        template <class Pins>
+        SpiMater(Type2Type<Pins>) : rcvInterrupt_(Detail::SpiPortSelect<Port>::RcvInterruptID),
+                                    xmtInterrupt_(Detail::SpiPortSelect<Port>::XmtInterruptID),
+                                    statusInterrupt_(Detail::SpiPortSelect<Port>::StatusInterruptId)
+        {
+            // MPL::foreach<Pins, Detail::PortInitPins>::Process();                // Detail::PortInitPins  -- ?
+
+            InterruptSource<Detail::SpiPortSelect<Port>::XmtInterruptID,
+                            XmtInterruptTag, ThisType>::SetHandler(this);
+            InterruptSource<Detail::SpiPortSelect<Port>::RcvInterruptID,
+                            RcvInterruptTag, ThisType>::SetHandler(this);
+            InterruptSource<Detail::SpiPortSelect<Port>::StatusInterruptId,
+                            StatusInterruptTag, ThisType>::SetHandler(this);
+        }
+
+        ~SpiMater() {}
+
+        void Init(int freq, int bits = 8);
+
+        void EnableSlave(int slv);
+        void DisableSlave(int slv);
+
+        void InterruptHandler(XmtInterruptTag);
+        void InterruptHandler(RcvInterruptTag);
+        void InterruptHandler(StatusInterruptTag);
+
+        void PushTask(TaskType &task);
+        void PushTaskList();
+
+        void Kill();
+        bool IsInProgress()
+        {
+            return !taskList.empty();
+        }
+        void Wait()
+        {
+            while (IsInProgress())
+            {
+            }
+        }
+
+        void Stop();
+        void RunNext(TaskType &task);
+        void SelectSlave(int slv);
+        void DeselectSlave(int slv);
+
+    private:
+        const Detail::SpiPort<Port> port_;
+        const InterruptControl rcvInterrupt_;
+        const InterruptControl xmtInterrupt_;
+        const InterruptControl statusInterrupt_;
+        TaskList taskList_;
+        int bits_;
+    };
 } // namespace HAL
