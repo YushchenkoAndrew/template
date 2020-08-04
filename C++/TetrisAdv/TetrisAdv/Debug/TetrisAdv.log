@@ -1,0 +1,4 @@
+﻿  Main.cpp
+D:\Program\template\src\C++\TetrisAdv\TetrisAdv\Tetris.h(160,70): warning C4018: '<': signed/unsigned mismatch
+D:\Program\template\src\C++\TetrisAdv\TetrisAdv\Tetris.h(239,24): warning C4018: '<': signed/unsigned mismatch
+  TetrisAdv.vcxproj -> D:\Program\template\src\C++\TetrisAdv\Debug\TetrisAdv.exe
