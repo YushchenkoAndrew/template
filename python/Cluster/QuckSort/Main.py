@@ -74,7 +74,6 @@ def GatherData(data):
 			result.extend(i)
 	
 		print('Sorted array :\t', result)
-		time.sleep(2)
 
 
 def showColor(color):
@@ -139,10 +138,9 @@ time.sleep(1)
 # Show final result
 GatherData(data)
 
-# Wait for end progrogram
-comm.bcast("End program", root=0)
 
 # Reset all used GPIO
+time.sleep(2)
 GPIO.cleanup()
 
 
