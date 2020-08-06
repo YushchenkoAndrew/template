@@ -122,6 +122,7 @@ def QuickSort(array, lo, hi):
 		
 		
 
+
 # Program operations
 
 data = ScatterData([rand.randrange(-LEN, LEN) for i in range(LEN)], range(-LEN, LEN))
