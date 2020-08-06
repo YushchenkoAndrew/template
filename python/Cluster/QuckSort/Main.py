@@ -74,6 +74,7 @@ def GatherData(data):
 			result.extend(i)
 	
 		print('Sorted array :\t', result)
+		time.sleep(2)
 
 
 def showColor(color):
@@ -121,7 +122,6 @@ def QuickSort(array, lo, hi):
 		
 		
 
-
 # Program operations
 
 data = ScatterData([rand.randrange(-LEN, LEN) for i in range(LEN)], range(-LEN, LEN))
@@ -138,9 +138,10 @@ time.sleep(1)
 # Show final result
 GatherData(data)
 
+# Wait for end progrogram
+comm.bcast("End program", root=0)
 
 # Reset all used GPIO
-time.sleep(2)
 GPIO.cleanup()
 
 
