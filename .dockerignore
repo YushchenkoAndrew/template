@@ -1,7 +1,9 @@
+JavaScript-mancy_Tome_I.js
 node_modules/
 npm-debug.log
 .git/
 .gitignore
-kubernetes.yaml
+kubernetes/
 python/ 
-
+C+*/
+.dockerignore
