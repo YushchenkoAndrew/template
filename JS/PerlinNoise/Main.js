@@ -8,7 +8,8 @@ const step = 0.05;
 let pos = 0;
 
 function setup() {
-  createCanvas(700, 700, WEBGL);
+  let canvas = createCanvas(700, 700, WEBGL);
+  canvas.position((window.innerWidth - 700) / 2, 50);
 
   frameRate(20);
 }
@@ -44,8 +45,7 @@ function shiftNoise() {
   for (let i = 0; i < (w + 1) * step; i += step) {
     coords_Z.push([]);
     let index = coords_Z.length - 1;
-    for (let j = pos; j < (h + 1) * step + pos; j += step)
-      coords_Z[index].push(noise(i, j) * 700);
+    for (let j = pos; j < (h + 1) * step + pos; j += step) coords_Z[index].push(noise(i, j) * 700);
   }
 
   pos -= step;

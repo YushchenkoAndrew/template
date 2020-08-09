@@ -14,16 +14,15 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(W, H * 2);
+  let canvas = createCanvas(W, H * 2);
+  canvas.position((window.innerWidth - W) / 2, 50);
 
   loadTexture();
 
   scene = new Scene();
   scene.createRandomSurface(4);
 
-  console.log(
-    "Double click set a point for wall\n 2 double click create a wall\n You can shift light source with pressing the mouse button"
-  );
+  console.log("Double click set a point for wall\n 2 double click create a wall\n You can shift light source with pressing the mouse button");
 }
 
 function loadTexture() {
@@ -38,9 +37,7 @@ function doubleClicked() {
   if (!point) {
     point = new Point(mouseX, mouseY);
   } else {
-    scene.bounds.push(
-      new Bound(point, new Point(mouseX, mouseY), textures[4], color(0, 0, 255))
-    );
+    scene.bounds.push(new Bound(point, new Point(mouseX, mouseY), textures[4], color(0, 0, 255)));
     point = undefined;
   }
 }

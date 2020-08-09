@@ -5,12 +5,13 @@ const scale = 10;
 
 const damping = 0.95;
 
-let rand = false;
+let rand = true;
 let buff1 = [];
 let buff2 = [];
 
 function setup() {
-  createCanvas(N * scale, N * scale);
+  let canvas = createCanvas(N * scale, N * scale);
+  canvas.position((window.innerWidth - N * scale) / 2, (window.innerHeight - N * scale) / 2);
 
   for (let i = 0; i < N; i++) {
     buff1.push([]);
@@ -25,13 +26,11 @@ function setup() {
 }
 
 function mouseDragged() {
-  if (mouseX / scale < N && mouseY / scale < N && mouseX > 0 && mouseY > 0)
-    buff1[Math.floor(mouseX / scale)][Math.floor(mouseY / scale)] = 255;
+  if (mouseX / scale < N && mouseY / scale < N && mouseX > 0 && mouseY > 0) buff1[Math.floor(mouseX / scale)][Math.floor(mouseY / scale)] = 255;
 }
 
 function mouseClicked() {
-  if (mouseX / scale < N && mouseY / scale < N && mouseX > 0 && mouseY > 0)
-    buff1[Math.floor(mouseX / scale)][Math.floor(mouseY / scale)] = 255;
+  if (mouseX / scale < N && mouseY / scale < N && mouseX > 0 && mouseY > 0) buff1[Math.floor(mouseX / scale)][Math.floor(mouseY / scale)] = 255;
 }
 
 function draw() {
@@ -39,18 +38,11 @@ function draw() {
   //   loadPixels();
   noStroke();
 
-  if (rand)
-    buff1[Math.floor(random(10, N - 10))][Math.floor(random(10, N - 10))] = 255;
+  if (rand && frameCount % 4 == 0) buff1[Math.floor(random(10, N - 10))][Math.floor(random(10, N - 10))] = 255;
 
   for (let i = 1; i < N - 1; i++) {
     for (let j = 1; j < N - 1; j++) {
-      buff2[i][j] =
-        (buff1[i - 1][j] +
-          buff1[i + 1][j] +
-          buff1[i][j + 1] +
-          buff1[i][j - 1]) /
-          2 -
-        buff2[i][j];
+      buff2[i][j] = (buff1[i - 1][j] + buff1[i + 1][j] + buff1[i][j + 1] + buff1[i][j - 1]) / 2 - buff2[i][j];
 
       buff2[i][j] *= damping;
 

@@ -30,7 +30,12 @@ function setup() {
 }
 
 function mouseClicked() {
-  if (path) return;
+  if (path) {
+    start = undefined;
+    end = undefined;
+    path = undefined;
+    return;
+  }
 
   if (!start) {
     start = {

@@ -13,7 +13,8 @@ let buff2 = [];
 let coolingMap = [];
 
 function setup() {
-  createCanvas(N * scale, N * scale);
+  let canvas = createCanvas(N * scale, N * scale);
+  canvas.position((window.innerWidth - N * scale) / 2, window.innerHeight - N * scale);
 
   for (let i = 0; i < N; i++) {
     buff1.push([]);
@@ -48,13 +49,7 @@ function cooling(i = -1) {
 }
 
 function createPointFire() {
-  if (
-    mouseIsPressed &&
-    mouseX / scale < N &&
-    mouseY / scale < N &&
-    mouseX > 0 &&
-    mouseY > 0
-  ) {
+  if (mouseIsPressed && mouseX / scale < N && mouseY / scale < N && mouseX > 0 && mouseY > 0) {
     buff1[Math.floor(mouseX / scale)][Math.floor(mouseY / scale)] = 255;
     buff1[Math.floor(mouseX / scale) + 1][Math.floor(mouseY / scale)] = 255;
   }
@@ -71,13 +66,7 @@ function draw() {
 
   for (let i = 1; i < N - 1; i++) {
     for (let j = 1; j < N - 1; j++) {
-      buff2[i][j - 1] =
-        (buff1[i - 1][j] +
-          buff1[i + 1][j] +
-          buff1[i][j + 1] +
-          buff1[i][j - 1]) /
-          4 -
-        coolingMap[i][j];
+      buff2[i][j - 1] = (buff1[i - 1][j] + buff1[i + 1][j] + buff1[i][j + 1] + buff1[i][j - 1]) / 4 - coolingMap[i][j];
 
       if (buff2[i][j - 1] < 0) {
         buff2[i][j - 1] = 0;

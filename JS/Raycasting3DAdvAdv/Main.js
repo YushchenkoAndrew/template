@@ -32,7 +32,8 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(W, H * 2);
+  let canvas = createCanvas(W, H * 2);
+  canvas.position((window.innerWidth - W) / 2, 50);
 
   loadTexture();
 
@@ -90,12 +91,7 @@ function draw() {
     if (current < path.path.length) {
       let index = Math.floor(current - 2);
 
-      current = !scene.moveAI(
-        index >= 0 ? path.path[index] : undefined,
-        path.path[Math.floor(current)]
-      )
-        ? current
-        : current + 0.1;
+      current = !scene.moveAI(index >= 0 ? path.path[index] : undefined, path.path[Math.floor(current)]) ? current : current + 0.1;
     }
     // path.update();
   }
