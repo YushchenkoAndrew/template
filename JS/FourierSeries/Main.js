@@ -11,7 +11,7 @@ let stack = [];
 
 function setup() {
   let canvas = createCanvas(W, H);
-  canvas.position((window.innerWidth - W) / 2, 50);
+  canvas.position((window.innerWidth - W) / 2, 60);
   colorMode(HSB, 20, 255, 255);
 
   for (let i = 0; i < N; i++) {
