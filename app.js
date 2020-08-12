@@ -16,6 +16,7 @@ app.use("/projects", express.static("JS"));
 
 app.get("/*", (req, res) => {
   console.log(`\n~ Unexpected URL: ${req.url}`);
+  console.log(`\t=> At ${time}`);
   console.log(`\t=> File '${req.url.split("/").pop()}' not found\n`);
   res.status(404);
   res.send("404: File Not Found");
