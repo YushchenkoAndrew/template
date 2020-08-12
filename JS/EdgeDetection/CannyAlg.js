@@ -1,3 +1,8 @@
+// Source:  https://en.wikipedia.org/wiki/Canny_edge_detector#Process_of_Canny_edge_detection_algorithm
+//          https://towardsdatascience.com/canny-edge-detection-step-by-step-in-python-computer-vision-b49c3a2d8123
+//          https://en.wikipedia.org/wiki/Gaussian_blur#Sample_Gaussian_matrix
+//          https://en.wikipedia.org/wiki/Sobel_operator
+
 class CannyAlg {
   constructor() {
     image(img, 0, 0);
