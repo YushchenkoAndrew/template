@@ -5,9 +5,13 @@
 
 class CannyAlg {
   constructor() {
-    image(img, 0, 0);
-
     this.pixels = [];
+
+    this.reset();
+  }
+
+  reset() {
+    image(img, 0, 0);
 
     loadPixels();
     for (let i = 0; i < H * pxD; i++)
@@ -41,7 +45,7 @@ class CannyAlg {
    * @param {*} k -- size = 2 * k + 1
    * @param {*} sigma
    */
-  applyGaussFilter(k, sigma = 1) {
+  applyGaussFilter(k = 2, sigma = 1) {
     // loadPixels();
 
     for (let i = 0; i < H * pxD; i++)
@@ -200,7 +204,7 @@ class CannyAlg {
     return max;
   }
 
-  applyDoubleThreshold(highThresholdRatio, lowThresholdRatio) {
+  applyDoubleThreshold(highThresholdRatio = 0.08, lowThresholdRatio = 0.05) {
     let highThreshold = this.getMax() * highThresholdRatio;
     let lowThreshold = highThreshold * lowThresholdRatio;
 
