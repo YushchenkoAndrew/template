@@ -46,7 +46,7 @@ class CannyAlg {
    * @param {*} sigma
    */
   applyGaussFilter(k = 2, sigma = 1) {
-    // loadPixels();
+    k = int(k);
 
     for (let i = 0; i < H * pxD; i++)
       for (let j = 0; j < W; j++) {

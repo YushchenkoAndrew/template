@@ -22,34 +22,55 @@ class Item {
   setData(data) {
     this.data = {};
     Object.setPrototypeOf(this.data, data);
-  }
-
-  showData(x, y) {
-    if (this.y < y || this.y - MENU_SIZE > y || this.x > x || this.x + this.w < x) return;
-
-    // fill(150, 0, 250, 100);
-    // rect(this.x, this.y, this.w, 100);
+    this.data.min = [];
+    this.data.max = [];
 
     let step = this.w / this.data.value.length;
     for (let i = 0; i < this.data.value.length; i++) {
-      noStroke();
-      fill(164, 34, 250);
-      text(this.data.value[i], this.x + 10 + step * i, this.y - 50);
-      let w_ = (MENU_SIZE / 2) * (this.data.value[i] + "").length;
+      let w_ = (MENU_SIZE / 2) * this.data.value[i].toFixed(2).length + step * i;
+
+      this.data.min[i] = { x: this.x + w_, y: this.y - 50 - MENU_SIZE, w: MENU_SIZE / 2, h: MENU_SIZE };
+      this.data.max[i] = { x: this.x + w_ + MENU_SIZE / 2, y: this.y - 50 - MENU_SIZE, w: MENU_SIZE / 2, h: MENU_SIZE };
+    }
+  }
+
+  showData(x_, y_, enable) {
+    if (!enable && (this.y < y_ || this.y - MENU_SIZE > y_ || this.x > x_ || this.x + this.w < x_)) return;
+
+    let step = this.w / this.data.value.length;
+    for (let i = 0; i < this.data.value.length; i++) {
+      stroke(0);
+      fill(255);
+
+      text(this.data.value[i].toFixed(2), this.x + step * i, this.y - 50);
+      // let w_ = (MENU_SIZE / 2) * (this.data.value[i] + "").length;
 
       fill(192, 57, 43);
-      text("<", this.x + 10 + step * i + w_, this.y - 50);
+      text("<", this.data.min[i].x, this.data.min[i].y + MENU_SIZE);
 
       fill(100, 255, 20);
-      text(">", this.x + 10 + step * i + w_ + MENU_SIZE / 2, this.y - 50);
-
-      stroke(255);
-      noFill();
-      rect(this.x + 10 + step * i + w_, this.y - 50 - MENU_SIZE, MENU_SIZE / 2, MENU_SIZE);
-      rect(this.x + 10 + step * i + w_ + MENU_SIZE / 2, this.y - 50 - MENU_SIZE, MENU_SIZE / 2, MENU_SIZE);
+      text(">", this.data.max[i].x, this.data.max[i].y + MENU_SIZE);
     }
-    // console.log("Yo Data!!");
     return true;
+  }
+
+  changeData(x_, y_) {
+    for (var i = 0; i < this.data.value.length; i++) {
+      let { y, w, h } = this.data.min[i];
+      let minX = this.data.min[i].x;
+      let maxX = this.data.max[i].x;
+
+      if (y < y_ && y + h > y_) {
+        let sign = minX < x_ && minX + w > x_ ? -1 : 0;
+        sign = maxX < x_ && maxX + w > x_ ? 1 : sign;
+
+        this.data.value[i] += this.data.step * sign;
+
+        if (sign) break;
+      }
+    }
+
+    return !(i == this.data.value.length);
   }
 
   reset() {

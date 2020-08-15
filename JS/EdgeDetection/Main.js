@@ -43,12 +43,12 @@ function setup() {
 }
 
 function mouseClicked() {
-  if (menu.IsEnable() && !menu.enableOption(mouseX, mouseY)) return;
+  if (menu.IsEnable() && (!menu.enableOption(mouseX, mouseY) || !menu.changeItemData(mouseX, mouseY))) return;
   menu.runNextOption();
 }
 
 function doubleClicked() {
-  invertFlag ^= true;
+  // invertFlag ^= true;
 }
 
 function draw() {

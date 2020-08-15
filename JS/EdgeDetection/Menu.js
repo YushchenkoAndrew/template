@@ -4,6 +4,7 @@ class Menu {
     this.enable = true;
     this.menuButt = { x: 10, y: 10, w: 30, h: 30 };
     this.index = -1;
+    this.inTheRange = false;
 
     textSize(MENU_SIZE);
 
@@ -18,21 +19,24 @@ class Menu {
   }
 
   enableOption(x, y) {
-    for (var i in this.items) if (this.items[i].changeOption(x, y)) break;
+    for (var i = 0; i < this.items.length; i++) if (this.items[i].changeOption(x, y)) break;
 
-    return i == this.items.length - 1;
+    return i == this.items.length;
   }
 
   runNextOption() {
     if (++this.index == this.func.length - 1) {
       this.reset();
       this.func[this.index](); // Reset Image
+      this.refreshMenuBar();
       this.index = -1;
       return;
     }
 
     if (!this.items[this.index].enable && this.refreshMenuBar()) return;
-    this.func[this.index]();
+
+    let data = this.items[this.index].data ? this.items[this.index].data.value : [];
+    this.func[this.index](...data);
     this.items[this.index].complete = true;
 
     this.refreshMenuBar();
@@ -45,6 +49,8 @@ class Menu {
     noStroke();
     fill(0, 100);
     if (!this.enable) rect(0, 0, menuW, H);
+    for (let i in this.items) this.items[i].show();
+
     return true;
   }
 
@@ -56,10 +62,35 @@ class Menu {
     this.items[index].setData(data);
   }
 
-  showData(x, y) {
-    for (var i in this.items) if (this.items[i].data && this.items[i].showData(x, y)) break;
+  showData(x_, y_) {
+    let checkRange = InRange.bind(this);
 
-    // if (i == this.items.length - 1) this.refreshMenuBar();
+    for (var i = 0; i < this.items.length; i++) if (this.items[i].data && this.items[i].showData(x_, y_, this.inTheRange && checkRange(i, x_, y_))) break;
+
+    this.inTheRange |= i != this.items.length;
+
+    if (this.inTheRange) {
+      this.inTheRange &= checkRange(i, x_, y_);
+      if (this.inTheRange) return;
+
+      this.refreshMenuBar();
+    }
+
+    function InRange(i, x_, y_) {
+      let { x, y } = this.items[i - 1] || { x: 0, y: 0 };
+      let { w } = this.items[i] || 0;
+      let h = (this.items[i] ? this.items[i].y : y) - y;
+
+      return x < x_ && x + w > x_ && y < y_ && y + h > y_;
+    }
+  }
+
+  changeItemData(x, y) {
+    for (var i = 0; i < this.items.length; i++) if (this.items[i].data && this.items[i].changeData(x, y)) break;
+
+    if (i != this.items.length) this.refreshMenuBar();
+
+    return i == this.items.length;
   }
 
   IsEnable() {
