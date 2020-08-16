@@ -1,47 +1,54 @@
 import sqlalchemy as db
-import os
 import owncloud
+import os
+import sys
+import select
+import time
 
-USER = 'GrimReaper'
-PASS = ''
 PATH = '/home/pi/Share'
 FOLDER = 'Share'
+TIMEOUT = 10
 
 
-def connToDataBase(name, user, passw, host='127.0.0.1', port=''):
+def connToDataBase(name, user, passw, table, host='127.0.0.1', port=''):
     engine = db.create_engine(
         'mysql+pymysql://{0}:{1}@{2}/{3}'.format(user, passw, host, name))
 
     metadata = db.MetaData()
-    storage = db.Table('Storage', metadata, autoload=True,
+    storage = db.Table(table, metadata, autoload=True,
                        autoload_with=engine)
     return (engine.connect(), metadata, storage)
 
 
-def connToCloud():
-    cloud = owncloud.Client('http://127.0.0.1/owncloud')
-    cloud.login(USER, PASS)
+def connToCloud(cloud, user, passw, host = '127.0.0.1', port = 80):
+    cloud = owncloud.Client('http://{0}:{1}/{2}'.format(host, port, cloud))
+    cloud.login(user, passw)
     return cloud
 
 
-def getFilesName(dbTable):
+def getFilesName(conn, dbTable):
     return [f[1] for f in conn.execute(db.select([dbTable])).fetchall()]
 
 
-def checkFolderExistenceInCloud(name):
+def checkFolderExistenceInCloud(cloud, name):
     try:
         cloud.list("/" + name)
     except Exception:
         cloud.mkdir(name)
-        print("Folder {0} created".format(name))
+        print("~ Create Direcectory -- '{}'".format(name))
 
 
-def getFilesList(path):
-    # Add files description to DataBase
-    stream = os.popen('ls ' + PATH + ' --full-time')
-    output = stream.read()
+def walker(path):
+    names = []
+    location = []
 
-    return [i.split(" ") for i in output.split("\n") if '.' in i.split(" ")[- 1]]
+    for root, dirs, files in  os.walk(path):
+        names.extend(files)
+
+        for f in files:
+            location.append(root + '/' + f)
+
+    return names, location
 
 
 def deleteMissedFiles(files, conn, cloud):
@@ -52,45 +59,82 @@ def deleteMissedFiles(files, conn, cloud):
 
 
 def showDataBaseState(conn, dbTable):
-    print("Files:")
+    print("\n~Print current DataBase State")
     for data in conn.execute(db.select([dbTable])).fetchall():
-        print(data)
+        for el in data:
+            print("\t{}".format(el), sep="\t", end="")
+        print()
 
 
-def checkFolder(dbTable, conn, cloud):
-    files = getFilesName(dbTable)
+def checkFolder(dbTable, conn, cloud, storage):
+    files = getFilesName(conn, dbTable)
+    names, loc = walker(PATH)
 
-    print("\nExistent Files:")
+    print("\n~ Check new Files")
 
-    for f in getFilesList(PATH):
-        print("{0} -- {1}".format(f[-1], f[-4]))
-        if not(f[-1] in files):
-            op = storage.insert().values(FileName=f[-1], Date=f[-4])
-            cloud.put_file('Share/' + f[-1], PATH + "/" + f[-1])
-            files.append(f[-1])
+    for f, path in zip(names, loc):
+        print("\t{0} -- {1}".format(f, path))
+        if not(f in files):
+            op = storage.insert().values(Name=f, Type='f', Date=time.strftime("%Y-%m-%d"))
+            cloud.put_file('Share/' + f, path)
+            files.append(f)
         else:
-            op = storage.update().values(Date=f[-4])
+            op = storage.update().values(Date=time.strftime("%Y-%m-%d"))
 
-        files.remove(f[-1])
+        files.remove(f)
         conn.execute(op)
 
-    print("\nDelete Files: ", files)
+    print("\n~ Delete Files:", files)
 
     # Delete files from cloud if they don't into a folder
     deleteMissedFiles(files, conn, cloud)
 
 
-# Connect to DataBase
-conn, metadata, storage = connToDataBase(
-    user='test', passw='test', name='FolderSharing')
-print("Success: Connected to DataBase")
+def Main():
+    # Connect to DataBase
+    try:
+        conn, metadata, storage = connToDataBase(
+            user='test', passw='test', name='FolderSharing', table='Storage', host='192.168.0.105')
+        print("~ Success: Connection to DataBase")
+    except:
+        print("~ Faild: Connection to DataBase")
+        sys.exit()
 
-# Connect to Cloud
-cloud = connToCloud()
-print("Success: Connected to Cloud")
-checkFolderExistenceInCloud(FOLDER)
+    # Connect to Cloud
+    try:
+        cloud = connToCloud(user='GrimReaper', passw='', cloud='nextcloud')
+        print("~ Success: Login to Cloud")
+        checkFolderExistenceInCloud(cloud, FOLDER)
+    except:
+        print("~ Faild: Connection to Cloud")
+        sys.exit()
 
-checkFolder(storage, conn, cloud)
 
-# Equivalent to 'SELECT * FROM User'
-#showDataBaseState(conn, storage)
+    checkFolder(storage, conn, cloud, storage)
+
+    # Equivalent to 'SELECT * FROM User'
+    showDataBaseState(conn, storage)
+
+
+print("\n~ Wait for Command\n")
+while 1:
+    i, o, e = select.select([sys.stdin], [], [], TIMEOUT)
+
+    command = 'auto'
+
+    if (i):
+        command = sys.stdin.readline().strip()
+
+    if ('Refresh' in command or 'rf' in command):
+        print("~ Check Changes")
+        Main()
+        print("\n~ Wait for Command\n\t")
+
+    elif ('break' in command):
+        print("~ Program Terminated")
+        break
+
+    elif ('auto' in command and time.strftime("%H-%M-%S").split("-")[0] == '21'):
+        print("~ Auto update")
+        Main()
+        print("\n~ Wait for Command\n\t")
