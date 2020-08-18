@@ -1,3 +1,6 @@
+// Source: https://www.red3d.com/cwr/boids/
+//         https://natureofcode.com/book/chapter-6-autonomous-agents/
+
 class Flock {
   constructor(n = 1) {
     this.flock = [];
