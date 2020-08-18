@@ -1,14 +1,17 @@
 const express = require("express");
 const app = express();
-const time = new Date();
 
 const HOST = "0.0.0.0";
 const PORT = 8000;
 
 app.get("/projects/*", (req, res, next) => {
   console.log(`~ Get request to ${req.url}`);
+  const time = new Date();
   console.log(`\t=> At ${time}`);
-  console.log(`\t=> From Client ${req.connection.remoteAddress}\n`);
+
+  const forwarded = req.headers['x-forwarded-for'];
+  const clientIP = forwarded ? forwarded.split(/, /)[0] : req.connection.remoteAddress;
+  console.log(`\t=> From Client ${clientIP}\n`);
   next();
 });
 
@@ -16,8 +19,14 @@ app.use("/projects", express.static("JS"));
 
 app.get("/*", (req, res) => {
   console.log(`\n~ Unexpected URL: ${req.url}`);
+  let time = new Date();
   console.log(`\t=> At ${time}`);
   console.log(`\t=> File '${req.url.split("/").pop()}' not found\n`);
+
+  const forwarded = req.headers['x-forwarded-for'];
+  const clientIP = forwarded ? forwarded.split(/, /)[0] : req.connection.remoteAddress;
+  console.log(`\t=> From Client ${clientIP}\n`);
+
   res.status(404);
   res.send("404: File Not Found");
 });
