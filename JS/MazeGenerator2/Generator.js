@@ -15,6 +15,8 @@ class Generator {
       },
     };
 
+    this.index = 0;
+    this.keys = ["NW", "NE", "SW", "SE"];
     this.chambers = { NW: {}, NE: {}, SW: {}, SE: {} };
 
     for (let i in this.chambers) {
@@ -25,10 +27,8 @@ class Generator {
   subDivide() {
     if (this.chamber.w - step < step || this.chamber.h - step < step) return;
 
-    let dx =
-      Math.floor(random(1, Math.floor(this.chamber.w / step - 1))) * step;
-    let dy =
-      Math.floor(random(1, Math.floor(this.chamber.h / step - 1))) * step;
+    let dx = Math.floor(random(1, Math.floor(this.chamber.w / step - 1))) * step;
+    let dy = Math.floor(random(1, Math.floor(this.chamber.h / step - 1))) * step;
 
     let w = this.chamber.w - dx;
     let h = this.chamber.h - dy;
@@ -65,6 +65,8 @@ class Generator {
     this.chambers["SE"].setValue(new Generator(se));
 
     this.divide = true;
+
+    return true;
   }
 
   generateHoles(x, y, w, h) {
@@ -88,19 +90,20 @@ class Generator {
   }
 
   update() {
-    if (!this.divide) {
-      this.subDivide();
-      // return;
+    if (!this.divide) return this.subDivide();
+
+    if (this.keys[this.index] && this.chambers[this.keys[this.index]].divide && !this.chambers[this.keys[this.index]].value.update()) {
+      for (var i = this.index + 1; i < this.keys.length; i++) if (this.chambers[this.keys[i]].divide) break;
+
+      this.index = i;
     }
 
-    for (let i in this.chambers)
-      if (this.chambers[i].divide) this.chambers[i].value.update();
+    return this.keys[this.index];
   }
 
   show() {
     this.chamber.show();
 
-    for (let i in this.chambers)
-      if (this.chambers[i].divide) this.chambers[i].value.show();
+    for (let i in this.chambers) if (this.chambers[i].divide) this.chambers[i].value.show();
   }
 }

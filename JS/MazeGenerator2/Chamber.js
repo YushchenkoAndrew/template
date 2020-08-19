@@ -9,30 +9,15 @@ class Chamber {
 
     switch (wall.type) {
       case "NW": {
-        this.walls.Down = [
-          this.x,
-          this.y + this.h,
-          this.x + this.w,
-          this.y + this.h,
-        ];
-        this.walls.Right = [
-          this.x + this.w,
-          this.y,
-          this.x + this.w,
-          this.y + this.h,
-        ];
+        this.walls.Down = [this.x, this.y + this.h, this.x + this.w, this.y + this.h];
+        this.walls.Right = [this.x + this.w, this.y, this.x + this.w, this.y + this.h];
 
         this.walls.Down = setHole(this.walls.Down, wall.Down, 0);
         this.walls.Right = setHole(this.walls.Right, wall.Right, 1);
         break;
       }
       case "NE": {
-        this.walls.Down = [
-          this.x,
-          this.y + this.h,
-          this.x + this.w,
-          this.y + this.h,
-        ];
+        this.walls.Down = [this.x, this.y + this.h, this.x + this.w, this.y + this.h];
         this.walls.Left = [this.x, this.y, this.x, this.y + this.h];
 
         this.walls.Down = setHole(this.walls.Down, wall.Down, 0);
@@ -41,12 +26,7 @@ class Chamber {
       }
       case "SW": {
         this.walls.Up = [this.x, this.y, this.x + this.w, this.y];
-        this.walls.Right = [
-          this.x + this.w,
-          this.y,
-          this.x + this.w,
-          this.y + this.h,
-        ];
+        this.walls.Right = [this.x + this.w, this.y, this.x + this.w, this.y + this.h];
 
         this.walls.Up = setHole(this.walls.Up, wall.Up, 0);
         this.walls.Right = setHole(this.walls.Right, wall.Right, 1);
@@ -63,12 +43,8 @@ class Chamber {
       default: {
         this.walls.Up = [[this.x, this.y, this.x + this.w, this.y]];
         this.walls.Left = [[this.x, this.y, this.x, this.y + this.h]];
-        this.walls.Right = [
-          [this.x + this.w, this.y, this.x + this.w, this.y + this.h],
-        ];
-        this.walls.Down = [
-          [this.x, this.y + this.h, this.x + this.w, this.y + this.h],
-        ];
+        this.walls.Right = [[this.x + this.w, this.y, this.x + this.w, this.y + this.h]];
+        this.walls.Down = [[this.x, this.y + this.h, this.x + this.w, this.y + this.h]];
       }
     }
 
@@ -84,11 +60,13 @@ class Chamber {
   }
 
   show() {
-    stroke(255);
-    // noFill();
+    noStroke();
+    fill(highlight ? 255 : 0, 20);
+    rect(this.x, this.y, this.w, this.h);
 
-    // rect(this.x, this.y, this.w, this.h);
-    for (let i in this.walls)
-      for (let j in this.walls[i]) line(...this.walls[i][j]);
+    noFill();
+    stroke(255);
+    strokeWeight(2);
+    for (let i in this.walls) for (let j in this.walls[i]) line(...this.walls[i][j]);
   }
 }
