@@ -1,0 +1,32 @@
+.terminal,
+.terminal-output > :not(.raw),
+.terminal-output > :not(.raw) span,
+.terminal-output > :not(.raw) a,
+.cmd,
+.cmd span {
+  font-family: Consolas, "Courier New", monospace;
+  /* font-size: 18px; */
+  /* line-height: 1; */
+}
+
+/* .cmd {
+  position: absolute !important;
+  bottom: 10px;
+  right: 10px;
+  left: 10px;
+  width: auto !important;
+}
+.terminal {
+  overflow-y: hidden;
+}
+.terminal .terminal-output {
+  max-height: calc(100% - 15px);
+  overflow-y: auto;
+} */
+
+.terminal {
+  --color: rgba(255, 255, 255, 0.99);
+  --background: #272833;
+  --animation: terminal-underline;
+  --size: 1.5;
+}
