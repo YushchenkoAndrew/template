@@ -132,14 +132,12 @@ $("body").terminal(
     keymap: {
       "CTRL+R": () => {},
     },
-  },
+  }
 );
 
 $.terminal.defaults.formatters.push(function (str) {
   let strList = str.split(/((?:\s|&nbsp;)+)/);
   strList[0] = commands.indexOf(strList[0]) != -1 ? `[[;#aed581;]${strList[0]}]` : strList[0];
-  // ??
-  // `[[;#d32f2f;]${strList[0]}]`;
 
   return strList.join("");
 });
