@@ -8,6 +8,7 @@ namespace HAL
 {
 #pragma pad(4)
 
+  // TODO:
   struct UartRegList
   {
   };
