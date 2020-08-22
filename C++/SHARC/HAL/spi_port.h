@@ -116,8 +116,8 @@ namespace HAL
 
 #pragma always_inline
             inline SpiPort() : regs_(reinterpret_cast<SpiRegList<Port> *>(SpiPortSelect<Port>::Address)),
-                               rcvDma_(reinterpret_cast<DmaRegsList *>(SpiPortSelect<Port>::RcvDmaAddress)),
-                               xmtDma_(reinterpret_cast<DmaRegsList *>(SpiPortSelect<Port>::XmtDmaAddress))
+                               rcvDma_(reinterpret_cast<DmaRegsList<> *>(SpiPortSelect<Port>::RcvDmaAddress)),
+                               xmtDma_(reinterpret_cast<DmaRegsList<> *>(SpiPortSelect<Port>::XmtDmaAddress))
             {
             }
 
@@ -128,21 +128,21 @@ namespace HAL
             }
 
 #pragma always_inline
-            inline volatile DmaRegsList *const RcvDma()
+            inline volatile DmaRegsList<> *const RcvDma()
             {
                 return rcvDma_;
             }
 
 #pragma always_inline
-            inline volatile DmaRegsList *const XmtDma()
+            inline volatile DmaRegsList<> *const XmtDma()
             {
                 return xmtDma_;
             }
 
         private:
-            volatile SpiRegList<Port> *regs_;
-            volatile DmaRegsList *const rcvDma_;
-            volatile DmaRegsList *const xmtDma_;
+            volatile SpiRegList<Port> *const regs_;
+            volatile DmaRegsList<> *const rcvDma_;
+            volatile DmaRegsList<> *const xmtDma_;
         };
     } // namespace Detail
 

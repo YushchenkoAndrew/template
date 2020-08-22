@@ -204,6 +204,7 @@ namespace HAL
                                     xmtInterrupt_(Detail::SpiPortSelect<Port>::XmtInterruptID),
                                     statusInterrupt_(Detail::SpiPortSelect<Port>::StatusInterruptId)
         {
+            // FIXME:
             // MPL::foreach<Pins, Detail::PortInitPins>::Process();                // Detail::PortInitPins  -- ?
 
             InterruptSource<Detail::SpiPortSelect<Port>::XmtInterruptID,

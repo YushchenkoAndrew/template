@@ -2,6 +2,9 @@
 
 namespace HAL
 {
+#define sti() __asm("CPSIE i") // enable interrupts
+#define cli() __asm("CPSID i") // disable interrupts
+
     class CriticalSection
     {
     public:
@@ -20,14 +23,13 @@ namespace HAL
 #pragma always_inline
         inline void Lock()
         {
+            cli();
         }
 
 #pragma always_inline
         inline void UnLock()
         {
+            sti();
         }
-
-    private:
-        unsigned int mask_;
     };
 } // namespace HAL
