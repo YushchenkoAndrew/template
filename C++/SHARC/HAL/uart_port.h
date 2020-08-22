@@ -8,9 +8,22 @@ namespace HAL
 {
 #pragma pad(4)
 
-  // TODO:
   struct UartRegList
   {
+    unsigned long Contol;
+    unsigned long Status;
+    unsigned short Scr;
+    unsigned long Clock;
+    unsigned short IntMask;
+    unsigned short IntMaskSet;
+    unsigned short IntMaskClear;
+    unsigned short RcvBuff;
+    unsigned short XmtHoldReg;
+    unsigned short Taip; // Transmit Address/Intert Pulse Register
+    unsigned short XmtShiftReg;
+    unsigned short RcvShiftReg;
+    unsigned short XmtCountReg;
+    unsigned short RcvCountReg;
   };
 
   namespace Detail

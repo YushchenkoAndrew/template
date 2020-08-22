@@ -200,7 +200,8 @@ namespace HAL
         typedef SpiMater<Port> ThisType;
 
         template <class Pins>
-        SpiMater(Type2Type<Pins>) : rcvInterrupt_(Detail::SpiPortSelect<Port>::RcvInterruptID),
+        SpiMater(Type2Type<Pins>) : port_(Int2Type<Port>()),
+                                    rcvInterrupt_(Detail::SpiPortSelect<Port>::RcvInterruptID),
                                     xmtInterrupt_(Detail::SpiPortSelect<Port>::XmtInterruptID),
                                     statusInterrupt_(Detail::SpiPortSelect<Port>::StatusInterruptId)
         {

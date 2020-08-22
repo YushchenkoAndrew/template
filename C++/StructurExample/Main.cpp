@@ -66,10 +66,16 @@ int main()
 
     std::cout << "~1 = " << std::bitset<32>(~1) << "\n";
 
-    int b = 5;
+    // int b = 5;
 
     TypeTesting<5>(0);
     WithoutType(5);
+
+    unsigned char aa = 'a';
+    char bb = aa;
+
+    std::cout << "a = " << aa << std::endl
+              << "b = " << bb << std::endl;
 
     return 0;
 }
