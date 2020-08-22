@@ -9,7 +9,7 @@ app.get("/projects/*", (req, res, next) => {
   const time = new Date();
   console.log(`\t=> At ${time}`);
 
-  const forwarded = req.headers['x-forwarded-for'];
+  const forwarded = req.headers["x-forwarded-for"];
   const clientIP = forwarded ? forwarded.split(/, /)[0] : req.connection.remoteAddress;
   console.log(`\t=> From Client ${clientIP}\n`);
   next();
@@ -23,12 +23,12 @@ app.get("/*", (req, res) => {
   console.log(`\t=> At ${time}`);
   console.log(`\t=> File '${req.url.split("/").pop()}' not found\n`);
 
-  const forwarded = req.headers['x-forwarded-for'];
+  const forwarded = req.headers["x-forwarded-for"];
   const clientIP = forwarded ? forwarded.split(/, /)[0] : req.connection.remoteAddress;
   console.log(`\t=> From Client ${clientIP}\n`);
 
   res.status(404);
-  res.send("404: File Not Found");
+  res.sendFile(__dirname + "/FileNotFound.html");
 });
 
 process.on("SIGINT", function () {
