@@ -10,7 +10,10 @@
     "description": "Call function 'funcName' with parameters 'InputData' ('$0' = undefined, parameters declare by comma)"
   },
   "run": { "command": "run <URL>", "description": "Redirect to the specific website 'URL' or project" },
-  "use": { "command": "use <API>", "description": "Change command filed to the specific command for this API" },
-  "example": { "command": "example", "description": "Show example for all commands" },
-  "func": { "command": "func", "description": "Display all interactive functions" }
+  "use": { "command": "use <API>", "description": "Change command field to the specific command for this API" },
+  "example": { "command": "example", "description": "Show example for all commands\n Also used for testing purpose" },
+  "func": { "command": "func", "description": "Display all interactive functions" },
+  "watch": { "command": "watch <funcName>", "description": "Execute a function/variable and show its output (Stop - CTRL+D)" },
+  "set": { "command": "func <variable> <value>", "description": "Set value to the variable" },
+  "print": { "command": "func", "description": "Print variable value" }
 }

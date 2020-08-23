@@ -11,3 +11,8 @@ function sum(a, b) {
   console.log(a + b);
   $.terminal.active().echo(`${outputSign} sum = ${a} + ${b} = ${a + b}`);
 }
+
+function setup() {
+  noCanvas();
+  console.log("Yep!!!");
+}

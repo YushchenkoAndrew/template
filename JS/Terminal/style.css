@@ -12,8 +12,15 @@
 }
 
 .terminal {
-  top: -580px;
-  left: 125px;
+  position: fixed;
+  top: 135px;
+  /* left: 125px; */
+  right: 75px;
+  scroll-behavior: initial;
+}
+
+body {
+  background-color: #ffffff
 }
 
 /* .cmd {
@@ -32,10 +39,10 @@
   max-height: calc(100% - 15px);
   overflow-y: auto;
 } */
-img {
+/* img {
   margin-top: 10px;
   margin-left: 100px;
-}
+} */
 
 .terminal {
   --color: rgba(255, 255, 255, 0.99);

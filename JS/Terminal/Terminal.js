@@ -1,15 +1,17 @@
 const prevComm = "[[;#5dade2;]$]";
 const outputSign = "[[;#5dade2;] >]";
 const highlightFolder = (name) => `[[;#f4d03f;]${name}]`;
-const commands = ["example", "cc", "help", "cat", "history", "ls", "tree", "use", "cin", "run", "func"];
+const commands = ["example", "cc", "help", "cat", "history", "ls", "tree", "use", "cin", "run", "func", "watch", "set", "print"];
 const successCommand = (comm) => `[[;#aed581;]${comm}]`;
 const int = (char) => (!!Number(char) ? Number(char) : char);
 const highlightCommand = (command) => command.replace(/</g, "[[;#f7dc6f;]<").replace(/>/g, ">]");
 const highlightAnnotation = (str) => str.replace("(", "[[;#cb4335;](").replace(")", ")]");
 
+var test = "hello world!!";
+
 $("body").terminal(
   {
-    example: () => {
+    example: async () => {
       let terminal = $.terminal.active();
       terminal.update(-1, `${prevComm} ${successCommand("test")}`);
 
@@ -22,8 +24,8 @@ $("body").terminal(
       terminal.exec("cin testFunc Its_Work!");
 
       // Command - cat
-      terminal.exec("cat CirclePacking/Neko.jpg");
       terminal.exec("cat app.js");
+      terminal.exec("cat CirclePacking/Neko.jpg");
 
       // Command - help
       terminal.exec("help -l");
@@ -34,11 +36,11 @@ $("body").terminal(
       // Command - tree
       terminal.exec("tree");
 
-      console.log(window.innerWidth);
-      console.log(window.innerHeight);
+      // Command - print
+      terminal.exec("print testFunc");
     },
 
-    cat: async (fileName) => {
+    cat: (fileName) => {
       $.terminal.active().update(-1, `${prevComm} ${successCommand("cat")} ${fileName}`);
 
       if (fileName.includes("png") || fileName.includes("jpg")) {
@@ -74,6 +76,7 @@ $("body").terminal(
       });
     },
 
+    // Maybe create this function later~~
     use: (dir) => {
       $.terminal.active().update(-1, `${prevComm} ${successCommand("use")} ${dir}`);
       // $.getJSON("FileStructure.json", (data) => {
@@ -119,7 +122,6 @@ $("body").terminal(
           $.terminal.active().echo(`|- ${highlightFolder(i)}`);
           for (var j = 0; j < data[i].length - 1; j++) $.terminal.active().echo(`|\t|--- ${data[i][j]}`);
           $.terminal.active().echo(`|\t+--- ${data[i][j]}\n|`);
-          // console.log();
         }
 
         // $.terminal.active().echo(list);
@@ -145,7 +147,6 @@ $("body").terminal(
 
           let indent = " ".repeat(command.length > 15 ? 15 : command.length);
           let formattedStr = "";
-
           let step = 40 - indent.length;
 
           for (let i = 0; i < description.length; i += step) formattedStr += [highlightAnnotation(description.slice(i, i + step)), "\n", indent].join("");
@@ -156,6 +157,8 @@ $("body").terminal(
     },
 
     func: () => {
+      $.terminal.active().update(-1, `${prevComm} ${successCommand("func")}`);
+
       $.getJSON("FuncList.json", (data) => {
         $.terminal.active().echo(`${outputSign}\t[[;#85c1e9;]FUNC] \t [[;#85c1e9;]PARAMETERS] \t [[;#85c1e9;]TYPE]`);
 
@@ -167,6 +170,45 @@ $("body").terminal(
           $.terminal.active().echo();
         }
       });
+    },
+
+    watch: async (funcName) => {
+      $.terminal.active().update(-1, `${prevComm} ${successCommand("watch")} ${funcName}`);
+      $.terminal.active().echo(`${outputSign}`);
+      $.terminal.active().pause();
+
+      if (!window[funcName]) {
+        $.terminal.active().update(-1, `[[;#cb4335;] > No such Function or Variable: ${funcName}]`);
+        return;
+      }
+
+      while ($.terminal.active().paused()) {
+        $.terminal.active().update(-1, `${outputSign} ${typeof window[funcName] === "function" ? window[funcName]() : window[funcName]}`);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    },
+
+    set: (variable, value) => {
+      $.terminal.active().update(-1, `${prevComm} ${successCommand("set")} ${variable} ${value}`);
+
+      if (!window[variable]) {
+        $.terminal.active().error(` > No such Function or Variable: ${funcName}]`);
+        return;
+      }
+
+      window[variable] = int(value);
+      $.terminal.active().echo(`${outputSign} ${variable} = ${window[variable]}`);
+    },
+
+    print: (variable) => {
+      $.terminal.active().update(-1, `${prevComm} ${successCommand("print")} ${variable}`);
+
+      if (!window[variable]) {
+        $.terminal.active().error(` > No such Function or Variable: ${funcName}]`);
+        return;
+      }
+
+      $.terminal.active().echo(`${outputSign} ${variable} = ${window[variable]}`);
     },
 
     history: () => {
