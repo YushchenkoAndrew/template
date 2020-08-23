@@ -1,0 +1,14 @@
+{
+  "test": {
+    "parameters": ["data"],
+    "type": ["any"]
+  },
+  "name": {
+    "parameters": ["data"],
+    "type": ["array of any"]
+  },
+  "sum": {
+    "parameters": ["a", "b"],
+    "type": ["Number", "Number"]
+  }
+}

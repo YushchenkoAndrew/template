@@ -1,0 +1,16 @@
+{
+  "help": { "command": "help <flag>", "description": "Print all commands and their descriptions ('-a' => Show description, '-l' => Print list)" },
+  "cc": { "command": "cc", "description": "Clear display" },
+  "history": { "command": "history", "description": "Show history (last 60 commands)" },
+  "cat": { "command": "cat <file>", "description": "Print file or load picture, pictures can be load from other websites" },
+  "ls": { "command": "ls", "description": "List directory contents (from '/')" },
+  "tree": { "command": "tree", "description": "Show directories contents organized as tree (from '/')" },
+  "cin": {
+    "command": "cin <funcName> <InputData>",
+    "description": "Call function 'funcName' with parameters 'InputData' ('$0' = undefined, parameters declare by comma)"
+  },
+  "run": { "command": "run <URL>", "description": "Redirect to the specific website 'URL' or project" },
+  "use": { "command": "use <API>", "description": "Change command filed to the specific command for this API" },
+  "example": { "command": "example", "description": "Show example for all commands" },
+  "func": { "command": "func", "description": "Display all interactive functions" }
+}
