@@ -1,47 +1,66 @@
 const prevComm = "[[;#5dade2;]$]";
 const outputSign = "[[;#5dade2;] >]";
 const highlightFolder = (name) => `[[;#f4d03f;]${name}]`;
-const commands = ["test", "cc", "help", "cat", "history", "ls", "tree", "use", "cin", "run"];
+const commands = ["example", "cc", "help", "cat", "history", "ls", "tree", "use", "cin", "run", "func"];
 const successCommand = (comm) => `[[;#aed581;]${comm}]`;
 const int = (char) => (!!Number(char) ? Number(char) : char);
+const highlightCommand = (command) => command.replace(/</g, "[[;#f7dc6f;]<").replace(/>/g, ">]");
+const highlightAnnotation = (str) => str.replace("(", "[[;#cb4335;](").replace(")", ")]");
 
 $("body").terminal(
   {
-    test: () => {
+    example: () => {
       let terminal = $.terminal.active();
       terminal.update(-1, `${prevComm} ${successCommand("test")}`);
 
-      terminal.echo(`${outputSign} It works!!`);
-      terminal.echo(`${outputSign} [[;#f4d03f;]test]`);
-      terminal.echo(`${outputSign} [[;#d32f2f;]test]`);
+      terminal.echo(`${outputSign} [[;#f4d03f;]Hello world]`);
 
-      terminal.echo(undefined);
+      // Command - history
+      terminal.exec("history");
 
-      $.getJSON("FileStructure.json", (data) => {
-        console.log(data.CodeRain);
-      });
+      // Command - cin
+      terminal.exec("cin testFunc Its_Work!");
 
-      const img = $('<img src="../CirclePacking/Neko.jpg">');
-      terminal.echo(img);
+      // Command - cat
+      terminal.exec("cat CirclePacking/Neko.jpg");
+      terminal.exec("cat app.js");
 
-      // terminal.scroll_to_bottom();
-      // terminal.scroll(terminal.scrollBottomOffset);
+      // Command - help
+      terminal.exec("help -l");
+
+      // Command - ls
+      terminal.exec("ls");
+
+      // Command - tree
+      terminal.exec("tree");
+
+      console.log(window.innerWidth);
+      console.log(window.innerHeight);
     },
 
-    cat: (fileName) => {
+    cat: async (fileName) => {
       $.terminal.active().update(-1, `${prevComm} ${successCommand("cat")} ${fileName}`);
 
       if (fileName.includes("png") || fileName.includes("jpg")) {
-        $.terminal.active().echo($(`<img src="../${fileName}">`));
+        $.getJSON("FileStructure.json", (data) =>
+          $.terminal.active().echo($(`<img src="${(data[fileName.split("/")[0]] ? "../" : "") + fileName}">`))
+        ).fail(() => $.terminal.active().error(" > File not found!"));
         return;
       }
 
-      $.get("../" + fileName, (data, err) => $.terminal.active().echo(data)).fail(() => $.terminal.active().error(" > File not found!"));
+      if (fileName.includes(".json")) {
+        $.getJSON("../" + fileName, (data) => $.terminal.active().echo($(`<p>${JSON.stringify(data)}</p>`))).fail(() =>
+          $.terminal.active().error(" > File not found!")
+        );
+        return;
+      }
+
+      $.get("../" + fileName, (data) => $.terminal.active().echo(data)).fail(() => $.terminal.active().error(" > File not found!"));
     },
 
     cc: () => {
       $.terminal.active().clear();
-      $.terminal.active().echo(`${outputSign} Type 'help' for printing all commands`);
+      $.terminal.active().echo(`${outputSign} Type 'help -a' for showing commands`);
     },
 
     ls: () => {
@@ -107,11 +126,47 @@ $("body").terminal(
       });
     },
 
-    help: () => {
-      let terminal = $.terminal.active();
-      terminal.update(-1, `${prevComm} ${successCommand("help")}`);
+    help: (flag) => {
+      $.terminal.active().update(-1, `${prevComm} ${successCommand("help")} ${flag}`);
 
-      terminal.echo(`${outputSign} Printing...\n${commands}`);
+      if (flag == "-l") {
+        $.terminal.active().echo(`${outputSign} [[;#85c1e9;]COMMAND]`);
+        for (let i in commands) $.terminal.active().echo(commands[i]);
+        return;
+      }
+
+      // Print Header
+      $.terminal.active().echo(`${outputSign}\t[[;#85c1e9;]COMMAND] \t [[;#85c1e9;]DESCRIPTION]`);
+
+      $.getJSON("Help.json", (data) => {
+        for (let i of commands) {
+          let { command, description } = data[i];
+          $.terminal.active().echo(`${highlightCommand(command)}\n`);
+
+          let indent = " ".repeat(command.length > 15 ? 15 : command.length);
+          let formattedStr = "";
+
+          let step = 40 - indent.length;
+
+          for (let i = 0; i < description.length; i += step) formattedStr += [highlightAnnotation(description.slice(i, i + step)), "\n", indent].join("");
+
+          $.terminal.active().echo(`${indent}${formattedStr}`);
+        }
+      });
+    },
+
+    func: () => {
+      $.getJSON("FuncList.json", (data) => {
+        $.terminal.active().echo(`${outputSign}\t[[;#85c1e9;]FUNC] \t [[;#85c1e9;]PARAMETERS] \t [[;#85c1e9;]TYPE]`);
+
+        for (let i in data) {
+          $.terminal.active().echo(`${highlightFolder(i)}`);
+          let indent = " ".repeat(i.length);
+
+          for (let j in data[i].parameters) $.terminal.active().echo(`${indent}${data[i].parameters[j]}  --  [[;#cb4335;]${data[i].type[j]}]`);
+          $.terminal.active().echo();
+        }
+      });
     },
 
     history: () => {
@@ -123,11 +178,11 @@ $("body").terminal(
     },
   },
   {
-    // height: 200,
-    // width: window.innerWidth / 2,
+    height: 550,
+    width: 450,
     autocompleteMenu: true,
     completion: commands,
-    greetings: `${outputSign} Type 'help' for printing all commands`,
+    greetings: `${outputSign} Type 'help -a' for showing commands`,
     prompt: "[[;#a569bd;]$ ]",
     keymap: {
       "CTRL+R": () => {},
@@ -142,7 +197,7 @@ $.terminal.defaults.formatters.push(function (str) {
   return strList.join("");
 });
 
-function test(data) {
+function testFunc(data) {
   $.terminal.active().echo(`${outputSign} ${data}`);
   console.log(data);
 }

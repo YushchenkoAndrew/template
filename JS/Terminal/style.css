@@ -1,12 +1,19 @@
 .terminal,
-.terminal-output > :not(.raw),
-.terminal-output > :not(.raw) span,
-.terminal-output > :not(.raw) a,
+.terminal-output> :not(.raw),
+.terminal-output> :not(.raw) span,
+.terminal-output> :not(.raw) a,
 .cmd,
 .cmd span {
   font-family: Consolas, "Courier New", monospace;
+  /* top: 100px; */
+  /* margin-top: 100px; */
   /* font-size: 18px; */
   /* line-height: 1; */
+}
+
+.terminal {
+  top: -580px;
+  left: 125px;
 }
 
 /* .cmd {
@@ -16,13 +23,19 @@
   left: 10px;
   width: auto !important;
 }
+
 .terminal {
   overflow-y: hidden;
 }
+
 .terminal .terminal-output {
   max-height: calc(100% - 15px);
   overflow-y: auto;
 } */
+img {
+  margin-top: 10px;
+  margin-left: 100px;
+}
 
 .terminal {
   --color: rgba(255, 255, 255, 0.99);
