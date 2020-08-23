@@ -1,105 +1,108 @@
 <html>
   <head>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" />
     <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
 
-    <style> body {padding: 0; margin: 0;} </style>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+      }
+    </style>
     <script src="Main.js"></script>
     <script src="CannyAlg.js"></script>
     <script src="Menu.js"></script>
     <script src="Item.js"></script>
 
+    <link rel="stylesheet" type="text/css" href="../style.css" />
 
-
-    <link rel="stylesheet" type="text/css" href="../style.css"/>
-
-    <style>     html,
+    <style>
+      html,
       header,
       body {
-          background-color: #fff;
-      }</style>
+        background-color: #fff;
+      }
+    </style>
 
     <title>Mortis</title>
   </head>
   <body>
-
     <ul id="menu">
-        <li><a href="http://mortis-grimreaper.ddns.net/projects/">Home</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropbtn">Fractal Alg</a>
-          <div class="dropdown-content">
-            <a href="http://mortis-grimreaper.ddns.net/projects/FractalSpirograph/">Fractal Spirograph</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/FractalTree/">Fractal Tree</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/FractalTreeAdv/">Fractal Tree Adv</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/L-SystemFractalTree/">L-System Fractal Tree</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/SpongeFractal/">Sponge Fractal</a>
-          </div>
-        </li>
+      <li><a href="http://mortis-grimreaper.ddns.net/projects/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropbtn">Fractal Alg</a>
+        <div class="dropdown-content">
+          <a href="http://mortis-grimreaper.ddns.net/projects/FractalSpirograph/">Fractal Spirograph</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/FractalTree/">Fractal Tree</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/FractalTreeAdv/">Fractal Tree Adv</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/L-SystemFractalTree/">L-System Fractal Tree</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/SpongeFractal/">Sponge Fractal</a>
+        </div>
+      </li>
 
-        <li class="dropdown">
-          <a href="#" class="dropbtn">n-Dimensional Alg</a>
-          <div class="dropdown-content">
-            <a href="http://mortis-grimreaper.ddns.net/projects/Hypercube/">Hypercube (Cube in 4D)</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting2D/">Raycasting 2D</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting3D/">Raycasting 3D</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting3DAdv/">Raycasting 3D Adv</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting3DAdvAdv/">Raycasting 3D Adv Adv</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/PerlinNoise/">Unlimited Space Gen</a>
-          </div>
-        </li>
+      <li class="dropdown">
+        <a href="#" class="dropbtn">n-Dimensional Alg</a>
+        <div class="dropdown-content">
+          <a href="http://mortis-grimreaper.ddns.net/projects/Hypercube/">Hypercube (Cube in 4D)</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting2D/">Raycasting 2D</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting3D/">Raycasting 3D</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting3DAdv/">Raycasting 3D Adv</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting3DAdvAdv/">Raycasting 3D Adv Adv</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/PerlinNoise/">Unlimited Space Gen</a>
+        </div>
+      </li>
 
-        <li class="dropdown">
-          <a href="#" class="dropbtn">Graph Alg</a>
-          <div class="dropdown-content">
-            <a href="http://mortis-grimreaper.ddns.net/projects/DijkstrasAlgorithm/">Dijkstra's Algorithm</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/GiftWrappingAlgorithm/">Gift Wrapping Alg</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/GrahamScan/">Graham Scan Alg</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/PathFinding/">Path Finding</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/PathFindingAdv/">Path Finding Adv</a>
-          </div>
-        </li>
+      <li class="dropdown">
+        <a href="#" class="dropbtn">Graph Alg</a>
+        <div class="dropdown-content">
+          <a href="http://mortis-grimreaper.ddns.net/projects/DijkstrasAlgorithm/">Dijkstra's Algorithm</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/GiftWrappingAlgorithm/">Gift Wrapping Alg</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/GrahamScan/">Graham Scan Alg</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/PathFinding/">Path Finding</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/PathFindingAdv/">Path Finding Adv</a>
+        </div>
+      </li>
 
-        <li class="dropdown">
-          <a href="#" class="dropbtn">Computer Graphics Alg</a>
-          <div class="dropdown-content">
-            <a href="http://mortis-grimreaper.ddns.net/projects/CodeRain/">Code Rain</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/EdgeDetection/">Edge Detection Alg</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/FireEffect/">Fire Effect</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/FireEffectAdv/">Fire Effect Adv</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/FlockingSimulation/">Flocking Simulation</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/FlowField/">Flow Field</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/MarchingSquares/">Marching Squares Alg</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/Metaballs/">Metaballs Alg</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/SteeringBehavior/">Steering Behavior</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/SteeringBehaviorAdv/">Steering Behavior Adv</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/WaterRipple/">Water Ripple</a>
-          </div>
-        </li>
+      <li class="dropdown">
+        <a href="#" class="dropbtn">Computer Graphics Alg</a>
+        <div class="dropdown-content">
+          <a href="http://mortis-grimreaper.ddns.net/projects/CodeRain/">Code Rain</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/EdgeDetection/">Edge Detection Alg</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/FireEffect/">Fire Effect</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/FireEffectAdv/">Fire Effect Adv</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/FlockingSimulation/">Flocking Simulation</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/FlowField/">Flow Field</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/MarchingSquares/">Marching Squares Alg</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/Metaballs/">Metaballs Alg</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/SteeringBehavior/">Steering Behavior</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/SteeringBehaviorAdv/">Steering Behavior Adv</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/WaterRipple/">Water Ripple</a>
+        </div>
+      </li>
 
-        <li class="dropdown">
-          <a href="#" class="dropbtn">Creating "Map"</a>
-          <div class="dropdown-content">
-            <a href="http://mortis-grimreaper.ddns.net/projects/HilbertCurve/">Hilber Curve</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/HilbertCurveAdv/">Hilber Curve Adv</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/MazeGenerator/">Maze Generator</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/MazeGenerator2/">Maze Generator2</a>
-          </div>
-        </li>
+      <li class="dropdown">
+        <a href="#" class="dropbtn">Creating "Map"</a>
+        <div class="dropdown-content">
+          <a href="http://mortis-grimreaper.ddns.net/projects/HilbertCurve/">Hilber Curve</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/HilbertCurveAdv/">Hilber Curve Adv</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/MazeGenerator/">Maze Generator</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/MazeGenerator2/">Maze Generator2</a>
+        </div>
+      </li>
 
-        <li class="dropdown">
-          <a href="#" class="dropbtn">Other</a>
-          <div class="dropdown-content">
-            <a href="http://mortis-grimreaper.ddns.net/projects/ApproximatingPiValue/">Approximating Pi Value</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/BockWaves/">Block Waves</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/CirclePacking/">Circle Packing</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/Fireworks/">Fireworks</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/FourierSeries/">Fourier Series</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/QuadTree/">QuadTree</a>
-          </div>
-        </li>
-        <li><a href="https://github.com/YushchenkoAndrew/template">Code</a></li>
-      </ul>
-
-
+      <li class="dropdown">
+        <a href="#" class="dropbtn">Other</a>
+        <div class="dropdown-content">
+          <a href="http://mortis-grimreaper.ddns.net/projects/ApproximatingPiValue/">Approximating Pi Value</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/BockWaves/">Block Waves</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/CirclePacking/">Circle Packing</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/Fireworks/">Fireworks</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/FourierSeries/">Fourier Series</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/QuadTree/">QuadTree</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/Terminal/">Terminal</a>
+        </div>
+      </li>
+      <li><a href="https://github.com/YushchenkoAndrew/template">Code</a></li>
+    </ul>
   </body>
 </html>
