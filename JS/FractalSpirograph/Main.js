@@ -50,6 +50,12 @@ function createFigure() {
 function draw() {
   background(0);
 
+  stroke(255, 200);
+  line(mouseX, 0, mouseX, H);
+  line(0, mouseY, W, mouseY);
+  fill(255, 100);
+  ellipse(mouseX, mouseY, 20);
+
   if (!(frameCount % 50)) {
     createFigure();
   }
@@ -60,8 +66,7 @@ function draw() {
     path.push(planet.getPoints());
 
     stroke(255, 0, 150);
-    for (let i = 0; i < path.length - 1; i++)
-      line(path[i].x, path[i].y, path[i + 1].x, path[i + 1].y);
+    for (let i = 0; i < path.length - 1; i++) line(path[i].x, path[i].y, path[i + 1].x, path[i + 1].y);
 
     planet.rotate();
   }
