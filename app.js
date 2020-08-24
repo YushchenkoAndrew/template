@@ -1,5 +1,7 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const app = express();
+var jsonParser = bodyParser.json();
 
 const HOST = "0.0.0.0";
 const PORT = 8000;
@@ -16,6 +18,14 @@ app.get("/projects/*", (req, res, next) => {
 });
 
 app.use("/projects", express.static("JS"));
+
+app.post("/guest", jsonParser, (req, res) => {
+  console.log(`~ Get some Activity on Website from guest`);
+  let indent = " ".repeat(5);
+  let data = req.body.data.split("\n");
+  for (let i in data) console.log(`${indent}  ${data[i]}`);
+  res.sendStatus(200);
+});
 
 app.get("/*", (req, res) => {
   console.log(`\n~ Unexpected URL: ${req.url}`);
