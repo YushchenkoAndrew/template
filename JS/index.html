@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://unpkg.com/jquery.terminal/js/jquery.terminal.min.js"></script>
+    <script src="https://unpkg.com/jquery.terminal/js/autocomplete_menu.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/jquery.terminal/css/jquery.terminal.min.css" />
+
     <script src="HomePage/WellcomePage.js"></script>
     <script src="HomePage/Char.js"></script>
     <script src="HomePage/CodeRain.js"></script>
@@ -104,6 +110,8 @@
         display: block;
       }
     </style>
+
+    <link rel="stylesheet" href="HomePage/style.css" />
   </head>
   <body>
     <div id="header"></div>
@@ -185,26 +193,10 @@
       <li><a href="https://github.com/YushchenkoAndrew/template">Code</a></li>
     </ul>
 
-    <div id="description">
-      <h2>Welcome, again... (→ _ →)</h2>
-      <p style="font-size: 18px;">
-        In this Website you can find some cool projects, with some fascinating ideas or with cool special effects. Let's start at the beginning. (~Flash back
-        sound~) When I decided to create some cool computer graphic algorithm, the main question that raised is "What language should I use for this?" and as
-        you can guess I chose JavaScript. Unfortunately I'm a lazy butt and don't want to learn HTML and CSS of top of this. Therefor I used a "cheat code" or
-        more if I be more specific I used library p5js. This library is an interpretation of Processing and it's very easy to use, so for me it was a perfect
-        match. Yes, I knew this library is not the best for Web and I can see it when I tryed to carry out complicated algorithm with a frame rate about 5fps (*
-        ￣︿￣) but in another hand Webroser also don't supouse to calculate such big data chunk. So at the first time I just stock this projects in my local
-        machine but after creating a Cluster with Kubernetes and Docker I decided to push this projects to the Internet why not? also I will get some experience
-        with Docker and Kubernetes. <br /><br /><br />
-        Most of this project (All) have not so best view, because of not using CSS and HTML, (maybe one day I decided to improve it, maybe.. (¬_¬ ) ) For better
-        visualisation some idea I have to low resolution... yep no the best... Most of this projects have some custom input, so feel free to click on the frame
-        and have fun with it, for experience user I made some changeable parameters that you can change using Console. I divide projects at the several
-        categories, for better navigation. <br />If you have some free time and you are reading this, congrats You finished this boring text and now You can
-        solve this freshly generated Maze but what if you would say, I'm too lazy for this (I understand you bro), then have no problem. I created a Maze solver
-        algorithm "Path Finding Alg", (big brain I know (¬‿¬)).<br />Bye.
-      </p>
-    </div>
+    <div id="description"></div>
 
+    <img src="./HomePage/Frame.png" style="position: absolute; top: 107vh; right: 25px;" />
+    <script src="./HomePage/Terminal.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
