@@ -1,0 +1,23 @@
+  [[;#aed581;]Welcome], again... (→ _ →)
+
+  In this Website you can find some [[;#85c1e9;]cool projects], with some fascinating ideas or with [[;#85c1e9;]cool special effects].
+  Let's start at the beginning.
+
+  (~Flash back sound~)
+
+  When I decided to create some cool computer graphic algorithm, the main question that raised is [[;#85c1e9;]"What language should I use for this?"] and as you can guess I chose [[;#f4d03f;]JavaScript].
+  Unfortunately I'm a lazy butt and don't want to learn [[;#eb984e;]HTML] and [[;#48c9b0;]CSS] of top of this.
+  Therefor I used a [[;#a569bd;]"cheat code"] or more if I be more specific I used library [[;#cb4335;]p5js].
+  This library is an interpretation of Processing and it's very easy to use, so for me it was a perfect match.
+  Yes, I knew this library is not the best for Web and I can see it when I tryed to carry out complicated algorithm with a frame rate about 5fps (*￣︿￣) but in another hand Webroser also don't supouse to calculate such big data chunk.
+  So at the first time I just stock this projects in my local machine but after creating a Cluster with Kubernetes and Docker I decided to push this projects to the Internet why not? also I will get some experience with [[;#5499c7;]Docker] and [[;#a9cce3;]Kubernetes].
+
+
+  Most of this project (All) have not so best view, because of not using [[;#48c9b0;]CSS] and [[;#eb984e;]HTML], (maybe one day I decided to improve it, maybe.. (¬_¬ ) ).
+  For better visualisation some idea I have to low resolution... yep no the best...
+  Most of this projects have some custom input, so feel free to click on the frame and have fun with it, for experience user I made some changeable parameters that you can change using Console.
+  I divide projects at the several categories, for better navigation.
+  If you have some free time and you are reading this, congrats You finished this boring text and now You can solve this freshly generated Maze but what if you would say, I'm too lazy for this (I understand you bro), then have no problem.
+  I created a Maze solver algorithm [[;#85c1e9;]"Path Finding Alg"], (big brain I know (¬‿¬)).
+
+  [[;#aed581;]Bye.]
