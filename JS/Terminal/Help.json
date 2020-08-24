@@ -14,6 +14,7 @@
   "example": { "command": "example", "description": "Show example for all commands\n Also used for testing purpose" },
   "func": { "command": "func", "description": "Display all interactive functions" },
   "watch": { "command": "watch <funcName>", "description": "Execute a function/variable and show its output (Stop - CTRL+D)" },
-  "set": { "command": "func <variable> <value>", "description": "Set value to the variable" },
-  "print": { "command": "func", "description": "Print variable value" }
+  "set": { "command": "set <variable> <value>", "description": "Set value to the variable" },
+  "print": { "command": "print <variable>", "description": "Print variable value" },
+  "show": { "command": "show <fileName>", "description": "Display text word by word (Interactive func)" }
 }

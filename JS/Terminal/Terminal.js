@@ -1,7 +1,7 @@
 const prevComm = "[[;#5dade2;]$]";
 const outputSign = "[[;#5dade2;] >]";
 const highlightFolder = (name) => `[[;#f4d03f;]${name}]`;
-const commands = ["example", "cc", "help", "cat", "history", "ls", "tree", "use", "cin", "run", "func", "watch", "set", "print"];
+const commands = ["example", "cc", "help", "cat", "history", "ls", "tree", "use", "cin", "run", "func", "watch", "set", "print", "show"];
 const successCommand = (comm) => `[[;#aed581;]${comm}]`;
 const int = (char) => (!!Number(char) ? Number(char) : char);
 const highlightCommand = (command) => command.replace(/</g, "[[;#f7dc6f;]<").replace(/>/g, ">]");
@@ -209,6 +209,26 @@ $("body").terminal(
       }
 
       $.terminal.active().echo(`${outputSign} ${variable} = ${window[variable]}`);
+    },
+
+    show: (fileName) => {
+      $.terminal.active().update(-1, `${prevComm} ${successCommand("show")} ${fileName}`);
+
+      $.get("../" + fileName, async (data) => {
+        let lines = data.split("\n");
+
+        for (let i in lines) {
+          $.terminal.active().echo(`${outputSign}`);
+
+          let wordList = lines[i].split(" ");
+          for (let j = 1; j <= wordList.length; j++) {
+            $.terminal.active().update(-1, `${outputSign} ${highlightAnnotation(wordList.slice(0, j).join(" "))}`);
+            await new Promise((resolve) => setTimeout(resolve, 150));
+          }
+        }
+
+        // $.terminal.active().echo(data);
+      }).fail(() => $.terminal.active().error(" > File not found!"));
     },
 
     history: () => {
