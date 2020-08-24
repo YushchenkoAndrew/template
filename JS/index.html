@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html  lang="en">
+<html lang="en">
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <script src="HomePage/WellcomePage.js"></script>
     <script src="HomePage/Char.js"></script>
     <script src="HomePage/CodeRain.js"></script>
@@ -13,10 +14,12 @@
     <script src="HomePage/Cell.js"></script>
     <title>Mortis</title>
     <style>
-      html, header, body {
-          margin: 0;
-          height: 100%;
-          scroll-behavior: smooth;
+      html,
+      header,
+      body {
+        margin: 0;
+        height: 100%;
+        scroll-behavior: smooth;
       }
 
       #header {
@@ -47,7 +50,7 @@
       }
 
       #menu a:hover {
-        background-color:  #f1c40f;
+        background-color: #f1c40f;
         color: black;
       }
 
@@ -69,142 +72,138 @@
         padding-top: 150px;
       }
 
-
       #menu li.dropdown {
-          display: inline-block;
+        display: inline-block;
       }
 
       .dropdown-content {
-          display: none;
-          background-color: #f9f9f9;
-          padding: 0;
-          position: fixed;
-          text-align: center;
-          min-width: 220px;
-          box-shadow: 0px 8px 16px 0px rgba(0,0,0,1);
-          z-index: 2;
+        display: none;
+        background-color: #f9f9f9;
+        padding: 0;
+        position: fixed;
+        text-align: center;
+        min-width: 220px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 1);
+        z-index: 2;
       }
 
-
       #menu .dropdown-content a {
-          color: black;
-          padding: 12px 16px;
-          text-decoration: none;
-          display: block;
-          text-align: left;
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        text-align: left;
       }
 
       #menu .dropdown-content a:hover {
-        background-color:  #7b241c;
+        background-color: #7b241c;
         color: white;
-        }
-
-      #menu .dropdown:hover .dropdown-content {
-          display: block;
       }
 
+      #menu .dropdown:hover .dropdown-content {
+        display: block;
+      }
     </style>
   </head>
   <body>
     <div id="header"></div>
 
-      <ul id="menu">
-        <li><a href="http://mortis-grimreaper.ddns.net/projects/">Home</a></li>
-        <li class="dropdown">
-          <a href="http://mortis-grimreaper.ddns.net/projects/FractalTreeAdv/" class="dropbtn">Fractal Alg</a>
-          <div class="dropdown-content">
-            <a href="http://mortis-grimreaper.ddns.net/projects/FractalSpirograph/">Fractal Spirograph</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/FractalTree/">Fractal Tree</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/FractalTreeAdv/">Fractal Tree Adv</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/L-SystemFractalTree/">L-System Fractal Tree</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/SpongeFractal/">Sponge Fractal</a>
-          </div>
-        </li>
+    <ul id="menu">
+      <li><a href="http://mortis-grimreaper.ddns.net/projects/">Home</a></li>
+      <li class="dropdown">
+        <a href="http://mortis-grimreaper.ddns.net/projects/FractalTreeAdv/" class="dropbtn">Fractal Alg</a>
+        <div class="dropdown-content">
+          <a href="http://mortis-grimreaper.ddns.net/projects/FractalSpirograph/">Fractal Spirograph</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/FractalTree/">Fractal Tree</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/FractalTreeAdv/">Fractal Tree Adv</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/L-SystemFractalTree/">L-System Fractal Tree</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/SpongeFractal/">Sponge Fractal</a>
+        </div>
+      </li>
 
-        <li class="dropdown">
-          <a href="http://mortis-grimreaper.ddns.net/projects/Hypercube/" class="dropbtn">n-Dimensional Alg</a>
-          <div class="dropdown-content">
-            <a href="http://mortis-grimreaper.ddns.net/projects/Hypercube/">Hypercube (Cube in 4D)</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting2D/">Raycasting 2D</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting3D/">Raycasting 3D</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting3DAdv/">Raycasting 3D Adv</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting3DAdvAdv/">Raycasting 3D Adv Adv</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/PerlinNoise/">Unlimited Space Gen</a>
-          </div>
-        </li>
+      <li class="dropdown">
+        <a href="http://mortis-grimreaper.ddns.net/projects/Hypercube/" class="dropbtn">n-Dimensional Alg</a>
+        <div class="dropdown-content">
+          <a href="http://mortis-grimreaper.ddns.net/projects/Hypercube/">Hypercube (Cube in 4D)</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting2D/">Raycasting 2D</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting3D/">Raycasting 3D</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting3DAdv/">Raycasting 3D Adv</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/Raycasting3DAdvAdv/">Raycasting 3D Adv Adv</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/PerlinNoise/">Unlimited Space Gen</a>
+        </div>
+      </li>
 
-        <li class="dropdown">
-          <a href="http://mortis-grimreaper.ddns.net/projects/PathFindingAdv/" class="dropbtn">Graph Alg</a>
-          <div class="dropdown-content">
-            <a href="http://mortis-grimreaper.ddns.net/projects/DijkstrasAlgorithm/">Dijkstra's Algorithm</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/GiftWrappingAlgorithm/">Gift Wrapping Alg</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/GrahamScan/">Graham Scan Alg</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/PathFinding/">Path Finding</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/PathFindingAdv/">Path Finding Adv</a>
-          </div>
-        </li>
+      <li class="dropdown">
+        <a href="http://mortis-grimreaper.ddns.net/projects/PathFindingAdv/" class="dropbtn">Graph Alg</a>
+        <div class="dropdown-content">
+          <a href="http://mortis-grimreaper.ddns.net/projects/DijkstrasAlgorithm/">Dijkstra's Algorithm</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/GiftWrappingAlgorithm/">Gift Wrapping Alg</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/GrahamScan/">Graham Scan Alg</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/PathFinding/">Path Finding</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/PathFindingAdv/">Path Finding Adv</a>
+        </div>
+      </li>
 
-        <li class="dropdown">
-          <a href="http://mortis-grimreaper.ddns.net/projects/FireEffect/" class="dropbtn">Computer Graphics Alg</a>
-          <div class="dropdown-content">
-            <a href="http://mortis-grimreaper.ddns.net/projects/CodeRain/">Code Rain</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/EdgeDetection/">Edge Detection Alg</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/FireEffect/">Fire Effect</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/FireEffectAdv/">Fire Effect Adv</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/FlockingSimulation/">Flocking Simulation</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/FlowField/">Flow Field</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/MarchingSquares/">Marching Squares Alg</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/Metaballs/">Metaballs Alg</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/SteeringBehavior/">Steering Behavior</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/SteeringBehaviorAdv/">Steering Behavior Adv</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/WaterRipple/">Water Ripple</a>
-          </div>
-        </li>
+      <li class="dropdown">
+        <a href="http://mortis-grimreaper.ddns.net/projects/FireEffect/" class="dropbtn">Computer Graphics Alg</a>
+        <div class="dropdown-content">
+          <a href="http://mortis-grimreaper.ddns.net/projects/CodeRain/">Code Rain</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/EdgeDetection/">Edge Detection Alg</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/FireEffect/">Fire Effect</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/FireEffectAdv/">Fire Effect Adv</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/FlockingSimulation/">Flocking Simulation</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/FlowField/">Flow Field</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/MarchingSquares/">Marching Squares Alg</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/Metaballs/">Metaballs Alg</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/SteeringBehavior/">Steering Behavior</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/SteeringBehaviorAdv/">Steering Behavior Adv</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/WaterRipple/">Water Ripple</a>
+        </div>
+      </li>
 
-        <li class="dropdown">
-          <a href="http://mortis-grimreaper.ddns.net/projects/HilbertCurveAdv/" class="dropbtn">Creating "Map"</a>
-          <div class="dropdown-content">
-            <a href="http://mortis-grimreaper.ddns.net/projects/HilbertCurve/">Hilber Curve</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/HilbertCurveAdv/">Hilber Curve Adv</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/MazeGenerator/">Maze Generator</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/MazeGenerator2/">Maze Generator2</a>
-          </div>
-        </li>
+      <li class="dropdown">
+        <a href="http://mortis-grimreaper.ddns.net/projects/HilbertCurveAdv/" class="dropbtn">Creating "Map"</a>
+        <div class="dropdown-content">
+          <a href="http://mortis-grimreaper.ddns.net/projects/HilbertCurve/">Hilber Curve</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/HilbertCurveAdv/">Hilber Curve Adv</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/MazeGenerator/">Maze Generator</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/MazeGenerator2/">Maze Generator2</a>
+        </div>
+      </li>
 
-        <li class="dropdown">
-          <a href="http://mortis-grimreaper.ddns.net/projects/BockWaves/" class="dropbtn">Other</a>
-          <div class="dropdown-content">
-            <a href="http://mortis-grimreaper.ddns.net/projects/ApproximatingPiValue/">Approximating Pi Value</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/BockWaves/">Block Waves</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/CirclePacking/">Circle Packing</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/Fireworks/">Fireworks</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/FourierSeries/">Fourier Series</a>
-            <a href="http://mortis-grimreaper.ddns.net/projects/QuadTree/">QuadTree</a>
-          </div>
-        </li>
-        <li><a href="https://github.com/YushchenkoAndrew/template">Code</a></li>
-      </ul>
+      <li class="dropdown">
+        <a href="http://mortis-grimreaper.ddns.net/projects/BockWaves/" class="dropbtn">Other</a>
+        <div class="dropdown-content">
+          <a href="http://mortis-grimreaper.ddns.net/projects/ApproximatingPiValue/">Approximating Pi Value</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/BockWaves/">Block Waves</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/CirclePacking/">Circle Packing</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/Fireworks/">Fireworks</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/FourierSeries/">Fourier Series</a>
+          <a href="http://mortis-grimreaper.ddns.net/projects/QuadTree/">QuadTree</a>
+        </div>
+      </li>
+      <li><a href="https://github.com/YushchenkoAndrew/template">Code</a></li>
+    </ul>
 
     <div id="description">
-  <h2>Welcome, again... (→ _ →)</h2>
-  <p style="font-size:18px;">In this Website you can find some cool projects, with some fascinating ideas or with cool special effects.
-    Let's start at the beginning. (~Flash back sound~) When I decided to create some cool computer graphic algorithm,
-    the main question that raised is "What language should I use for this?" and as you can guess I chose JavaScript.
-    Unfortunately I'm a lazy butt and don't want to learn HTML and CSS of top of this. Therefor I used a "cheat code"
-    or more if I be more specific I used library p5js. This library is an interpretation of Processing and it's very easy to use,
-    so for me it was a perfect match. Yes, I knew this library is not the best for Web and I can see it when I tryed to carry out
-    complicated algorithm with a frame rate about 5fps  (* ￣︿￣) but in another hand Webroser also don't supouse to calculate such big data chunk.
-    So at the first time I just stock this projects in my local machine but after creating a Cluster with Kubernetes and Docker I decided to push this projects to the Internet why not? also I will get some experience with Docker and Kubernetes.
-    <br><br><br>
-    Most of this project (All) have not so best view, because of not using CSS and HTML, (maybe one day I decided to improve it, maybe.. (¬_¬ ) )
-     For better visualisation some idea I have to low resolution... yep no the best... Most of this projects have some custom input, so feel free
-      to click on the frame and have fun with it, for experience user I made some changeable parameters that you can change using Console.
-      I divide projects at the several categories, for better navigation. <br>If you have some free time and you are reading this, congrats
-      You finished this boring text and now You can solve this freshly generated Maze but what if you would say,
-      I'm too lazy for this (I understand you bro), then have no problem. I created a Maze solver algorithm "Path Finding Alg",
-      (big brain I know (¬‿¬)).<br>Bye.</p>
+      <h2>Welcome, again... (→ _ →)</h2>
+      <p style="font-size: 18px;">
+        In this Website you can find some cool projects, with some fascinating ideas or with cool special effects. Let's start at the beginning. (~Flash back
+        sound~) When I decided to create some cool computer graphic algorithm, the main question that raised is "What language should I use for this?" and as
+        you can guess I chose JavaScript. Unfortunately I'm a lazy butt and don't want to learn HTML and CSS of top of this. Therefor I used a "cheat code" or
+        more if I be more specific I used library p5js. This library is an interpretation of Processing and it's very easy to use, so for me it was a perfect
+        match. Yes, I knew this library is not the best for Web and I can see it when I tryed to carry out complicated algorithm with a frame rate about 5fps (*
+        ￣︿￣) but in another hand Webroser also don't supouse to calculate such big data chunk. So at the first time I just stock this projects in my local
+        machine but after creating a Cluster with Kubernetes and Docker I decided to push this projects to the Internet why not? also I will get some experience
+        with Docker and Kubernetes. <br /><br /><br />
+        Most of this project (All) have not so best view, because of not using CSS and HTML, (maybe one day I decided to improve it, maybe.. (¬_¬ ) ) For better
+        visualisation some idea I have to low resolution... yep no the best... Most of this projects have some custom input, so feel free to click on the frame
+        and have fun with it, for experience user I made some changeable parameters that you can change using Console. I divide projects at the several
+        categories, for better navigation. <br />If you have some free time and you are reading this, congrats You finished this boring text and now You can
+        solve this freshly generated Maze but what if you would say, I'm too lazy for this (I understand you bro), then have no problem. I created a Maze solver
+        algorithm "Path Finding Alg", (big brain I know (¬‿¬)).<br />Bye.
+      </p>
     </div>
-
 
     <script src="app.js"></script>
   </body>
