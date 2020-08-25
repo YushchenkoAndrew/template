@@ -178,6 +178,6 @@ namespace HAL
         //   TC (Transmit Collision Indication), MF (Mode Fault Indication)
         reg->Status = 0x000000F0;
         // TODO: interrupt
-    }
+    };
 
 } // namespace HAL
