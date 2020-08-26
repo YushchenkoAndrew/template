@@ -7,7 +7,9 @@ const int = (char) => (!!Number(char) ? Number(char) : char);
 const highlightCommand = (command) => command.replace(/</g, "[[;#f7dc6f;]<").replace(/>/g, ">]");
 const highlightAnnotation = (str) => str.replace("(", "[[;#cb4335;](").replace(")", ")]");
 
-var test = "hello world!!";
+var HelpLoc = "./Help.json";
+var FuncListLoc = "./FuncList.json";
+var FileStructureLoc = "./FileStructure.json";
 
 $("body").terminal(
   {
@@ -44,9 +46,9 @@ $("body").terminal(
       $.terminal.active().update(-1, `${prevComm} ${successCommand("cat")} ${fileName}`);
 
       if (fileName.includes("png") || fileName.includes("jpg")) {
-        $.getJSON("FileStructure.json", (data) =>
-          $.terminal.active().echo($(`<img src="${(data[fileName.split("/")[0]] ? "../" : "") + fileName}">`))
-        ).fail(() => $.terminal.active().error(" > File not found!"));
+        $.getJSON(FileStructureLoc, (data) => $.terminal.active().echo($(`<img src="${(data[fileName.split("/")[0]] ? "../" : "") + fileName}">`))).fail(() =>
+          $.terminal.active().error(" > File not found!")
+        );
         return;
       }
 
@@ -68,7 +70,7 @@ $("body").terminal(
     ls: () => {
       $.terminal.active().update(-1, `${prevComm} ${successCommand("ls")}`);
 
-      $.getJSON("FileStructure.json", (data) => {
+      $.getJSON(FileStructureLoc, (data) => {
         let list = [];
         for (let i in data) list.push(data[i] ? highlightFolder(i) : i);
 
@@ -79,7 +81,7 @@ $("body").terminal(
     // Maybe create this function later~~
     use: (dir) => {
       $.terminal.active().update(-1, `${prevComm} ${successCommand("use")} ${dir}`);
-      // $.getJSON("FileStructure.json", (data) => {
+      // $.getJSON(FileStructureLoc, (data) => {
       //   if (data[dir])
       //     // console.log(dir);
       //     $.terminal.active().push(
@@ -106,13 +108,13 @@ $("body").terminal(
     run: (url) => {
       $.terminal.active().update(-1, `${prevComm} ${successCommand("run")} ${url}`);
 
-      $.getJSON("FileStructure.json", (data) => (window.location = data[url] ? `../${url}` : url));
+      $.getJSON(FileStructureLoc, (data) => (window.location = data[url] ? `../${url}` : url));
     },
 
     tree: () => {
       $.terminal.active().update(-1, `${prevComm} ${successCommand("tree")}`);
 
-      $.getJSON("FileStructure.json", (data) => {
+      $.getJSON(FileStructureLoc, (data) => {
         for (let i in data) {
           if (!data[i]) {
             $.terminal.active().echo(`|- ${i}`);
@@ -140,7 +142,7 @@ $("body").terminal(
       // Print Header
       $.terminal.active().echo(`${outputSign}\t[[;#85c1e9;]COMMAND] \t [[;#85c1e9;]DESCRIPTION]`);
 
-      $.getJSON("Help.json", (data) => {
+      $.getJSON(HelpLoc, (data) => {
         for (let i of commands) {
           let { command, description } = data[i];
           $.terminal.active().echo(`${highlightCommand(command)}\n`);
@@ -159,7 +161,7 @@ $("body").terminal(
     func: () => {
       $.terminal.active().update(-1, `${prevComm} ${successCommand("func")}`);
 
-      $.getJSON("FuncList.json", (data) => {
+      $.getJSON(FuncListLoc, (data) => {
         $.terminal.active().echo(`${outputSign}\t[[;#85c1e9;]FUNC] \t [[;#85c1e9;]PARAMETERS] \t [[;#85c1e9;]TYPE]`);
 
         for (let i in data) {
