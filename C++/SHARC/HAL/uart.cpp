@@ -8,11 +8,36 @@ namespace HAL
 #define TEMPLATE template <class Handler, typename Tag>
 #define CLASS Uart<Handler, Tag>
 
-  // TODO:
   TEMPLATE void CLASS::InterruptHandler(XmtInterruptTag)
   {
+    volatile DmaRegsList<> *dma = port_.XmtDma();
+    volatile UartRegList *reg = port_.Reg();
+
+    ResetTimeout(); // Set xmtTime to the current Time
+
+    // 0x01(IRQDONE) - Check if DMA has detected the completion of a work and has issued an interrupt request
+    if (dma->Status & 0x01)
+    {
+      reg->IntMaskClear = 0x02; // 0x02(ETBEI) - Transmit Buffer Empty Interrupt
+      dma->Status |= 0x01;      // 0x01(IRQDONE) - Check if DMA has detected the completion of a work and has issued an interrupt request
+      reg->Status |= 0x07;      // 0x07(PE, OE, DR)
+
+      // FIXME: ?
+      // dma->Config = 0;
+
+      while (!IsXmtEmpty())
+      {
+      }
+      if (handler_ != NULL)
+        handler_->OnXmt(Tag());
+      return;
+    }
+
+    if (handler_ != NULL)
+      handler_->OnXmtSingle(Tag());
   }
 
+  // TODO:
   TEMPLATE void CLASS::InterruptHandler(RcvInterruptTag)
   {
   }
@@ -21,16 +46,53 @@ namespace HAL
   {
   }
 
+  TEMPLATE void CLASS::InitialRcv()
+  {
+    // Flush FIFO if OverRun Error
+    // 0x02(OE) - Overrun Error
+    // FIXME: ?
+    // if (port_.Reg()->Status & 0x02) {}
+
+    // 0xx1(ERBFI) - Enable Receive Buffer Full Interrupt
+    port_.Reg()->IntMaskSet = 0x01;
+    sync();
+
+    RcvInterrupt_.Enable();
+  }
+
+  TEMPLATE void CLASS::Rcv(void *prt, int size)
+  {
+    // TODO: Configure DMA Regs
+  }
+
+  TEMPLATE void CLASS::Xmt(void *prt, int size)
+  {
+  }
+
+  TEMPLATE int CLASS::GetCharTimeout(int millisec)
+  {
+    clock_t start = clock();
+
+    clock_t end = clock();
+    // TODO: FIXME: PLL
+    // clock_t DeadTime = PLL::GetCoreFrequency() / 1000;
+
+    while (!IsRcvDataReady() && clock() - start < end)
+    {
+    }
+
+    return IsRcvDataReady() ? GetChar() : -1;
+  }
+
   TEMPLATE void CLASS::Init(int baud)
   {
     // TODO: FIXME: PLL
     unsigned long div = 0;
-    // unsigned long div = PLL : GetSystemFrequency() / baud;
+    // unsigned long div = PLL::GetSystemFrequency() / baud;
     // div += GetSystemFrequency() % baud > baud / 2 ? 1 : 0;
 
     // Flags:  EDBO   - Enable Divide By One (Bit clock prescaler = 1)
     port_.Reg()->Clock = div | 0x80000000;
-    // FIXME: LCR ?
 
     // Flags:  ERBFI  - Enable Receive Buffer Full Interrupt
     //         ETBEI  - Enable Transmit Buffer Empty Interrupt
@@ -67,9 +129,25 @@ namespace HAL
     //         RFIT    - Set RFCS=1 if RX FIFO count >= 4
     //         RFRT    - Deassert RTS if RX FIFO word count > 4; assert if <= 4
     port_.Reg()->Contol = 0x00000301;
+    // LCR Reg(Blackfin) confurged in Control Reg(Sharc)
+
     sync();
 
     // TODO: Interrupt
   }
+
+  TEMPLATE void CLASS::SetBaudrate(int baud)
+  {
+    // TODO: FIXME: PLL
+    unsigned long div = 0;
+    // unsigned long div = PLL : GetSystemFrequency() / baud;
+    // div += GetSystemFrequency() % baud > baud / 2 ? 1 : 0;
+
+    // Flags:  EDBO   - Enable Divide By One (Bit clock prescaler = 1)
+    port_.Reg()->Clock = div | 0x80000000;
+  }
+
+  // #undef TEMPLATE
+  // #undef CLASS
 
 } // namespace HAL

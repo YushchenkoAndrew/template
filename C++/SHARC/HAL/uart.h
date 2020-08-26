@@ -86,25 +86,37 @@ namespace HAL
         PutCharWait(*str++);
     }
 
-    // TODO:
-    inline bool IsRcvRun();
-    inline bool IsXmtRun();
-    inline bool IsRcvDataReady();
-    inline bool IsXmtFinished();
-    inline bool IsXmtEmpty();
+    inline bool IsRcvRun()
+    {
+      return port_.RcvDma()->Config & 0x01; // 0x01 - Check if DMA is Enabled ?
+    }
+    inline bool IsXmtRun()
+    {
+      return port_.XmtDma()->Config & 0x01; // 0x01 - Check if DMA is Enabled ?
+    }
+
+    inline bool IsRcvDataReady()
+    {
+      return port_.Reg()->Status & 0x01; // 0x01(DR) - Check if Data is Ready ?
+    }
+    inline bool IsXmtFinished()
+    {
+      return port_.Reg()->Status & 0x80; // 0x80(TEMT) - Check if TSR/THR is Empty ?
+    }
+    inline bool IsXmtEmpty()
+    {
+      return port_.Reg()->Status & 0x20; // 0x20(THRE) - Check if Transmit Hold Register is Empty ?
+    }
 
     inline bool IsAlive()
     {
-      // TODO: PLL
-
-      // unsigned int time = clock() / TimeScale;
-      // return (time - xmtTime_) < DeadTime;
+      unsigned int time = clock() / TimeScale;
+      return (time - xmtTime_) < DeadTime;
     }
 
     inline void ResetTimeout()
     {
-      // TODO: PLL
-      // xmtTime_ = clock() / TimeScale;
+      xmtTime_ = clock() / TimeScale;
     }
 
   private:

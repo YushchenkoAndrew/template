@@ -180,4 +180,7 @@ namespace HAL
         // TODO: interrupt
     };
 
+#undef MTMPLT
+#undef MCLASS
+
 } // namespace HAL
