@@ -1,14 +1,14 @@
 
   [[;#f4d03f;]Hi there!]
 
-This guid inform you about all possible manipulation that you can impact on "Conway's Game of Life".
+This guid inform you about all possible manipulation that you can impact on [[;#d4efdf;]"Conway's Game of Life"].
 Using this terminal you gain close as possible control of the game (I tried my best!) and get a bunch of standard patterns.
 Which you can find here https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
 Also fell free to [[;#f0b27a;]COPY] and [[;#f0b27a;]PASTE] commands below they will start with Symbol '[[;#a569bd;]$]'.
 
 At the beginning you enter the game with a [[;#aed581;]Normal MODE], that mean that you can change only one Cell in the while game is running.
 
-~ For [;#d2b4de;]Pause/Resume] game call a func:
+~ For [[;#d2b4de;]Pause/Resume] game call a func:
   [[;#a569bd;]$] [[;#aed581;]cin] freeze $0
 
 While game is paused, you are able to change a variate of cells just click or drag a specific square.
@@ -57,5 +57,9 @@ In this MODE you don't able to change a single Cell or draw but you gain the abi
   [[;#a569bd;]$] [[;#aed581;]cin] handOfGod exit
 
 And you are back into [[;#aed581;]Normal MODE].
+
+For more information call func:
+  [[;#a569bd;]$] [[;#aed581;]func]
+  [[;#a569bd;]$] [[;#aed581;]help] -a
 
   [[;#f4d03f;]Have fun!]
