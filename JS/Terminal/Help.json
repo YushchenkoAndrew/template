@@ -16,5 +16,5 @@
   "watch": { "command": "watch <funcName>", "description": "Execute a function/variable and show its output (Stop - CTRL+D)" },
   "set": { "command": "set <variable> <value>", "description": "Set value to the variable" },
   "print": { "command": "print <variable>", "description": "Print variable value" },
-  "show": { "command": "show <fileName>", "description": "Display text word by word (Interactive func)" }
+  "show": { "command": "show <fileName> <speed>", "description": "Display text word by word with certain speed (Interactive func)" }
 }

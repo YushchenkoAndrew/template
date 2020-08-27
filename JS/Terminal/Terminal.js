@@ -149,7 +149,7 @@ $("body").terminal(
 
           let indent = " ".repeat(command.length > 15 ? 15 : command.length);
           let formattedStr = "";
-          let step = 40 - indent.length;
+          let step = 38 - indent.length;
 
           for (let i = 0; i < description.length; i += step) formattedStr += [highlightAnnotation(description.slice(i, i + step)), "\n", indent].join("");
 
@@ -213,7 +213,7 @@ $("body").terminal(
       $.terminal.active().echo(`${outputSign} ${variable} = ${window[variable]}`);
     },
 
-    show: (fileName) => {
+    show: (fileName, speed) => {
       $.terminal.active().update(-1, `${prevComm} ${successCommand("show")} ${fileName}`);
 
       $.get("../" + fileName, async (data) => {
@@ -225,7 +225,7 @@ $("body").terminal(
           let wordList = lines[i].split(" ");
           for (let j = 1; j <= wordList.length; j++) {
             $.terminal.active().update(-1, `${outputSign} ${highlightAnnotation(wordList.slice(0, j).join(" "))}`);
-            await new Promise((resolve) => setTimeout(resolve, 150));
+            await new Promise((resolve) => setTimeout(resolve, speed));
           }
         }
 
