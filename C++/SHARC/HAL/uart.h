@@ -49,8 +49,8 @@ namespace HAL
     void SetBaudrate(int baud);
 
     void InitialRcv();
-    void Xmt(void *prt, int size);
-    void Rcv(void *prt, int size);
+    void Xmt(void *ptr, int size);
+    void Rcv(void *ptr, int size);
 
     inline unsigned char GetChar()
     {
@@ -116,6 +116,7 @@ namespace HAL
 
     inline void ResetTimeout()
     {
+      rcvTime_ = clock() / TimeScale;
       xmtTime_ = clock() / TimeScale;
     }
 
