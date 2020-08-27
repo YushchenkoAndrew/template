@@ -34,6 +34,11 @@ var handOfGod = (name) => {
 };
 var greatFlood = () => game.greatFlood();
 
+var changeGrid = (step_) => {
+  step = step_;
+  game = new GameOfLife();
+};
+
 let prev = {
   x: -1,
   y: -1,
