@@ -3,10 +3,13 @@ const W = 700;
 
 var step = 10;
 
+// mode == 0 ? => Normal Mode : GOD MODE
+var mode = 0;
+
 var timeStep = 50;
 var nextGeneration = setInterval(() => game.nextGeneration(), timeStep);
 
-var setTime = (step) => {
+var timeFlow = (step) => {
   timeStep = step;
 
   clearInterval(nextGeneration);
@@ -16,7 +19,19 @@ var setTime = (step) => {
 var freeze = () => (game.pause ^= 1);
 
 var showPattern = () => {};
-var handOfGod = (name) => (showPattern = game.handOfGod.bind(game, name));
+var handOfGod = (name) => {
+  mode = 1;
+
+  if (name == "exit") {
+    $.terminal.active().echo(`${outputSign} You exit form [[;#f4d03f;]GOD MODE]`);
+    $.terminal.active().echo(`${outputSign} You are into [[;#aed581;]Normal MODE]`);
+
+    mode = 0;
+    return;
+  }
+  $.terminal.active().echo(`${outputSign} You enter into [[;#f4d03f;]GOD MODE]`);
+  showPattern = game.handOfGod.bind(game, name);
+};
 var greatFlood = () => game.greatFlood();
 
 let prev = {
@@ -50,20 +65,23 @@ function setup() {
   createCanvas(W, H);
 
   game = new GameOfLife();
+
+  $.terminal.active().echo(`${outputSign} You are into [[;#aed581;]Normal MODE]`);
+  $.terminal.active().exec("show GameOfLife/Guid.txt 100");
 }
 
-// function mousePressed() {
-//   showPattern(true);
-//  }
+function mousePressed() {
+  if (mode) showPattern(true);
+}
 
 function draw() {
   background(255);
 
-  if (prev.update(mouseX, mouseY)) game.createLive(prev);
+  if (!mode && prev.update(mouseX, mouseY)) game.createLive(prev);
 
   // if (!mouseIsPressed) prev.x = -1;
 
-  showPattern();
+  if (mode) showPattern();
 
   game.show();
 

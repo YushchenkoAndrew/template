@@ -3,9 +3,9 @@ class GameOfLife {
     this.curr = [];
     this.aliveCells = [];
 
-    // this.status = "start";
     this.pause = false;
     this.pattern = {};
+    this.off = (index, border) => index + (index >= 0 && index < border ? 0 : -border * Math.sign(index));
 
     this.h = Math.floor(H / step);
     this.w = Math.floor(W / step);
@@ -56,24 +56,16 @@ class GameOfLife {
     this.pattern.show(insert);
 
     function showPattern(pattern, insert) {
+      if (mouseX > W || mouseX < 0 || mouseY > H || mouseY < 0) return;
+
       let x = Math.floor(mouseX / step);
       let y = Math.floor(mouseY / step);
 
       fill(120);
       for (let i in pattern) {
-        rect((x + pattern[i].j) * step, (y + pattern[i].i) * step, step);
+        rect(this.off(x + pattern[i].j, this.w) * step, this.off(y + pattern[i].i, this.h) * step, step);
 
-        if (insert) {
-          let index = (y + pattern[i].i) * this.w + x + pattern[i].j;
-          this.curr[index] ^= 1;
-
-          if (this.curr[index]) this.aliveCells.push({ i: (y + pattern[i].i) * step, j: (x + pattern[i].j) * step });
-          else
-            this.aliveCells.splice(
-              this.aliveCells.findIndex((cell) => cell.x == x + pattern[i].j * step && cell.y == (y + pattern[i].i) * step),
-              1
-            );
-        }
+        if (insert) this.createLive({ x: this.off(x + pattern[i].j, this.w), y: this.off(y + pattern[i].i, this.h) });
       }
     }
   }
@@ -84,14 +76,12 @@ class GameOfLife {
     let next = [];
     this.aliveCells = [];
 
-    const offset = (index, border) => index + (index >= 0 && index < border ? 0 : -border * Math.sign(index));
-
     for (let i = 0; i < this.h; i++)
       for (let j = 0; j < this.w; j++) {
         const index = i * this.w + j;
 
         let sum = -this.curr[index];
-        for (let x = -1; x < 2; x++) for (let y = -1; y < 2; y++) sum += this.curr[offset(i + y, this.h) * this.w + offset(j + x, this.w)] ? 1 : 0;
+        for (let x = -1; x < 2; x++) for (let y = -1; y < 2; y++) sum += this.curr[this.off(i + y, this.h) * this.w + this.off(j + x, this.w)] ? 1 : 0;
 
         // Kill Cell
         next[index] = sum < 2 || sum > 3 ? 0 : this.curr[index];
