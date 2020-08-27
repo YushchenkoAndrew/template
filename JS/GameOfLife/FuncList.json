@@ -1,14 +1,22 @@
 {
-  "test": {
-    "parameters": ["data"],
-    "type": ["any"]
+  "freeze": {
+    "parameters": ["None"],
+    "type": ["undefined"]
   },
-  "name": {
-    "parameters": ["data"],
-    "type": ["array of any"]
+  "timeFlow": {
+    "parameters": ["speed"],
+    "type": ["Number"]
   },
-  "sum": {
-    "parameters": ["a", "b"],
-    "type": ["Number", "Number"]
+  "greatFlood": {
+    "parameters": ["None"],
+    "type": ["undefined"]
+  },
+  "handOfGod": {
+    "parameters": ["name"],
+    "type": ["String"]
+  },
+  "changeGrid": {
+    "parameters": ["step"],
+    "type": ["Number"]
   }
 }
