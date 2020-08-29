@@ -133,7 +133,8 @@ namespace HAL
     sync();
 
     dma->Config = 0x01; // 0x01 - Enable DMA
-    // TODO: Interrupt
+
+    InitialRcv();
   }
 
   TEMPLATE void CLASS::Xmt(void *ptr, int size)
@@ -151,7 +152,8 @@ namespace HAL
     dma->Config = 0x01; // 0x01 - Enable DMA
     sync();
     reg->IntMaskSet = 0x02; // 0x02(ETBEI) - Transmit Buffer Empty Interrupt
-    // TODO: Interrupt
+
+    XmtInterrupt_.Enable();
   }
 
   TEMPLATE int CLASS::GetCharTimeout(int millisec)
@@ -160,7 +162,7 @@ namespace HAL
 
     clock_t end = clock();
     // TODO: FIXME: PLL
-    // clock_t DeadTime = PLL::GetCoreFrequency() / 1000;
+    clock_t DeadTime = Pll::GetCoreFrequency() / 1000;
 
     while (!IsRcvDataReady() && clock() - start < end)
     {
@@ -172,9 +174,8 @@ namespace HAL
   TEMPLATE void CLASS::Init(int baud)
   {
     // TODO: FIXME: PLL
-    unsigned long div = 0;
-    // unsigned long div = PLL::GetSystemFrequency() / baud;
-    // div += GetSystemFrequency() % baud > baud / 2 ? 1 : 0;
+    unsigned long div = Pll::GetSystemFrequency() / baud;
+    div += Pll::GetSystemFrequency() % baud > baud / 2 ? 1 : 0;
 
     // Flags:  EDBO   - Enable Divide By One (Bit clock prescaler = 1)
     port_.Reg()->Clock = div | 0x80000000;
@@ -217,16 +218,14 @@ namespace HAL
     // LCR Reg(Blackfin) confurged in Control Reg(Sharc)
 
     sync();
-
-    // TODO: Interrupt
+    StatusInterrupt_.Enable();
   }
 
   TEMPLATE void CLASS::SetBaudrate(int baud)
   {
     // TODO: FIXME: PLL
-    unsigned long div = 0;
-    // unsigned long div = PLL : GetSystemFrequency() / baud;
-    // div += GetSystemFrequency() % baud > baud / 2 ? 1 : 0;
+    unsigned long div = Pll::GetSystemFrequency() / baud;
+    div += Pll::GetSystemFrequency() % baud > baud / 2 ? 1 : 0;
 
     // Flags:  EDBO   - Enable Divide By One (Bit clock prescaler = 1)
     port_.Reg()->Clock = div | 0x80000000;

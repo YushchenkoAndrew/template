@@ -67,7 +67,10 @@ namespace HAL
         reg->SlaveSelect |= 0xFF00; // Set default value
 
         task.Reset();
-        // TODO: Interrupt
+
+        statusInterrupt_.Enable();
+        rcvInterrupt_.Enable();
+        xmtInterrupt_.Enable();
 
         sync();
         reg->Control |= 1;
@@ -92,7 +95,10 @@ namespace HAL
         //   TC (Transmit Collision Indication), MF (Mode Fault Indication)
         reg->Status = 0x000000F0;
         sync();
-        // TODO: interrupt
+
+        statusInterrupt_.Disable();
+        rcvInterrupt_.Disable();
+        xmtInterrupt_.Disable();
     }
 
     MTMPLT void MCLASS::EnableSlave(int slv)
@@ -167,9 +173,7 @@ namespace HAL
         //         FMODE- Fast-Mode Disable
         reg->Control = 0x000001B2 | ((bits > 8 ? 1 : 0) << (bits == 16 ? 9 : 10));
 
-        unsigned short baud = 0;
-        // TODO: PLL
-        // int baud = Pll::GetSystemFrequency() / (2 * freq) + 1;
+        unsigned short baud = Pll::GetSystemFrequency() / (2 * freq) + 1;
         baud = clamp(baud, 2, 65535);
         reg->Clock = baud;
 
@@ -177,7 +181,10 @@ namespace HAL
         //   ROR (Receive Overrun Indication), TUR (Transmit Underrun Indication)
         //   TC (Transmit Collision Indication), MF (Mode Fault Indication)
         reg->Status = 0x000000F0;
-        // TODO: interrupt
+
+        statusInterrupt_.Enable();
+        rcvInterrupt_.Disable();
+        xmtInterrupt_.Disable();
     };
 
 #undef MTMPLT
