@@ -1,0 +1,52 @@
+:root {
+  font-size: 20px;
+}
+
+body {
+  color: black;
+  background-color: white;
+  margin: 0;
+  padding: 0;
+
+
+  display: block;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+body::-webkit-scrollbar {
+  width: 7px;
+}
+
+body::-webkit-scrollbar-track {
+  background-color: rgba(10, 10, 10, 50);
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 100);
+}
+
+
+#MatrixCanvas {
+  background-color: #000000;
+}
+
+#MazeGenerator {
+  position: absolute;
+  top: 100vh;
+  height: 100vh;
+
+  background-color: #000000;
+}
+
+.description {
+  position: absolute;
+  top: 100vh;
+  left: 50vw;
+
+  height: 100vh;
+  width: 50vw;
+
+
+  /* padding-top: 10vh; */
+}
