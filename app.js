@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
+
 var jsonParser = bodyParser.json();
 
 const HOST = "0.0.0.0";
