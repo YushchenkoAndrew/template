@@ -13,19 +13,19 @@ namespace HAL
     {
         void *NextDescPtr;
         void *StartAddr;
-        unsigned short Config;
-        unsigned short XCount;
-        unsigned short XModify;
-        unsigned short YCount;
-        unsigned short YModify;
+        unsigned long Config;
+        unsigned long XCount;
+        unsigned long XModify;
+        unsigned long YCount;
+        unsigned long YModify;
         int r0;
         int r1;
         void *CurrDescPtr;
         void *PrevDescPtr;
         void *CurrAddr;
-        unsigned short Status;
-        unsigned short CurrXCount;
-        unsigned short CurrYCount;
+        unsigned long Status;
+        unsigned long CurrXCount;
+        unsigned long CurrYCount;
     };
 
     template <>
@@ -33,19 +33,19 @@ namespace HAL
     {
         void *NextDescPtr;
         void *StartAddr;
-        unsigned short Config;
-        unsigned short XCount;
-        unsigned short XModify;
-        unsigned short YCount;
-        unsigned short YModify;
+        unsigned long Config;
+        unsigned long XCount;
+        unsigned long XModify;
+        unsigned long YCount;
+        unsigned long YModify;
         int r0;
         int r1;
         void *CurrDescPtr;
         void *PrevDescPtr;
         void *CurrAddr;
-        unsigned short Status;
-        unsigned short CurrXCount;
-        unsigned short CurrYCount;
+        unsigned long Status;
+        unsigned long CurrXCount;
+        unsigned long CurrYCount;
         int r3;
         unsigned short bwlCnt;
         unsigned short bwlCnt_curr;

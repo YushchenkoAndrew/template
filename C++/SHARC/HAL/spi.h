@@ -185,7 +185,7 @@ namespace HAL
     };
 
     template <int Port>
-    class SpiMater
+    class SpiMaster
     {
     public:
         typedef boost::intrusive::slist<SpiTask, boost::intrusive::constant_time_size<false>,
@@ -216,7 +216,7 @@ namespace HAL
                             StatusInterruptTag, ThisType>::SetHandler(this);
         }
 
-        ~SpiMater() {}
+        ~SpiMater(){};
 
         void Init(int freq, int bits = 8);
 
@@ -253,6 +253,6 @@ namespace HAL
         const InterruptControl xmtInterrupt_;
         const InterruptControl statusInterrupt_;
         TaskList taskList_;
-        int bits_;
     };
+
 } // namespace HAL

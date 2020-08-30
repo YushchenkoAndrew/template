@@ -22,8 +22,8 @@ namespace HAL
       dma->Status = 0x01;       // 0x01(IRQDONE) - Check if DMA has detected the completion of a work and has issued an interrupt request
       reg->Status = 0x07;       // 0x07(PE, OE, DR)
 
-      // FIXME: ?
-      // dma->Config = 0;
+      // Cancel data receive
+      dma->Config = 0x00;
 
       while (!IsXmtEmpty())
       {
@@ -49,8 +49,8 @@ namespace HAL
     {
       reg->Status = 0x01; // 0x01(IRQDONE) - Check if DMA has detected the completion of a work and has issued an interrupt request
 
-      // FIXME: ?
-      // dma->Config = 0;
+      // Cancel data receive
+      dma->Config = 0x00;
 
       if (hander_ != NULL)
         handler_->OnRcv(Tag());
@@ -96,8 +96,8 @@ namespace HAL
     unsigned int time = clock() / TimeScale;
     if (time - rcvTime_ > 500) // 0.5 sec
     {
-      // FIXME: ?  Cancel data receive
-      // dma->Config = 0;
+      // Cancel data receive
+      dma->Config = 0x00;
 
       rcvTime_ = time;
     }
@@ -105,13 +105,14 @@ namespace HAL
 
   TEMPLATE void CLASS::InitialRcv()
   {
+    volatile UartRegList *reg = port_.Reg();
     // Flush FIFO if OverRun Error
     // 0x02(OE) - Overrun Error
     // FIXME: ?
-    // if (port_.Reg()->Status & 0x02) {}
+    // if (reg->Status & 0x02) {}
 
     // 0xx1(ERBFI) - Enable Receive Buffer Full Interrupt
-    port_.Reg()->IntMaskSet = 0x0001;
+    reg->IntMaskSet = 0x0001;
     sync();
 
     RcvInterrupt_.Enable();
@@ -120,27 +121,39 @@ namespace HAL
   TEMPLATE void CLASS::Rcv(void *ptr, int size)
   {
     volatile DmaRegsList<> *dma = port_.RcvDma();
-    volatile UartRegList reg = port_.Reg();
+    volatile UartRegList *reg = port_.Reg();
+
+    reg->IntMaskClear = 0x0001;
+
+    dma->StartAddr = ptr;
+    dma->Config = 0x010304; // (SYNC, MSIZE, INT(0x01 Interrupt When X Count Expires))
+
+    dma->XCount = size;
+    dma->XModify = 0x01;
+    sync();
+
+    dma->Config = 0x01; // 0x01 - Enable DMA
+
+    InitialRcv();
   }
 
   TEMPLATE void CLASS::Xmt(void *ptr, int size)
   {
     volatile DmaRegsList<> *dma = port_.XmtDma();
-    volatile UartRegList reg = port_.Reg();
+    volatile UartRegList *reg = port_.Reg();
 
     dma->StartAddr = ptr;
-    // FIXME: DI_EN ?
-    dma->Config = 0x0304; // 0x00(SYNC, MSIZE)
+    dma->Config = 0x010304; // (SYNC, MSIZE, INT(0x01 Interrupt When X Count Expires))
 
-    // TODO:
-    // port_.XmtDma()->XCount	= size;
-    // port_.XmtDma()->XModify	= 1;
-
+    dma->XCount = size;
+    dma->XModify = 0x01;
     sync();
+
     dma->Config = 0x01; // 0x01 - Enable DMA
     sync();
     reg->IntMaskSet = 0x02; // 0x02(ETBEI) - Transmit Buffer Empty Interrupt
-    // TODO: Interrupt
+
+    XmtInterrupt_.Enable();
   }
 
   TEMPLATE int CLASS::GetCharTimeout(int millisec)
@@ -149,7 +162,7 @@ namespace HAL
 
     clock_t end = clock();
     // TODO: FIXME: PLL
-    // clock_t DeadTime = PLL::GetCoreFrequency() / 1000;
+    clock_t DeadTime = Pll::GetCoreFrequency() / 1000;
 
     while (!IsRcvDataReady() && clock() - start < end)
     {
@@ -161,9 +174,8 @@ namespace HAL
   TEMPLATE void CLASS::Init(int baud)
   {
     // TODO: FIXME: PLL
-    unsigned long div = 0;
-    // unsigned long div = PLL::GetSystemFrequency() / baud;
-    // div += GetSystemFrequency() % baud > baud / 2 ? 1 : 0;
+    unsigned long div = Pll::GetSystemFrequency() / baud;
+    div += Pll::GetSystemFrequency() % baud > baud / 2 ? 1 : 0;
 
     // Flags:  EDBO   - Enable Divide By One (Bit clock prescaler = 1)
     port_.Reg()->Clock = div | 0x80000000;
@@ -206,16 +218,14 @@ namespace HAL
     // LCR Reg(Blackfin) confurged in Control Reg(Sharc)
 
     sync();
-
-    // TODO: Interrupt
+    StatusInterrupt_.Enable();
   }
 
   TEMPLATE void CLASS::SetBaudrate(int baud)
   {
     // TODO: FIXME: PLL
-    unsigned long div = 0;
-    // unsigned long div = PLL : GetSystemFrequency() / baud;
-    // div += GetSystemFrequency() % baud > baud / 2 ? 1 : 0;
+    unsigned long div = Pll::GetSystemFrequency() / baud;
+    div += Pll::GetSystemFrequency() % baud > baud / 2 ? 1 : 0;
 
     // Flags:  EDBO   - Enable Divide By One (Bit clock prescaler = 1)
     port_.Reg()->Clock = div | 0x80000000;
