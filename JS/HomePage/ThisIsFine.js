@@ -6,6 +6,7 @@ console.log("Yesss");
 
 function Maze(p) {
   let maze;
+  var update = setInterval(() => maze.move(), 300);
 
   p.setup = function () {
     let canvas = p.createCanvas(700, 705);
@@ -17,7 +18,7 @@ function Maze(p) {
   p.draw = function () {
     p.background(0);
 
-    if (p.frameCount % 4 == 0) maze.move();
+    // if (p.frameCount % 4 == 0) maze.move();
     maze.show();
   };
 }

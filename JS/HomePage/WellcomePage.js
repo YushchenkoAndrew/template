@@ -1,21 +1,11 @@
-const header = new p5(codeRain, "header");
-const W = window.innerWidth - 17;
-const H = window.innerHeight;
+var matrixCanvas = document.getElementById("MatrixCanvas");
+matrixCanvas.width = window.innerWidth;
+matrixCanvas.height = window.innerHeight;
 
-function codeRain(p) {
-  let rain;
+var mCanvas = matrixCanvas.getContext("2d");
 
-  p.setup = function () {
-    let canvas = p.createCanvas(W, H);
-    canvas.position(0, 0);
+var fontSize = Math.floor(matrixCanvas.width / 60);
+var codeRain = new CodeRain("Welcome to the warehouse for projects", fontSize, "Arial");
+codeRain.startMatrix();
 
-    rain = new CodeRain("Welcome to the warehouse for projects", 24);
-    rain.startMatrix();
-  };
-
-  p.draw = function () {
-    p.background(0, 100);
-
-    rain.show();
-  };
-}
+var rain = setInterval(() => codeRain.show(), 20);
