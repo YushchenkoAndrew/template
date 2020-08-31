@@ -1,21 +1,41 @@
-var mysql = require("mysql");
+// var mysql = require("mysql");
+const Sequelize = require("sequelize");
+const { Op, DataTypes } = Sequelize;
 
-function connect() {
-  var con = mysql.createConnection({
+async function connect() {
+  var sequelize = new Sequelize("Test", "root", "6sCMqddng4agAcj", {
     host: "192.168.0.105",
-    user: "root",
-    password: "6sCMqddng4agAcj",
+    dialect: "mysql",
   });
 
-  con.connect(function (err) {
-    if (err) throw err;
-    console.log("Connected!");
-    con.query("SHOW DATABASES", function (err, result) {
-      if (err) throw err;
-      console.log("Result: ");
-      for (let i in result) console.log(result[i]);
-    });
-  });
+  await sequelize
+    .authenticate()
+    .then((err) => console.log("\n~ Connected to DataBase"))
+    .catch((err) => console.log("\n~ Unable to connect to db" + err));
+
+  // Test if it work
+  // sequelize.query("select * from potluck").then(function (rows) {
+  //   console.log(JSON.stringify(rows));
+  // });
+
+  const item = sequelize.define(
+    "potluck",
+    {
+      id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+      name: { type: Sequelize.DataTypes.STRING },
+      food: { type: Sequelize.DataTypes.STRING },
+      confirmed: { type: Sequelize.DataTypes.CHAR },
+      signup_date: { type: Sequelize.DataTypes.DATE },
+    },
+    {
+      timestamps: false,
+      freezeTableName: true,
+    }
+  );
+
+  item.findAll().then((data) => console.log(data));
+
+  // sequelize.close();
 }
 
 module.exports.connect = connect;
