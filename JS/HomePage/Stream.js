@@ -5,7 +5,7 @@ class Stream {
     this.chars = [];
     this.length = Math.round(Math.random() * 10 + 5);
 
-    this.vel = (Math.random() * matrixCanvas.height) / 300 + matrixCanvas.height / 400;
+    this.vel = (Math.random() * MatrixCanvas.height) / 300 + MatrixCanvas.height / 400;
     this.shadowChar = Math.random() * this.length + 2;
     this.lightStep = 53 / (this.length - this.shadowChar);
 

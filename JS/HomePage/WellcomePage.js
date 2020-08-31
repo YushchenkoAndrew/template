@@ -1,11 +1,25 @@
-var matrixCanvas = document.getElementById("MatrixCanvas");
-matrixCanvas.width = window.innerWidth;
-matrixCanvas.height = window.innerHeight;
+// Code Rain
 
-var mCanvas = matrixCanvas.getContext("2d");
+var MatrixCanvas = document.getElementById("MatrixCanvas");
+MatrixCanvas.width = window.innerWidth;
+MatrixCanvas.height = window.innerHeight;
 
-var fontSize = Math.floor(matrixCanvas.width / 60);
+var rainCanvas = MatrixCanvas.getContext("2d");
+
+var fontSize = Math.floor(MatrixCanvas.width / 60);
 var codeRain = new CodeRain("Welcome to the warehouse for projects", fontSize, "Arial");
 codeRain.startMatrix();
 
 var rain = setInterval(() => codeRain.show(), 20);
+
+// MazeGenerator
+
+var MazeCanvas = document.getElementById("MazeGenerator");
+var mazeCanvas = MazeCanvas.getContext("2d");
+
+const step = 35;
+
+var generator = new Generator();
+
+var move = setInterval(() => generator.move(), 100);
+var show = setInterval(() => generator.show(), 20);

@@ -25,8 +25,8 @@ class Char {
   }
 
   show(stopFlag) {
-    mCanvas.fillStyle = this.color;
-    mCanvas.fillText(this.value, this.pos.x, this.pos.y);
+    rainCanvas.fillStyle = this.color;
+    rainCanvas.fillText(this.value, this.pos.x, this.pos.y);
 
     if (stopFlag && this.store) {
       this.value = this.store;

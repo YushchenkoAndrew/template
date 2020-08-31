@@ -6,7 +6,7 @@ class CodeRain {
       style: textStyle,
     };
 
-    mCanvas.font = `${textSize}px ${textStyle}`;
+    rainCanvas.font = `${textSize}px ${textStyle}`;
 
     this.streams = [];
 
@@ -30,10 +30,10 @@ class CodeRain {
   }
 
   clear() {
-    mCanvas.globalAlpha = 0.32;
-    mCanvas.fillStyle = "#000000";
-    mCanvas.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
-    mCanvas.globalAlpha = 1;
+    rainCanvas.globalAlpha = 0.32;
+    rainCanvas.fillStyle = "#000000";
+    rainCanvas.fillRect(0, 0, MatrixCanvas.width, MatrixCanvas.height);
+    rainCanvas.globalAlpha = 1;
   }
 
   show() {

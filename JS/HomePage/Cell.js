@@ -4,8 +4,11 @@ class Cell {
     this.j = j;
 
     this.isCurrent = true;
-    this.defaultColor = body.color(150, 0, 250, 100);
-    this.highlightColor = body.color(100, 250, 0, 150);
+
+    this.defaultColor = "#580093";
+    // this.defaultColor = body.color(150, 0, 250, 100);
+    this.highlightColor = "#3a9300";
+    // this.highlightColor = body.color(100, 250, 0, 150);
 
     let x = this.j * step;
     let y = this.i * step;
@@ -35,12 +38,24 @@ class Cell {
 
   show() {
     if (this.visited) {
-      body.noStroke();
-      body.fill(this.isCurrent ? this.highlightColor : this.defaultColor);
-      body.rect(this.j * step, this.i * step, step, step);
+      // body.noStroke();
+      mazeCanvas.fillStyle = this.isCurrent ? this.highlightColor : this.defaultColor;
+      // body.fill(this.isCurrent ? this.highlightColor : this.defaultColor);
+      mazeCanvas.fillRect(this.j * step, this.i * step, step, step);
+      // body.rect(this.j * step, this.i * step, step, step);
     }
 
-    body.stroke(255);
-    for (let i in this.walls) if (this.walls[i].isFree) body.line(...this.walls[i].value);
+    // body.stroke(255);
+    mazeCanvas.strokeStyle = "#E0E0E0";
+    for (let i in this.walls)
+      if (this.walls[i].isFree) {
+        let coords = this.walls[i].value;
+
+        mazeCanvas.beginPath();
+        mazeCanvas.moveTo(coords[0], coords[1]);
+        mazeCanvas.lineTo(coords[2], coords[3]);
+        mazeCanvas.stroke();
+        // body.line(...this.walls[i].value);
+      }
   }
 }
