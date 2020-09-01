@@ -17,6 +17,9 @@ var rain = setInterval(() => codeRain.show(), 20);
 var MazeCanvas = document.getElementById("MazeGenerator");
 var mazeCanvas = MazeCanvas.getContext("2d");
 
+// MazeCanvas.width = window.innerWidth > 700 ? 700 : Math.floor(window.innerWidth / 100) * 100;
+// MazeCanvas.height = MazeCanvas.width;
+
 const step = 35;
 
 var generator = new Generator();
