@@ -29,17 +29,27 @@ app.post("/guest", jsonParser, (req, res) => {
   res.sendStatus(200);
 });
 
-app.get("/db", (req, res) => {
+app.post("/db", jsonParser, (req, res) => {
   console.log(req.query.title);
   console.log(req.params.id);
 
-  db.print();
+  console.log("Here I am!!");
+  console.log(req.body);
 
+  db.print();
   res.send("Connection to DataBase");
 });
 
-app.get("/db:id", (req, res) => {
-  console.log(req.params.id);
+app.get("/db:task", (req, res) => {
+  console.log(req.params.task);
+
+  switch (req.params.task) {
+    case ":print": {
+      db.print();
+      break;
+    }
+  }
+
   res.sendStatus(200);
 });
 
