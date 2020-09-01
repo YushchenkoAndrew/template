@@ -1,7 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
-const db = require("./JS/MySQL/Test.js");
+const db = require("./JS/MySQL/controllers/Controller.js");
+
 var jsonParser = bodyParser.json();
 
 const HOST = "0.0.0.0";
@@ -29,9 +30,17 @@ app.post("/guest", jsonParser, (req, res) => {
 });
 
 app.get("/db", (req, res) => {
-  db.connect();
+  console.log(req.query.title);
+  console.log(req.params.id);
+
+  db.print();
 
   res.send("Connection to DataBase");
+});
+
+app.get("/db:id", (req, res) => {
+  console.log(req.params.id);
+  res.sendStatus(200);
 });
 
 app.get("/*", (req, res) => {
