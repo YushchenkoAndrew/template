@@ -29,28 +29,63 @@ app.post("/guest", jsonParser, (req, res) => {
   res.sendStatus(200);
 });
 
-app.post("/db", jsonParser, (req, res) => {
+app.post("/db", jsonParser, async (req, res) => {
   console.log(req.query.title);
   console.log(req.params.id);
 
   console.log("Here I am!!");
   console.log(req.body);
 
-  db.print();
-  res.send("Connection to DataBase");
+  // db.print();
+
+  res.send(await db.findAll("ip", req.body.ip));
+
+  // res.send("Connection to DataBase");
 });
 
-app.get("/db:task", (req, res) => {
+app.get("/db/command/:task/:condition", (req, res) => {
   console.log(req.params.task);
 
   switch (req.params.task) {
-    case ":print": {
-      db.print();
+    case "print": {
+      db.print()
+        .then((data) => {
+          for (let i in data) console.log(data[i].dataValues);
+          res.send(data);
+        })
+        .catch((err) => res.status(500).send(err.message));
       break;
     }
+    case "findAll": {
+      db.findAll(...req.params.condition.split("="))
+        .then((data) => res.send(data))
+        .catch((err) => res.status(500).send(err.message));
+      break;
+    }
+    case "create": {
+      db.create(req.params.condition.split(","))
+        .then((data) => res.send(data))
+        .catch((err) => res.status(500).send(err.message));
+      break;
+    }
+    case "delete": {
+      db.delete(...req.params.condition.split("="))
+        .then((data) => {
+          if (data) res.send("Information was deleted successfully");
+          else res.status(500).send(`Such element as '${key} = ${value}' not exist!`);
+        })
+        .catch((err) => res.status(500).send(err.message));
+      break;
+    }
+    case "update": {
+      db.update(req.params.condition.split(","))
+        .then((data) => {
+          if (data) res.send("Information was updated successfully");
+          else res.status(500).send(`Such element as '${key} = ${value}' not exist!`);
+        })
+        .catch((err) => res.status(500).send(err.message));
+    }
   }
-
-  res.sendStatus(200);
 });
 
 app.get("/*", (req, res) => {
