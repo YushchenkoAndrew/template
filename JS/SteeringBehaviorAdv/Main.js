@@ -23,7 +23,7 @@ let central;
 let mouse;
 
 function preload() {
-  img = loadImage("image106.png");
+  img = loadImage("Neko.jpg");
   f = loadFont("Fonts/BPdotsLight.otf");
 }
 
@@ -33,20 +33,9 @@ function setup() {
   fill(255);
 
   let input = [];
-  input.push(
-    new Data("Press and hold mouse to change Text!", 150, H - 20, W - 600)
-  );
-  input.push(
-    new Data(
-      "When you press/release mouse You create a some special effect",
-      150,
-      H - 20,
-      W - 800
-    )
-  );
-  input.push(
-    new Data("Press arrow left/right Key to chang effect", 150, H - 20, W - 700)
-  );
+  input.push(new Data("Press and hold mouse to change Text!", 150, H - 20, W - 600));
+  input.push(new Data("When you press/release mouse You create a some special effect", 150, H - 20, W - 800));
+  input.push(new Data("Press arrow left/right Key to chang effect", 150, H - 20, W - 700));
   input.push(new Data("Explosion", 150, H - 20, W - 300));
   input.push(new Data("Flee", 150, H - 20, W - 200));
   input.push(new Data("Magnet", 150, H - 20, W - 200));
@@ -61,8 +50,8 @@ function setup() {
   input.push(new Data("Have Fun!!", 150));
   input.push(new Data("Made by ..", 150));
   input.push(new Data("Andrew Y.", 150));
-  input.push(new Data("This dude", 72, 100));
-  input.push(new Data("This dude", 72, 100));
+  input.push(new Data("Have fun!!", 72, 100));
+  input.push(new Data("Have fun!!", 72, 100));
 
   central = new SteeringBehavior(input);
 
