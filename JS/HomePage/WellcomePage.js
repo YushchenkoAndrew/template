@@ -17,12 +17,14 @@ var rain = setInterval(() => codeRain.show(), 20);
 var MazeCanvas = document.getElementById("MazeGenerator");
 var mazeCanvas = MazeCanvas.getContext("2d");
 
-// MazeCanvas.width = window.innerWidth > 700 ? 700 : Math.floor(window.innerWidth / 100) * 100;
-// MazeCanvas.height = MazeCanvas.width;
-
 const step = 35;
+MazeCanvas.width = window.innerWidth >= 700 ? 700 : Math.floor(window.innerWidth / step + 1) * step;
 
 var generator = new Generator();
 
 var move = setInterval(() => generator.move(), 100);
 var show = setInterval(() => generator.show(), 20);
+
+// Terminal
+
+window.onload = () => $.terminal.active().exec("show HomePage/Text.txt");

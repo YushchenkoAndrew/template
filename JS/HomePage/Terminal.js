@@ -7,10 +7,6 @@ const int = (char) => (!!Number(char) ? Number(char) : char);
 const highlightCommand = (command) => command.replace(/</g, "[[;#f7dc6f;]<").replace(/>/g, ">]");
 const highlightAnnotation = (str) => str.replace("(", "[[;#cb4335;](").replace(")", ")]");
 
-// Show Text -- HomePage
-
-window.onload = () => $.terminal.active().exec("show HomePage/Text.txt");
-
 $("body").terminal(
   {
     example: async () => {
@@ -242,8 +238,8 @@ $("body").terminal(
     },
   },
   {
-    height: 650,
-    width: 700,
+    height: (650 * window.innerHeight) / 760,
+    width: document.body.clientWidth > 1400 ? (700 * window.innerWidth) / 1540 : window.innerWidth,
     autocompleteMenu: true,
     completion: commands,
     greetings: `${outputSign} Type 'help -a' for showing commands`,
