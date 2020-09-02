@@ -1,5 +1,5 @@
 const config = require("../config/config.json");
-const Sequelize = require("sequelize");
+const { Sequelize, Op } = require("sequelize");
 const db = {};
 
 const sequelize = new Sequelize(config.database, config.username, config.password, {
@@ -14,6 +14,7 @@ sequelize
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
+db.Op = Op;
 
 db.Visitors = require("./Visitor.model.js")(sequelize, Sequelize);
 
