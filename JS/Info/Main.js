@@ -1,14 +1,10 @@
 var xhr = new XMLHttpRequest();
-xhr.open("POST", "/db", true);
+xhr.open("POST", "/db/1", true);
 
 $.get("https://www.cloudflare.com/cdn-cgi/trace", (data) => {
   xhr.setRequestHeader("Content-Type", "application/json");
 
   data = data.split("\n");
-
-  console.log(data[2].split("=")[1]);
-  console.log(data[8].split("=")[1]);
-  console.log(new Date().toISOString().slice(0, 10));
 
   xhr.send(
     JSON.stringify({
@@ -19,12 +15,33 @@ $.get("https://www.cloudflare.com/cdn-cgi/trace", (data) => {
   );
 });
 
-$.get("http://example.com", function (responseText) {
-  alert(responseText);
+google.charts.load("current", {
+  packages: ["geochart"],
+  mapsApiKey: "AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY",
 });
 
 xhr.onreadystatechange = () => {
   if (xhr.readyState == XMLHttpRequest.DONE) {
-    alert(xhr.responseText);
+    console.log(JSON.parse(xhr.responseText));
+    var db = JSON.parse(xhr.responseText);
+
+    google.charts.setOnLoadCallback(() => {
+      $.getJSON("./Country.json", (country) => {
+        let data = [["Country", "Views"]];
+        for (let i in db) data.push([country[db[i].Country] || db[i].Country, db[i].Count]);
+
+        // Testing...
+        // for (let i in country) data.push([country[i], Math.random() * 100]);
+
+        var options = {
+          colorAxis: {
+            colors: ["#aed6f1", "#1b4f72"],
+          },
+        };
+
+        var chart = new google.visualization.GeoChart(document.getElementById("regions_div"));
+        chart.draw(google.visualization.arrayToDataTable(data), options);
+      });
+    });
   }
 };
