@@ -4,44 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="Main.js"></script>
     <title>Info</title>
-
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load("current", {
-        packages: ["geochart"],
-        // Note: you will need to get a mapsApiKey for your project.
-        // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
-        mapsApiKey: "AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY",
-      });
-      google.charts.setOnLoadCallback(drawRegionsMap);
-
-      function drawRegionsMap() {
-        $.getJSON("./Country.json", (country) => {
-          console.log(country);
-
-          var data = google.visualization.arrayToDataTable([
-            ["Country", "Popularity"],
-            ["Germany", 200],
-            [country["US"], 300],
-            ["Brazil", 400],
-            ["Canada", 500],
-            ["France", 600],
-            [country["RU"] || "RU", 700],
-            [country["GB"], 700],
-            [country["BL"], 700],
-            [country["MP"], 700],
-          ]);
-
-          var options = {};
-
-          var chart = new google.visualization.GeoChart(document.getElementById("regions_div"));
-
-          chart.draw(data, options);
-        });
-      }
-    </script>
   </head>
   <body>
     <div id="regions_div" style="width: 900px; height: 500px"></div>
