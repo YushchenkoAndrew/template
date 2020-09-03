@@ -21,6 +21,7 @@ app.get("/projects/*", (req, res, next) => {
 
 app.use("/projects", express.static("JS"));
 
+// FIXME:
 app.post("/guest", jsonParser, (req, res) => {
   console.log(`~ Get some Activity on Website from guest`);
   let indent = " ".repeat(5);
@@ -29,18 +30,23 @@ app.post("/guest", jsonParser, (req, res) => {
   res.sendStatus(200);
 });
 
-app.post("/db", jsonParser, async (req, res) => {
-  console.log(req.query.title);
-  console.log(req.params.id);
+app.post("/db/:sendDB", jsonParser, async (req, res) => {
+  console.log(`~ Get some Activity on Website from guest`);
+  let indent = " ".repeat(5);
+  for (let i in req.body) console.log(`${indent}  ${req.body[i]}`);
+  console.log();
 
-  console.log("Here I am!!");
-  console.log(req.body);
+  let { Country, ip, Visit_Date } = req.body;
 
-  // db.print();
+  let result = await db.findAll("Country", Country);
+  result = result[0] ? result[0].dataValues : undefined;
 
-  res.send(await db.findAll("ip", req.body.ip));
+  if (!result) await db.create([`Country=${Country}`, `ip=${ip}`, `Visit_Date=${Visit_Date}`, `Count=1`]);
+  else if (!ip.includes(result.ip) || !Visit_Date.includes(result.Visit_Date))
+    await db.update([`Country=${Country}`, `ip=${ip}`, `Visit_Date=${Visit_Date}`, `Count=${result.Count + 1}`]);
 
-  // res.send("Connection to DataBase");
+  if (Number(req.params.sendDB)) db.print().then((data) => res.send(data));
+  else res.sendStatus(200);
 });
 
 app.get("/db/command/:task/:condition", (req, res) => {
