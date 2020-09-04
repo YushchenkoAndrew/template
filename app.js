@@ -91,6 +91,8 @@ app.get("/db/command/:task/:condition", (req, res) => {
         })
         .catch((err) => res.status(500).send(err.message));
     }
+    default:
+      res.sendStatus(404);
   }
 });
 
