@@ -33,6 +33,7 @@ body::-webkit-scrollbar-thumb {
   /* height: 2.2rem; */
   width: 100vw;
   background-color: black;
+  z-index: 2;
 }
 
 .navbar-nav {
