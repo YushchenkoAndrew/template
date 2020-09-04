@@ -5,10 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link rel="stylesheet" href="style.css" />
     <script src="Main.js"></script>
     <title>Info</title>
   </head>
   <body>
-    <div id="regions_div" style="width: 900px; height: 500px"></div>
+    <div class="grid-container">
+      <div class="map_item" id="regions_div"></div>
+      <div class="count_item">
+        <p id="total-title">Total Views</p>
+        <p id="total_count"></p>
+      </div>
+      <div class="table-item">
+        <p id="table-title">Recent Views</p>
+        <table id="table">
+          <tr style="color: #5499c7">
+            <th>Date</th>
+            <th>Country</th>
+          </tr>
+        </table>
+      </div>
+    </div>
   </body>
 </html>

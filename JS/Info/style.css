@@ -1,0 +1,99 @@
+body {
+  background-color: #f4f4f4;
+
+}
+
+.grid-container {
+
+  display: grid;
+  grid-gap: 50px;
+  /* grid-template-columns: auto auto auto; */
+  padding: 20px;
+  padding-left: 50px;
+}
+
+
+#regions_div {
+  width: 900px;
+  height: 500px;
+}
+
+.map_item {
+  background-color: white;
+
+  grid-colum: 2;
+  grid-row: 1 / span 4;
+  /* border-radius: 25px; */
+  border: 2px solid rgba(200, 200, 200);
+  /* padding: 20px; */
+}
+
+.count_item {
+  grid-row: 1;
+  grid-column: 1 / span 2;
+  /* width: 100%; */
+
+
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(220, 220, 220);
+
+  border-radius: 25px;
+  padding: 20px;
+}
+
+#total-title {
+  font-family: Consolas, "Courier New", monospace;
+  line-height: 0.01;
+
+  margin-bottom: 0;
+  text-align: center;
+  color: #888;
+}
+
+#total_count {
+  margin: 0;
+  color: #48c9b0;
+
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 42px;
+
+  text-align: center;
+
+}
+
+#table-title {
+  font-family: Consolas, "Courier New", monospace;
+  line-height: 0.01;
+
+  font-size: 18px;
+  text-align: center;
+  color: #888;
+}
+
+.table-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(220, 220, 220);
+
+  border-radius: 25px;
+
+  text-align: center;
+  padding: 20px;
+}
+
+table {
+  font-family: Consolas, "Courier New", monospace;
+
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td,
+th {
+  /* border: 1px solid #DDD; */
+  text-align: center;
+  padding: 20px;
+}
+
+tr:nth-child(even) {
+  background-color: #F4F4F4;
+}

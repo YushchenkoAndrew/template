@@ -25,18 +25,34 @@ xhr.onreadystatechange = () => {
     console.log(JSON.parse(xhr.responseText));
     var db = JSON.parse(xhr.responseText);
 
+    document.getElementById("total_count").innerHTML = db.reduce((acc, value) => {
+      return { Count: acc.Count + value.Count };
+    }).Count;
+
     google.charts.setOnLoadCallback(() => {
       $.getJSON("./Country.json", (country) => {
         let data = [["Country", "Views"]];
-        for (let i in db) data.push([country[db[i].Country] || db[i].Country, db[i].Count]);
+        for (let i in db) {
+          data.push([country[db[i].Country] || db[i].Country, db[i].Count]);
 
-        // Testing...
-        // for (let i in country) data.push([country[i], Math.random() * 100]);
+          // Writing to table
+          let row = document.getElementById("table").insertRow(Number(i) + 1);
+          row.insertCell(0);
+          row.insertCell(1);
+
+          document.getElementById("table").rows[Number(i) + 1].cells[0].innerHTML = new Date(...db[i].Visit_Date.split("-")).toLocaleDateString("en-GB", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+          document.getElementById("table").rows[Number(i) + 1].cells[1].innerHTML = country[db[i].Country] || db[i].Country;
+        }
 
         var options = {
           colorAxis: {
             colors: ["#aed6f1", "#1b4f72"],
           },
+          // backgroundColor: { fill: "#222" },
         };
 
         var chart = new google.visualization.GeoChart(document.getElementById("regions_div"));
