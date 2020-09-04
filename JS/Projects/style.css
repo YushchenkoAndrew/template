@@ -55,6 +55,10 @@ body {
   box-shadow: 4px 4px 8px 1px rgba(0, 0, 0, 0.5);
 }
 
+.card:hover:nth-child(odd) {
+  transform: scale(1.1) rotate(-3deg);
+}
+
 /* .text {
   padding: 0 20px 20px;
 } */
