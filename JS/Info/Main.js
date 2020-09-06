@@ -31,6 +31,9 @@ xhr.onreadystatechange = () => {
 
     google.charts.setOnLoadCallback(() => {
       $.getJSON("./Country.json", (country) => {
+        let today = new Date().toISOString().slice(0, 10);
+        let counter = 0;
+
         let data = [["Country", "Views"]];
         for (let i in db) {
           data.push([country[db[i].Country] || db[i].Country, db[i].Count]);
@@ -46,7 +49,12 @@ xhr.onreadystatechange = () => {
             day: "numeric",
           });
           document.getElementById("table").rows[Number(i) + 1].cells[1].innerHTML = country[db[i].Country] || db[i].Country;
+
+          // Count how many people visited today
+          counter += db[i].Visit_Date.includes(today) ? 1 : 0;
         }
+
+        document.getElementById("today_count").innerHTML = counter;
 
         var options = {
           colorAxis: {

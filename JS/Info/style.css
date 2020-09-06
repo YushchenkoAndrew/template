@@ -54,7 +54,18 @@ body {
   margin: 0;
   color: #48c9b0;
 
-  font-family: Consolas, "Courier New", monospace;
+  font-family: consolas, "courier new", monospace;
+  font-size: 42px;
+
+  text-align: center;
+
+}
+
+#today_count {
+  margin: 0;
+  color: #16a085;
+
+  font-family: consolas, "courier new", monospace;
   font-size: 42px;
 
   text-align: center;
