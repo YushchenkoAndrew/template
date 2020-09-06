@@ -2,7 +2,7 @@ const W = window.innerWidth;
 const H = window.innerHeight;
 
 const rectSize = 300;
-const shift = { x: 450, y: 200 };
+const shift = { x: 500, y: 150 };
 
 // Chose options
 let showGrid = false;

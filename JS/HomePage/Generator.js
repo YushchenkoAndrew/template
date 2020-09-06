@@ -6,8 +6,8 @@ class Generator {
     this.grid = [];
     this.stack = [];
 
-    this.row = Math.floor(N / step);
-    this.col = Math.floor(N / step);
+    this.row = Math.floor(MazeCanvas.height / step);
+    this.col = Math.floor(MazeCanvas.width / step);
 
     for (let i = 0; i < this.row; i++) {
       for (let j = 0; j < this.col; j++) this.grid.push(new Cell(i, j));
@@ -31,7 +31,7 @@ class Generator {
     let right = this.grid[this.index(i, j + 1)];
 
     let unvisited = check(up, down, left, right);
-    let index = Math.floor(body.random(0, unvisited.length));
+    let index = Math.floor(Math.random() * unvisited.length);
 
     // console.log(unvisited);
 
@@ -43,8 +43,9 @@ class Generator {
   }
 
   move() {
-    let i = this.current.i;
-    let j = this.current.j;
+    let { i, j } = this.current;
+    // let i = this.current.i;
+    // let j = this.current.j;
 
     this.current.isCurrent = false;
 
@@ -80,8 +81,6 @@ class Generator {
   }
 
   show() {
-    for (let g of this.grid) {
-      g.show();
-    }
+    for (let i in this.grid) this.grid[i].show();
   }
 }

@@ -1,21 +1,30 @@
-const header = new p5(codeRain, "header");
-const W = window.innerWidth - 17;
-const H = window.innerHeight;
+// Code Rain
 
-function codeRain(p) {
-  let rain;
+var MatrixCanvas = document.getElementById("MatrixCanvas");
+MatrixCanvas.width = window.innerWidth;
+MatrixCanvas.height = window.innerHeight;
 
-  p.setup = function () {
-    let canvas = p.createCanvas(W, H);
-    canvas.position(0, 0);
+var rainCanvas = MatrixCanvas.getContext("2d");
 
-    rain = new CodeRain("Welcome to the warehouse for projects", 24);
-    rain.startMatrix();
-  };
+var fontSize = Math.floor(MatrixCanvas.width / 60);
+var codeRain = new CodeRain("Welcome to the warehouse for projects", fontSize, "Arial");
+codeRain.startMatrix();
 
-  p.draw = function () {
-    p.background(0, 100);
+var rain = setInterval(() => codeRain.show(), 20);
 
-    rain.show();
-  };
-}
+// MazeGenerator
+
+var MazeCanvas = document.getElementById("MazeGenerator");
+var mazeCanvas = MazeCanvas.getContext("2d");
+
+const step = 35;
+MazeCanvas.width = window.innerWidth >= 700 ? 700 : Math.floor(window.innerWidth / step + 1) * step;
+
+var generator = new Generator();
+
+var move = setInterval(() => generator.move(), 100);
+var show = setInterval(() => generator.show(), 20);
+
+// Terminal
+
+window.onload = () => $.terminal.active().exec("show HomePage/Text.txt");

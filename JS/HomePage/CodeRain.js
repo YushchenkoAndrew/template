@@ -1,41 +1,55 @@
 class CodeRain {
-  constructor(text, size) {
-    this.text = text;
-    header.textSize(size);
+  constructor(text, textSize, textStyle) {
+    this.text = {
+      value: text,
+      size: textSize,
+      style: textStyle,
+    };
+
+    rainCanvas.font = `${textSize}px ${textStyle}`;
 
     this.streams = [];
 
-    this.cycleNum = Math.floor(header.random(1, 3));
+    // this.cycleNum = 1;
+    this.cycleNum = Math.round(Math.random() * 2) + 1;
     this.cycleIndex = 0;
 
-    this.index = Math.floor(header.random(0, W / header.textSize() - 1));
-    this.index = 0;
+    this.index = Math.floor(Math.random() * (window.innerWidth / textSize - 1));
+    // this.index = 0;
   }
 
   startMatrix() {
-    let num = Math.floor(W / header.textSize());
-    let startPoint = Math.floor((num - this.text.length) / 2);
+    let numOfStream = Math.floor(window.innerWidth / this.text.size);
+    let startPoint = Math.floor((numOfStream - this.text.value.length) / 2);
 
-    for (let i = 0; i < num; i++) {
-      let p = new Point(i * header.textSize(), header.random(-1000, -50));
-      this.streams.push(new Stream(p));
+    for (let i = 0; i < numOfStream; i++) {
+      this.streams.push(new Stream({ x: i * this.text.size, y: Math.random() * -900 - 50 }));
 
-      this.streams[i].createLine(i >= startPoint ? this.text[i - startPoint] : undefined);
+      this.streams[i].createLine(i >= startPoint ? this.text.value[i - startPoint] : undefined);
     }
   }
 
+  clear() {
+    rainCanvas.globalAlpha = 0.32;
+    rainCanvas.fillStyle = "#000000";
+    rainCanvas.fillRect(0, 0, MatrixCanvas.width, MatrixCanvas.height);
+    rainCanvas.globalAlpha = 1;
+  }
+
   show() {
-    let stopFlag = this.cycleIndex > this.cycleNum;
+    this.clear();
+
+    let stopFlag = this.cycleIndex >= this.cycleNum;
 
     for (let i = 0; i < this.streams.length; i++) {
-      this.streams[i].show(stopFlag && this.streams[i].getY() >= H / 2);
+      this.streams[i].show(stopFlag);
 
       if (this.streams[i].chars.length == 0) this.streams.splice(i, 1);
     }
 
     if (!stopFlag) {
       let y = this.streams[this.index].getY();
-      this.cycleIndex += y >= H / 2 && y < H / 2 + 5 ? 1 : 0;
+      this.cycleIndex += y >= window.innerHeight / 2 && y < window.innerHeight / 2 + 5 ? 1 : 0;
     }
   }
 }

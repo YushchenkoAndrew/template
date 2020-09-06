@@ -1,0 +1,86 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin-top: 3.5rem;
+}
+
+/* Remove extra left and right margins, due to padding */
+.grid {
+  /* margin: 0 -5px; */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-gap: 20px;
+  align-items: stretch;
+}
+
+/* Clear floats after the columns */
+/* .grid:after {
+  content: "";
+  display: table;
+  clear: both;
+} */
+
+/* Responsive columns */
+/* @media screen and (max-width: 600px) {
+  .column {
+    width: 100%;
+    display: block;
+    margin-bottom: 20px;
+  }
+} */
+
+/* Style the counter cards */
+.card {
+  box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2);
+  text-align: center;
+  text-decoration: none;
+
+  background-color: #f1f1f1;
+
+  transition: 0.3s;
+  transform: rotate(0deg);
+  z-index: 0;
+
+  /* border: 1px solid #ccc; */
+  /* box-shadow: 2px 2px 6px 0px rgba(0, 0, 0, 0.3); */
+}
+
+.card:hover {
+  transform: scale(1.1) rotate(3deg);
+  z-index: 1;
+  /* width: 500px; */
+
+  box-shadow: 4px 4px 8px 1px rgba(0, 0, 0, 0.5);
+}
+
+.card:hover:nth-child(odd) {
+  transform: scale(1.1) rotate(-3deg);
+}
+
+/* .text {
+  padding: 0 20px 20px;
+} */
+
+.source-link {
+  color: black;
+  text-decoration: none;
+  font-size: 32px;
+  /* margin: 24px 0; */
+  /* padding: 5rem; */
+}
+
+.source-link:hover {
+  color: #555;
+}
+
+.project-link {
+  color: black;
+  text-decoration: none;
+  /* margin: 24px 0; */
+}
+
+.project-link:hover {
+  color: #555;
+}
