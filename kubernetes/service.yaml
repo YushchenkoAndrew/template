@@ -7,8 +7,8 @@ spec:
   selector:
     app: webserver
   ports:
-    - port: 80
+    - port: 8000
       targetPort: 8000
   type: LoadBalancer
   externalIPs:
-    - 192.168.0.104
+    - 192.168.0.106
