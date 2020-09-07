@@ -5,10 +5,10 @@ metadata:
   namespace: template
 spec:
   rules:
-  - host: test.192.168.0.104.nip.io
+  - host: mortis-grimreaper.ddns.net
     http:
       paths:
       - backend:
           serviceName: web-service
           servicePort: 8000
-        path: /path
+        path: /projects
