@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: web-ingress
+  namespace: template
+spec:
+  rules:
+  - host: test.192.168.0.104.nip.io
+    http:
+      paths:
+      - backend:
+          serviceName: web-service
+          servicePort: 8000
+        path: /path
