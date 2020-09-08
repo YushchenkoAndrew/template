@@ -1,5 +1,7 @@
 #include <iostream>
 
+#define test() "Testing...";
+
 struct A
 {
     virtual void operator()() { std::cout << "A" << std::endl; }
@@ -23,5 +25,9 @@ int main()
 
     //also correct
     b(); //prints B
+
+    std::cout << test();
+    std::cout << std::endl;
+
     return 0;
 }
