@@ -33,13 +33,20 @@ app.post("/guest", jsonParser, (req, res) => {
 app.post("/db/:sendDB", jsonParser, async (req, res) => {
   console.log(`~ Get some Activity on Website from guest`);
   let indent = " ".repeat(5);
-  for (let i in req.body) console.log(`${indent}  ${req.body[i]}`);
+  for (let i in req.body) console.log(`${indent}=> ${req.body[i]}`);
   console.log();
 
   let { Country, ip, Visit_Date } = req.body;
 
+  console.log(req.body);
+
   let result = await db.findAll("Country", Country);
+
+  console.log(result);
+
   result = result[0] ? result[0].dataValues : undefined;
+
+  console.log(result);
 
   if (!result) await db.create([`Country=${Country}`, `ip=${ip}`, `Visit_Date=${Visit_Date}`, `Count=1`]);
   else if (!ip.includes(result.ip) || !Visit_Date.includes(result.Visit_Date))
@@ -90,6 +97,7 @@ app.get("/db/command/:task/:condition", (req, res) => {
           else res.status(500).send(`Such element as '${key} = ${value}' not exist!`);
         })
         .catch((err) => res.status(500).send(err.message));
+      break;
     }
     default:
       res.sendStatus(404);
