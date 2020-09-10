@@ -32,7 +32,7 @@ xhr.onreadystatechange = () => {
     google.charts.setOnLoadCallback(() => {
       $.getJSON("./Country.json", (country) => {
         let today = new Date().toISOString().slice(0, 10);
-        let today_count = { count: 0, country: "" };
+        let today_count = { count: 0, country: [] };
 
         let data = [["Country", "Views"]];
         for (let i in db) {
@@ -51,12 +51,14 @@ xhr.onreadystatechange = () => {
           document.getElementById("table").rows[Number(i) + 1].cells[1].innerHTML = country[db[i].Country] || db[i].Country;
 
           // Count how many people visited today
-          today_count.count += db[i].Visit_Date.includes(today) ? 1 : 0;
-          today_count.country += db[i].Visit_Date.includes(today) ? `${country[db[i].Country] || db[i].Country} ` : "";
+          if (db[i].Visit_Date.includes(today)) {
+            today_count.count++;
+            today_count.country.push(country[db[i].Country] || db[i].Country);
+          }
         }
 
         document.getElementById("today_count").innerHTML = today_count.count;
-        document.getElementById("tooltiptext").innerHTML = today_count.country;
+        document.getElementById("tooltiptext").innerHTML = today_count.country.join("&nbsp;&nbsp;&nbsp;&nbsp");
 
         var options = {
           colorAxis: {

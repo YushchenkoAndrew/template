@@ -39,6 +39,7 @@ body {
 
   border-radius: 25px;
   padding: 20px;
+  padding-bottom: 0;
 }
 
 #total-title {
@@ -79,22 +80,17 @@ body {
 #tooltiptext {
   visibility: hidden;
   background-color: black;
+
   color: white;
   text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  /* display: inline-block; */
 
   border-radius: 6px;
   padding: 5px 10px;
 
-
-  /* width: 120px; */
-
-  /* width: 120px; */
-  /* top: 100%; */
-  /* left: 50%; */
-  /* margin-left: -60px; */
-
   /* Position the tooltip */
-  /* position: relative; */
+  /* position: absolute; */
   z-index: 1;
 }
 
