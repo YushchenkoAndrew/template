@@ -16,8 +16,8 @@ function setup() {
   rect(-r / 2, -r / 2, r, r);
 }
 
-function mousePressed() {
-  for (let i = 0; i < 100000; i++) {
+function addDots() {
+  for (let i = 0; i < 10000; i++) {
     let x = random(-r / 2, r / 2);
     let y = random(-r / 2, r / 2);
 
@@ -31,6 +31,10 @@ function mousePressed() {
   }
 }
 
+function mousePressed() {
+  return new Promise(addDots);
+}
+
 function draw() {
   translate(350, 350);
 
@@ -40,6 +44,5 @@ function draw() {
 
   textSize(32);
   fill(255);
-  if (dots.length != 0)
-    text(((4 * dotsInCircle) / dots.length).toFixed(6), -60, 300);
+  if (dots.length != 0) text(((4 * dotsInCircle) / dots.length).toFixed(6), -60, 300);
 }

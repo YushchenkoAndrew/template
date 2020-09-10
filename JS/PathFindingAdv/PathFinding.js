@@ -101,8 +101,7 @@ class PathFinding {
 
       let tentative_gScore = current.g + 1;
 
-      if (this.openSet.includes(neighbor) && tentative_gScore >= neighbor.g)
-        continue;
+      if (this.openSet.includes(neighbor) && tentative_gScore >= neighbor.g) continue;
 
       neighbor.g = tentative_gScore;
       neighbor.h = this.h(neighbor, this.end);

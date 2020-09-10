@@ -11,7 +11,7 @@ body {
 
   display: block;
   overflow-x: hidden;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
 
 body::-webkit-scrollbar {
@@ -79,6 +79,7 @@ body::-webkit-scrollbar-thumb {
 
   margin: 1rem 0.1rem;
 }
+
 .nav-link i {
   min-width: 0.5rem;
   /* font-size: 30px; */

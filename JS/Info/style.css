@@ -72,6 +72,36 @@ body {
 
 }
 
+.tooltip {
+  text-align: center;
+}
+
+#tooltiptext {
+  visibility: hidden;
+  background-color: black;
+  color: white;
+  text-align: center;
+
+  border-radius: 6px;
+  padding: 5px 10px;
+
+
+  /* width: 120px; */
+
+  /* width: 120px; */
+  /* top: 100%; */
+  /* left: 50%; */
+  /* margin-left: -60px; */
+
+  /* Position the tooltip */
+  /* position: relative; */
+  z-index: 1;
+}
+
+.tooltip:hover #tooltiptext {
+  visibility: visible;
+}
+
 #table-title {
   font-family: Consolas, "Courier New", monospace;
   line-height: 0.01;

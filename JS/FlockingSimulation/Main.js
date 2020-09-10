@@ -9,6 +9,7 @@ let flockSimulation;
 
 function setup() {
   createCanvas(W, H);
+
   FRAME = new Rectangle(0, 0, W, H);
 
   flockSimulation = new Flock(200);

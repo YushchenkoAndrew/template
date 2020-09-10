@@ -4,6 +4,8 @@ const H = 700;
 let fractal;
 let index = 0;
 
+let details = 0;
+
 function setup() {
   createCanvas(W, H);
 
@@ -35,7 +37,7 @@ function setup() {
 }
 
 function mouseClicked() {
-  fractal.update();
+  if (++details < 5) fractal.update();
 }
 
 function doubleClicked() {
@@ -44,6 +46,7 @@ function doubleClicked() {
   let angle = { r: PI / 8, l: -PI / 8 };
 
   console.log(index + 1);
+  details = 0;
 
   switch (++index) {
     case 0: {

@@ -35,7 +35,7 @@ function setup() {
     edge.applyNonMaximumSuppression.bind(edge),
     edge.applyDoubleThreshold.bind(edge),
     edge.trackEdge.bind(edge),
-    edge.reset.bind(edge),
+    edge.reset.bind(edge)
   );
 
   menu.setAdditionalData(1, { value: [2, 1], step: 0.1 });

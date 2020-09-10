@@ -4,6 +4,8 @@ const H = 700;
 const len = 300;
 let angle = 0;
 
+let details = 0;
+
 let sponge;
 
 function setup() {
@@ -13,7 +15,7 @@ function setup() {
 }
 
 function mouseClicked() {
-  sponge.update();
+  if (++details < 3) sponge.update();
 }
 
 function draw() {

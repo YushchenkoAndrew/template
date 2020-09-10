@@ -67,10 +67,10 @@ class Menu {
 
     for (var i = 0; i < this.items.length; i++) if (this.items[i].data && this.items[i].showData(x_, y_, this.inTheRange && checkRange(i, x_, y_))) break;
 
-    this.inTheRange |= i != this.items.length;
+    this.inTheRange = this.inTheRange || i != this.items.length;
 
     if (this.inTheRange) {
-      this.inTheRange &= checkRange(i, x_, y_);
+      this.inTheRange = this.inTheRange && checkRange(i, x_, y_);
       if (this.inTheRange) return;
 
       this.refreshMenuBar();
