@@ -2,22 +2,11 @@
   <head>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <title>404 Not Found</title>
+    <script src="./app.js"></script>
   </head>
   <body>
     <center><h1>404 Not Found</h1></center>
     <hr />
     <center>This requested URL was not found on this server.</center>
-    <script>
-      $.get("https://www.cloudflare.com/cdn-cgi/trace", (data) => {
-        let xhr = new XMLHttpRequest();
-        xhr.open("POST", "/guest", true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.send(
-          JSON.stringify({
-            data: data,
-          })
-        );
-      });
-    </script>
   </body>
 </html>

@@ -8,29 +8,7 @@ var jsonParser = bodyParser.json();
 const HOST = "0.0.0.0";
 const PORT = 8000;
 
-app.get("/projects/*", (req, res, next) => {
-  console.log(`~ Get request to ${req.url}`);
-  const time = new Date();
-  console.log(`\t=> At ${time}`);
-
-  const forwarded = req.headers["x-forwarded-for"];
-  const clientIP = forwarded ? forwarded.split(/, /)[0] : req.connection.remoteAddress;
-  console.log(`\t=> From Client ${clientIP}\n`);
-  next();
-});
-
-app.use("/projects", express.static("JS"));
-
-// FIXME:
-app.post("/guest", jsonParser, (req, res) => {
-  console.log(`~ Get some Activity on Website from guest`);
-  let indent = " ".repeat(5);
-  let data = req.body.data.split("\n");
-  for (let i in data) console.log(`${indent}  ${data[i]}`);
-  res.sendStatus(200);
-});
-
-app.post("/db/:sendDB", jsonParser, async (req, res) => {
+app.post("/projects/db/:sendDB", jsonParser, async (req, res) => {
   console.log(`~ Get some Activity on Website from guest`);
   let indent = " ".repeat(5);
   for (let i in req.body) console.log(`${indent}=> ${req.body[i]}`);
@@ -38,15 +16,8 @@ app.post("/db/:sendDB", jsonParser, async (req, res) => {
 
   let { Country, ip, Visit_Date } = req.body;
 
-  console.log(req.body);
-
   let result = await db.findAll("Country", Country);
-
-  console.log(result);
-
   result = result[0] ? result[0].dataValues : undefined;
-
-  console.log(result);
 
   if (!result) await db.create([`Country=${Country}`, `ip=${ip}`, `Visit_Date=${Visit_Date}`, `Count=1`]);
   else if (!ip.includes(result.ip) || !Visit_Date.includes(result.Visit_Date))
@@ -56,7 +27,7 @@ app.post("/db/:sendDB", jsonParser, async (req, res) => {
   else res.sendStatus(200);
 });
 
-app.get("/db/command/:task/:condition", (req, res) => {
+app.get("/projects/db/command/:task/:condition", (req, res) => {
   console.log(req.params.task);
 
   switch (req.params.task) {
@@ -100,19 +71,25 @@ app.get("/db/command/:task/:condition", (req, res) => {
       break;
     }
     default:
-      res.sendStatus(404);
+      res.status(404);
+      res.sendFile(__dirname + "/FileNotFound.html");
   }
 });
+
+app.get("/projects/*", (req, res, next) => {
+  console.log(`~ Get request to ${req.url}`);
+  const time = new Date();
+  console.log(`\t=> At ${time}\n`);
+  next();
+});
+
+app.use("/projects", express.static("JS"));
 
 app.get("/*", (req, res) => {
   console.log(`\n~ Unexpected URL: ${req.url}`);
   let time = new Date();
   console.log(`\t=> At ${time}`);
   console.log(`\t=> File '${req.url.split("/").pop()}' not found\n`);
-
-  const forwarded = req.headers["x-forwarded-for"];
-  const clientIP = forwarded ? forwarded.split(/, /)[0] : req.connection.remoteAddress;
-  console.log(`\t=> From Client ${clientIP}\n`);
 
   res.status(404);
   res.sendFile(__dirname + "/FileNotFound.html");

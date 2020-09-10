@@ -1,10 +1,15 @@
 $.get("https://www.cloudflare.com/cdn-cgi/trace", (data) => {
   let xhr = new XMLHttpRequest();
-  xhr.open("POST", "/guest", true);
+  xhr.open("POST", "/projects/db/0", true);
   xhr.setRequestHeader("Content-Type", "application/json");
+
+  data = data.split("\n");
+
   xhr.send(
     JSON.stringify({
-      data: data,
+      ip: data[2].split("=")[1],
+      Country: data[8].split("=")[1],
+      Visit_Date: new Date().toISOString().slice(0, 10),
     })
   );
 });

@@ -1,5 +1,5 @@
 var xhr = new XMLHttpRequest();
-xhr.open("POST", "/db/1", true);
+xhr.open("POST", "/projects/db/1", true);
 
 $.get("https://www.cloudflare.com/cdn-cgi/trace", (data) => {
   xhr.setRequestHeader("Content-Type", "application/json");
