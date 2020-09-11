@@ -11,7 +11,7 @@ spec:
   tls:
   - hosts: 
     - mortis-grimreaper.ddns.net
-    secretName: "web-tls"
+    secretName: mortis-tls
   rules:
   - host: mortis-grimreaper.ddns.net
     http:
