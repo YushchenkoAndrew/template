@@ -5,25 +5,29 @@ const app = express();
 const HOST = "0.0.0.0";
 const PORT = 18000;
 
+// Default setup
+var pythonSript = spawn("python", ["./Main.py", "g", 0]);
+
 app.get("/led/:command/:value", (req, res) => {
   console.log("~ Recieve request to change LED");
 
-  // Run python script
-  const python = spawn("python", ["./Main.py", req.params.command, req.params.value]);
+  // Send SIGTERM to process
+  pythonSript.kill("SIGKILL")
 
-  python.stdout.on("data", (data) => {
+  // Run python script
+  pythonSript = spawn("python", ["./Main.py", req.params.command, req.params.value]);
+
+  pythonSript.stdout.on("data", (data) => {
     console.log("~ Returned Data form python script");
     console.log(`\t=> ${data.toString().split("\n").join("\n\t=> ")}`);
   });
 
-  python.stderr.on('data', (data) => {
+  pythonSript.stderr.on('data', (data) => {
     console.log(data.toString());
   })
 
-  // Send SIGTERM to process
-  // python.kill("SIGQUIT");
 
-  res.send("Yep");
+  res.send("OK");
 
 });
 
