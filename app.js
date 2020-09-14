@@ -23,8 +23,12 @@ app.post("/projects/db/:sendDB", jsonParser, async (req, res) => {
   else if (!ip.includes(result.ip) || !Visit_Date.includes(result.Visit_Date))
     await db.update("Visitors", [`Country=${Country}`, `ip=${ip}`, `Visit_Date=${Visit_Date}`, `Count=${result.Count + 1}`]);
 
-  if (Number(req.params.sendDB)) db.print("Visitors").then((data) => res.send(data));
-  else res.sendStatus(200);
+  if (Number(req.params.sendDB)) {
+    let data = {};
+    data["Visitors"] = await db.print("Visitors");
+    data["Views"] = await db.print("Views");
+    res.send(data);
+  } else res.sendStatus(200);
 });
 
 app.get("/projects/db/:table/command/:task/:condition", (req, res) => {

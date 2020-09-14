@@ -22,10 +22,9 @@ google.charts.load("current", {
 
 xhr.onreadystatechange = () => {
   if (xhr.readyState == XMLHttpRequest.DONE) {
-    console.log(JSON.parse(xhr.responseText));
     var db = JSON.parse(xhr.responseText);
 
-    document.getElementById("total_count").innerHTML = db.reduce((acc, value) => {
+    document.getElementById("total_count").innerHTML = db.Visitors.reduce((acc, value) => {
       return { Count: acc.Count + value.Count };
     }).Count;
 
@@ -35,25 +34,28 @@ xhr.onreadystatechange = () => {
         let today_count = { count: 0, country: [] };
 
         let data = [["Country", "Views"]];
-        for (let i in db) {
-          data.push([country[db[i].Country] || db[i].Country, db[i].Count]);
+        for (let i in db.Visitors) {
+          data.push([country[db.Visitors[i].Country] || db.Visitors[i].Country, db.Visitors[i].Count]);
 
           // Writing to table
           let row = document.getElementById("table").insertRow(Number(i) + 1);
           row.insertCell(0);
           row.insertCell(1);
 
-          document.getElementById("table").rows[Number(i) + 1].cells[0].innerHTML = new Date(...db[i].Visit_Date.split("-")).toLocaleDateString("en-GB", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          });
-          document.getElementById("table").rows[Number(i) + 1].cells[1].innerHTML = country[db[i].Country] || db[i].Country;
+          document.getElementById("table").rows[Number(i) + 1].cells[0].innerHTML = new Date(...db.Visitors[i].Visit_Date.split("-")).toLocaleDateString(
+            "en-GB",
+            {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }
+          );
+          document.getElementById("table").rows[Number(i) + 1].cells[1].innerHTML = country[db.Visitors[i].Country] || db.Visitors[i].Country;
 
           // Count how many people visited today
-          if (db[i].Visit_Date.includes(today)) {
+          if (db.Visitors[i].Visit_Date.includes(today)) {
             today_count.count++;
-            today_count.country.push(country[db[i].Country] || db[i].Country);
+            today_count.country.push(country[db.Visitors[i].Country] || db.Visitors[i].Country);
           }
         }
 
@@ -70,6 +72,37 @@ xhr.onreadystatechange = () => {
         var chart = new google.visualization.GeoChart(document.getElementById("regions_div"));
         chart.draw(google.visualization.arrayToDataTable(data), options);
       });
+    });
+
+    let labels = [];
+    let data = [];
+    for (let i in db.Views) {
+      labels.push(db.Views[i].Curr_Date);
+      data.push(db.Views[i].Count);
+    }
+
+    var ctx = document.getElementById("chart").getContext("2d");
+
+    var chart = new Chart(ctx, {
+      // The type of chart we want to create
+      type: "line",
+
+      // The data for our dataset
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Views",
+            backgroundColor: "rgba(88, 214, 141, 0.6)",
+            borderColor: "#52be80",
+            data: data,
+          },
+        ],
+      },
+
+      // Configuration options go here
+      // options: {},
+      options: { responsive: false, maintainAspectRatio: false, width: 700, height: 200 },
     });
   }
 };
