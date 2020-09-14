@@ -1,15 +1,24 @@
-const { Visitors } = require("../models/index.js");
+const { Visitors, Views } = require("../models/index.js");
 
-exports.print = () => Visitors.findAll();
+function getTable(name) {
+  switch (name) {
+    case "Visitors":
+      return Visitors;
+    case "Views":
+      return Views;
+  }
+}
 
-exports.findAll = (key, value) => {
+exports.print = (table) => getTable(table).findAll();
+
+exports.findAll = (table, key, value) => {
   let condition = {};
   condition[key] = value || null;
 
-  return Visitors.findAll({ where: condition });
+  return getTable(table).findAll({ where: condition });
 };
 
-exports.create = (data) => {
+exports.create = (table, data) => {
   let newVisitor = {};
 
   for (let i in data) {
@@ -17,17 +26,17 @@ exports.create = (data) => {
     newVisitor[params[0]] = params[1] || null;
   }
 
-  return Visitors.create(newVisitor);
+  return getTable(table).create(newVisitor);
 };
 
-exports.delete = (key, value) => {
+exports.delete = (table, key, value) => {
   let condition = {};
   condition[key] = value;
 
-  return Visitors.destroy({ where: condition });
+  return getTable(table).destroy({ where: condition });
 };
 
-exports.update = (data) => {
+exports.update = (table, data) => {
   let condition = data.splice(0, 1)[0].split("=");
   let where = {};
   where[condition[0]] = condition[1];
@@ -39,5 +48,5 @@ exports.update = (data) => {
     newValue[params[0]] = params[1];
   }
 
-  return Visitors.update(newValue, { where: where });
+  return getTable(table).update(newValue, { where: where });
 };
