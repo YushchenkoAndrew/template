@@ -30,11 +30,22 @@ body::-webkit-scrollbar-track {
   height: 500px;
 }
 
+#chart {
+  width: 820px;
+  height: 200px;
+  /* height: 100px; */
+  /* height: auto; */
+
+  text-align: center;
+  /* max-height: 350px; */
+  padding: 20px;
+}
+
 .map_item {
   background-color: white;
 
-  grid-colum: 2;
-  grid-row: 1 / span 4;
+  grid-column: 2;
+  grid-row: 1 / span 2;
   /* border-radius: 25px; */
   border: 2px solid rgba(200, 200, 200);
   /* padding: 20px; */
@@ -42,8 +53,7 @@ body::-webkit-scrollbar-track {
 
 .count_item {
   grid-row: 1;
-  grid-column: 1 / span 2;
-  /* width: 100%; */
+  grid-column: 1 / span 1;
 
   background-color: rgba(255, 255, 255, 0.8);
   border: 2px solid rgba(220, 220, 220);
@@ -51,6 +61,18 @@ body::-webkit-scrollbar-track {
   border-radius: 25px;
   padding: 20px;
   padding-bottom: 0;
+}
+
+.views_chart {
+  /* position: relative !important; */
+  background-color: white;
+
+  text-align: center;
+
+  border-radius: 25px;
+  border: 2px solid rgba(200, 200, 200);
+
+  padding: 20px;
 }
 
 #total-title {
@@ -119,6 +141,9 @@ body::-webkit-scrollbar-track {
 .table-item {
   background-color: rgba(255, 255, 255, 0.8);
   border: 2px solid rgba(220, 220, 220);
+
+  grid-column: 1 / span 1;
+  grid-row: 2 / span 2;
 
   border-radius: 25px;
 
