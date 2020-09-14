@@ -16,23 +16,23 @@ app.post("/projects/db/:sendDB", jsonParser, async (req, res) => {
 
   let { Country, ip, Visit_Date } = req.body;
 
-  let result = await db.findAll("Country", Country);
+  let result = await db.findAll("Visitors", "Country", Country);
   result = result[0] ? result[0].dataValues : undefined;
 
-  if (!result) await db.create([`Country=${Country}`, `ip=${ip}`, `Visit_Date=${Visit_Date}`, `Count=1`]);
+  if (!result) await db.create("Visitors", [`Country=${Country}`, `ip=${ip}`, `Visit_Date=${Visit_Date}`, `Count=1`]);
   else if (!ip.includes(result.ip) || !Visit_Date.includes(result.Visit_Date))
-    await db.update([`Country=${Country}`, `ip=${ip}`, `Visit_Date=${Visit_Date}`, `Count=${result.Count + 1}`]);
+    await db.update("Visitors", [`Country=${Country}`, `ip=${ip}`, `Visit_Date=${Visit_Date}`, `Count=${result.Count + 1}`]);
 
-  if (Number(req.params.sendDB)) db.print().then((data) => res.send(data));
+  if (Number(req.params.sendDB)) db.print("Visitors").then((data) => res.send(data));
   else res.sendStatus(200);
 });
 
-app.get("/projects/db/command/:task/:condition", (req, res) => {
+app.get("/projects/db/:table/command/:task/:condition", (req, res) => {
   console.log(req.params.task);
 
   switch (req.params.task) {
     case "print": {
-      db.print()
+      db.print(req.params.table)
         .then((data) => {
           for (let i in data) console.log(data[i].dataValues);
           res.send(data);
@@ -41,19 +41,19 @@ app.get("/projects/db/command/:task/:condition", (req, res) => {
       break;
     }
     case "findAll": {
-      db.findAll(...req.params.condition.split("="))
+      db.findAll(req.params.table, ...req.params.condition.split("="))
         .then((data) => res.send(data))
         .catch((err) => res.status(500).send(err.message));
       break;
     }
     case "create": {
-      db.create(req.params.condition.split(","))
+      db.create(req.params.table, req.params.condition.split(","))
         .then((data) => res.send(data))
         .catch((err) => res.status(500).send(err.message));
       break;
     }
     case "delete": {
-      db.delete(...req.params.condition.split("="))
+      db.delete(req.params.table, ...req.params.condition.split("="))
         .then((data) => {
           if (data) res.send("Information was deleted successfully");
           else res.status(500).send(`Such element as '${key} = ${value}' not exist!`);
@@ -62,7 +62,7 @@ app.get("/projects/db/command/:task/:condition", (req, res) => {
       break;
     }
     case "update": {
-      db.update(req.params.condition.split(","))
+      db.update(req.params.table, req.params.condition.split(","))
         .then((data) => {
           if (data) res.send("Information was updated successfully");
           else res.status(500).send(`Such element as '${key} = ${value}' not exist!`);
@@ -76,10 +76,19 @@ app.get("/projects/db/command/:task/:condition", (req, res) => {
   }
 });
 
-app.get("/projects/*", (req, res, next) => {
+app.get("/projects/*", async (req, res, next) => {
   console.log(`~ Get request to ${req.url}`);
   const time = new Date();
   console.log(`\t=> At ${time}\n`);
+
+  if (req.url.substr(-1) == "/" && !req.url.includes("Info")) {
+    let result = await db.findAll("Views", "Curr_Date", new Date().toISOString().slice(0, 10));
+    result = result[0] ? result[0].dataValues : undefined;
+
+    if (!result) await db.create("Views", [`Curr_Date=${new Date().toISOString().slice(0, 10)}`, `Count=1`]);
+    else await db.update("Views", [`Curr_Date=${new Date().toISOString().slice(0, 10)}`, `Count=${result.Count + 1}`]);
+  }
+
   next();
 });
 

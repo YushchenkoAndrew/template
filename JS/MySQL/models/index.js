@@ -17,5 +17,6 @@ db.sequelize = sequelize;
 db.Op = Op;
 
 db.Visitors = require("./Visitor.model.js")(sequelize, Sequelize);
+db.Views = require("./Views.model.js")(sequelize, Sequelize);
 
 module.exports = db;
