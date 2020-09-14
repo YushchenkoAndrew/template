@@ -5,7 +5,7 @@ module.exports = (sequelize, Sequelize) => {
       id: { type: Sequelize.DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       Country: { type: Sequelize.DataTypes.STRING },
       ip: { type: Sequelize.DataTypes.STRING },
-      Visit_Date: { type: Sequelize.DataTypes.DATE },
+      Visit_Date: { type: Sequelize.DataTypes.DATEONLY },
       Count: { type: Sequelize.DataTypes.INTEGER },
     },
     {
