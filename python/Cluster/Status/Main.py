@@ -82,6 +82,7 @@ def rainbow(frequency):
                 GPIO.output(LED[k], 0)
                 time.sleep(delay)
                 GPIO.output(LED[k], 1)
+                time.sleep(1 / FREQ)
 
 
 def main():
