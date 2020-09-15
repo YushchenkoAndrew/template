@@ -9,7 +9,7 @@ import RPi.GPIO as GPIO
 LED = {"r": 18, "g": 16, "b": 12}
 
 # Frequecy in Hz
-FREQ = 1000
+FREQ = 500
 
 STEP = 100.0
 
@@ -74,7 +74,7 @@ def rainbow(frequency):
 
         for _ in range(frequency):
             for k in color:
-                delay = color[k] / 255.0 / FREQ
+                delay = color[k] / 256.0 / FREQ
 
                 GPIO.output(LED[k], 0)
                 time.sleep(delay)
