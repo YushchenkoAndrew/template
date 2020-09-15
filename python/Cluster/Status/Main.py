@@ -11,7 +11,7 @@ LED = {"r": 18, "g": 16, "b": 12}
 # Frequecy in Hz
 FREQ = 500
 
-STEP = 100.0
+STEP = 200.0
 
 # Rainbow Colors
 colorEffect = [
@@ -62,24 +62,26 @@ def rainbow(frequency):
     color = {k: colorEffect[0][k] for k in colorEffect[0]}
     delta = {k: (colorEffect[next][k] - color[k]) / STEP for k in color}
 
+    count = 1
+
     while True:
         color = {k: color[k] + delta[k] for k in color}
+	count += 1
 
-        if not len(
-            [k for k in color if (color[k] + delta[k] + 0.1) < colorEffect[next][k]]
-        ):
+	if count + 1 >= STEP:
             curr = next
             next = (next + 1) % len(colorEffect)
             delta = {k: (colorEffect[next][k] - color[k]) / STEP for k in color}
+	    count = 0
+
 
         for _ in range(frequency):
             for k in color:
-                delay = color[k] / 256.0 / FREQ
+                delay = color[k] / 255.0 / FREQ
 
                 GPIO.output(LED[k], 0)
                 time.sleep(delay)
                 GPIO.output(LED[k], 1)
-                time.sleep(1.0 / FREQ - delay)
 
 
 def main():
