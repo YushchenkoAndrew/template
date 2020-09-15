@@ -66,6 +66,9 @@ def rainbow(frequency):
 
     while True:
         color = {k: color[k] + delta[k] for k in color}
+        delay = {k: color[k] / (255.0 * FREQ) for k in color}
+	turnOff = max(delay.values())
+
 	count += 1
 
 	if count + 1 >= STEP:
@@ -74,15 +77,13 @@ def rainbow(frequency):
             delta = {k: (colorEffect[next][k] - color[k]) / STEP for k in color}
 	    count = 0
 
-
         for _ in range(frequency):
             for k in color:
-                delay = color[k] / 255.0 / FREQ
 
                 GPIO.output(LED[k], 0)
-                time.sleep(delay)
+                time.sleep(delay[k])
                 GPIO.output(LED[k], 1)
-                time.sleep(1 / FREQ)
+                time.sleep(0.00001)
 
 
 def main():
