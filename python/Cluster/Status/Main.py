@@ -4,6 +4,7 @@ import signal
 import atexit
 import random as rand
 import RPi.GPIO as GPIO
+import threading
 
 # Initialize Pin (const)
 LED = {"r": 18, "g": 16, "b": 12}
@@ -66,13 +67,13 @@ def rainbow(frequency):
 
     while True:
         color = {k: color[k] + delta[k] for k in color}
-	count += 1
+        count += 1
 
-	if count + 1 >= STEP:
+        if count + 1 >= STEP:
             curr = next
             next = (next + 1) % len(colorEffect)
             delta = {k: (colorEffect[next][k] - color[k]) / STEP for k in color}
-	    count = 0
+            count = 0
 
 
         for _ in range(frequency):
@@ -93,6 +94,7 @@ def main():
     command = sys.argv[1]
     param = sys.argv[2]
 
+
     # Switch case statment
     if command in LED.keys():
         GPIO.output(LED[command], int(param))
@@ -102,17 +104,19 @@ def main():
         if param == "rand":
             param = rand.choice(list(LED.keys()))
 
-        blink(float(command.split("-")[1]) / 1000, LED[param])
+        proc = threading.Thread(target=blink, args=(float(command.split("-")[1]) / 1000, LED[param],))
 
     elif "setColor" in command:
-        setColor(
+        proc = threading.Thread(target=setColor, args=(
             int("0x" + param[0:2], 16),  # Red Value
             int("0x" + param[2:4], 16),  # Green Value
             int("0x" + param[4:], 16),  # Blue Value
-        )
+        ))
+        proc.start()
 
     elif "rainbow" in command:
-        rainbow(int(param) // 3)
+        proc = threading.Thread(target=rainbow, args=(int(param) // 3, ))
+        proc.start()
 
     else:  # If no one is correct then exit
         # Reset all used GPIO
