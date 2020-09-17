@@ -67,14 +67,8 @@ def rainbow(frequency):
 
     while True:
         color = {k: color[k] + delta[k] for k in color}
-<<<<<<< HEAD
         count += 1
-=======
         delay = {k: color[k] / (255.0 * FREQ) for k in color}
-	turnOff = max(delay.values())
-
-	count += 1
->>>>>>> 3308e8f7bed65767178c1029b5321863238367f7
 
         if count + 1 >= STEP:
             curr = next
@@ -110,6 +104,7 @@ def main():
             param = rand.choice(list(LED.keys()))
 
         proc = threading.Thread(target=blink, args=(float(command.split("-")[1]) / 1000, LED[param],))
+        proc.start()
 
     elif "setColor" in command:
         proc = threading.Thread(target=setColor, args=(
