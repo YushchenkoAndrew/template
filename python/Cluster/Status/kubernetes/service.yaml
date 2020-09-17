@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rgb-service
+  namespace: cluster-rgb
+spec:
+  selector:
+    app: cluster-rgb
+  ports:
+    - port: 18000
+      targetPort: 18000
+  type: LoadBalancer

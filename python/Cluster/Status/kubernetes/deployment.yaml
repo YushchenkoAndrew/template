@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rgb-deployment
+  namespace: cluster-rgb
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cluster-rgb
+  template:
+    metadata:
+      labels:
+        app: cluster-rgb
+    spec:
+      containers:
+        - name: cluster-rgb
+          imagePullPolicy: Always
+          image: grimreapermortis/cluster_rgb:beta
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: 18000
