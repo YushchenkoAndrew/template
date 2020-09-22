@@ -37,7 +37,7 @@ namespace HAL
     {
       enum
       {
-        Address = 0,
+        Address = UART0_CTL,
         RcvInterruptID = InterruptID::Uart0Rcv,
         XmtInterruptID = InterruptID::Uart0Xmt,
         StatusInterruptID = InterruptID::Uart0Status,
@@ -51,7 +51,7 @@ namespace HAL
     {
       enum
       {
-        Address = 0,
+        Address = UART1_CTL,
         RcvInterruptID = InterruptID::Uart1Rcv,
         XmtInterruptID = InterruptID::Uart1Xmt,
         StatusInterruptID = InterruptID::Uart1Status,
@@ -65,7 +65,7 @@ namespace HAL
     {
       enum
       {
-        Address = 0,
+        Address = UART2_CTL,
         RcvInterruptID = InterruptID::Uart2Rcv,
         XmtInterruptID = InterruptID::Uart2Xmt,
         StatusInterruptID = InterruptID::Uart2Status,
