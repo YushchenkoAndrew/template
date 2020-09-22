@@ -57,6 +57,9 @@ namespace HAL
             Mdma3SrcErr = 255,
             Mdma3DstErr = 256,
 
+            TWI0 = 155,
+            TWI1 = 156,
+            TWI2 = 157,
         };
     }
 
