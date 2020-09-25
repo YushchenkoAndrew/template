@@ -89,13 +89,13 @@ xhr.onreadystatechange = () => {
 
       // The data for our dataset
       data: {
-        labels: labels,
+        labels: labels.slice(-7),
         datasets: [
           {
             label: "Views",
             backgroundColor: "rgba(88, 214, 141, 0.6)",
             borderColor: "#52be80",
-            data: data,
+            data: data.slice(-7),
           },
         ],
       },
