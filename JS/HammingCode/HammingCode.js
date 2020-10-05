@@ -28,10 +28,13 @@ class HammingCode {
 
   changeData({ x, y }) {
     // Save x and y value
+
+    let rect = hammingCode.getBoundingClientRect();
+
     let pos = { x: x, y: y };
 
     x = Math.floor((x - this.shift.x) / this.step);
-    y = Math.floor((y - this.shift.y) / this.step);
+    y = Math.floor((y - this.shift.y - rect.y) / this.step);
 
     if (y >= 0 && x >= 0 && y - this.size < 0 && x - this.size < 0) {
       // console.log(`Mouse Clicked!!! x = ${x}, y = ${y}`);
