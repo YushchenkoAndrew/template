@@ -51,7 +51,7 @@ class HammingCode {
       // console.log(`Mouse Clicked2!!! x = ${x}, y = ${y}`);
 
       // User click on correct data, then save corrected data + change by index
-      this.data[this.detectError] ^= true;
+      this.data[this.detectError()] ^= true;
       this.data[y * this.size + x] ^= true;
       this.draw();
       return;
