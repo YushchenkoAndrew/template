@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: psql
+  namespace: psql
+spec:
+  selector:
+    matchLabels:
+      app: psql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: psql
+    spec:
+      containers:
+      - image: postgres
+        name: psql
+        envFrom:
+        - configMapRef:
+            name: psql-config
+        ports:
+        - containerPort: 3306
+          name: psql
+        volumeMounts:
+        - name:  storage
+          mountPath:  /var/lib/psql
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: psql-pvc
