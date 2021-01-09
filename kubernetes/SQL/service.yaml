@@ -9,3 +9,4 @@ spec:
     targetPort: 3306
   selector:
     app: psql
+  type: LoadBalancer
