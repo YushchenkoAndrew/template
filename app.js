@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const db = require("./JS/MySQL/controllers/Controller.js");
+const { convertToAscii } = require("./JS/ASCII-art");
 
 var jsonParser = bodyParser.json();
 
@@ -94,6 +95,19 @@ app.get("/projects/*", async (req, res, next) => {
   }
 
   next();
+});
+
+app.post("/projects/ASCII-art", (req, res) => {
+  console.log(`~ POST request to ${req.url}`);
+  const time = new Date();
+  console.log(`\t=> At ${time}\n`);
+
+  let { path, scale, repeat } = req.query;
+  if (!path) res.status(400).send("Wrong path declaration");
+
+  convertToAscii(path, { scale, repeat })
+    .then((data) => res.send(data))
+    .catch((err) => res.status(500).send(err));
 });
 
 app.use("/projects", express.static("JS"));
