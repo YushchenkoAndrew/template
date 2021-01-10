@@ -6,6 +6,8 @@ function getPixels(path) {
 }
 
 function convertToAscii(path, { scale = 1, repeat = 2 } = {}) {
+  scale = Number(scale);
+  repeat = Number(repeat);
   return new Promise(async (resolve, reject) => {
     let {
       shape: [W, H, pxD],
@@ -28,7 +30,10 @@ function convertToAscii(path, { scale = 1, repeat = 2 } = {}) {
   });
 }
 
-convertToAscii("./Shark.png", { scale: 7, repeat: 2 }).then((data) => {
-  console.log(data);
-  writeFileSync("ASCII-art.txt", data);
-});
+module.exports = { convertToAscii };
+
+// Testing locally
+// convertToAscii("./Shark.png", { scale: 7, repeat: 2 }).then((data) => {
+//   console.log(data);
+//   writeFileSync("ASCII-art.txt", data);
+// });
