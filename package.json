@@ -8,7 +8,10 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "chroma-js": "^2.1.0",
     "express": "^4.17.1",
+    "get-image-colors": "^4.0.0",
+    "get-pixels": "^3.3.2",
     "mysql": "^2.18.1",
     "mysql2": "^2.1.0",
     "pg": "^8.3.3",
