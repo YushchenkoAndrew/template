@@ -1,103 +1,80 @@
 class Handwriting {
   constructor() {
-    this.grid = [];
     this.STEP = 20;
     this.SIZE = 28;
-    this.OFFSET = { x: 160, y: 110 };
+    this.OFFSET = { grid: { x: 160, y: 110 }, box: { x: 120, y: 35 } };
     this.BLUR = 2;
-    // this.BLUR_MATRIX = this.getGaussianMatrix(5, 6);
-    // console.log(this.BLUR_MATRIX);
+    this.BRIGHTNESS = { value: 50, k: 0.3 };
 
     this.mousePressed = false;
     this.prevCoords = { x: -1, y: -1 };
+    this.grid = [];
+    this.box = [];
 
     for (let i = 0; i < this.SIZE; i++) {
       this.grid.push([]);
       // for (let j = 0; j < this.SIZE; j++) this.grid[i][j] = Math.round(Math.random() * 255);
       for (let j = 0; j < this.SIZE; j++) this.grid[i][j] = 0;
     }
+
+    for (let i = 0; i < 10; i++) {
+      this.box[i] = Math.random();
+    }
   }
 
-  gaussianBlur({ x, y }) {
-    let result = [];
-    x -= Math.floor(this.BLUR_MATRIX.length / 2);
-    y -= Math.floor(this.BLUR_MATRIX.length / 2);
+  makeBlur(curr, prev) {
+    const { value, k } = this.BRIGHTNESS;
+    let dir = { x: (curr.x - prev.x) * k, y: (curr.y - prev.y) * k };
 
-    for (let i in this.BLUR_MATRIX) {
-      result.push([]);
+    for (let i = -this.BLUR; i < this.BLUR + 1; i++) {
+      let y = curr.y + i;
+      if (y < 0 || y >= this.grid.length) continue;
 
-      for (let j in this.BLUR_MATRIX) {
-        result[i][j] = 0;
+      for (let j = -this.BLUR; j < this.BLUR + 1; j++) {
+        let x = curr.x + j;
+        if ((!i && !j) || x + j < 0 || x + j >= this.grid[y].length) continue;
 
-        for (let k in this.BLUR_MATRIX) {
-          result[i][j] += this.grid[y + Number(i)][x + Number(j)] * this.BLUR_MATRIX[i][j];
-        }
-      }
-    }
-
-    console.log(result);
-
-    for (let i in result) {
-      for (let j in result) {
-        this.grid[Number(i) + y][Number(j) + x] = result[i][j];
+        this.grid[y][x] += Math.floor(value / ((i - dir.y) * (i - dir.y) + (j - dir.x) * (j - dir.x)));
+        this.grid[y][x] = this.grid[y][x] > 255 ? 255 : this.grid[y][x];
       }
     }
   }
 
   setPixel({ x, y }) {
     if (!this.mousePressed) return;
-
     let rect = grid.getBoundingClientRect();
 
-    x = Math.floor((x - this.OFFSET.x) / this.STEP);
-    y = Math.floor((y - this.OFFSET.y - rect.y) / this.STEP);
+    x = Math.floor((x - this.OFFSET.grid.x) / this.STEP);
+    y = Math.floor((y - this.OFFSET.grid.y - rect.y) / this.STEP);
 
-    if (x == this.prevCoords.x && y == this.prevCoords.y) return;
+    if ((x == this.prevCoords.x && y == this.prevCoords.y) || y < 0 || x < 0 || y >= this.SIZE || x >= this.SIZE) return;
 
-    if (y >= 0 && x >= 0 && y - this.SIZE < 0 && x - this.SIZE < 0) {
-      console.log(`Mouse Clicked!!! x = ${x}, y = ${y}`);
-
-      this.grid[y][x] += 180;
-
-      for (let i = -this.BLUR; i < this.BLUR + 1; i++) {
-        for (let j = -this.BLUR; j < this.BLUR + 1; j++) {
-          // if (!i && !j) continue;
-
-          this.grid[y + i][x + j] += 5 / (i * i + j * j + 1);
-
-          this.grid[y + i][x + j] = this.grid[y + i][x + j] > 200 ? 255 : this.grid[y + i][x + j];
-        }
-      }
-
-      this.prevCoords = { x, y };
-      // this.gaussianBlur({ x, y });
-      return;
-    }
-  }
-
-  getGaussianMatrix(size, phi) {
-    let matrix = [];
-    // let sqrPhi = 2 * phi * phi;
-    // let rate = 1 / (Math.PI * sqrPhi);
-    // let range = Math.floor(size / 2);
-
-    for (let i = 0; i < size; i++) {
-      // let sqrY = i * i;
-      matrix.push([]);
-
-      for (let j = 0; j < size; j++) {
-        // let sqrX = j * j;
-
-        // matrix[i + range].push(rate * Math.exp(-((sqrX + sqrY) / sqrPhi)));
-        matrix[i].push(1 / phi);
-      }
-    }
-
-    return matrix;
+    this.grid[y][x] = this.grid[y][x] + 150 > 255 ? 255 : this.grid[y][x] + 150;
+    this.makeBlur({ x, y }, this.prevCoords.x == -1 ? { x, y } : this.prevCoords);
+    this.prevCoords = { x, y };
   }
 
   setMouseFlag(flag) {
     this.mousePressed = flag;
+    this.prevCoords = { x: -1, y: -1 };
+  }
+
+  drawBox({ x, y }) {
+    canvas.fillStyle = "#DDD";
+    canvas.font = `${textSize}px ${textStyle}`;
+
+    let step = (this.SIZE * this.STEP) / 7 - 30;
+    let offset = x - step / 2 + 5;
+
+    for (let i = 0; i < 10; i++) {
+      canvas.fillStyle = "#DDD";
+      canvas.fillText(i, x + i * (step + 20), y);
+      this.drawRoundRect(i * (step + 20) + offset, y + 10, step, step, 7);
+
+      canvas.fillStyle = "#000";
+      let h = (step - 4) * this.box[i];
+      this.drawRoundRect(i * (step + 20) + offset + 2, step - h + y + 8, step - 4, h, h < 5 ? 2 : 7);
+    }
   }
 
   drawGrid({ x, y }) {
@@ -113,14 +90,29 @@ class Handwriting {
       this.drawLine(x + step, y, x + step, y + len);
 
       for (let j in this.grid[i]) {
-        canvas.fillStyle = "#" + Math.floor(this.grid[i][j]).toString(16).repeat(3);
-        canvas.fillRect(x + j * this.STEP, y + step, this.STEP - lineWidth, this.STEP - lineWidth);
+        canvas.fillStyle = `rgb(${this.grid[i][j]}, ${this.grid[i][j]}, ${this.grid[i][j]})`;
+        canvas.fillRect(x + j * this.STEP + 1, y + step + 1, this.STEP - lineWidth, this.STEP - lineWidth);
       }
     }
 
     // Draw two last lines
     this.drawLine(x, y + len, x + len, y + len);
     this.drawLine(x + len, y, x + len, y + len);
+  }
+
+  drawRoundRect(x, y, width, height, radius) {
+    canvas.beginPath();
+    canvas.moveTo(x + radius, y);
+    canvas.lineTo(x + width - radius, y);
+    canvas.quadraticCurveTo(x + width, y, x + width, y + radius);
+    canvas.lineTo(x + width, y + height - radius);
+    canvas.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    canvas.lineTo(x + radius, y + height);
+    canvas.quadraticCurveTo(x, y + height, x, y + height - radius);
+    canvas.lineTo(x, y + radius);
+    canvas.quadraticCurveTo(x, y, x + radius, y);
+    canvas.closePath();
+    canvas.fill();
   }
 
   drawLine(...pos) {
@@ -135,6 +127,7 @@ class Handwriting {
     canvas.fillStyle = "#000000";
     canvas.fillRect(0, 0, grid.width, grid.height);
 
-    this.drawGrid(this.OFFSET);
+    this.drawGrid(this.OFFSET.grid);
+    this.drawBox(this.OFFSET.box);
   }
 }
