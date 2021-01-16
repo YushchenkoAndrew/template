@@ -1,18 +1,37 @@
+const W = 900;
+const H = 700;
+
 const lineWidth = 2;
-const textSize = 24;
-const textStyle = "Comic Sans MS";
 
-var grid = document.getElementById("Handwriting");
-grid.width = 900;
-grid.height = 700;
+const modelDetails = {
+  model: "model/model.json",
+  metadata: "model/model_meta.json",
+  weights: "model/model.weights.bin",
+};
 
-var canvas = grid.getContext("2d");
-canvas.lineWidth = lineWidth;
+let handwriting;
 
-let handwriting = new Handwriting();
+function setup() {
+  createCanvas(W, H);
 
-grid.addEventListener("mousedown", (event) => handwriting.setMouseFlag(true, event) || handwriting.setPixel(event), false);
-grid.addEventListener("mousemove", (event) => handwriting.setPixel(event), false);
-grid.addEventListener("mouseup", (event) => handwriting.setMouseFlag(false), false);
+  textSize(24);
+  textFont("Comic Sans MS");
 
-setInterval(() => handwriting.draw(), 20);
+  handwriting = new Handwriting();
+}
+
+// function mouseDragged() {
+//   handwriting.setPixel({ x: mouseX, y: mouseY });
+// }
+
+function mouseClicked() {
+  handwriting.press({ mouseX, mouseY });
+}
+
+function draw() {
+  background(0);
+
+  if (mouseIsPressed) handwriting.setPixel({ x: mouseX, y: mouseY });
+
+  handwriting.draw();
+}
