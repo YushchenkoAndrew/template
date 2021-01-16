@@ -3,6 +3,8 @@ JavaScript-mancy_Tome*
 .vscode/
 TestingData/
 library/
+MNIST/
+data/
 
 # Logs
 logs
