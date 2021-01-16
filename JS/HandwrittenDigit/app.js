@@ -11,7 +11,7 @@ canvas.lineWidth = lineWidth;
 
 let handwriting = new Handwriting();
 
-grid.addEventListener("mousedown", (event) => handwriting.setMouseFlag(true) || handwriting.setPixel(event), false);
+grid.addEventListener("mousedown", (event) => handwriting.setMouseFlag(true, event) || handwriting.setPixel(event), false);
 grid.addEventListener("mousemove", (event) => handwriting.setPixel(event), false);
 grid.addEventListener("mouseup", (event) => handwriting.setMouseFlag(false), false);
 

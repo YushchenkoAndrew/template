@@ -54,9 +54,22 @@ class Handwriting {
     this.prevCoords = { x, y };
   }
 
-  setMouseFlag(flag) {
+  setMouseFlag(flag, event) {
     this.mousePressed = flag;
     this.prevCoords = { x: -1, y: -1 };
+    if (!event) return;
+
+    let step = (this.SIZE * this.STEP) / 7 - 30;
+    let offset = this.OFFSET.box.x - step / 2 + 5;
+    let x = 10 * (step + 20) + offset;
+    let y = this.OFFSET.box.y + 70;
+
+    // Reset grid
+    if (event.x > x && event.y > y && event.x < x + step + 25 && event.y < y + step) {
+      for (let i in this.grid) {
+        for (let j in this.grid[i]) this.grid[i][j] = 0;
+      }
+    }
   }
 
   drawBox({ x, y }) {
@@ -69,12 +82,17 @@ class Handwriting {
     for (let i = 0; i < 10; i++) {
       canvas.fillStyle = "#DDD";
       canvas.fillText(i, x + i * (step + 20), y);
-      this.drawRoundRect(i * (step + 20) + offset, y + 10, step, step, 7);
+      this.drawRoundRect(i * (step + 20) + offset, y + 10, step, step, 7, true);
 
       canvas.fillStyle = "#000";
       let h = (step - 4) * this.box[i];
-      this.drawRoundRect(i * (step + 20) + offset + 2, step - h + y + 8, step - 4, h, h < 5 ? 2 : 7);
+      this.drawRoundRect(i * (step + 20) + offset + 2, step - h + y + 8, step - 4, h, h < 5 ? 2 : 7, true);
     }
+
+    // Set Clear Button
+    canvas.fillStyle = "#DDD";
+    canvas.fillText("Clear", x + 10 * (step + 20) - 10, y + step / 2 + 15);
+    this.drawRoundRect(10 * (step + 20) + offset, y + 10, step + 25, step, 7, false, true);
   }
 
   drawGrid({ x, y }) {
@@ -100,7 +118,7 @@ class Handwriting {
     this.drawLine(x + len, y, x + len, y + len);
   }
 
-  drawRoundRect(x, y, width, height, radius) {
+  drawRoundRect(x, y, width, height, radius, fill, stroke) {
     canvas.beginPath();
     canvas.moveTo(x + radius, y);
     canvas.lineTo(x + width - radius, y);
@@ -112,7 +130,8 @@ class Handwriting {
     canvas.lineTo(x, y + radius);
     canvas.quadraticCurveTo(x, y, x + radius, y);
     canvas.closePath();
-    canvas.fill();
+    if (fill) canvas.fill();
+    if (stroke) canvas.stroke();
   }
 
   drawLine(...pos) {
