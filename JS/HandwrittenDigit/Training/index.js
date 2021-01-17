@@ -4,7 +4,7 @@ let data = [];
 function preload() {
   for (let i = 0; i < 10; i++) {
     data.push([]);
-    for (let j = 0; j < 1000; j++) {
+    for (let j = 0; j < 2000; j++) {
       let index = `000${j + 1}`.slice(-4);
       data[i][j] = loadImage(`data/Handwriting-${i}-${index}.png`);
     }
@@ -29,7 +29,7 @@ function setup() {
 
   numberClassifier.normalizeData();
 
-  numberClassifier.train({ epochs: 100 }, finishTraining);
+  numberClassifier.train({ epochs: 200 }, finishTraining);
 }
 
 function finishTraining() {
