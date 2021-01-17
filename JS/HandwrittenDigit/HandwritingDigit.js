@@ -25,7 +25,6 @@ class Handwriting {
     let options = {
       inputs: [this.SIZE, this.SIZE, 4],
       task: "imageClassification",
-      debug: true,
     };
 
     this.numberClassifier = ml5.neuralNetwork(options);
