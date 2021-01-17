@@ -10,10 +10,10 @@ class Handwriting {
     this.prevCoords = { x: -1, y: -1 };
     this.grid = [];
     this.box = [];
+    this.predict = false;
 
     for (let i = 0; i < this.SIZE; i++) {
       this.grid.push([]);
-      // for (let j = 0; j < this.SIZE; j++) this.grid[i][j] = Math.round(Math.random() * 255);
       for (let j = 0; j < this.SIZE; j++) this.grid[i][j] = 0;
     }
 
@@ -29,7 +29,12 @@ class Handwriting {
     };
 
     this.numberClassifier = ml5.neuralNetwork(options);
-    this.numberClassifier.load(modelDetails, () => console.log("Model Loaded"));
+    this.numberClassifier.load(modelDetails, this.loadModel.bind(this));
+  }
+
+  loadModel() {
+    this.predict = true;
+    console.log("Model loaded");
   }
 
   makeBlur(curr, prev) {
@@ -50,15 +55,106 @@ class Handwriting {
     }
   }
 
+  // Bresenham's Algorithm
+  drawLine(start, end) {
+    let pixels = [];
+
+    let dx = end.x - start.x;
+    let dy = end.y - start.y;
+
+    let dx1 = Math.abs(dx);
+    let dy1 = Math.abs(dy);
+
+    // Calculate error intervals for both axis
+    let px = 2 * dy1 - dx1;
+    let py = 2 * dx1 - dy1;
+
+    let x = 0;
+    let y = 0;
+    let xe = 0;
+    let ye = 0;
+
+    // The line is X-axis dominant
+    if (dy1 <= dx1) {
+      // Line is drawn left to right
+      if (dx >= 0) {
+        x = start.x;
+        y = start.y;
+        xe = end.x;
+      } else {
+        // Line is drawn right to left (swap ends)
+        x = end.x;
+        y = end.y;
+        xe = start.x;
+      }
+
+      pixels.push({ x, y });
+
+      for (; x < xe; x++) {
+        // Deal with octants...
+        if (px < 0) px += 2 * dy1;
+        else {
+          if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0)) y++;
+          else y--;
+
+          px += 2 * (dy1 - dx1);
+        }
+        // Draw pixel from line span at currently rasterized position
+        pixels.push({ x, y });
+      }
+    } else {
+      // The line is Y-axis dominant
+      // Line is drawn bottom to top
+      if (dy >= 0) {
+        x = start.x;
+        y = start.y;
+        ye = end.y;
+      } else {
+        // Line is drawn top to bottom
+        x = end.x;
+        y = end.y;
+        ye = start.y;
+      }
+      // Draw first pixel Rasterize the line
+      pixels.push({ x, y });
+
+      for (; y < ye; y++) {
+        // Deal with octants...
+        if (py <= 0) py += 2 * dx1;
+        else {
+          if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0)) x++;
+          else x--;
+
+          py += 2 * (dx1 - dy1);
+        }
+
+        // Draw pixel from line span at currently rasterized position
+        pixels.push({ x, y });
+      }
+    }
+
+    return pixels;
+  }
+
   setPixel({ x, y }) {
     x = Math.floor((x - this.OFFSET.grid.x) / this.STEP);
     y = Math.floor((y - this.OFFSET.grid.y) / this.STEP);
 
     if ((x == this.prevCoords.x && y == this.prevCoords.y) || y < 0 || x < 0 || y >= this.SIZE || x >= this.SIZE) return;
 
-    this.grid[y][x] = this.grid[y][x] + 180 > 255 ? 255 : this.grid[y][x] + 180;
-    this.makeBlur({ x, y }, this.prevCoords.x == -1 ? { x, y } : this.prevCoords);
+    if (this.prevCoords.x == -1) this.prevCoords = { x, y };
+
+    this.drawLine({ x, y }, this.prevCoords).forEach(({ x, y }) => {
+      this.grid[y][x] = this.grid[y][x] + 180 > 255 ? 255 : this.grid[y][x] + 180;
+      this.makeBlur({ x, y }, this.prevCoords.x == -1 ? { x, y } : this.prevCoords);
+    });
+
     this.prevCoords = { x, y };
+    if (this.predict) this.applyNeuralNetwork();
+  }
+
+  applyNeuralNetwork() {
+    this.predict = false;
 
     let img = createImage(this.SIZE, this.SIZE);
     img.loadPixels();
@@ -78,6 +174,8 @@ class Handwriting {
       console.log(err);
       return;
     }
+
+    ptr.predict = true;
 
     for (let { label, confidence } of result) {
       ptr.box[label] = confidence;
