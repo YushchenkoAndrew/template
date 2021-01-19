@@ -5,17 +5,19 @@
   "author": "Andrew Yushchenko (Mortis)",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "dependencies": {
     "chroma-js": "^2.1.0",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "get-image-colors": "^4.0.0",
     "get-pixels": "^3.3.2",
+    "jpeg-js": ">=0.4.0",
     "mysql": "^2.18.1",
     "mysql2": "^2.1.0",
     "pg": "^8.3.3",
-    "sequelize": "^6.3.4",
-    "jpeg-js": ">=0.4.0"
+    "sequelize": "^6.3.4"
   }
 }
