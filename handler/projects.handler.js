@@ -1,65 +1,6 @@
-require("dotenv").config();
-const http = require("http");
 const { logRequest, logError } = require("../lib");
-
-const headers = { "Content-Type": "application/json" };
-const options = {
-  hostname: process.env.API_HOST,
-  port: process.env.API_PORT,
-};
-
-const login = {
-  user: process.env.API_USER,
-  pass: process.env.API_PASS,
-};
-
-let token = null;
-
-const getToken = () =>
-  httpRequest(
-    {
-      ...options,
-      headers,
-      path: "/api/login",
-      method: "POST",
-    },
-    JSON.stringify(login)
-  );
-
-const checkToken = ({ accessToken: token }) =>
-  httpRequest({
-    ...options,
-    headers: { ...headers, Authorization: "Bearer " + token },
-    path: "/api/token",
-    method: "GET",
-  });
-
-function httpRequest(options, body = null) {
-  return new Promise((resolve, reject) => {
-    let data = "";
-
-    let req = http.request(options, (res) => {
-      res.on("data", (chunk) => {
-        data += chunk;
-      });
-
-      res.on("end", () => {
-        try {
-          resolve(res.statusCode != 204 ? JSON.parse(data) : null);
-        } catch (err) {
-          reject(err);
-        }
-      });
-    });
-
-    req.on("error", (err) => {
-      reject(err);
-    });
-
-    if (body) req.write(body);
-    req.end();
-  });
-}
+const { options, headers } = require("../config");
+const { getToken, checkToken, httpRequest } = require("./http.handler");
 
 async function getRequest(file) {
   logRequest("GET", "PATH =", file);
@@ -75,11 +16,15 @@ async function getRequest(file) {
       method: "GET",
     });
 
-    if (!token) token = await getToken();
+    let token = null;
+    if (!process.env.TOKEN) token = await getToken();
     else {
-      let { message } = await checkToken(token);
-      if (message != "OK") token = await getToken();
+      let { message } = await checkToken(process.env.TOKEN);
+      token = message != "OK" ? await getToken() : { accessToken: process.env.TOKEN };
     }
+
+    // Save Token in the env
+    process.env.TOKEN = token.accessToken;
 
     if (!data || !data[0])
       httpRequest(
