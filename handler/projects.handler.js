@@ -1,23 +1,109 @@
-const { logRequest } = require("../lib");
+require("dotenv").config();
+const http = require("http");
+const { logRequest, logError } = require("../lib");
 
-// app.get("/projects/*", async (req, res, next) => {
-//   console.log(`~ Get request to ${req.url}`);
-//   const time = new Date();
-//   console.log(`\t=> At ${time}\n`);
+const headers = { "Content-Type": "application/json" };
+const options = {
+  hostname: process.env.API_HOST,
+  port: process.env.API_PORT,
+};
 
-//   if (req.url.substr(-1) == "/" && !req.url.includes("Info")) {
-//     let result = await db.findAll("Views", "Curr_Date", new Date().toISOString().slice(0, 10));
-//     result = result[0] ? result[0].dataValues : undefined;
+const login = {
+  user: process.env.API_USER,
+  pass: process.env.API_PASS,
+};
 
-//     if (!result) await db.create("Views", [`Curr_Date=${new Date().toISOString().slice(0, 10)}`, `Count=1`]);
-//     else await db.update("Views", [`Curr_Date=${new Date().toISOString().slice(0, 10)}`, `Count=${result.Count + 1}`]);
-//   }
+let token = null;
 
-//   next();
-// });
+const getToken = () =>
+  httpRequest(
+    {
+      ...options,
+      headers,
+      path: "/api/login",
+      method: "POST",
+    },
+    JSON.stringify(login)
+  );
 
-function getRequest(file) {
+const checkToken = ({ accessToken: token }) =>
+  httpRequest({
+    ...options,
+    headers: { ...headers, Authorization: "Bearer " + token },
+    path: "/api/token",
+    method: "GET",
+  });
+
+function httpRequest(options, body = null) {
+  return new Promise((resolve, reject) => {
+    let data = "";
+
+    let req = http.request(options, (res) => {
+      res.on("data", (chunk) => {
+        data += chunk;
+      });
+
+      res.on("end", () => {
+        try {
+          resolve(res.statusCode != 204 ? JSON.parse(data) : null);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    });
+
+    req.on("error", (err) => {
+      reject(err);
+    });
+
+    if (body) req.write(body);
+    req.end();
+  });
+}
+
+async function getRequest(file) {
   logRequest("GET", "PATH =", file);
+
+  if (file.substr(-1) != "/" || file.includes("Info")) return;
+
+  try {
+    const currDate = new Date().toISOString().slice(0, 10);
+    let data = await httpRequest({
+      ...options,
+      headers,
+      path: "/api/Views?Curr_Date=" + currDate,
+      method: "GET",
+    });
+
+    if (!token) token = await getToken();
+    else {
+      let { message } = await checkToken(token);
+      if (message != "OK") token = await getToken();
+    }
+
+    if (!data || !data[0])
+      httpRequest(
+        {
+          ...options,
+          headers: { ...headers, Authorization: "Bearer " + token.accessToken },
+          path: "/api/Views?Curr_Date=" + currDate,
+          method: "POST",
+        },
+        JSON.stringify({ Curr_Date: currDate, Count: 1 })
+      );
+    else
+      httpRequest(
+        {
+          ...options,
+          headers: { ...headers, Authorization: "Bearer " + token.accessToken },
+          path: "/api/Views?Curr_Date=" + currDate,
+          method: "PUT",
+        },
+        JSON.stringify({ Count: Number(data[0].Count) + 1 })
+      );
+  } catch (err) {
+    logError(500, err.message);
+  }
 }
 
 function postRequest(file) {
