@@ -31,7 +31,7 @@ async function getRequest(file) {
         {
           ...options,
           headers: { ...headers, Authorization: "Bearer " + token.accessToken },
-          path: "/api/Views?Curr_Date=" + currDate,
+          path: "/api/Views",
           method: "POST",
         },
         JSON.stringify({ Curr_Date: currDate, Count: 1 })
