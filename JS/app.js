@@ -1,6 +1,6 @@
 $.get("https://www.cloudflare.com/cdn-cgi/trace", (data) => {
   let xhr = new XMLHttpRequest();
-  xhr.open("POST", "/projects/db/0", true);
+  xhr.open("POST", "/projects/db/Visitor", true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   data = data.split("\n");
