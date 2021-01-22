@@ -1,71 +1,67 @@
-// app.post("/projects/db/:sendDB", jsonParser, async (req, res) => {
-//   console.log(`~ Get some Activity on Website from guest`);
-//   let indent = " ".repeat(5);
-//   for (let i in req.body) console.log(`${indent}=> ${req.body[i]}`);
-//   console.log();
+const { options, headers } = require("../config");
+const { getToken, checkToken, httpRequest } = require("./http.handler");
 
-//   let { Country, ip, Visit_Date } = req.body;
+async function addNewVisitor({ Country, ip, Visit_Date }) {
+  try {
+    let data = await httpRequest({
+      ...options,
+      headers,
+      path: "/api/Visitor?Country=" + Country,
+      method: "GET",
+    });
 
-//   let result = await db.findAll("Visitors", "Country", Country);
-//   result = result[0] ? result[0].dataValues : undefined;
+    let token = null;
+    if (!process.env.TOKEN) token = await getToken();
+    else {
+      let { message } = await checkToken(process.env.TOKEN);
+      token = message != "OK" ? await getToken() : { accessToken: process.env.TOKEN };
+    }
 
-//   if (!result) await db.create("Visitors", [`Country=${Country}`, `ip=${ip}`, `Visit_Date=${Visit_Date}`, `Count=1`]);
-//   else if (!ip.includes(result.ip) || !Visit_Date.includes(result.Visit_Date))
-//     await db.update("Visitors", [`Country=${Country}`, `ip=${ip}`, `Visit_Date=${Visit_Date}`, `Count=${result.Count + 1}`]);
+    // Save Token in the env
+    process.env.TOKEN = token.accessToken;
 
-//   if (Number(req.params.sendDB)) {
-//     let data = {};
-//     data["Visitors"] = await db.print("Visitors");
-//     data["Views"] = await db.print("Views");
-//     res.send(data);
-//   } else res.sendStatus(200);
-// });
+    if (!data || !data[0])
+      httpRequest(
+        {
+          ...options,
+          headers: { ...headers, Authorization: "Bearer " + token.accessToken },
+          path: "/api/Visitor",
+          method: "POST",
+        },
+        JSON.stringify({ Country, ip, Visit_Date, Count: 1 })
+      );
+    else
+      httpRequest(
+        {
+          ...options,
+          headers: { ...headers, Authorization: "Bearer " + token.accessToken },
+          path: "/api/Visitor?Country=" + Country,
+          method: "PUT",
+        },
+        JSON.stringify({ Count: Number(data[0].Count) + 1 })
+      );
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
 
-// app.get("/projects/db/:table/command/:task/:condition", (req, res) => {
-//   console.log(req.params.task);
+  return { success: true };
+}
 
-//   switch (req.params.task) {
-//     case "print": {
-//       db.print(req.params.table)
-//         .then((data) => {
-//           for (let i in data) console.log(data[i].dataValues);
-//           res.send(data);
-//         })
-//         .catch((err) => res.status(500).send(err.message));
-//       break;
-//     }
-//     case "findAll": {
-//       db.findAll(req.params.table, ...req.params.condition.split("="))
-//         .then((data) => res.send(data))
-//         .catch((err) => res.status(500).send(err.message));
-//       break;
-//     }
-//     case "create": {
-//       db.create(req.params.table, req.params.condition.split(","))
-//         .then((data) => res.send(data))
-//         .catch((err) => res.status(500).send(err.message));
-//       break;
-//     }
-//     case "delete": {
-//       db.delete(req.params.table, ...req.params.condition.split("="))
-//         .then((data) => {
-//           if (data) res.send("Information was deleted successfully");
-//           else res.status(500).send(`Such element as '${key} = ${value}' not exist!`);
-//         })
-//         .catch((err) => res.status(500).send(err.message));
-//       break;
-//     }
-//     case "update": {
-//       db.update(req.params.table, req.params.condition.split(","))
-//         .then((data) => {
-//           if (data) res.send("Information was updated successfully");
-//           else res.status(500).send(`Such element as '${key} = ${value}' not exist!`);
-//         })
-//         .catch((err) => res.status(500).send(err.message));
-//       break;
-//     }
-//     default:
-//       res.status(404);
-//       res.sendFile(__dirname + "/FileNotFound.html");
-//   }
-// });
+async function getTableData(table) {
+  let data = null;
+
+  try {
+    data = await httpRequest({
+      ...options,
+      headers,
+      path: "/api/" + table,
+      method: "GET",
+    });
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
+
+  return { success: true, data };
+}
+
+module.exports = { addNewVisitor, getTableData };
