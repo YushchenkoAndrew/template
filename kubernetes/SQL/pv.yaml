@@ -8,8 +8,12 @@ metadata:
 spec:
   storageClassName: manual
   capacity:
-    storage: 20Gi
+    storage: 10Gi
   accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/media/sd1/psql"
+    - ReadWriteMany
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: "/var/lib/postgresql/11/main/"
+    server: 192.168.0.105
