@@ -30,7 +30,7 @@ async function addNewVisitor({ Country, ip, Visit_Date }) {
         },
         JSON.stringify({ Country, ip, Visit_Date, Count: 1 })
       );
-    else
+    else if (ip != data[0].ip || Visit_Date != result.Visit_Date)
       httpRequest(
         {
           ...options,
@@ -38,7 +38,7 @@ async function addNewVisitor({ Country, ip, Visit_Date }) {
           path: "/api/Visitor?Country=" + Country,
           method: "PUT",
         },
-        JSON.stringify({ Count: Number(data[0].Count) + 1 })
+        JSON.stringify({ ip, Visit_Date, Count: Number(data[0].Count) + 1 })
       );
   } catch (err) {
     return { success: false, message: err.message };
