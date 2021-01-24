@@ -4,20 +4,30 @@ import random
 class Apple:
   pos = (0, 0)
   step = 20
-  grid = ()
+  grid = []
+
 
   def __init__(self, grid, step):
     self.grid = grid
     self.step = step
     self.setPos()
 
-    print("Initialize Apple pos:", self.pos)
+    self.printMessage('Initialize pos:', self.pos)
 
-  def setPos(self):
-    self.pos = [random.randrange(i) for i in self.grid]
 
-  def getPos(self):
-    return self.pos
+  def printMessage(self, *message):
+    print('\033[1;31;40mApple:\033[0m', *message)
+
+
+  def setPos(self, notAllowed = []):
+    while True:
+      self.pos = [random.randrange(i) for i in self.grid]
+
+      if not(self.pos in notAllowed):
+        break
+
+    self.printMessage('Set new pos:', self.pos)
+
 
   def draw(self, screen, offset):
     [dx, dy] = offset
