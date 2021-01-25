@@ -94,7 +94,7 @@ def eval_genomes(_genomes, config):
         # genomes[i].fitness -= 0.5
 
       if apple == game.snake.pos[0]:
-        genomes[i].fitness += 50
+        genomes[i].fitness += 10
 
       # Check if Snake is going at the one place
       if game.snake.pos[0] in game.snake.path[:-1]:
