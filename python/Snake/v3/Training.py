@@ -1,4 +1,5 @@
 from SnakeGame import *
+from AI import activateFunc
 
 import pygame
 import neat
@@ -13,17 +14,9 @@ POS = []
 
 screen = None
 
-def moveByPlayer(events):
-  DIRECTION = { pygame.K_UP: 'up', pygame.K_DOWN: 'down', pygame.K_LEFT: 'left', pygame.K_RIGHT: 'right' }
-  direction = None
-
-  for event in events:
-    if not direction:
-      direction = DIRECTION.get(event.key if event.type == pygame.KEYDOWN else None, None)
-
-  return direction
-
 def main(config_file):
+  global screen
+  screen = pygame.display.set_mode(WINDOW)
   definePos()
 
   # Load configuration.
@@ -31,7 +24,8 @@ def main(config_file):
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          config_file)
   # Create the population, which is the top-level object for a NEAT run.
-  p = neat.Population(config)
+  # p = neat.Population(config)
+  p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-1099')
 
   # Add a stdout reporter to show progress in the terminal.
   p.add_reporter(neat.StdOutReporter(True))
@@ -40,7 +34,7 @@ def main(config_file):
   p.add_reporter(neat.Checkpointer(20))
 
   # Run generations.
-  winner = p.run(eval_genomes, 1000)
+  winner = p.run(eval_genomes, 5000)
 
 
 def definePos():
@@ -54,37 +48,19 @@ def definePos():
       POS.append([x, y])
 
 
-def activateFunc(output):
-  # North
-  if output[0] > 0.5:
-    return 'up'
-
-  # South
-  elif output[1] > 0.5:
-    return 'down'
-
-  # West
-  elif output[2] > 0.5:
-    return 'left'
-
-  # East
-  elif output[3] > 0.5:
-    return 'right'
-
-
-
 def eval_genomes(_genomes, config):
   net = []
   genomes = []
   games = []
 
   for j, (i, genome) in enumerate(_genomes):
-    genome.fitness = 0
+    genome.fitness = -1000
     n = neat.nn.FeedForwardNetwork.create(genome, config)
     net.append(n)
     genomes.append(genome)
 
     game = SnakeGame(j, (*POS[j % len(_genomes)], *SIZE), screen, STEP, False, False)
+    game.SPEED = 500
     game.snake.path = []
     games.append(game)
 
@@ -96,32 +72,29 @@ def eval_genomes(_genomes, config):
 
     for i, game in enumerate(games):
       if not game.run:
-        if not game.GameOver:
-          genomes[i].fitness -= 1000
-          game.clean()
-          game.GameOver = True
+        game.clean()
         continue
 
       run = run or game.run
 
       apple = game.apple.pos
-      curr = [(a - b) for a, b in zip(game.snake.pos[0], apple)]
+      prev = [(a - b) for a, b in zip(game.snake.pos[0], apple)]
 
-      direction = activateFunc(net[i].activate([*curr, *game.snake.getDistanceToObstacle()]))
+      direction = activateFunc(net[i].activate([*prev, *game.snake.getDistanceToObstacle()]))
       game.draw(events, lambda x: direction)
 
       # Get distance to Apple
-      curr = sum([i * i for i in curr])
-      prev = sum([(b - a) * (b - a) for a, b in zip(game.snake.pos[1], apple)])
+      prev = sum([i * i for i in prev])
+      curr = sum([(b - a) * (b - a) for a, b in zip(game.snake.pos[0], apple)])
 
       # Check if snake go closer, then award if
-      if curr <= prev:
-        genomes[i].fitness += 0.5
-      else:
-        genomes[i].fitness -= 0.2
+      # if curr <= prev:
+        # genomes[i].fitness += 0.5
+      # else:
+        # genomes[i].fitness -= 0.5
 
       if apple == game.snake.pos[0]:
-        genomes[i].fitness += 100
+        genomes[i].fitness += 50
 
       # Check if Snake is going at the one place
       if game.snake.pos[0] in game.snake.path[:-1]:
@@ -135,11 +108,5 @@ def eval_genomes(_genomes, config):
 if __name__ == '__main__':
   # Initialize pygame
   pygame.init()
-  screen = pygame.display.set_mode(WINDOW)
-  local_dir = os.path.dirname(__file__)
-  config_path = os.path.join(local_dir, 'config-feedforward.txt')
-  print(config_path)
-
-  main(config_path)
-
+  main('config-feedforward.txt')
   pygame.quit()
