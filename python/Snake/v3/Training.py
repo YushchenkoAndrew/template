@@ -105,14 +105,14 @@ def eval_genomes(_genomes, config):
       run = run or game.run
 
       apple = game.apple.pos
-      curr = [a - b for a, b in zip(game.snake.pos[0], apple)]
+      curr = [(a - b) for a, b in zip(game.snake.pos[0], apple)]
 
       direction = activateFunc(net[i].activate([*curr, *game.snake.getDistanceToObstacle()]))
       game.draw(events, lambda x: direction)
 
       # Get distance to Apple
       curr = sum([i * i for i in curr])
-      prev = sum([(b - a) * (b - a) for a, b in zip(game.snake.pos[1], game.apple.pos)])
+      prev = sum([(b - a) * (b - a) for a, b in zip(game.snake.pos[1], apple)])
 
       # Check if snake go closer, then award if
       if curr <= prev:
