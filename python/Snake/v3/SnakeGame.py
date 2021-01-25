@@ -8,26 +8,30 @@ class SnakeGame:
   grid = None
   step = 10
 
-  SPEED = 10
+  SPEED = 500
   run = True
+  GameOver = False
 
-  def __init__(self, canvas, screen, step = 20, showGrid = True):
+  def __init__(self, index, canvas, screen, step = 20, showGrid = True, log = True):
     self.clock = pygame.time.Clock()
 
     self.canvas = canvas
     self.screen = screen
     self.showGrid = showGrid
     self.step = step
+    self.index = index
+    self.log = log
     self.grid = [i // step for i in canvas[2:]]
 
     self.printMessage('Initialize grid:', self.grid)
 
-    self.snake = Snake([i // 2 for i in self.grid], step, self.grid)
-    self.apple = Apple(self.grid, step)
+    self.snake = Snake(index, [i // 2 for i in self.grid], step, self.grid, 3, log)
+    self.apple = Apple(index, self.grid, step, log)
 
 
   def printMessage(self, *message):
-    print('\033[1;33;40mGame:\033[0m', *message)
+    if self.log:
+      print(f'\033[1;33;40mGame[{self.index}]:\033[0m', *message)
 
 
   def listenToEvents(self, events):
@@ -36,6 +40,15 @@ class SnakeGame:
     for event in events:
       if (event.type == pygame.QUIT):
         self.run = False
+      elif event.type == pygame.KEYDOWN:
+
+        if event.key == pygame.K_w:
+          self.SPEED += 10
+          self.printMessage('Speed:', self.SPEED)
+
+        elif event.key == pygame.K_s:
+          self.SPEED -= 10 if self.SPEED - 10 > 0 else 0
+          self.printMessage('Speed:', self.SPEED)
 
 
   def moveSnake(self, direction):
@@ -59,27 +72,31 @@ class SnakeGame:
     pygame.draw.rect(self.screen, (255,) * 3, (x, y, w, h), 1)
 
 
-  def draw(self, getDirection):
-    while self.run:
-      # Fill canvas with black
+  def clean(self):
+    # Fill canvas with black
+    pygame.draw.rect(self.screen, (0,) * 3, self.canvas)
+
+  def draw(self, events, getDirection):
+    if not self.run:
       pygame.draw.rect(self.screen, (0,) * 3, self.canvas)
-      self.clock.tick(self.SPEED)
+      return
 
-      # Event Handler
-      events = pygame.event.get()
-      self.listenToEvents(events)
-      self.moveSnake(getDirection(events))
+    self.clean()
+    self.clock.tick(self.SPEED)
 
-      # Draw
-      self.drawGrid()
-      self.snake.draw(self.screen, self.canvas[:2])
-      self.apple.draw(self.screen, self.canvas[:2])
+    # Event Handler
+    # events = pygame.event.get()
+    self.listenToEvents(events)
+    self.moveSnake(getDirection(events))
 
-      # Check if it a game over
-      if not self.snake.alive:
-        break
+    # Draw
+    self.drawGrid()
+    self.snake.draw(self.screen, self.canvas[:2])
+    self.apple.draw(self.screen, self.canvas[:2])
 
-      # Flip the display
-      pygame.display.flip()
+    # Check if it a game over
+    if not self.snake.alive:
+      self.run = False
 
-    self.printMessage('Game over')
+    # Flip the display
+    pygame.display.flip()

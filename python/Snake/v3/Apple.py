@@ -7,16 +7,19 @@ class Apple:
   grid = []
 
 
-  def __init__(self, grid, step):
+  def __init__(self, index, grid, step, log):
     self.grid = grid
     self.step = step
+    self.index = index
+    self.log = log
     self.setPos()
 
     self.printMessage('Initialize pos:', self.pos)
 
 
   def printMessage(self, *message):
-    print('\033[1;31;40mApple:\033[0m', *message)
+    if self.log:
+      print(f'\033[1;31;40mApple[{self.index}]:\033[0m', *message)
 
 
   def setPos(self, notAllowed = []):

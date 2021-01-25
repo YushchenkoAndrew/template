@@ -11,16 +11,45 @@ class Snake:
 
   DIRACTION = { 'up': (0, -1), 'down': (0, 1), 'left': (-1, 0), 'right': (1, 0) }
 
-  def __init__(self, pos, step, grid, n = 3):
+  def __init__(self, index, pos, step, grid, n, log):
     self.grid = grid
     self.step = step
-    self.pos = [[x, y + i] for (x, y), i in zip([pos] * n, range(n))]
+    self.index = index
+    self.log = log
+    self.pos = [[x, y + i] for i, (x, y) in enumerate([pos] * n)]
 
     self.printMessage('Initialize pos:', self.pos)
 
 
   def printMessage(self, *message):
-    print('\033[1;32;40mSnake:\033[0m', *message)
+    if self.log:
+      print(f'\033[1;32;40mSnake[{self.index}]:\033[0m', *message)
+
+
+  def getDistanceToObstacle(self):
+    [x, y] = self.pos[0]
+    [w, h] = self.grid
+
+    [W, N, E, S] = (x, y, w - x - 1, h - y - 1)
+
+    for (_x, _y) in self.pos[1:]:
+      if _x == x:
+        dist = abs(y - _y) - 1
+
+        if y >= _y:
+          N = dist if dist < N else N
+        else:
+          S = dist if dist < S else S
+
+      elif _y == y:
+        dist = abs(x - _x) - 1
+
+        if x >= _x:
+          W = dist if dist < W else W
+        else:
+          E = dist if dist < E else E
+
+    return [N, S, W, E]
 
 
   def isInside(self, pos):
@@ -43,6 +72,7 @@ class Snake:
     # Check if Snake bite self tail
     if ([x + dx, y + dy] in self.pos) or not self.isInside([x + dx, y + dy]):
       self.alive = False
+      self.path = []
       self.printMessage('Dead, apples', self.apples)
       return
 
@@ -50,7 +80,7 @@ class Snake:
     self.prev = (dx, dy)
 
     # Save path of Snake
-    self.path.append(self.pos[0])
+    self.path.append([x + dx, y + dy])
 
     if (self.pos[0] == apple):
       # Grow Snake
