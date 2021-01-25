@@ -8,9 +8,8 @@ class SnakeGame:
   grid = None
   step = 10
 
-  SPEED = 500
+  SPEED = 20
   run = True
-  GameOver = False
 
   def __init__(self, index, canvas, screen, step = 20, showGrid = True, log = True):
     self.clock = pygame.time.Clock()
@@ -74,11 +73,13 @@ class SnakeGame:
 
   def clean(self):
     # Fill canvas with black
-    pygame.draw.rect(self.screen, (0,) * 3, self.canvas)
+    if self.screen:
+      pygame.draw.rect(self.screen, (0,) * 3, self.canvas)
 
   def draw(self, events, getDirection):
     if not self.run:
-      pygame.draw.rect(self.screen, (0,) * 3, self.canvas)
+      if self.screen:
+        pygame.draw.rect(self.screen, (0,) * 3, self.canvas)
       return
 
     self.clean()
@@ -90,13 +91,15 @@ class SnakeGame:
     self.moveSnake(getDirection(events))
 
     # Draw
-    self.drawGrid()
-    self.snake.draw(self.screen, self.canvas[:2])
-    self.apple.draw(self.screen, self.canvas[:2])
+    if self.screen:
+      self.drawGrid()
+      self.snake.draw(self.screen, self.canvas[:2])
+      self.apple.draw(self.screen, self.canvas[:2])
 
     # Check if it a game over
     if not self.snake.alive:
       self.run = False
 
     # Flip the display
-    pygame.display.flip()
+    if self.screen:
+      pygame.display.flip()
