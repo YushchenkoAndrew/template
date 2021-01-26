@@ -24,17 +24,17 @@ def main(config_file):
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          config_file)
   # Create the population, which is the top-level object for a NEAT run.
-  # p = neat.Population(config)
-  p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-1099')
+  p = neat.Population(config)
+  # p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-10979')
 
   # Add a stdout reporter to show progress in the terminal.
   p.add_reporter(neat.StdOutReporter(True))
   stats = neat.StatisticsReporter()
   p.add_reporter(stats)
-  p.add_reporter(neat.Checkpointer(20))
+  p.add_reporter(neat.Checkpointer(100))
 
   # Run generations.
-  winner = p.run(eval_genomes, 5000)
+  winner = p.run(eval_genomes, 10000)
 
 
 def definePos():
@@ -88,13 +88,14 @@ def eval_genomes(_genomes, config):
       curr = sum([(b - a) * (b - a) for a, b in zip(game.snake.pos[0], apple)])
 
       # Check if snake go closer, then award if
-      # if curr <= prev:
-        # genomes[i].fitness += 0.5
-      # else:
-        # genomes[i].fitness -= 0.5
+      if curr <= prev:
+        genomes[i].fitness += 1.5
+      else:
+        genomes[i].fitness -= 1.5
+      # genomes[i].fitness += 0.5
 
       if apple == game.snake.pos[0]:
-        genomes[i].fitness += 10
+        genomes[i].fitness += 35
 
       # Check if Snake is going at the one place
       if game.snake.pos[0] in game.snake.path[:-1]:
