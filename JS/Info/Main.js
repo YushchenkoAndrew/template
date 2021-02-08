@@ -47,14 +47,11 @@ xhr.onreadystatechange = () => {
           row.insertCell(0);
           row.insertCell(1);
 
-          document.getElementById("table").rows[Number(i) + 1].cells[0].innerHTML = new Date(...db.Visitor[i].Visit_Date.split("-")).toLocaleDateString(
-            "en-GB",
-            {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            }
-          );
+          document.getElementById("table").rows[Number(i) + 1].cells[0].innerHTML = new Date(db.Visitor[i].Visit_Date).toLocaleDateString("en-GB", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
           document.getElementById("table").rows[Number(i) + 1].cells[1].innerHTML = country[db.Visitor[i].Country] || db.Visitor[i].Country;
 
           // Count how many people visited today
