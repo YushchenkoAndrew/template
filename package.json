@@ -1,12 +1,18 @@
 {
   "name": "webserver",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "webserver for some simple projects",
-  "author": "Andrew Yushchenko (Mortis)",
+  "author": "Andrew Y (Mortis)",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "docker:build": "docker build -t grimreapermortis/webserver:1.0.5 .",
+    "docker:push": "docker push grimreapermortis/webserver:1.0.5",
+    "kube:add": "kubectl apply -f kubernetes/",
+    "kube:del": "kubectl delete -f kubernetes/",
+    "kube:get": "kubectl get pods -n template",
+    "kube:scale": "kubectl scale deployment web-deployment --replicas=4 -n template"
   },
   "dependencies": {
     "chroma-js": "^2.1.0",
