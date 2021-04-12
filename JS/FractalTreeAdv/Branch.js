@@ -20,8 +20,8 @@ function Branch(begin, end) {
     }
   };
 
-  this.jitter = function (dx) {
-    this.end.x = -10 + noise(dx) * 20 + this.coords.x;
+  this.jitter = function (dx, level) {
+    this.end.x = -2.5 * level + noise(dx) * 5 * level + this.coords.x;
   };
 
   this.branch = function () {
@@ -44,10 +44,7 @@ function Branch(begin, end) {
       return newBranch;
     }
 
-    return [
-      createBranch.call(this, right, 1),
-      createBranch.call(this, left, -1),
-    ];
+    return [createBranch.call(this, right, 1), createBranch.call(this, left, -1)];
   };
 
   this.leaf = function () {

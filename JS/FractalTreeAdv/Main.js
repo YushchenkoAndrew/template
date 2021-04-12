@@ -34,10 +34,10 @@ function mousePressed() {
 function draw() {
   background(0);
   for (let i = tree.length - 1; i >= 0; i--) {
-    if (!tree[i].finished) {
-      tree[i].jitter(dx);
-    }
+    // if (!tree[i].finished) {
+    tree[i].jitter(dx, Math.floor(Math.log2(i + 1)) + 1);
+    // }
     tree[i].show(dx);
   }
-  dx += 0.01;
+  dx += 0.005;
 }
