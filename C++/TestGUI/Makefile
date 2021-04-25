@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-lSDL2 -lSDL2main
+CFLAGS=`sdl-config --cflags` `sdl-config --libs` -std=c99
 TARGET = Main
 OBJ = a.out
 
@@ -7,3 +7,6 @@ all: $(TARGET)
 
 $(TARGET): $(TARGET).c
 	$(CC) $(TARGET).c $(CFLAGS)
+
+run:
+	./$(OBJ)
