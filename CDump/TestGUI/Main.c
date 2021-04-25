@@ -80,15 +80,15 @@ void drawRandomPixels() {
     if (SDL_MUSTLOCK(surface)) SDL_LockSurface(surface);
 
     Uint8 * pixels = surface->pixels;
-    for (int i=0; i < 512 * 512; i++) {
-        int j = i * 4;
-        // char randomByte = rand() % 255;
-        // pixels[i] = randomByte;
-        char randomByte = round(perlin2d(i % 512 + offset, i / 512 + offset, 0.02, 4) * 255);
-        pixels[j] = randomByte;
-        pixels[++j] = randomByte;
-        pixels[++j] = randomByte;
-        pixels[++j] = 1;
+    for (int i = 0; i < 512; i++) {
+        for (int j = 0; j < 512; j++) {
+            int index = i * 512 * 4 + j * 4;
+            char randomByte = round(perlin2d(i + offset, j + offset, 0.02, 4) * 255);
+            pixels[index] = randomByte;
+            pixels[++index] = randomByte;
+            pixels[++index] = randomByte;
+            pixels[++index] = 1;
+        }
     }
 
     offset += 1;
