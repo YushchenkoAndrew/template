@@ -12,4 +12,4 @@ run:
 	./$(OBJ)
 
 web:
-	emcc -o index.html *.c
+	emcc -o index.html *.c -s USE_SDL=2
