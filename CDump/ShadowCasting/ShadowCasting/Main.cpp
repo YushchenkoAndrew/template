@@ -1,5 +1,6 @@
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
+#include "BinaryTree.h"
 
 #include <stdio.h>
 
@@ -179,6 +180,7 @@ private:
 
 	void CalcVisiablePolyMap(float x, float y, float radius) {
 		vVisiblePolyMap.clear();
+		tPolyMap.RemoveAll();
 
 		for (size_t i = 0; i < vEdge.size(); i++) {
 			// Use 'for' loop for simplify code appearance
@@ -225,8 +227,10 @@ private:
 						}
 					}
 
-					if (bValid)
+					if (bValid) {
 						vVisiblePolyMap.push_back(minPoint);
+						tPolyMap.Insert(minPoint.x, minPoint.y, minPoint.angle);
+					}
 				}
 			}
 		}
@@ -251,16 +255,23 @@ private:
 		}
 
 
+		DrawString(4, 4, "Ray Cast: " + std::to_string(vVisiblePolyMap.size()) + " Tree: " + std::to_string(tPolyMap.GetSize()));
 		olc::vf2d mouse = GetMousePos();
-		for (size_t i = 0; i < vVisiblePolyMap.size(); i++) {
-			DrawLine(mouse.x, mouse.y, vVisiblePolyMap[i].x, vVisiblePolyMap[i].y);
+		std::vector<Node*> vPolyMap = tPolyMap.GetVector();
+		//for (size_t i = 0; i < vVisiblePolyMap.size(); i++) {
+		//	DrawLine(mouse.x, mouse.y, vVisiblePolyMap[i].x, vVisiblePolyMap[i].y);
+		//}
+		for (size_t i = 0; i < vPolyMap.size(); i++) {
+			DrawLine(mouse.x, mouse.y, vPolyMap[i]->x, vPolyMap[i]->y);
 		}
+
 	}
 
 private:
 	sCell* world;
 	std::vector<sEdge> vEdge;
 	std::vector<sPoint> vVisiblePolyMap;
+	BinaryTree tPolyMap;
 	const int iWorldWidth = 40;
 	const int iWorldHeigh = 30;
 	const int iBlockSize = 16;
