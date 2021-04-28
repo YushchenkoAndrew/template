@@ -16,14 +16,19 @@
 
 
 struct sEdge {
-	int sx, sy;
-	int ex, ey;
+	float sx, sy;
+	float ex, ey;
 };
 
 struct sCell {
 	bool exist = false;
 	bool edge_exist[4];
-	int edge_id[4];
+	unsigned int edge_id[4];
+};
+
+struct sPoint {
+	float x, y;
+	float angle;
 };
 
 class ShadowCasting : public olc::PixelGameEngine {
@@ -46,14 +51,17 @@ public:
 			int index = INDEX(mouse.x / iBlockSize, mouse.y / iBlockSize, iWorldWidth);
 			world[index].exist = !world[index].exist;
 
-			ConvertBitMapIntoPolyMap(0, 0, iWorldWidth, iWorldHeigh, iBlockSize, iWorldWidth);
+			ConvertBitMapIntoPolyMap(0, 0, iWorldWidth, iWorldHeigh, (float)iBlockSize, iWorldWidth);
 		}
 
+		//if (GetMouse(1).bHeld)
+		CalcVisiablePolyMap((float)mouse.x, (float)mouse.y, 100000.0f);
 		Draw();
 		return true;
 	}
 
-	void ConvertBitMapIntoPolyMap(int sx, int sy, int w, int h, int iBlockSize, int pitch) {
+private:
+	void ConvertBitMapIntoPolyMap(int sx, int sy, int w, int h, float fBlockSize, int pitch) {
 
 		// Reset PolyMap
 		vEdge.clear();
@@ -84,16 +92,16 @@ public:
 					if (!world[w].exist) {
 						if (world[n].edge_exist[WEST]) {
 							// Increase bounder of the edge
-							vEdge[world[n].edge_id[WEST]].ey += iBlockSize;
+							vEdge[world[n].edge_id[WEST]].ey += fBlockSize;
 							world[i].edge_id[WEST] = world[n].edge_id[WEST];
 							world[i].edge_exist[WEST] = true;
 						}
 						else {
 							sEdge edge;
-							edge.sx = x * iBlockSize; edge.sy = y * iBlockSize;
-							edge.ex = x * iBlockSize; edge.ey = (y + 1) * iBlockSize;
+							edge.sx = x * fBlockSize; edge.sy = y * fBlockSize;
+							edge.ex = x * fBlockSize; edge.ey = (y + 1) * fBlockSize;
 
-							int edge_id = vEdge.size();
+							unsigned int edge_id = vEdge.size();
 							vEdge.push_back(edge);
 
 							world[i].edge_exist[WEST] = true;
@@ -105,16 +113,16 @@ public:
 					if (!world[e].exist) {
 						if (world[n].edge_exist[EAST]) {
 							// Increase bounder of the edge
-							vEdge[world[n].edge_id[EAST]].ey += iBlockSize;
+							vEdge[world[n].edge_id[EAST]].ey += fBlockSize;
 							world[i].edge_id[EAST] = world[n].edge_id[EAST];
 							world[i].edge_exist[EAST] = true;
 						}
 						else {
 							sEdge edge;
-							edge.sx = (x + 1) * iBlockSize; edge.sy = y * iBlockSize;
-							edge.ex = (x + 1) * iBlockSize; edge.ey = (y + 1) * iBlockSize;
+							edge.sx = (x + 1) * fBlockSize; edge.sy = y * fBlockSize;
+							edge.ex = (x + 1) * fBlockSize; edge.ey = (y + 1) * fBlockSize;
 
-							int edge_id = vEdge.size();
+							unsigned int edge_id = vEdge.size();
 							vEdge.push_back(edge);
 
 							world[i].edge_exist[EAST] = true;
@@ -126,16 +134,16 @@ public:
 					if (!world[n].exist) {
 						if (world[w].edge_exist[NORTH]) {
 							// Increase bounder of the edge
-							vEdge[world[w].edge_id[NORTH]].ex += iBlockSize;
+							vEdge[world[w].edge_id[NORTH]].ex += fBlockSize;
 							world[i].edge_id[NORTH] = world[w].edge_id[NORTH];
 							world[i].edge_exist[NORTH] = true;
 						}
 						else {
 							sEdge edge;
-							edge.sx = x * iBlockSize; edge.sy = y * iBlockSize;
-							edge.ex = (x + 1) * iBlockSize; edge.ey = y * iBlockSize;
+							edge.sx = x * fBlockSize; edge.sy = y * fBlockSize;
+							edge.ex = (x + 1) * fBlockSize; edge.ey = y * fBlockSize;
 
-							int edge_id = vEdge.size();
+							unsigned int edge_id = vEdge.size();
 							vEdge.push_back(edge);
 
 							world[i].edge_exist[NORTH] = true;
@@ -147,16 +155,16 @@ public:
 					if (!world[s].exist) {
 						if (world[w].edge_exist[SOUTH]) {
 							// Increase bounder of the edge
-							vEdge[world[w].edge_id[SOUTH]].ex += iBlockSize;
+							vEdge[world[w].edge_id[SOUTH]].ex += fBlockSize;
 							world[i].edge_id[SOUTH] = world[w].edge_id[SOUTH];
 							world[i].edge_exist[SOUTH] = true;
 						}
 						else {
 							sEdge edge;
-							edge.sx = x * iBlockSize; edge.sy = (y + 1) * iBlockSize;
-							edge.ex = (x + 1) * iBlockSize; edge.ey = (y + 1) * iBlockSize;
+							edge.sx = x * fBlockSize; edge.sy = (y + 1) * fBlockSize;
+							edge.ex = (x + 1) * fBlockSize; edge.ey = (y + 1) * fBlockSize;
 
-							int edge_id = vEdge.size();
+							unsigned int edge_id = vEdge.size();
 							vEdge.push_back(edge);
 
 							world[i].edge_exist[SOUTH] = true;
@@ -164,6 +172,61 @@ public:
 						}
 					}
 
+				}
+			}
+		}
+	}
+
+	void CalcVisiablePolyMap(float x, float y, float radius) {
+		vVisiblePolyMap.clear();
+
+		for (size_t i = 0; i < vEdge.size(); i++) {
+			// Use 'for' loop for simplify code appearance
+			for (int j = 0; j < 2; j++) {
+				float dx, dy;
+				dx = (j == 0 ? vEdge[i].sx : vEdge[i].ex) - x;
+				dy = (j == 0 ? vEdge[i].sy : vEdge[i].ey) - y;
+
+				const float cAngle = atan2f(dy, dx);
+
+				float angle = 0.0f;
+				// Calculate 3 more Vector with a slit angle changed  
+				for (int k = 0; k < 3; k++) {
+					if (k == 0) angle = cAngle - 0.000001f;
+					if (k == 1) angle = cAngle;
+					if (k == 2) angle = cAngle + 0.000001f;
+
+					dx = radius * cosf(angle);
+					dy = radius * sinf(angle);
+
+					float min_t = INFINITY;
+					sPoint minPoint;
+					bool bValid = false;
+
+					for (auto& e : vEdge) {
+						float sdx, sdy;
+						sdx = e.ex - e.sx + 0.001f;
+						sdy = e.ey - e.sy;
+
+
+						if (fabs(sdx - dx) > 0.0f && fabs(sdy - dy) > 0.0f) {
+							float s = (dx * (y - e.sy) + (dy * (e.sx - x))) / (dx * sdy - sdx * dy);
+							float t = (sdx * (y - e.sy) + (sdy * (e.sx - x))) / (dx * sdy - sdx * dy);
+
+							if (s >= 0.0f && s <= 1.0f && t <= 1.0f && t >= 0.0f) {
+								if (t < min_t) {
+									min_t = t;
+									minPoint.x = x + (t * dx);
+									minPoint.y = y + (t * dy);
+									minPoint.angle = atan2f(minPoint.y - y, minPoint.x - x);
+									bValid = true;
+								}
+							}
+						}
+					}
+
+					if (bValid)
+						vVisiblePolyMap.push_back(minPoint);
 				}
 			}
 		}
@@ -181,16 +244,23 @@ private:
 			}
 		}
 
-		for (int i = 0; i < vEdge.size(); i++) {
+		for (size_t i = 0; i < vEdge.size(); i++) {
 			DrawLine(vEdge[i].sx, vEdge[i].sy, vEdge[i].ex, vEdge[i].ey);
 			FillCircle(vEdge[i].sx, vEdge[i].sy, 3, olc::RED);
 			FillCircle(vEdge[i].ex, vEdge[i].ey, 3, olc::RED);
+		}
+
+
+		olc::vf2d mouse = GetMousePos();
+		for (size_t i = 0; i < vVisiblePolyMap.size(); i++) {
+			DrawLine(mouse.x, mouse.y, vVisiblePolyMap[i].x, vVisiblePolyMap[i].y);
 		}
 	}
 
 private:
 	sCell* world;
 	std::vector<sEdge> vEdge;
+	std::vector<sPoint> vVisiblePolyMap;
 	const int iWorldWidth = 40;
 	const int iWorldHeigh = 30;
 	const int iBlockSize = 16;
