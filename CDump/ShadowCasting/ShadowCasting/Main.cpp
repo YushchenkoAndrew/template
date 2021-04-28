@@ -255,9 +255,9 @@ private:
 		}
 
 
-		DrawString(4, 4, "Ray Cast: " + std::to_string(vVisiblePolyMap.size()) + " Tree: " + std::to_string(tPolyMap.GetSize()));
-		olc::vf2d mouse = GetMousePos();
 		std::vector<Node*> vPolyMap = tPolyMap.GetVector();
+		DrawString(4, 4, "Ray Cast: " + std::to_string(vVisiblePolyMap.size()) + " Nodes: " + std::to_string(vPolyMap.size()));
+		olc::vf2d mouse = GetMousePos();
 		//for (size_t i = 0; i < vVisiblePolyMap.size(); i++) {
 		//	DrawLine(mouse.x, mouse.y, vVisiblePolyMap[i].x, vVisiblePolyMap[i].y);
 		//}

@@ -12,7 +12,7 @@ struct Node {
 
 class BinaryTree {
 public:
-	BinaryTree() : root(nullptr), iSize(0u) {}
+	BinaryTree() : root(nullptr) {}
 
 	~BinaryTree() {
 		RemoveAllNode(&root);
@@ -50,11 +50,6 @@ public:
 		return vTree;
 	}
 
-
-	unsigned int GetSize() {
-		return iSize;
-	}
-
 private:
 	void InsertLeaf(Node **ptr, float x, float y, float key) {
 		Node* next = (Node *)malloc(sizeof(Node));
@@ -64,12 +59,10 @@ private:
 		next->x = x; next->y = y; next->key = key;
 		next->left = nullptr; next->right = nullptr;
 		*ptr = next;
-		iSize++;
 	}
 
 	void InsertLeaf(Node **ptr, Node **node) {
 		*ptr = *node;
-		iSize++;
 	}
 
 	void InsertNode(Node **ptr, float x, float y, float key) {
@@ -77,8 +70,8 @@ private:
 		if (a == nullptr)
 			return InsertLeaf(ptr, x, y, key);
 		// Check on a small difference between a->key and key,
-		// instead of directly check on equality 
-		if (fabs(a->key - key) < 0.0001f)
+		// instead of directly check on equality (a->key == key)
+		if (fabs(a->key - key) < 0.001f)
 			return;
 		if (a->key > key)
 			return InsertNode(&a->left, x, y, key);
@@ -100,13 +93,12 @@ private:
 
 	void RemoveNode(Node **ptr) {
 		Node* a = *ptr;
-		if (a->left != nullptr)
-			*ptr = a->left;
+		*ptr = a->left;
+
 		if (a->right != nullptr) {
 			if (a->left != nullptr) {
 				if (a->left->right != nullptr) {
 					InsertNode(&root, &a->right);
-					iSize--;
 				}
 				else {
 					(*ptr)->right = a->right;
@@ -117,11 +109,7 @@ private:
 			}
 		}
 
-		if (a->left == nullptr && a->right == nullptr)
-			*ptr = nullptr;
-
 		free(a);
-		iSize--;
 	}
 
 	void RemoveAllNode(Node **ptr) {
@@ -136,5 +124,4 @@ private:
 
 private:
 	Node *root;
-	unsigned int iSize;
 };
