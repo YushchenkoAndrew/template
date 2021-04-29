@@ -13,8 +13,7 @@
 #define NORTH_NEIGBOR(X, Y, STEP) (INDEX(X, Y - 1, STEP))
 #define SOUTH_NEIGBOR(X, Y, STEP) (INDEX(X, Y + 1, STEP))
 #define WEST_NEIGBOR(X, Y, STEP) (INDEX((X - 1), Y, STEP))
-#define EAST_NEIGBOR(X, Y, STEP) (INDEX((X + 1), Y, STEP))
-
+#define EAST_NEIGBOR(X, Y, STEP) (INDEX((X + 1), Y, STEP)) 
 
 struct sEdge {
 	float sx, sy;
@@ -27,11 +26,6 @@ struct sCell {
 	unsigned int edge_id[4];
 };
 
-struct sPoint {
-	float x, y;
-	float angle;
-};
-
 class ShadowCasting : public olc::PixelGameEngine {
 public:
 	ShadowCasting() {
@@ -42,14 +36,30 @@ public:
 
 public:
 	bool OnUserCreate() override {
+		printf("Start\n");
+		olc::ResourcePack cResource;
+		cResource.LoadPack("BinaryMap.bin", "");
+		olc::ResourceBuffer buf = cResource.GetFileBuffer("BinaryMap.bin");
+
+		for (size_t i = 0; i < buf.vMemory.size(); i++) {
+			printf("%c", buf.vMemory[i]);
+		}
+
+
 		return true;
 	}
 
 	bool OnUserUpdate(float fElapsedTime) override {
 		olc::vi2d mouse = GetMousePos();
+		int index = 0;
 		
-		if (GetMouse(0).bReleased) {
-			int index = INDEX(mouse.x / iBlockSize, mouse.y / iBlockSize, iWorldWidth);
+		if (GetMouse(0).bReleased &&
+			// Check the Top and Bottom boundary
+			(index = INDEX(mouse.x / iBlockSize, mouse.y / iBlockSize, iWorldWidth)) >= iWorldWidth &&
+			index < INDEX(0, iWorldHeigh - 1, iWorldWidth) &&
+			// Check Left and Right boundary
+			index % iWorldWidth != 0 && (index + 1) % iWorldWidth != 0) {
+			//int index = INDEX(mouse.x / iBlockSize, mouse.y / iBlockSize, iWorldWidth);
 			world[index].exist = !world[index].exist;
 
 			ConvertBitMapIntoPolyMap(0, 0, iWorldWidth, iWorldHeigh, (float)iBlockSize, iWorldWidth);
@@ -179,7 +189,6 @@ private:
 	}
 
 	void CalcVisiablePolyMap(float x, float y, float radius) {
-		vVisiblePolyMap.clear();
 		tPolyMap.RemoveAll();
 
 		for (size_t i = 0; i < vEdge.size(); i++) {
@@ -202,7 +211,7 @@ private:
 					dy = radius * sinf(angle);
 
 					float min_t = INFINITY;
-					sPoint minPoint;
+					float min_x, min_y, min_angle;
 					bool bValid = false;
 
 					for (auto& e : vEdge) {
@@ -218,19 +227,17 @@ private:
 							if (s >= 0.0f && s <= 1.0f && t <= 1.0f && t >= 0.0f) {
 								if (t < min_t) {
 									min_t = t;
-									minPoint.x = x + (t * dx);
-									minPoint.y = y + (t * dy);
-									minPoint.angle = atan2f(minPoint.y - y, minPoint.x - x);
+									min_x = x + (t * dx);
+									min_y = y + (t * dy);
+									min_angle = atan2f(min_y - y, min_x - x);
 									bValid = true;
 								}
 							}
 						}
 					}
 
-					if (bValid) {
-						vVisiblePolyMap.push_back(minPoint);
-						tPolyMap.Insert(minPoint.x, minPoint.y, minPoint.angle);
-					}
+					if (bValid) 
+						tPolyMap.Insert(min_x, min_y, min_angle);
 				}
 			}
 		}
@@ -244,25 +251,22 @@ private:
 		for (int x = 0; x < iWorldWidth; x++) {
 			for (int y = 0; y < iWorldHeigh; y++) {
 				if (world[y * iWorldWidth + x].exist)
-					FillRect(x * iBlockSize, y * iBlockSize, iBlockSize, iBlockSize, olc::BLUE);
+					FillRect((int32_t)(x * iBlockSize), (int32_t)(y * iBlockSize), iBlockSize, iBlockSize, olc::BLUE);
 			}
 		}
 
 		for (size_t i = 0; i < vEdge.size(); i++) {
-			DrawLine(vEdge[i].sx, vEdge[i].sy, vEdge[i].ex, vEdge[i].ey);
-			FillCircle(vEdge[i].sx, vEdge[i].sy, 3, olc::RED);
-			FillCircle(vEdge[i].ex, vEdge[i].ey, 3, olc::RED);
+			DrawLine((int32_t)vEdge[i].sx, (int32_t)vEdge[i].sy, (int32_t)vEdge[i].ex, (int32_t)vEdge[i].ey);
+			FillCircle((int32_t)vEdge[i].sx, (int32_t)vEdge[i].sy, 3, olc::RED);
+			FillCircle((int32_t)vEdge[i].ex, (int32_t)vEdge[i].ey, 3, olc::RED);
 		}
 
 
 		std::vector<Node*> vPolyMap = tPolyMap.GetVector();
-		DrawString(4, 4, "Ray Cast: " + std::to_string(vVisiblePolyMap.size()) + " Nodes: " + std::to_string(vPolyMap.size()));
+		DrawString(4, 4, "Nodes: " + std::to_string(vPolyMap.size()));
 		olc::vf2d mouse = GetMousePos();
-		//for (size_t i = 0; i < vVisiblePolyMap.size(); i++) {
-		//	DrawLine(mouse.x, mouse.y, vVisiblePolyMap[i].x, vVisiblePolyMap[i].y);
-		//}
 		for (size_t i = 0; i < vPolyMap.size(); i++) {
-			DrawLine(mouse.x, mouse.y, vPolyMap[i]->x, vPolyMap[i]->y);
+			DrawLine((int32_t)mouse.x, (int32_t)mouse.y, (int32_t)vPolyMap[i]->x, (int32_t)vPolyMap[i]->y);
 		}
 
 	}
@@ -270,7 +274,6 @@ private:
 private:
 	sCell* world;
 	std::vector<sEdge> vEdge;
-	std::vector<sPoint> vVisiblePolyMap;
 	BinaryTree tPolyMap;
 	const int iWorldWidth = 40;
 	const int iWorldHeigh = 30;
