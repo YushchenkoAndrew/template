@@ -5,8 +5,6 @@ const db = require("./db.routes");
 const { convertToAscii } = require("../JS/ASCII-art");
 const { logError } = require("../lib");
 
-routes.use("/CDump", express.static("CDump"));
-
 routes.get("/*", (req, res, next) => {
   handler.getRequest(req.url);
   next();
@@ -33,5 +31,6 @@ routes.post("/ASCII-art", (req, res) => {
 });
 
 routes.use("/db", db);
+routes.use("/CDump", express.static("CDump"));
 
 module.exports = routes;
