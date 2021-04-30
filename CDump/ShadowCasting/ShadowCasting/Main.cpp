@@ -38,9 +38,12 @@ public:
 	bool OnUserCreate() override {
 		printf("Start\n");
 
-		sprLightCast = new olc::Sprite("light_cast.png");
+		sprLightCast = new olc::Sprite("ShadowCasting/assets/light_cast.png");
+		//sprLightCast = new olc::Sprite(ScreenWidth(), ScreenHeight());
 		buffLightRay = new olc::Sprite(ScreenWidth(), ScreenHeight());
 		buffLightTex = new olc::Sprite(ScreenWidth(), ScreenHeight());
+
+		//printf("%d\n", rImage.Load("./ShadowCasting/assets/temp/light_cast.png"));
 
 		olc::ResourcePack cResource;
 		//cResource.AddFile("BinaryMap.bin");
@@ -51,7 +54,7 @@ public:
 
 		//cResource.SaveFile("BinaryMap.bin", vData);
 
-		cResource.LoadPack("BinaryMap.bin", "");
+		cResource.LoadPack("ShadowCasting/assets/BinaryMap.bin", "");
 		olc::ResourceBuffer buf = cResource.GetFileBuffer("BinaryMap.bin");
 		for (uint32_t i = 0; i < buf.vMemory.size(); i++) {
 			for (uint32_t j = 0; j < 8; j++)
@@ -287,7 +290,7 @@ private:
 		Clear(olc::BLACK);
 
 		std::vector<Node*> vPolyMap = tPolyMap.GetVector();
-		olc::vf2d mouse = GetMousePos();
+		olc::vi2d mouse = GetMousePos();
 
 		DrawSprite((int32_t)mouse.x - 255, (int32_t)mouse.y - 255, sprLightCast);
 
@@ -295,20 +298,23 @@ private:
 		SetDrawTarget(buffLightRay);
 		Clear(olc::BLACK);
 
-		for (size_t i = 0; i < vPolyMap.size() - 1; i++) {
-			//DrawLine((int32_t)mouse.x, (int32_t)mouse.y, (int32_t)vPolyMap[i]->x, (int32_t)vPolyMap[i]->y);
-			FillTriangle(
-			//DrawTriangle(
-				(int32_t)mouse.x, (int32_t)mouse.y, 
-				(int32_t)vPolyMap[i]->x, (int32_t)vPolyMap[i]->y,
-				(int32_t)vPolyMap[i + 1]->x, (int32_t)vPolyMap[i + 1]->y);
-		}
+		if (vPolyMap.size() != 0) {
+			for (uint32_t i = 0; i < vPolyMap.size() - 1; i++) {
+				//DrawLine((int32_t)mouse.x, (int32_t)mouse.y, (int32_t)vPolyMap[i]->x, (int32_t)vPolyMap[i]->y);
+				FillTriangle(
+					//DrawTriangle(
+					mouse.x, mouse.y,
+					(int32_t)vPolyMap[i]->x, (int32_t)vPolyMap[i]->y,
+					(int32_t)vPolyMap[i + 1]->x, (int32_t)vPolyMap[i + 1]->y);
+			}
 
-		FillTriangle(
-		//DrawTriangle(
-			(int32_t)mouse.x, (int32_t)mouse.y, 
-			(int32_t)vPolyMap[0]->x, (int32_t)vPolyMap[0]->y,
-			(int32_t)vPolyMap[vPolyMap.size() - 1]->x, (int32_t)vPolyMap[vPolyMap.size() - 1]->y);
+			FillTriangle(
+			//	//DrawTriangle(
+				mouse.x, mouse.y,
+				(int32_t)vPolyMap[0]->x, (int32_t)vPolyMap[0]->y,
+				//(int32_t)vPolyMap[vPolyMap.size() - 1]->x, (int32_t)vPolyMap[vPolyMap.size() - 1]->y);
+				(int32_t)vPolyMap.back()->x, (int32_t)vPolyMap.back()->y);
+		}
 
 
 
@@ -324,6 +330,8 @@ private:
 					PixelGameEngine::Draw(x, y, buffLightTex->GetPixel(x, y));
 			}
 		}
+
+		//DrawDecal(GetMousePos(), rImage.Decal());
 
 
 		DrawString(4, 4, "Nodes: " + std::to_string(vPolyMap.size()));
@@ -348,6 +356,7 @@ private:
 	olc::Sprite* sprLightCast;
 	olc::Sprite* buffLightRay;
 	olc::Sprite* buffLightTex;
+	olc::Renderable rImage;
 	const int iWorldWidth = 40;
 	const int iWorldHeigh = 30;
 	const int iBlockSize = 16;
