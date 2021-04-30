@@ -37,14 +37,30 @@ public:
 public:
 	bool OnUserCreate() override {
 		printf("Start\n");
+
+		sprLightCast = new olc::Sprite("light_cast.png");
+		buffLightRay = new olc::Sprite(ScreenWidth(), ScreenHeight());
+		buffLightTex = new olc::Sprite(ScreenWidth(), ScreenHeight());
+
 		olc::ResourcePack cResource;
+		//cResource.AddFile("BinaryMap.bin");
+		//std::vector<char> vData;
+
+		//for(char i = '0'; i <= '9'; i++)
+		//	vData.push_back(i);
+
+		//cResource.SaveFile("BinaryMap.bin", vData);
+
 		cResource.LoadPack("BinaryMap.bin", "");
 		olc::ResourceBuffer buf = cResource.GetFileBuffer("BinaryMap.bin");
-
-		for (size_t i = 0; i < buf.vMemory.size(); i++) {
-			printf("%c", buf.vMemory[i]);
+		for (uint32_t i = 0; i < buf.vMemory.size(); i++) {
+			for (uint32_t j = 0; j < 8; j++)
+				if (INDEX(j, i, 8) < iWorldHeigh * iWorldWidth)
+					world[INDEX(j, i, 8)].exist = (buf.vMemory[i] & (1u << j)) != 0;
 		}
 
+		ConvertBitMapIntoPolyMap(0, 0, iWorldWidth, iWorldHeigh, (float)iBlockSize, iWorldWidth);
+		printf("Done!\n");
 
 		return true;
 	}
@@ -52,17 +68,39 @@ public:
 	bool OnUserUpdate(float fElapsedTime) override {
 		olc::vi2d mouse = GetMousePos();
 		int index = 0;
+		bool bCellExist = false;
 		
-		if (GetMouse(0).bReleased &&
+		if (((bCellExist = GetMouse(0).bHeld) || GetMouse(1).bHeld) &&
 			// Check the Top and Bottom boundary
 			(index = INDEX(mouse.x / iBlockSize, mouse.y / iBlockSize, iWorldWidth)) >= iWorldWidth &&
 			index < INDEX(0, iWorldHeigh - 1, iWorldWidth) &&
 			// Check Left and Right boundary
 			index % iWorldWidth != 0 && (index + 1) % iWorldWidth != 0) {
-			//int index = INDEX(mouse.x / iBlockSize, mouse.y / iBlockSize, iWorldWidth);
-			world[index].exist = !world[index].exist;
+			world[index].exist = bCellExist;
 
 			ConvertBitMapIntoPolyMap(0, 0, iWorldWidth, iWorldHeigh, (float)iBlockSize, iWorldWidth);
+		}
+
+
+		// Temporary solution
+		if (GetKey(olc::Key::Q).bPressed) {
+			olc::ResourcePack cResource ;
+
+			cResource.AddFile("BinaryMap.bin");
+			std::vector<char> vData;
+			char cData = NULL;
+
+			for (size_t i = 0; i < iWorldHeigh * iWorldWidth; i++) {
+				if (i % 8 == 0 && i != 0) {
+					vData.push_back(cData);
+					cData = NULL;
+				}
+				cData = cData | (world[i].exist << (i % 8));
+			}
+
+			cResource.SaveFile("BinaryMap.bin", vData);
+
+			printf("Saved\n");
 		}
 
 		//if (GetMouse(1).bHeld)
@@ -203,9 +241,9 @@ private:
 				float angle = 0.0f;
 				// Calculate 3 more Vector with a slit angle changed  
 				for (int k = 0; k < 3; k++) {
-					if (k == 0) angle = cAngle - 0.000001f;
+					if (k == 0) angle = cAngle - 0.002f;
 					if (k == 1) angle = cAngle;
-					if (k == 2) angle = cAngle + 0.000001f;
+					if (k == 2) angle = cAngle + 0.002f;
 
 					dx = radius * cosf(angle);
 					dy = radius * sinf(angle);
@@ -245,9 +283,50 @@ private:
 
 private:
 	void Draw() {
-		// Clear the screen
+		SetDrawTarget(buffLightTex);
 		Clear(olc::BLACK);
 
+		std::vector<Node*> vPolyMap = tPolyMap.GetVector();
+		olc::vf2d mouse = GetMousePos();
+
+		DrawSprite((int32_t)mouse.x - 255, (int32_t)mouse.y - 255, sprLightCast);
+
+
+		SetDrawTarget(buffLightRay);
+		Clear(olc::BLACK);
+
+		for (size_t i = 0; i < vPolyMap.size() - 1; i++) {
+			//DrawLine((int32_t)mouse.x, (int32_t)mouse.y, (int32_t)vPolyMap[i]->x, (int32_t)vPolyMap[i]->y);
+			FillTriangle(
+			//DrawTriangle(
+				(int32_t)mouse.x, (int32_t)mouse.y, 
+				(int32_t)vPolyMap[i]->x, (int32_t)vPolyMap[i]->y,
+				(int32_t)vPolyMap[i + 1]->x, (int32_t)vPolyMap[i + 1]->y);
+		}
+
+		FillTriangle(
+		//DrawTriangle(
+			(int32_t)mouse.x, (int32_t)mouse.y, 
+			(int32_t)vPolyMap[0]->x, (int32_t)vPolyMap[0]->y,
+			(int32_t)vPolyMap[vPolyMap.size() - 1]->x, (int32_t)vPolyMap[vPolyMap.size() - 1]->y);
+
+
+
+		// Clear the screen
+		SetDrawTarget(nullptr);
+		Clear(olc::BLACK);
+
+
+		// Draw Sprite Texture pixel where the source of light exist
+		for (int x = 0; x < ScreenWidth(); x++) {
+			for (int y = 0; y < ScreenWidth(); y++) {
+				if (buffLightRay->GetPixel(x, y).r > 0)
+					PixelGameEngine::Draw(x, y, buffLightTex->GetPixel(x, y));
+			}
+		}
+
+
+		DrawString(4, 4, "Nodes: " + std::to_string(vPolyMap.size()));
 		for (int x = 0; x < iWorldWidth; x++) {
 			for (int y = 0; y < iWorldHeigh; y++) {
 				if (world[y * iWorldWidth + x].exist)
@@ -260,21 +339,15 @@ private:
 			FillCircle((int32_t)vEdge[i].sx, (int32_t)vEdge[i].sy, 3, olc::RED);
 			FillCircle((int32_t)vEdge[i].ex, (int32_t)vEdge[i].ey, 3, olc::RED);
 		}
-
-
-		std::vector<Node*> vPolyMap = tPolyMap.GetVector();
-		DrawString(4, 4, "Nodes: " + std::to_string(vPolyMap.size()));
-		olc::vf2d mouse = GetMousePos();
-		for (size_t i = 0; i < vPolyMap.size(); i++) {
-			DrawLine((int32_t)mouse.x, (int32_t)mouse.y, (int32_t)vPolyMap[i]->x, (int32_t)vPolyMap[i]->y);
-		}
-
 	}
 
 private:
 	sCell* world;
 	std::vector<sEdge> vEdge;
 	BinaryTree tPolyMap;
+	olc::Sprite* sprLightCast;
+	olc::Sprite* buffLightRay;
+	olc::Sprite* buffLightTex;
 	const int iWorldWidth = 40;
 	const int iWorldHeigh = 30;
 	const int iBlockSize = 16;
