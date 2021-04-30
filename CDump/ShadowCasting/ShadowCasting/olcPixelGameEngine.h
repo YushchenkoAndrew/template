@@ -683,6 +683,7 @@ namespace olc
 		ResourcePack();
 		~ResourcePack();
 		bool AddFile(const std::string& sFile);
+		bool SaveFile(const std::string& sFile, const std::vector<char>& vData);
 		bool LoadPack(const std::string& sFile, const std::string& sKey);
 		bool SavePack(const std::string& sFile, const std::string& sKey);
 		ResourceBuffer GetFileBuffer(const std::string& sFile);
@@ -1559,6 +1560,38 @@ namespace olc
 			return true;
 		}
 		return false;
+	}
+
+	bool ResourcePack::SaveFile(const std::string& sFile, const std::vector<char>& vData) 
+	{
+		// Create/Overwrite destination file
+		std::ofstream ofs(sFile, std::ofstream::binary);
+
+		// Temporary write file size
+		uint32_t nIndexSize = 0;
+		ofs.write((char *)&nIndexSize, sizeof(uint32_t));
+		uint32_t nMapSize = 1u;		// For now write only first section, will change in a future
+		ofs.write((char *)&nMapSize, sizeof(uint32_t));
+		uint32_t nPathSize = sFile.size();
+		ofs.write((char *)&nPathSize, sizeof(uint32_t));
+		ofs.write(sFile.c_str(), nPathSize);
+
+		uint32_t nOffset = (sizeof(uint32_t) << 2) + nPathSize;
+		uint32_t nDataSize = nOffset + vData.size();
+		nOffset += sizeof(uint32_t);
+		ofs.write((char *)&nDataSize, sizeof(uint32_t));
+		ofs.write((char *)&nOffset, sizeof(uint32_t));
+
+		// Write all data by one
+		for (uint32_t i = 0; i < vData.size(); i++)
+			ofs.write((char *)(vData.data() + i), sizeof(char));
+
+		// Rewrite file Size
+		ofs.seekp(0, std::ios::beg);
+		ofs.write((char *)&nDataSize, sizeof(uint32_t));
+
+		ofs.close();
+		return true;
 	}
 
 	bool ResourcePack::LoadPack(const std::string& sFile, const std::string& sKey)
