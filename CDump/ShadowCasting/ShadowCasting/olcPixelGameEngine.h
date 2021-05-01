@@ -1589,8 +1589,13 @@ namespace olc
 		// Rewrite file Size
 		ofs.seekp(0, std::ios::beg);
 		ofs.write((char *)&nDataSize, sizeof(uint32_t));
-
 		ofs.close();
+
+		// Update MapStructure with a new File
+		sResourceFile e;
+		e.nSize = nDataSize;
+		e.nOffset = nOffset;
+		mapFiles[sFile] = e;
 		return true;
 	}
 
