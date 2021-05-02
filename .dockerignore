@@ -5,5 +5,4 @@ npm-debug.log
 .gitignore
 kubernetes/
 python/
-C+*/
 .dockerignore
