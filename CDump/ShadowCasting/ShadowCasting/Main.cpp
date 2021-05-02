@@ -31,19 +31,20 @@ class cButton {
 public:
 	cButton() : sTitle("???"), bActive(false) {
 		viPos.x = 0; viPos.y = 0;
-		viOffset.x = 3, viOffset.y = 2;
-		viSize.x = 9 * sTitle.size(), viSize.y = 11;
+		viOffset.x = 3; viOffset.y = 3;
+		viSize.x = 9 * sTitle.size(); viSize.y = 13;
 	}
 
 	void Construct(int32_t x, int32_t y, std::string sTitle_, bool bActive_ = false) {
 		sTitle = sTitle_;
 		bActive = bActive_;
 		viPos.x = x; viPos.y = y;
-		viSize.x = 9 * sTitle.size(), viSize.y = 11;
+		viSize.x = 9 * sTitle.size();
 	}
 
 	bool OnClicked(olc::vi2d mouse) {
-		if (abs(mouse.x - viPos.x + viOffset.x) < viSize.x && abs(mouse.y - viPos.y + viOffset.y) < viSize.y) {
+		olc::vi2d viRange = mouse - viPos + viOffset;
+		if (viRange.x > 0 && viRange.x < viSize.x && viRange.y > 0 && viRange.y < viSize.y) {
 			bActive = !bActive;
 			return true;
 		}
@@ -57,6 +58,24 @@ public:
 
 	bool GetStatus() {
 		return bActive;
+	}
+
+	void SetActive(bool bActive_) {
+		bActive = bActive_;
+	}
+
+	// TODO: Change viSize.x based on max size of string
+	// Size of string define as index of first find "\n"
+	void SetTitle(std::string sTitle_) {
+		sTitle = sTitle_;
+		viSize.x = 9 * sTitle.size();
+		int32_t iCount = 1;
+		for (auto& s : sTitle) iCount += (s == *"\n");
+		viSize.y = iCount * 13;
+	}
+
+	std::string GetTitle() {
+		return sTitle;
 	}
 
 private:
@@ -73,19 +92,24 @@ public:
 		sAppName = "ShadowCasting";
 
 		world = new sCell[iWorldWidth * iWorldHeigh];
-		bDebug.Construct(100, 4, "Debug");
+
+		// Define buttons
+		bDebug.Construct(100, 4, "Debug (D)");
+		bSave.Construct(180, 4, "Save (S)");
+		bLoad.Construct(260, 4, "Load (L)", true);
+		bPath.Construct(340, 4, "FILE UKNOWN");
 	}
 
 public:
 	bool OnUserCreate() override {
-		printf("Start\n");
-
 		sprLightCast = new olc::Sprite("assets/light_cast.png");
 		buffLightRay = new olc::Sprite(ScreenWidth(), ScreenHeight());
 		buffLightTex = new olc::Sprite(ScreenWidth(), ScreenHeight());
 
-		if (LoadFile("assets/BinaryMap.bin"))
+		if (LoadFile("assets/BinaryMap.bin")) {
+			bPath.SetTitle("assets/BinaryMap.bin");
 			ConvertBitMapIntoPolyMap(0, 0, iWorldWidth, iWorldHeigh, (float)iBlockSize, iWorldWidth);
+		}
 
 		return true;
 	}
@@ -95,6 +119,7 @@ public:
 		tPolyMap.RemoveAll();
 
 		olc::vi2d mouse = GetMousePos();
+		bool bLoadUpdate = false;
 		int index = 0;
 
 		// Check the Top and Bottom boundary
@@ -113,19 +138,45 @@ public:
 			CalcVisiablePolyMap((float)mouse.x, (float)mouse.y, 100000.0f);
 		}
 
-		if (GetMouse(0).bPressed)
+		// Some buttons events
+		if (GetMouse(0).bPressed) {
 			bDebug.OnClicked(mouse);
+			bSave.SetTitle("Save (S)");
+			bSave.SetActive(false);
+			bLoad.SetActive(false);
 
-
-		// Simple Key shortcuts
-		if (GetKey(olc::Key::S).bPressed) {
-			SaveFile("assets/BinaryMap.bin");
+			if (bPath.OnClicked(mouse)) {
+				if (bPath.GetStatus())
+					bPath.SetTitle("assets/BinaryMap.bin\n\nassets/BinaryMap2.bin");
+				else {
+					// Update with the second one
+					bPath.SetTitle("assets/BinaryMap2.bin");
+					// Check if mouse was on a first Title then change it
+					if (bPath.OnClicked(mouse)) bPath.SetTitle("assets/BinaryMap.bin");
+					bPath.SetActive(false);
+					bLoadUpdate = true;
+				}
+			}
 		}
 
-		if (GetKey(olc::Key::L).bPressed) {
-			if (LoadFile("assets/BinaryMap.bin"))
+
+		// Simple Key shortcuts and button event
+		if (GetKey(olc::Key::S).bPressed || (GetMouse(0).bPressed && bSave.OnClicked(mouse))) {
+			SaveFile(bPath.GetTitle());
+			bSave.SetTitle("Saved (S)");
+			bSave.SetActive(true);
+		}
+
+
+		// Simple Key shortcuts and button event
+		if (GetKey(olc::Key::L).bPressed || (GetMouse(0).bPressed && bLoad.OnClicked(mouse)) || bLoadUpdate) {
+			if (LoadFile(bPath.GetTitle())) {
 				ConvertBitMapIntoPolyMap(0, 0, iWorldWidth, iWorldHeigh, (float)iBlockSize, iWorldWidth);
+				bLoad.SetActive(true);
+			}
 		}
+
+		if (GetKey(olc::Key::D).bPressed) bDebug.SetActive(!bDebug.GetStatus());
 
 		Draw();
 		return true;
@@ -348,21 +399,25 @@ private:
 		Clear(olc::BLACK);
 
 		if (vPolyMap.size() != 0) {
+			// Use pointer to the function, such a way reduce if condition in the for-loop
+			void (olc::PixelGameEngine:: * DrawTriangle)(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, olc::Pixel) = NULL;
+			if (bDebug.GetStatus()) DrawTriangle = &olc::PixelGameEngine::DrawTriangle;
+			else DrawTriangle = &olc::PixelGameEngine::FillTriangle;
+
 			for (uint32_t i = 0; i < vPolyMap.size() - 1; i++) {
-				FillTriangle(
-					//DrawTriangle(
+				(*this.*DrawTriangle)(
 					mouse.x, mouse.y,
 					(int32_t)vPolyMap[i]->x, (int32_t)vPolyMap[i]->y,
-					(int32_t)vPolyMap[i + 1]->x, (int32_t)vPolyMap[i + 1]->y);
+					(int32_t)vPolyMap[i + 1]->x, (int32_t)vPolyMap[i + 1]->y,
+					olc::WHITE);
 			}
 
-			FillTriangle(
-			//	//DrawTriangle(
+			(*this.*DrawTriangle)(
 				mouse.x, mouse.y,
 				(int32_t)vPolyMap[0]->x, (int32_t)vPolyMap[0]->y,
-				(int32_t)vPolyMap.back()->x, (int32_t)vPolyMap.back()->y);
+				(int32_t)vPolyMap.back()->x, (int32_t)vPolyMap.back()->y,
+				olc::WHITE);
 		}
-
 
 
 		// Clear the screen
@@ -373,8 +428,9 @@ private:
 		// Draw Sprite Texture pixel where the source of light exist
 		for (int x = 0; x < ScreenWidth(); x++) {
 			for (int y = 0; y < ScreenWidth(); y++) {
+				// Draw the Sprite pixel or just a WHITE pixel depend on the curr mode
 				if (buffLightRay->GetPixel(x, y).r > 0)
-					PixelGameEngine::Draw(x, y, buffLightTex->GetPixel(x, y));
+					PixelGameEngine::Draw(x, y, bDebug.GetStatus() ? olc::WHITE : buffLightTex->GetPixel(x, y));
 			}
 		}
 
@@ -403,7 +459,10 @@ private:
 
 		// Draw Additional information
 		DrawString(4, 4, "Nodes: " + std::to_string(vPolyMap.size()));
-		bDebug.Draw(*this);
+		bDebug.Draw(*this); 
+		bSave.Draw(*this); 
+		bLoad.Draw(*this);
+		bPath.Draw(*this);
 	}
 
 private:
@@ -415,6 +474,9 @@ private:
 	olc::Sprite* buffLightTex;
 
 	cButton bDebug;
+	cButton bSave;
+	cButton bLoad;
+	cButton bPath;
 
 	const int32_t iWorldWidth = 40;
 	const int32_t iWorldHeigh = 30;
