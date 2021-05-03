@@ -91,7 +91,7 @@ public:
 	ShadowCasting() {
 		sAppName = "ShadowCasting";
 
-		world = new sCell[iWorldWidth * iWorldHeigh];
+		world = new sCell[iWorldWidth * iWorldHeight];
 
 		// Define buttons
 		bDebug.Construct(100, 4, "Debug (D)");
@@ -108,7 +108,7 @@ public:
 
 		if (LoadFile("assets/BinaryMap.bin")) {
 			bPath.SetTitle("assets/BinaryMap.bin");
-			ConvertBitMapIntoPolyMap(0, 0, iWorldWidth, iWorldHeigh, (float)iBlockSize, iWorldWidth);
+			ConvertBitMapIntoPolyMap(0, 0, iWorldWidth, iWorldHeight, (float)iBlockSize, iWorldWidth);
 		}
 
 		return true;
@@ -124,14 +124,14 @@ public:
 
 		// Check the Top and Bottom boundary
 		if ((index = INDEX(mouse.x / iBlockSize, mouse.y / iBlockSize, iWorldWidth)) >= iWorldWidth &&
-			index < INDEX(0, iWorldHeigh - 1, iWorldWidth) &&
+			index < INDEX(0, iWorldHeight - 1, iWorldWidth) &&
 			// Check Left and Right boundary
 			index % iWorldWidth != 0 && (index + 1) % iWorldWidth != 0) {
 
 			bool bCellExist = false;
 			if (((bCellExist = GetMouse(0).bHeld) || GetMouse(1).bHeld)) {
 				world[index].exist = bCellExist;
-				ConvertBitMapIntoPolyMap(0, 0, iWorldWidth, iWorldHeigh, (float)iBlockSize, iWorldWidth);
+				ConvertBitMapIntoPolyMap(0, 0, iWorldWidth, iWorldHeight, (float)iBlockSize, iWorldWidth);
 			}
 
 			// Find all crossed rays 
@@ -171,7 +171,7 @@ public:
 		// Simple Key shortcuts and button event
 		if (GetKey(olc::Key::L).bPressed || (GetMouse(0).bPressed && bLoad.OnClicked(mouse)) || bLoadUpdate) {
 			if (LoadFile(bPath.GetTitle())) {
-				ConvertBitMapIntoPolyMap(0, 0, iWorldWidth, iWorldHeigh, (float)iBlockSize, iWorldWidth);
+				ConvertBitMapIntoPolyMap(0, 0, iWorldWidth, iWorldHeight, (float)iBlockSize, iWorldWidth);
 				bLoad.SetActive(true);
 			}
 		}
@@ -362,7 +362,7 @@ private:
 		olc::ResourceBuffer buf = cResource.GetFileBuffer(sFile);
 		for (int32_t i = 0; i < (int32_t)buf.vMemory.size(); i++) {
 			for (int32_t j = 0; j < 8; j++)
-				if (INDEX(j, i, 8) < iWorldHeigh * iWorldWidth)
+				if (INDEX(j, i, 8) < iWorldHeight * iWorldWidth)
 					world[INDEX(j, i, 8)].exist = (buf.vMemory[i] & (1u << j)) != 0;
 		}
 		return true;
@@ -373,7 +373,7 @@ private:
 		std::vector<char> vData;
 		char cData = NULL;
 
-		for (int32_t i = 0; i < iWorldHeigh * iWorldWidth; i++) {
+		for (int32_t i = 0; i < iWorldHeight * iWorldWidth; i++) {
 			if (i % 8 == 0 && i != 0) {
 				vData.push_back(cData);
 				cData = NULL;
@@ -437,7 +437,7 @@ private:
 
 		if (bDebug.GetStatus()) {
 			for (int x = 0; x < iWorldWidth; x++) {
-				for (int y = 0; y < iWorldHeigh; y++) {
+				for (int y = 0; y < iWorldHeight; y++) {
 					if (world[y * iWorldWidth + x].exist)
 						FillRect((int32_t)(x * iBlockSize), (int32_t)(y * iBlockSize), iBlockSize, iBlockSize, olc::BLUE);
 				}
@@ -479,7 +479,7 @@ private:
 	cButton bPath;
 
 	const int32_t iWorldWidth = 40;
-	const int32_t iWorldHeigh = 30;
+	const int32_t iWorldHeight = 30;
 	const int32_t iBlockSize = 16;
 };
 
