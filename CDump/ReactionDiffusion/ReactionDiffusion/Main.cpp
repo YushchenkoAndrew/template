@@ -44,25 +44,7 @@ public:
 			}
 		}
 
-
-		// Key interface
-		if (GetKey(olc::Key::Z).bHeld) fKill -= 0.001f;
-		if (GetKey(olc::Key::X).bHeld) fKill += 0.001f;
-		if (GetKey(olc::Key::S).bHeld) fFeed -= 0.001f;
-		if (GetKey(olc::Key::D).bHeld) fFeed += 0.001f;
-		if (GetKey(olc::Key::Q).bHeld) fTime -= 0.001f;
-		if (GetKey(olc::Key::W).bHeld) fTime += 0.001f;
-		if (GetKey(olc::Key::C).bPressed) 
-			for (int32_t i = 0; i < iWorldHeight * iWorldWidth; i++) {
-				curr[i].a = 1.0f;
-				curr[i].b = 0.0f;
-			}
-
-
 		Clear(olc::BLACK);
-		DrawString(4, 110, "Kill = " + std::to_string(fKill));
-		DrawString(4, 120, "Feed = " + std::to_string(fFeed));
-		DrawString(4, 130, "Time = " + std::to_string(fTime));
 		UpdateDiffusion(viOffset.x, viOffset.y);
 		return true;
 	}
@@ -83,50 +65,11 @@ private:
 				// Swap layers
 				if (y >= 2) curr[INDEX(x, y - 1, iWorldWidth)] = next[INDEX(x, y - 1, iWorldWidth)];
 
-				int32_t R, G, B;
-				HSVtoRGB((a - b) * 180 + 180, 90, 90, R, G, B);
-
-				olc::PixelGameEngine::Draw(x + iXOffset, y + iYOffset, olc::Pixel(R, G, B));
-
-
-				//uint32_t color = roundf(a < b ? 0 : (a - b) * 255);
-				//olc::PixelGameEngine::Draw(x + iXOffset, y + iYOffset, olc::Pixel(color, color, color));
+				uint32_t color = roundf(a < b ? 0 : (a - b) * 255);
+				olc::PixelGameEngine::Draw(x + iXOffset, y + iYOffset, olc::Pixel(color, color, color));
 			}
 		}
 	}
-
-	void HSVtoRGB(float H, float S, float V, int32_t& R, int32_t& G, int32_t& B) {
-		float s = S / 100;
-		float v = V / 100;
-		float C = s * v;
-		float X = C * (1 - abs(fmod(H / 60.0, 2) - 1));
-		float m = v - C;
-		float r, g, b;
-		if (H >= 0 && H < 60) {
-			r = C, g = X, b = 0;
-		}
-		else if (H >= 60 && H < 120) {
-			r = X, g = C, b = 0;
-		}
-		else if (H >= 120 && H < 180) {
-			r = 0, g = C, b = X;
-		}
-		else if (H >= 180 && H < 240) {
-			r = 0, g = X, b = C;
-		}
-		else if (H >= 240 && H < 300) {
-			r = X, g = 0, b = C;
-		}
-		else {
-			r = C, g = 0, b = X;
-		}
-		R = (int32_t)((r + m) * 255) % 255;
-		G = (int32_t)((g + m) * 255) % 255;
-		B = (int32_t)((b + m) * 255) % 255;
-
-		//std::cout << R << G << B << std::endl;
-	}
-
 
 private:
 	sChemical LaplacianFunc(int32_t x, int32_t y) {
@@ -149,8 +92,8 @@ private:
 	float fKill;
 	float fTime;
 
-	const int32_t iWorldWidth = 200;
-	const int32_t iWorldHeight = 100;
+	const int32_t iWorldWidth = 150;
+	const int32_t iWorldHeight = 150;
 	const int32_t iRange = 8;
 
 	const float aWeight[9] = {
@@ -164,7 +107,7 @@ private:
 int main()
 {
 	ReactionDiffusion demo;
-	if (demo.Construct(200, 200, 4, 4))
+	if (demo.Construct(150, 150, 4, 4))
 		demo.Start();
 
 	return 0;
