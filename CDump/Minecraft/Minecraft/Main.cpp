@@ -1,22 +1,21 @@
 #define OLC_PGE_APPLICATION
-#include "olcPixelGameEngine.h";
 #include "GraphicsEngine.h"
 
 class Minecraft : public olc::PixelGameEngine {
 public:
     Minecraft() {
         sAppName = "Minecraft";
-
-        cEngine3D.Construct(ScreenHeight(), ScreenWidth());
     }
 
     bool OnUserCreate() override {
+        cEngine3D.Construct(ScreenHeight(), ScreenWidth());
+
         return true;
     }
 
     bool OnUserUpdate(float fElapsedTime) override {
 
-        cEngine3D.Draw(*this);
+        cEngine3D.Draw(*this, fElapsedTime);
 
         return true;
     }
@@ -29,7 +28,7 @@ private:
 int main()
 {
     Minecraft demo;
-    if (demo.Construct(200, 200, 4, 4))
+    if (demo.Construct(250, 250, 4, 4))
         demo.Start();
     return 0;
 }
