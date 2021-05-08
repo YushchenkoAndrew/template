@@ -2,16 +2,9 @@
 
 void GraphicsEngine::Construct(int32_t iHeight, int32_t iWidth) {
 		iScreenHeight = iHeight; iScreenWidth = iWidth;
-		fAspectRatio = (float)iScreenHeight / (float)iScreenWidth;
 
-		float fRad = 1.0f / tanf(fFieldOfView * 0.5f / 180.0f * 3.14159f);
-
-		mProjection.MA[0][0] = fAspectRatio * fRad;
-		mProjection.MA[1][1] = fRad;
-		mProjection.MA[2][2] = fZFar / (fZFar - fZNear);
-		mProjection.MA[3][2] = (-fZFar * fZNear) / (fZFar - fZNear);
-		mProjection.MA[2][3] = 1.0f;
-		mProjection.MA[3][3] = 0.0f;
+		// Projection Matrix
+		mProjection = Matrix4D::Projection((float)iScreenHeight / (float)iScreenWidth, 90.0f, 1000.0f, 0.1f);
 
 		mCube.tr = {
 			{ 0.0f, 0.0f, 0.0f,    0.0f, 1.0f, 0.0f,    1.0f, 1.0f, 0.0f },
@@ -45,8 +38,7 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 		mRotation = Matrix4D::RoutationOZ(fTheta) * Matrix4D::RoutationOX(fTheta * 0.5f);
 
 		// Translated
-		mTranslated = Matrix4D::Identity();
-		mTranslated.MA[3][2] = 3.0f;
+		mTranslated = Matrix4D::Translation(0.0f, 0.0f, 3.0f);
 
 	for (auto& tr : mCube.tr) {
 		sTriangle trProjected, trTranslated;

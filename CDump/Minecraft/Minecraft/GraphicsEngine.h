@@ -48,6 +48,27 @@ struct Matrix4D {
 		m.MA[2][2] = cosf(angle);
 		return m;
 	}
+
+	static Matrix4D Translation(float x, float y, float z) {
+		Matrix4D m = Identity();
+		m.MA[3][0] = x;
+		m.MA[3][1] = y;
+		m.MA[3][2] = z;
+		return m;
+	}
+
+	static Matrix4D Projection(float fAspectRatio, float fFieldOfView, float fZFar, float fZNear) {
+		float fRad = 1.0f / tanf(fFieldOfView * 0.5f / 180.0f * 3.14159f);
+
+		Matrix4D m;
+		m.MA[0][0] = fAspectRatio * fRad;
+		m.MA[1][1] = fRad;
+		m.MA[2][2] = fZFar / (fZFar - fZNear);
+		m.MA[3][2] = (-fZFar * fZNear) / (fZFar - fZNear);
+		m.MA[2][3] = 1.0f;
+		m.MA[3][3] = 0.0f;
+		return m;
+	}
 };
 
 struct sPoint3D {
@@ -115,12 +136,6 @@ public:
 	void Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime);
 
 private:
-	// Projection Matrix
-	const float fZNear = 0.1f;
-	const float fZFar = 1000.0f;
-	const float fFieldOfView = 90.0f;
-	float fAspectRatio = 0.0f;
-
 	int32_t iScreenHeight = 0;
 	int32_t iScreenWidth = 0;
 
