@@ -13,6 +13,45 @@ struct Matrix4D {
 		return res;
 	}
 
+	Matrix4D operator * (const float& right) const {
+		Matrix4D res;
+		for (uint8_t i = 0; i < 4; i++)
+			for (uint8_t j = 0; j < 4; j++)
+				res.MA[i][j] = this->MA[i][j] * right;
+		return res;
+	}
+
+	static Matrix4D Submatrix(const Matrix4D& m, const uint32_t& row, const uint32_t& col, const uint32_t n = 4u) {
+		Matrix4D res;
+		for (uint32_t i = 0u; i < n; i++) {
+			for (uint32_t j = 0u; j < n; j++) 
+				res.MA[i][j] = m.MA[i + (i < row ? 0 : 1)][j + (j < col ? 0 : 1)];
+		}
+		return res;
+	}
+
+	static float det(const Matrix4D& m, const uint32_t n = 4u) { 
+		if (n == 2)
+			return m.MA[0][0] * m.MA[1][1] - m.MA[0][1] * m.MA[1][0];
+
+		float det = 0.0f;
+		for (uint32_t i = 0; i < n; i++) {
+			det += m.MA[0][i] * Matrix4D::det(Matrix4D::Submatrix(m, 0, i, n - 1), n - 1) * (i % 2 == 1 ? -1.0f : 1.0f);
+		}
+		return det;
+	}
+
+	static Matrix4D Invert(const Matrix4D& m) {
+		float det = Matrix4D::det(m);
+		Matrix4D res;
+		if (det == 0.0f) return res;
+		for (uint8_t i = 0; i < 4; i++) {
+			for (uint8_t j = 0; j < 4; j++)
+				res.MA[j][i] = Matrix4D::det(Matrix4D::Submatrix(m, i, j, 3), 3) * ((i + j) % 2 == 1 ? -1.0f : 1.0f);
+		}
+		return res * (1 / det);
+	}
+
 	static Matrix4D Identity() {
 		Matrix4D m;
 		m.MA[0][0] = 1.0f;
@@ -132,6 +171,22 @@ public:
 	GraphicsEngine() {}
 	~GraphicsEngine() {}
 
+	Matrix4D CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget, sPoint3D& vUp) {
+		sPoint3D vForward = vPos - vTarget;
+		vForward = vForward.normalize();
+
+		sPoint3D vNewUp = vUp - (vForward * vUp.prod(vForward));
+		vNewUp = vNewUp.normalize();
+
+		sPoint3D vNewRight = vNewUp.cross(vForward);
+		Matrix4D m;
+		m.MA[0][0] = vNewRight.x;	m.MA[0][1] = vNewRight.y;	m.MA[0][2] = vNewRight.z;	m.MA[0][3] = 0.0f;
+		m.MA[1][0] = vNewUp.x;		m.MA[1][1] = vNewUp.y;		m.MA[1][2] = vNewUp.z;		m.MA[1][3] = 0.0f;
+		m.MA[2][0] = vForward.x;	m.MA[2][1] = vForward.y;	m.MA[2][2] = vForward.z;	m.MA[2][3] = 0.0f;
+		m.MA[3][0] = vPos.x;		m.MA[3][1] = vPos.y;		m.MA[3][2] = vPos.z;		m.MA[3][3] = 1.0f;
+		return m;
+	}
+
 	void Construct(int32_t iHeight, int32_t iWidth);
 	void Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime);
 
@@ -144,4 +199,5 @@ private:
 	Matrix4D mProjection;
 	sField mCube;
 	sPoint3D vCamera;
+	sPoint3D vLookDir;
 };
