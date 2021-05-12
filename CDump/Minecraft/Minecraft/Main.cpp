@@ -9,7 +9,6 @@ public:
 
     bool OnUserCreate() override {
         cEngine3D.Construct(ScreenHeight(), ScreenWidth());
-
         return true;
     }
 
