@@ -165,6 +165,36 @@ struct sTriangle {
 
 struct sField {
 	std::vector<sTriangle> tr;
+
+
+	static std::vector<sTriangle> CubeMap(float fXOffset = 0.0f, float fYOffset = 0.0f, float fZOffset = 0.0f) {
+		return {
+			{ fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 0.0f,    fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 0.0f },
+			{ fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 0.0f },
+
+			{ fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 1.0f },
+			{ fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 1.0f,    fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 1.0f },
+
+			{ fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 1.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 1.0f },
+			{ fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 1.0f },
+
+			{ fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 0.0f },
+			{ fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 0.0f,    fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 0.0f },
+
+			{ fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 0.0f,    fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 1.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 1.0f },
+			{ fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 1.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 0.0f },
+
+			{ fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 0.0f },
+			{ fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 0.0f }
+		};
+	}
+
+	sField operator + (const std::vector<sTriangle>& right) const { 
+		sField res; res.tr.reserve(this->tr.size() + right.size());
+		res.tr.insert(res.tr.end(), this->tr.begin(), this->tr.end()); res.tr.insert(res.tr.end(), right.begin(), right.end());
+		return res; 
+	}
+	sField& operator += (const std::vector<sTriangle>& right) { this->tr.reserve(this->tr.size() + right.size()); this->tr.insert(this->tr.end(), right.begin(), right.end()); return *this; }
 };
 
 #define TRIANGLE_OUTSIDE	12u
@@ -184,7 +214,8 @@ public:
 	Matrix4D CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget);
 	sPoint3D IntersectionLinePlane(sPoint3D& pPlane, sPoint3D& vPlane, sPoint3D& pStart, sPoint3D& pEnd);
 	uint8_t ClipTriangle(sPoint3D pPlane, sPoint3D vPlane, sTriangle& iTr, sTriangle& oTr1, sTriangle& oTr2);
-	void Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime);
+	void ClipByScreenEdge(std::list<sTriangle>& listClippedTr);
+	void Draw(olc::PixelGameEngine& GameEngine, float fElapsedTime);
 
 private:
 	int32_t iScreenHeight = 0;

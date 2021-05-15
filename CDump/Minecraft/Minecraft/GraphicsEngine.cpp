@@ -6,35 +6,21 @@ void GraphicsEngine::Construct(int32_t iHeight, int32_t iWidth) {
 	// Projection Matrix
 	mProjection = Matrix4D::Projection((float)iScreenHeight / (float)iScreenWidth, 90.0f, 1000.0f, 0.1f);
 
-	mCube.tr = {
-			{ 0.0f, 0.0f, 0.0f,    0.0f, 1.0f, 0.0f,    1.0f, 1.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f,    1.0f, 1.0f, 0.0f,    1.0f, 0.0f, 0.0f },
-
-			{ 1.0f, 0.0f, 0.0f,    1.0f, 1.0f, 0.0f,    1.0f, 1.0f, 1.0f },
-			{ 1.0f, 0.0f, 0.0f,    1.0f, 1.0f, 1.0f,    1.0f, 0.0f, 1.0f },
-
-			{ 1.0f, 0.0f, 1.0f,    1.0f, 1.0f, 1.0f,    0.0f, 1.0f, 1.0f },
-			{ 1.0f, 0.0f, 1.0f,    0.0f, 1.0f, 1.0f,    0.0f, 0.0f, 1.0f },
-
-			{ 0.0f, 0.0f, 1.0f,    0.0f, 1.0f, 1.0f,    0.0f, 1.0f, 0.0f },
-			{ 0.0f, 0.0f, 1.0f,    0.0f, 1.0f, 0.0f,    0.0f, 0.0f, 0.0f },
-
-			{ 0.0f, 1.0f, 0.0f,    0.0f, 1.0f, 1.0f,    1.0f, 1.0f, 1.0f },
-			{ 0.0f, 1.0f, 0.0f,    1.0f, 1.0f, 1.0f,    1.0f, 1.0f, 0.0f },
-
-			{ 1.0f, 0.0f, 1.0f,    0.0f, 0.0f, 1.0f,    0.0f, 0.0f, 0.0f },
-			{ 1.0f, 0.0f, 1.0f,    0.0f, 0.0f, 0.0f,    1.0f, 0.0f, 0.0f }
-	};
+	// TEMP: Create better solution for Cube Map Init
+	mCube.tr = sField::CubeMap();
+	mCube += sField::CubeMap(2.0f);
+	mCube += sField::CubeMap(-2.0f);
+	mCube += sField::CubeMap(0.0f, 2.0f);
+	mCube += sField::CubeMap(0.0f, -2.0f);
+	mCube += sField::CubeMap(0.0f, 0.0f, 2.0f);
+	mCube += sField::CubeMap(0.0f, 0.0f, -2.0f);
 }
 Matrix4D GraphicsEngine::CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget) {
 	sPoint3D vUp = { 0.0f, 1.0f, 0.0f };
 	sPoint3D vDirection = sPoint3D::normalize(vPos - vTarget);
 	sPoint3D vNewRight = vUp.cross(vDirection).normalize();
 	sPoint3D vNewUp = vDirection.cross(vNewRight);
-	//sPoint3D vNewUp = vUp - (vForward * vUp.prod(vForward));
-	//vNewUp = vNewUp.normalize();
 
-	//sPoint3D vNewRight = vNewUp.cross(vForward);
 	Matrix4D m;
 	m.MA[0][0] = vNewRight.x;	m.MA[0][1] = vNewRight.y;	m.MA[0][2] = vNewRight.z;	m.MA[0][3] = 0.0f;
 	m.MA[1][0] = vNewUp.x;		m.MA[1][1] = vNewUp.y;		m.MA[1][2] = vNewUp.z;		m.MA[1][3] = 0.0f;
@@ -118,6 +104,36 @@ uint8_t GraphicsEngine::ClipTriangle(sPoint3D pPlane, sPoint3D vPlane, sTriangle
 	}
 }
 
+void GraphicsEngine::ClipByScreenEdge(std::list<sTriangle>& listClippedTr) {
+	float fWidth = (float)iScreenWidth - 1.0f;
+	float fHeight = (float)iScreenHeight - 1.0f;
+
+	size_t nUnClippedTr = 1u;
+	sTriangle trClipped[2];
+
+	for (uint8_t i = 0u; i < 4u; i++) {
+		uint8_t nClippedTr = 0u;
+
+		while (nUnClippedTr > 0u) {
+			sTriangle trFront = listClippedTr.front();
+			listClippedTr.pop_front();
+			nUnClippedTr--;
+
+			switch (i)
+			{
+				case 0u: nClippedTr = ClipTriangle({ 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, trFront, trClipped[0], trClipped[1]); break;
+				case 1u: nClippedTr = ClipTriangle({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, trFront, trClipped[0], trClipped[1]); break;
+				case 2u: nClippedTr = ClipTriangle({ fWidth, 0.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, trFront, trClipped[0], trClipped[1]); break;
+				case 3u: nClippedTr = ClipTriangle({ 0.0f, fHeight, 0.0f }, { 0.0f, -1.0f, 0.0f }, trFront, trClipped[0], trClipped[1]); break;
+			}
+
+			for (uint8_t j = 0u; j < nClippedTr; j++)
+				listClippedTr.push_back(trClipped[j]);
+		}
+
+		nUnClippedTr = listClippedTr.size();
+	}
+}
 
 
 void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) {
@@ -190,83 +206,40 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 		trView.p[2] = trTranslated.p[2] * mView;
 
 
-		//trProjected.p[0] = trView.p[0] * mProjection + 1.0f;
-		//trProjected.p[1] = trView.p[1] * mProjection + 1.0f;
-		//trProjected.p[2] = trView.p[2] * mProjection + 1.0f;
-
-
 		sTriangle trClipped[2];
 		uint8_t nClippedTr = ClipTriangle({ 0.0f, 0.0f, -0.1f }, { 0.0f, 0.0f, -1.0f }, trView, trClipped[0], trClipped[1]);
-		//uint8_t nClippedTr = ClipTriangle({ 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, trProjected, trClipped[0], trClipped[1]);
-
 
 		for (uint8_t i = 0; i < nClippedTr; i++) {
-			//trProjected.p[0] = trClipped[i].p[0];
-			//trProjected.p[1] = trClipped[i].p[1];
-			//trProjected.p[2] = trClipped[i].p[2];
 
 			trProjected.p[0] = trClipped[i].p[0] * mProjection + 1.0f;
 			trProjected.p[1] = trClipped[i].p[1] * mProjection + 1.0f;
 			trProjected.p[2] = trClipped[i].p[2] * mProjection + 1.0f;
 
-			//trProjected.p[0] = trView.p[0] * mProjection + 1.0f;
-			//trProjected.p[1] = trView.p[1] * mProjection + 1.0f;
-			//trProjected.p[2] = trView.p[2] * mProjection + 1.0f;
-
-			//trProjected.p[0] = trTranslated.p[0] * mProjection + 1.0f;
-			//trProjected.p[1] = trTranslated.p[1] * mProjection + 1.0f;
-			//trProjected.p[2] = trTranslated.p[2] * mProjection + 1.0f;
-
 			trProjected.p[0].x *= 0.5f * (float)iScreenWidth; trProjected.p[0].y *= 0.5f * (float)iScreenHeight;
 			trProjected.p[1].x *= 0.5f * (float)iScreenWidth; trProjected.p[1].y *= 0.5f * (float)iScreenHeight;
 			trProjected.p[2].x *= 0.5f * (float)iScreenWidth; trProjected.p[2].y *= 0.5f * (float)iScreenHeight;
 
-			for (uint8_t j = 0; j < 4; j++) {
-
-				uint8_t nClippedProjectedTr = 0u;
-				sTriangle trClipped[2];
-
-				switch (j)
-				{
-				case 0u: nClippedProjectedTr = ClipTriangle({ 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, trProjected, trClipped[0], trClipped[1]); break;
-				case 1u: nClippedProjectedTr = ClipTriangle({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, trProjected, trClipped[0], trClipped[1]); break;
-				}
 
 
-				for (uint8_t k = 0; k < nClippedProjectedTr; k++) {
-					GameEngine.FillTriangle(
-						(int32_t)trClipped[k].p[0].x, (int32_t)trClipped[k].p[0].y,
-						(int32_t)trClipped[k].p[1].x, (int32_t)trClipped[k].p[1].y,
-						(int32_t)trClipped[k].p[2].x, (int32_t)trClipped[k].p[2].y,
-						//olc::Pixel(color, color, color)
-						olc::WHITE
-					);
+			std::list<sTriangle> listClippedTr = { trProjected };
+			ClipByScreenEdge(listClippedTr);
 
-					GameEngine.DrawTriangle(
-						(int32_t)trClipped[k].p[0].x, (int32_t)trClipped[k].p[0].y,
-						(int32_t)trClipped[k].p[1].x, (int32_t)trClipped[k].p[1].y,
-						(int32_t)trClipped[k].p[2].x, (int32_t)trClipped[k].p[2].y,
-						olc::BLACK
-					);
+			for (auto& trClipped : listClippedTr) {
+				GameEngine.FillTriangle(
+					(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
+					(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
+					(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
+					//olc::Pixel(color, color, color)
+					olc::WHITE
+				);
 
-
-					//GameEngine.FillTriangle(
-					//	(int32_t)trProjected.p[0].x, (int32_t)trProjected.p[0].y,
-					//	(int32_t)trProjected.p[1].x, (int32_t)trProjected.p[1].y,
-					//	(int32_t)trProjected.p[2].x, (int32_t)trProjected.p[2].y,
-					//	//olc::Pixel(color, color, color)
-					//	olc::WHITE
-					//);
-
-					//GameEngine.DrawTriangle(
-					//	(int32_t)trProjected.p[0].x, (int32_t)trProjected.p[0].y,
-					//	(int32_t)trProjected.p[1].x, (int32_t)trProjected.p[1].y,
-					//	(int32_t)trProjected.p[2].x, (int32_t)trProjected.p[2].y,
-					//	olc::BLACK
-					//);
-				}
+				GameEngine.DrawTriangle(
+					(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
+					(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
+					(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
+					olc::BLACK
+				);
 			}
-
 		}
 
 	}
