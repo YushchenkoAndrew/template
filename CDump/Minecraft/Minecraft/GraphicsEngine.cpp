@@ -26,18 +26,19 @@ void GraphicsEngine::Construct(int32_t iHeight, int32_t iWidth) {
 			{ 1.0f, 0.0f, 1.0f,    0.0f, 0.0f, 0.0f,    1.0f, 0.0f, 0.0f }
 	};
 }
-Matrix4D GraphicsEngine::CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget, sPoint3D& vUp) {
-	sPoint3D vForward = vPos - vTarget;
-	vForward = vForward.normalize();
+Matrix4D GraphicsEngine::CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget) {
+	sPoint3D vUp = { 0.0f, 1.0f, 0.0f };
+	sPoint3D vDirection = sPoint3D::normalize(vPos - vTarget);
+	sPoint3D vNewRight = vUp.cross(vDirection).normalize();
+	sPoint3D vNewUp = vDirection.cross(vNewRight);
+	//sPoint3D vNewUp = vUp - (vForward * vUp.prod(vForward));
+	//vNewUp = vNewUp.normalize();
 
-	sPoint3D vNewUp = vUp - (vForward * vUp.prod(vForward));
-	vNewUp = vNewUp.normalize();
-
-	sPoint3D vNewRight = vNewUp.cross(vForward);
+	//sPoint3D vNewRight = vNewUp.cross(vForward);
 	Matrix4D m;
 	m.MA[0][0] = vNewRight.x;	m.MA[0][1] = vNewRight.y;	m.MA[0][2] = vNewRight.z;	m.MA[0][3] = 0.0f;
 	m.MA[1][0] = vNewUp.x;		m.MA[1][1] = vNewUp.y;		m.MA[1][2] = vNewUp.z;		m.MA[1][3] = 0.0f;
-	m.MA[2][0] = vForward.x;	m.MA[2][1] = vForward.y;	m.MA[2][2] = vForward.z;	m.MA[2][3] = 0.0f;
+	m.MA[2][0] = vDirection.x;	m.MA[2][1] = vDirection.y;	m.MA[2][2] = vDirection.z;	m.MA[2][3] = 0.0f;
 	m.MA[3][0] = vPos.x;		m.MA[3][1] = vPos.y;		m.MA[3][2] = vPos.z;		m.MA[3][3] = 1.0f;
 	return m;
 }
@@ -105,9 +106,9 @@ uint8_t GraphicsEngine::ClipTriangle(sPoint3D pPlane, sPoint3D vPlane, sTriangle
 
 			// Second triangle is use one point inside and new calculated point
 			// for the first triangle
-			oTr1.p[0] = arrInside[1];
-			oTr1.p[1] = oTr1.p[2];
-			oTr1.p[2] = IntersectionLinePlane(pPlane, vPlane, arrInside[1], arrOutside[0]);
+			oTr2.p[0] = arrInside[1];
+			oTr2.p[1] = oTr1.p[2];
+			oTr2.p[2] = IntersectionLinePlane(pPlane, vPlane, arrInside[1], arrOutside[0]);
 
 			return 2u;
 		}
@@ -122,17 +123,23 @@ uint8_t GraphicsEngine::ClipTriangle(sPoint3D pPlane, sPoint3D vPlane, sTriangle
 void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) {
 	GameEngine.Clear(olc::BLACK);
 
-	if (GameEngine.GetKey(olc::W).bHeld)
-		vCamera.z -= 8.0f * fElapsedTime;
+	if (GameEngine.GetKey(olc::W).bHeld && !GameEngine.GetKey(olc::SHIFT).bHeld)
+		vCamera.z -= CAMERA_STEP * fElapsedTime;
 
-	if (GameEngine.GetKey(olc::S).bHeld)
-		vCamera.z += 8.0f * fElapsedTime;
+	if (GameEngine.GetKey(olc::S).bHeld && !GameEngine.GetKey(olc::SHIFT).bHeld)
+		vCamera.z += CAMERA_STEP * fElapsedTime;
+
+	if (GameEngine.GetKey(olc::W).bHeld && GameEngine.GetKey(olc::SHIFT).bHeld)
+		vCamera.y += CAMERA_STEP * fElapsedTime;
+
+	if (GameEngine.GetKey(olc::S).bHeld && GameEngine.GetKey(olc::SHIFT).bHeld)
+		vCamera.y -= CAMERA_STEP * fElapsedTime;
 
 	if (GameEngine.GetKey(olc::D).bHeld)
-		vCamera.x -= 8.0f * fElapsedTime;
+		vCamera.x -= CAMERA_STEP * fElapsedTime;
 
 	if (GameEngine.GetKey(olc::A).bHeld)
-		vCamera.x += 8.0f * fElapsedTime;
+		vCamera.x += CAMERA_STEP * fElapsedTime;
 
 
 
@@ -147,15 +154,15 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 	mTranslated = Matrix4D::Translation(0.0f, 0.0f, 3.0f);
 
 	vLookDir = { 0, 0, 1 };
-	sPoint3D vUp = { 0, 1, 0 };
-	sPoint3D vTarget = { 1, 1, 1 };
+	sPoint3D vTarget = { 1.0f, 1.0f, 1.0f };
 
+	// FIXME: Camera rotation
 	fYaw += 0.01f * fElapsedTime * (GameEngine.GetMousePos().x - vTemp.x);
 	fPitch += 0.01f * fElapsedTime * (GameEngine.GetMousePos().y - vTemp.y);
 
-	vLookDir = vTarget * Matrix4D::RoutationOY(fYaw) * Matrix4D::RoutationOZ(fPitch);
-	vTarget = vCamera + vLookDir;
-	Matrix4D mView = Matrix4D::Invert(CameraPointAt(vCamera, vTarget, vUp));
+	//vLookDir = vTarget * Matrix4D::RoutationOY(fYaw) * Matrix4D::RoutationOZ(fPitch);
+	vTarget = vCamera - vLookDir;
+	Matrix4D mView = Matrix4D::Invert(CameraPointAt(vCamera, vTarget));
 
 	vTemp.x = vTemp.x + (GameEngine.GetMousePos().x - vTemp.x) * fElapsedTime;
 	vTemp.y = vTemp.y + (GameEngine.GetMousePos().y - vTemp.y) * fElapsedTime;
@@ -171,11 +178,11 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 		sPoint3D normal, vect1, vect2;
 		vect1 = trTranslated.p[1] - trTranslated.p[0];
 		vect2 = trTranslated.p[2] - trTranslated.p[0];
-		normal = vect1.cross(vect2).normalize();
+		normal = sPoint3D::normalize(vect1.cross(vect2));
 
-		if (normal.prod(trTranslated.p[0] - vCamera) >= 0.0f) continue;
+		if (normal.prod(trTranslated.p[0] - vCamera) > 0.0f) continue;
 			
-		sPoint3D light{ 0.0f, 0.0f, -1.0f };
+		sPoint3D light{ 5.0f, 5.0f, 5.0f };
 		int32_t color = (int32_t)(normal.prod(light.normalize()) * 255);
 
 		trView.p[0] = trTranslated.p[0] * mView;
@@ -183,11 +190,21 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 		trView.p[2] = trTranslated.p[2] * mView;
 
 
+		//trProjected.p[0] = trView.p[0] * mProjection + 1.0f;
+		//trProjected.p[1] = trView.p[1] * mProjection + 1.0f;
+		//trProjected.p[2] = trView.p[2] * mProjection + 1.0f;
+
+
 		sTriangle trClipped[2];
-		uint8_t nClippedTr = ClipTriangle({ 0.0f, 0.0f, 0.1f }, { 0.0f, 0.0f, 1.0f }, trView, trClipped[0], trClipped[1]);
+		uint8_t nClippedTr = ClipTriangle({ 0.0f, 0.0f, -0.1f }, { 0.0f, 0.0f, -1.0f }, trView, trClipped[0], trClipped[1]);
+		//uint8_t nClippedTr = ClipTriangle({ 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, trProjected, trClipped[0], trClipped[1]);
 
 
 		for (uint8_t i = 0; i < nClippedTr; i++) {
+			//trProjected.p[0] = trClipped[i].p[0];
+			//trProjected.p[1] = trClipped[i].p[1];
+			//trProjected.p[2] = trClipped[i].p[2];
+
 			trProjected.p[0] = trClipped[i].p[0] * mProjection + 1.0f;
 			trProjected.p[1] = trClipped[i].p[1] * mProjection + 1.0f;
 			trProjected.p[2] = trClipped[i].p[2] * mProjection + 1.0f;
@@ -204,20 +221,52 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 			trProjected.p[1].x *= 0.5f * (float)iScreenWidth; trProjected.p[1].y *= 0.5f * (float)iScreenHeight;
 			trProjected.p[2].x *= 0.5f * (float)iScreenWidth; trProjected.p[2].y *= 0.5f * (float)iScreenHeight;
 
-			GameEngine.FillTriangle(
-				(int32_t)trProjected.p[0].x, (int32_t)trProjected.p[0].y,
-				(int32_t)trProjected.p[1].x, (int32_t)trProjected.p[1].y,
-				(int32_t)trProjected.p[2].x, (int32_t)trProjected.p[2].y,
-				//olc::Pixel(color, color, color)
-				olc::WHITE
-			);
+			for (uint8_t j = 0; j < 4; j++) {
 
-			GameEngine.DrawTriangle(
-				(int32_t)trProjected.p[0].x, (int32_t)trProjected.p[0].y,
-				(int32_t)trProjected.p[1].x, (int32_t)trProjected.p[1].y,
-				(int32_t)trProjected.p[2].x, (int32_t)trProjected.p[2].y,
-				olc::BLACK
-			);
+				uint8_t nClippedProjectedTr = 0u;
+				sTriangle trClipped[2];
+
+				switch (j)
+				{
+				case 0u: nClippedProjectedTr = ClipTriangle({ 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, trProjected, trClipped[0], trClipped[1]); break;
+				case 1u: nClippedProjectedTr = ClipTriangle({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, trProjected, trClipped[0], trClipped[1]); break;
+				}
+
+
+				for (uint8_t k = 0; k < nClippedProjectedTr; k++) {
+					GameEngine.FillTriangle(
+						(int32_t)trClipped[k].p[0].x, (int32_t)trClipped[k].p[0].y,
+						(int32_t)trClipped[k].p[1].x, (int32_t)trClipped[k].p[1].y,
+						(int32_t)trClipped[k].p[2].x, (int32_t)trClipped[k].p[2].y,
+						//olc::Pixel(color, color, color)
+						olc::WHITE
+					);
+
+					GameEngine.DrawTriangle(
+						(int32_t)trClipped[k].p[0].x, (int32_t)trClipped[k].p[0].y,
+						(int32_t)trClipped[k].p[1].x, (int32_t)trClipped[k].p[1].y,
+						(int32_t)trClipped[k].p[2].x, (int32_t)trClipped[k].p[2].y,
+						olc::BLACK
+					);
+
+
+					//GameEngine.FillTriangle(
+					//	(int32_t)trProjected.p[0].x, (int32_t)trProjected.p[0].y,
+					//	(int32_t)trProjected.p[1].x, (int32_t)trProjected.p[1].y,
+					//	(int32_t)trProjected.p[2].x, (int32_t)trProjected.p[2].y,
+					//	//olc::Pixel(color, color, color)
+					//	olc::WHITE
+					//);
+
+					//GameEngine.DrawTriangle(
+					//	(int32_t)trProjected.p[0].x, (int32_t)trProjected.p[0].y,
+					//	(int32_t)trProjected.p[1].x, (int32_t)trProjected.p[1].y,
+					//	(int32_t)trProjected.p[2].x, (int32_t)trProjected.p[2].y,
+					//	olc::BLACK
+					//);
+				}
+			}
+
 		}
 
 	}

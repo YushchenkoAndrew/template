@@ -115,9 +115,11 @@ struct sPoint3D {
 	float y = 0.0f;
 	float z = 0.0f;
 
+	static sPoint3D normalize(const sPoint3D& p) { return p / sPoint3D::length(p); }
+	static float length(const sPoint3D& p) { return sqrtf(p.x * p.x + p.y * p.y + p.z * p.z); }
 
-	float length() const { return sqrtf(this->x * this->x + this->y * this->y + this->z * this->z); }
-	sPoint3D normalize() const { return *this / length(); }
+	sPoint3D normalize() const { return sPoint3D::normalize(*this); }
+	float length() const { return sPoint3D::length(*this); }
 	float prod(const sPoint3D& right) const { return this->x * right.x + this->y * right.y + this->z * right.z; }
 	sPoint3D cross(const sPoint3D& right) const { 
 		return {
@@ -168,7 +170,9 @@ struct sField {
 #define TRIANGLE_OUTSIDE	12u
 #define TRIANGLE_INSIDE		3u
 #define TRIANGLE_SMALL		9u
-#define TRIANGLE_QAUD		13u
+#define TRIANGLE_QAUD		6u
+
+#define CAMERA_STEP			4.0f
 
 
 class GraphicsEngine {
@@ -177,7 +181,7 @@ public:
 	~GraphicsEngine() {}
 
 	void Construct(int32_t iHeight, int32_t iWidth);
-	Matrix4D CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget, sPoint3D& vUp);
+	Matrix4D CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget);
 	sPoint3D IntersectionLinePlane(sPoint3D& pPlane, sPoint3D& vPlane, sPoint3D& pStart, sPoint3D& pEnd);
 	uint8_t ClipTriangle(sPoint3D pPlane, sPoint3D vPlane, sTriangle& iTr, sTriangle& oTr1, sTriangle& oTr2);
 	void Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime);
@@ -192,7 +196,7 @@ private:
 
 	Matrix4D mProjection;
 	sField mCube;
-	sPoint3D vCamera;
+	sPoint3D vCamera = { 0.0f, 0.0f, 10.0f };
 	sPoint3D vLookDir;
 	sPoint3D vTemp;
 };
