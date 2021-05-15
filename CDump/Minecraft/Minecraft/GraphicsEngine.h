@@ -165,29 +165,21 @@ struct sField {
 	std::vector<sTriangle> tr;
 };
 
+#define TRIANGLE_OUTSIDE	12u
+#define TRIANGLE_INSIDE		3u
+#define TRIANGLE_SMALL		9u
+#define TRIANGLE_QAUD		13u
+
 
 class GraphicsEngine {
 public:
 	GraphicsEngine() {}
 	~GraphicsEngine() {}
 
-	Matrix4D CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget, sPoint3D& vUp) {
-		sPoint3D vForward = vPos - vTarget;
-		vForward = vForward.normalize();
-
-		sPoint3D vNewUp = vUp - (vForward * vUp.prod(vForward));
-		vNewUp = vNewUp.normalize();
-
-		sPoint3D vNewRight = vNewUp.cross(vForward);
-		Matrix4D m;
-		m.MA[0][0] = vNewRight.x;	m.MA[0][1] = vNewRight.y;	m.MA[0][2] = vNewRight.z;	m.MA[0][3] = 0.0f;
-		m.MA[1][0] = vNewUp.x;		m.MA[1][1] = vNewUp.y;		m.MA[1][2] = vNewUp.z;		m.MA[1][3] = 0.0f;
-		m.MA[2][0] = vForward.x;	m.MA[2][1] = vForward.y;	m.MA[2][2] = vForward.z;	m.MA[2][3] = 0.0f;
-		m.MA[3][0] = vPos.x;		m.MA[3][1] = vPos.y;		m.MA[3][2] = vPos.z;		m.MA[3][3] = 1.0f;
-		return m;
-	}
-
 	void Construct(int32_t iHeight, int32_t iWidth);
+	Matrix4D CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget, sPoint3D& vUp);
+	sPoint3D IntersectionLinePlane(sPoint3D& pPlane, sPoint3D& vPlane, sPoint3D& pStart, sPoint3D& pEnd);
+	uint8_t ClipTriangle(sPoint3D pPlane, sPoint3D vPlane, sTriangle& iTr, sTriangle& oTr1, sTriangle& oTr2);
 	void Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime);
 
 private:
@@ -195,9 +187,12 @@ private:
 	int32_t iScreenWidth = 0;
 
 	float fTheta = 0.0f;
+	float fYaw = 0.0f;
+	float fPitch = 0.0f;
 
 	Matrix4D mProjection;
 	sField mCube;
 	sPoint3D vCamera;
 	sPoint3D vLookDir;
+	sPoint3D vTemp;
 };
