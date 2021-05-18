@@ -8,12 +8,12 @@ void GraphicsEngine::Construct(int32_t iHeight, int32_t iWidth) {
 
 	// TEMP: Create better solution for Cube Map Init
 	mCube.tr = sField::CubeMap();
-	mCube += sField::CubeMap(2.0f);
-	mCube += sField::CubeMap(-2.0f);
-	mCube += sField::CubeMap(0.0f, 2.0f);
-	mCube += sField::CubeMap(0.0f, -2.0f);
-	mCube += sField::CubeMap(0.0f, 0.0f, 2.0f);
-	mCube += sField::CubeMap(0.0f, 0.0f, -2.0f);
+	mCube += sField::CubeMap(5.0f);
+	mCube += sField::CubeMap(-5.0f);
+	mCube += sField::CubeMap(0.0f, 5.0f);
+	mCube += sField::CubeMap(0.0f, -5.0f);
+	mCube += sField::CubeMap(0.0f, 0.0f, 5.0f);
+	mCube += sField::CubeMap(0.0f, 0.0f, -5.0f);
 }
 Matrix4D GraphicsEngine::CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget) {
 	sPoint3D vUp = { 0.0f, 1.0f, 0.0f };
@@ -139,26 +139,6 @@ void GraphicsEngine::ClipByScreenEdge(std::list<sTriangle>& listClippedTr) {
 void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) {
 	GameEngine.Clear(olc::BLACK);
 
-	if (GameEngine.GetKey(olc::W).bHeld && !GameEngine.GetKey(olc::SHIFT).bHeld)
-		vCamera.z -= CAMERA_STEP * fElapsedTime;
-
-	if (GameEngine.GetKey(olc::S).bHeld && !GameEngine.GetKey(olc::SHIFT).bHeld)
-		vCamera.z += CAMERA_STEP * fElapsedTime;
-
-	if (GameEngine.GetKey(olc::W).bHeld && GameEngine.GetKey(olc::SHIFT).bHeld)
-		vCamera.y += CAMERA_STEP * fElapsedTime;
-
-	if (GameEngine.GetKey(olc::S).bHeld && GameEngine.GetKey(olc::SHIFT).bHeld)
-		vCamera.y -= CAMERA_STEP * fElapsedTime;
-
-	if (GameEngine.GetKey(olc::D).bHeld)
-		vCamera.x -= CAMERA_STEP * fElapsedTime;
-
-	if (GameEngine.GetKey(olc::A).bHeld)
-		vCamera.x += CAMERA_STEP * fElapsedTime;
-
-
-
 	Matrix4D mRotation, mTranslated;
 	fTheta += 1.0f * fElapsedTime;
 
@@ -169,19 +149,75 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 	// Translated
 	mTranslated = Matrix4D::Translation(0.0f, 0.0f, 3.0f);
 
-	vLookDir = { 0, 0, 1 };
-	sPoint3D vTarget = { 1.0f, 1.0f, 1.0f };
 
-	// FIXME: Camera rotation
-	fYaw += 0.01f * fElapsedTime * (GameEngine.GetMousePos().x - vTemp.x);
-	fPitch += 0.01f * fElapsedTime * (GameEngine.GetMousePos().y - vTemp.y);
+	// Calculate camera rotation based on Mouse Position
+	olc::vi2d vMouse = GameEngine.GetMousePos();
+	if (bStart) {
+		vMouseLast.x = (float)vMouse.x;
+		vMouseLast.y = (float)vMouse.y;
+		bStart = false;
+	}
 
+	vMouseOffset.x = ((float)vMouse.x - vMouseLast.x) * MOUSE_SPEED;
+	vMouseOffset.y = (vMouseLast.y - (float)vMouse.y) * MOUSE_SPEED;
+
+	vMouseLast.x = (float)vMouse.x;
+	vMouseLast.y = (float)vMouse.y;
+
+
+	fYaw += vMouseOffset.x;
+	fPitch += vMouseOffset.y;
+
+	if (fPitch > 89.0f) fPitch = 89.0f;
+	if (fPitch < -89.0f) fPitch = -89.0f;
+
+	auto funcToRadians = [](const float fAngle) { return fAngle / 180.0f * 3.14159f; };
+
+
+	vLookDir = { 
+		cosf(funcToRadians(fYaw)) * cos(funcToRadians(fPitch)),
+		sinf(funcToRadians(fPitch)),
+		sinf(funcToRadians(fYaw)) * cos(funcToRadians(fPitch)),
+	};
+
+	vLookDir = sPoint3D::normalize(vLookDir);
+
+	sPoint3D vUp = { 0.0f, 1.0f, 0.0f };
+	
+	if (GameEngine.GetKey(olc::W).bHeld && !GameEngine.GetKey(olc::SHIFT).bHeld)
+		//vCamera.z += CAMERA_STEP * fElapsedTime * vLookDir.z;
+		vCamera -= vLookDir * CAMERA_STEP * fElapsedTime;
+
+	if (GameEngine.GetKey(olc::S).bHeld && !GameEngine.GetKey(olc::SHIFT).bHeld)
+		//vCamera.z -= CAMERA_STEP * fElapsedTime * vLookDir.z;
+		vCamera += vLookDir * CAMERA_STEP * fElapsedTime;
+
+	if (GameEngine.GetKey(olc::W).bHeld && GameEngine.GetKey(olc::SHIFT).bHeld)
+		vCamera.y += CAMERA_STEP * fElapsedTime;
+
+	if (GameEngine.GetKey(olc::S).bHeld && GameEngine.GetKey(olc::SHIFT).bHeld)
+		vCamera.y -= CAMERA_STEP * fElapsedTime;
+
+	if (GameEngine.GetKey(olc::D).bHeld)
+		//vCamera.x -= CAMERA_STEP * fElapsedTime * vLookDir.x;
+		vCamera += sPoint3D::normalize(vLookDir.cross(vUp)) * CAMERA_STEP * fElapsedTime;
+
+	if (GameEngine.GetKey(olc::A).bHeld)
+		//vCamera.x += CAMERA_STEP * fElapsedTime * vLookDir.x;
+		vCamera -= sPoint3D::normalize(vLookDir.cross(vUp)) * CAMERA_STEP * fElapsedTime;
+
+
+
+
+
+
+	//sPoint3D vTarget = { 1.0f, 1.0f, 1.0f };
 	//vLookDir = vTarget * Matrix4D::RoutationOY(fYaw) * Matrix4D::RoutationOZ(fPitch);
-	vTarget = vCamera - vLookDir;
+	sPoint3D vTarget = vCamera - vLookDir;
 	Matrix4D mView = Matrix4D::Invert(CameraPointAt(vCamera, vTarget));
 
-	vTemp.x = vTemp.x + (GameEngine.GetMousePos().x - vTemp.x) * fElapsedTime;
-	vTemp.y = vTemp.y + (GameEngine.GetMousePos().y - vTemp.y) * fElapsedTime;
+
+	std::vector<sTriangle> trPainted;
 
 	for (auto& tr : mCube.tr) {
 		sTriangle trProjected, trTranslated, trView;
@@ -198,8 +234,8 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 
 		if (normal.prod(trTranslated.p[0] - vCamera) > 0.0f) continue;
 			
-		sPoint3D light{ 5.0f, 5.0f, 5.0f };
-		int32_t color = (int32_t)(normal.prod(light.normalize()) * 255);
+		//sPoint3D light{ 3.0f, 3.0f, 3.0f };
+		//int32_t color = (int32_t)(normal.prod(light.normalize()) * 255);
 
 		trView.p[0] = trTranslated.p[0] * mView;
 		trView.p[1] = trTranslated.p[1] * mView;
@@ -223,23 +259,45 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 
 			std::list<sTriangle> listClippedTr = { trProjected };
 			ClipByScreenEdge(listClippedTr);
+			trPainted.insert(trPainted.end(), listClippedTr.begin(), listClippedTr.end());
 
-			for (auto& trClipped : listClippedTr) {
-				GameEngine.FillTriangle(
-					(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
-					(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
-					(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
-					//olc::Pixel(color, color, color)
-					olc::WHITE
-				);
+			//for (auto& trClipped : listClippedTr) {
+			//	GameEngine.FillTriangle(
+			//		(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
+			//		(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
+			//		(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
+			//		olc::Pixel(color, color, color)
+			//		//olc::WHITE
+			//	);
 
-				GameEngine.DrawTriangle(
-					(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
-					(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
-					(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
-					olc::BLACK
-				);
-			}
+			//	GameEngine.DrawTriangle(
+			//		(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
+			//		(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
+			//		(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
+			//		olc::BLACK
+			//	);
+			//}
+		}
+
+		// Painter's algorithm
+		std::sort(trPainted.begin(), trPainted.end(), [](sTriangle& tr1, sTriangle& tr2) { return tr1.AvgZ() < tr2.AvgZ(); });
+
+
+		for (auto& trClipped : trPainted) {
+			GameEngine.FillTriangle(
+				(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
+				(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
+				(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
+				//olc::Pixel(color, color, color)
+				olc::WHITE
+			);
+
+			GameEngine.DrawTriangle(
+				(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
+				(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
+				(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
+				olc::BLACK
+			);
 		}
 
 	}

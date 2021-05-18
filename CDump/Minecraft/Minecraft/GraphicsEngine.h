@@ -115,13 +115,13 @@ struct sPoint3D {
 	float y = 0.0f;
 	float z = 0.0f;
 
-	static sPoint3D normalize(const sPoint3D& p) { return p / sPoint3D::length(p); }
-	static float length(const sPoint3D& p) { return sqrtf(p.x * p.x + p.y * p.y + p.z * p.z); }
+	static inline sPoint3D normalize(const sPoint3D& p) { return p / sPoint3D::length(p); }
+	static inline float length(const sPoint3D& p) { return sqrtf(p.x * p.x + p.y * p.y + p.z * p.z); }
 
-	sPoint3D normalize() const { return sPoint3D::normalize(*this); }
-	float length() const { return sPoint3D::length(*this); }
-	float prod(const sPoint3D& right) const { return this->x * right.x + this->y * right.y + this->z * right.z; }
-	sPoint3D cross(const sPoint3D& right) const { 
+	inline sPoint3D normalize() const { return sPoint3D::normalize(*this); }
+	inline float length() const { return sPoint3D::length(*this); }
+	inline float prod(const sPoint3D& right) const { return this->x * right.x + this->y * right.y + this->z * right.z; }
+	inline sPoint3D cross(const sPoint3D& right) const { 
 		return {
 			this->y * right.z - this->z * right.y,
 			this->z * right.x - this->x * right.z,
@@ -161,6 +161,10 @@ struct sPoint3D {
 
 struct sTriangle {
 	sPoint3D p[3];
+
+	inline float AvgX() { return (p[0].x + p[1].x + p[2].x) / 3.0f; }
+	inline float AvgY() { return (p[0].y + p[1].y + p[2].y) / 3.0f; }
+	inline float AvgZ() { return (p[0].z + p[1].z + p[2].z) / 3.0f; }
 };
 
 struct sField {
@@ -203,6 +207,7 @@ struct sField {
 #define TRIANGLE_QAUD		6u
 
 #define CAMERA_STEP			4.0f
+#define MOUSE_SPEED			0.7f
 
 
 class GraphicsEngine {
@@ -229,5 +234,11 @@ private:
 	sField mCube;
 	sPoint3D vCamera = { 0.0f, 0.0f, 10.0f };
 	sPoint3D vLookDir;
-	sPoint3D vTemp;
+
+	olc::vf2d vMouseOffset;
+	olc::vf2d vMouseLast;
+	
+
+	// FIXME:
+	bool bStart = true;
 };
