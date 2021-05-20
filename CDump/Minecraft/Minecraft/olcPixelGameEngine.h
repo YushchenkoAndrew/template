@@ -856,6 +856,7 @@ namespace olc
 		virtual olc::rcode SetWindowTitle(const std::string& s) = 0;
 		virtual olc::rcode StartSystemEventLoop() = 0;
 		virtual olc::rcode HandleSystemEvent() = 0;
+		virtual olc::rcode SetMousePos(const int32_t x, const int32_t y) = 0;
 		static olc::PixelGameEngine* ptrPGE;
 	};
 
@@ -904,6 +905,8 @@ namespace olc
 		const olc::vi2d& GetWindowMouse() const;
 		// Gets the mouse as a vector to keep Tarriest happy
 		const olc::vi2d& GetMousePos() const;
+		// Set Mouse position based on x and y
+		void SetMousePos(const int32_t x, const int32_t y);
 
 	public: // Utility
 		// Returns the width of the screen in "pixels"
@@ -1948,6 +1951,11 @@ namespace olc
 	const olc::vi2d& PixelGameEngine::GetMousePos() const
 	{
 		return vMousePos;
+	}
+
+	void PixelGameEngine::SetMousePos(const int32_t x, const int32_t y) 
+	{
+		platform->SetMousePos(x, y);
 	}
 
 	int32_t PixelGameEngine::GetMouseWheel() const
@@ -4514,6 +4522,22 @@ namespace olc
 		virtual olc::rcode ApplicationStartUp() override { return olc::rcode::OK; }
 		virtual olc::rcode ApplicationCleanUp() override { return olc::rcode::OK; }
 		virtual olc::rcode ThreadStartUp() override { return olc::rcode::OK; }
+
+		virtual olc::rcode SetMousePos(const int32_t x, const int32_t y) override { 
+			RECT rWnd;
+			POINT pPos = { x, y };
+
+			// FIXME: Shift POS by Canvas
+			//HWND hWnd = FindWindow(L"OLC_PIXEL_GAME_ENGINE");
+			//GetClientRect(olc_hWnd, &rWnd);
+
+			//POINT pPos = { rWnd.left + x, rWnd.top + y };
+
+			ClientToScreen(olc_hWnd, &pPos);
+			//SetCursorPos(rWnd.left + x, rWnd.top + y);
+			SetCursorPos(pPos.x, pPos.y);
+			return olc::rcode::OK;
+		}
 
 		virtual olc::rcode ThreadCleanUp() override
 		{
