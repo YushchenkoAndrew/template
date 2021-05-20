@@ -153,16 +153,21 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 	// Calculate camera rotation based on Mouse Position
 	olc::vi2d vMouse = GameEngine.GetMousePos();
 	if (bStart) {
-		vMouseLast.x = (float)vMouse.x;
-		vMouseLast.y = (float)vMouse.y;
+		vMouseLast.x = 119.0f;
+		vMouseLast.y = 142.0f;
 		bStart = false;
 	}
 
 	vMouseOffset.x = ((float)vMouse.x - vMouseLast.x) * MOUSE_SPEED;
 	vMouseOffset.y = (vMouseLast.y - (float)vMouse.y) * MOUSE_SPEED;
 
-	vMouseLast.x = (float)vMouse.x;
-	vMouseLast.y = (float)vMouse.y;
+
+	vMouseLast.x = bFixedMousePos ? 119.0f : (float)vMouse.x;
+	vMouseLast.y = bFixedMousePos ? 142.0f : (float)vMouse.y;
+
+	if (bFixedMousePos) GameEngine.SetMousePos(480, 480);
+
+
 
 
 	fYaw += vMouseOffset.x;
@@ -171,7 +176,7 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 	if (fPitch > 89.0f) fPitch = 89.0f;
 	if (fPitch < -89.0f) fPitch = -89.0f;
 
-	auto funcToRadians = [](const float fAngle) { return fAngle / 180.0f * 3.14159f; };
+	auto funcToRadians = [](const float fAngle) { return fAngle * 0.5f / 180.0f * 3.14159f; };
 
 
 	vLookDir = { 
@@ -206,8 +211,7 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 		//vCamera.x += CAMERA_STEP * fElapsedTime * vLookDir.x;
 		vCamera -= sPoint3D::normalize(vLookDir.cross(vUp)) * CAMERA_STEP * fElapsedTime;
 
-
-
+	if (GameEngine.GetKey(olc::Q).bPressed) bFixedMousePos = !bFixedMousePos;
 
 
 
