@@ -6,7 +6,7 @@ const { logRequest } = require("../lib/");
 routes.post("/Visitor", async (req, res) => {
   logRequest("POST", `TABLE = 'Visitors' DATA =`, req.body);
 
-  let result = handler.addNewVisitor(req.body);
+  let result = await handler.addNewVisitor(req.body);
 
   if (result.success) res.json(result);
   else res.status(500).json(result);
