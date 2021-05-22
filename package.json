@@ -1,12 +1,17 @@
 {
   "name": "webserver",
   "version": "1.0.0",
+  "license": "MIT",
   "description": "webserver for some simple projects",
   "author": "Andrew Yushchenko (Mortis)",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YushchenkoAndrew/template"
   },
   "dependencies": {
     "chroma-js": "^2.1.0",
