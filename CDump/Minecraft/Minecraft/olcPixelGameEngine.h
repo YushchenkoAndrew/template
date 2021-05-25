@@ -856,7 +856,7 @@ namespace olc
 		virtual olc::rcode SetWindowTitle(const std::string& s) = 0;
 		virtual olc::rcode StartSystemEventLoop() = 0;
 		virtual olc::rcode HandleSystemEvent() = 0;
-		virtual olc::rcode SetMousePos(const int32_t x, const int32_t y) = 0;
+		virtual olc::rcode SetMousePos(const int32_t&x, const int32_t& y) = 0;
 		static olc::PixelGameEngine* ptrPGE;
 	};
 
@@ -1953,8 +1953,17 @@ namespace olc
 		return vMousePos;
 	}
 
-	void PixelGameEngine::SetMousePos(const int32_t x, const int32_t y) 
+	void PixelGameEngine::SetMousePos(const int32_t iX, const int32_t iY) 
 	{
+		// Calculate x, y position based on Pixel Size
+		int32_t x = iX * vPixelSize.x;
+		int32_t y = iY * vPixelSize.y;
+		// Calculate "scale" offset
+		x = (int32_t)((float)x * ((float)(vWindowSize.x - (float)(2 * vViewPos.x)) / ((float)vScreenSize.x * (float)vPixelSize.x)));
+		y = (int32_t)((float)y * ((float)(vWindowSize.y - (float)(2 * vViewPos.y)) / ((float)vScreenSize.y * (float)vPixelSize.y)));
+		// Offset by the start of the canvas
+		x += vViewPos.x;
+		y += vViewPos.y;
 		platform->SetMousePos(x, y);
 	}
 
@@ -4523,18 +4532,12 @@ namespace olc
 		virtual olc::rcode ApplicationCleanUp() override { return olc::rcode::OK; }
 		virtual olc::rcode ThreadStartUp() override { return olc::rcode::OK; }
 
-		virtual olc::rcode SetMousePos(const int32_t x, const int32_t y) override { 
-			RECT rWnd;
+		virtual olc::rcode SetMousePos(const int32_t& x, const int32_t& y) override 
+		{ 
 			POINT pPos = { x, y };
 
-			// FIXME: Shift POS by Canvas
-			//HWND hWnd = FindWindow(L"OLC_PIXEL_GAME_ENGINE");
-			//GetClientRect(olc_hWnd, &rWnd);
-
-			//POINT pPos = { rWnd.left + x, rWnd.top + y };
-
+			// Shift mouse by the start of canvas
 			ClientToScreen(olc_hWnd, &pPos);
-			//SetCursorPos(rWnd.left + x, rWnd.top + y);
 			SetCursorPos(pPos.x, pPos.y);
 			return olc::rcode::OK;
 		}
@@ -4740,6 +4743,11 @@ namespace olc
 		}
 
 		virtual olc::rcode ThreadStartUp() override
+		{
+			return olc::rcode::OK;
+		}
+
+		virtual olc::rcode SetMousePos(const int32_t& x, const int32_t& y) override 
 		{
 			return olc::rcode::OK;
 		}
@@ -4998,6 +5006,11 @@ namespace olc {
 		{
 			renderer->DestroyDevice();
 			return olc::OK;
+		}
+
+		virtual olc::rcode SetMousePos(const int32_t& x, const int32_t& y) override 
+		{
+			return olc::rcode::OK;
 		}
 
 		virtual olc::rcode CreateGraphics(bool bFullScreen, bool bEnableVSYNC, const olc::vi2d& vViewPos, const olc::vi2d& vViewSize) override
@@ -5276,6 +5289,11 @@ namespace olc
 		virtual olc::rcode ThreadCleanUp() override
 		{
 			renderer->DestroyDevice(); return olc::OK;
+		}
+
+		virtual olc::rcode SetMousePos(const int32_t& x, const int32_t& y) override 
+		{
+			return olc::rcode::OK;
 		}
 
 		virtual olc::rcode CreateGraphics(bool bFullScreen, bool bEnableVSYNC, const olc::vi2d& vViewPos, const olc::vi2d& vViewSize) override
