@@ -165,7 +165,9 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 	vMouseLast.x = bFixedMousePos ? 125.0f : (float)vMouse.x;
 	vMouseLast.y = bFixedMousePos ? 124.0f : (float)vMouse.y;
 
-	if (bFixedMousePos) GameEngine.SetMousePos(125, 125);
+	GameEngine.DrawCircle(vMouse.x, vMouse.y, 15);
+
+	//if (bFixedMousePos) GameEngine.LockMousePos(125, 125);
 
 
 
@@ -211,7 +213,10 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 		//vCamera.x += CAMERA_STEP * fElapsedTime * vLookDir.x;
 		vCamera -= sPoint3D::normalize(vLookDir.cross(vUp)) * CAMERA_STEP * fElapsedTime;
 
-	if (GameEngine.GetKey(olc::Q).bPressed) bFixedMousePos = !bFixedMousePos;
+	if (GameEngine.GetKey(olc::Q).bPressed) {
+		bFixedMousePos = !bFixedMousePos;
+		GameEngine.LockMousePos(125, 125);
+	}
 
 
 
