@@ -856,7 +856,7 @@ namespace olc
 		virtual olc::rcode SetWindowTitle(const std::string& s) = 0;
 		virtual olc::rcode StartSystemEventLoop() = 0;
 		virtual olc::rcode HandleSystemEvent() = 0;
-		virtual olc::rcode SetMousePos(const int32_t&x, const int32_t& y) = 0;
+		virtual olc::rcode LockMousePos(const int32_t&x, const int32_t& y) = 0;
 		static olc::PixelGameEngine* ptrPGE;
 	};
 
@@ -906,7 +906,7 @@ namespace olc
 		// Gets the mouse as a vector to keep Tarriest happy
 		const olc::vi2d& GetMousePos() const;
 		// Set Mouse position based on x and y
-		void SetMousePos(const int32_t x, const int32_t y);
+		void LockMousePos(const int32_t x, const int32_t y);
 
 	public: // Utility
 		// Returns the width of the screen in "pixels"
@@ -1953,7 +1953,7 @@ namespace olc
 		return vMousePos;
 	}
 
-	void PixelGameEngine::SetMousePos(const int32_t iX, const int32_t iY) 
+	void PixelGameEngine::LockMousePos(const int32_t iX, const int32_t iY) 
 	{
 		// Calculate x, y position based on Pixel Size
 		int32_t x = iX * vPixelSize.x;
@@ -1964,7 +1964,7 @@ namespace olc
 		// Offset by the start of the canvas
 		x += vViewPos.x;
 		y += vViewPos.y;
-		platform->SetMousePos(x, y);
+		platform->LockMousePos(x, y);
 	}
 
 	int32_t PixelGameEngine::GetMouseWheel() const
@@ -4532,7 +4532,7 @@ namespace olc
 		virtual olc::rcode ApplicationCleanUp() override { return olc::rcode::OK; }
 		virtual olc::rcode ThreadStartUp() override { return olc::rcode::OK; }
 
-		virtual olc::rcode SetMousePos(const int32_t& x, const int32_t& y) override 
+		virtual olc::rcode LockMousePos(const int32_t& x, const int32_t& y) override 
 		{ 
 			POINT pPos = { x, y };
 
@@ -4747,7 +4747,7 @@ namespace olc
 			return olc::rcode::OK;
 		}
 
-		virtual olc::rcode SetMousePos(const int32_t& x, const int32_t& y) override 
+		virtual olc::rcode LockMousePos(const int32_t& x, const int32_t& y) override 
 		{
 			return olc::rcode::OK;
 		}
@@ -5008,7 +5008,7 @@ namespace olc {
 			return olc::OK;
 		}
 
-		virtual olc::rcode SetMousePos(const int32_t& x, const int32_t& y) override 
+		virtual olc::rcode LockMousePos(const int32_t& x, const int32_t& y) override 
 		{
 			return olc::rcode::OK;
 		}
@@ -5291,8 +5291,23 @@ namespace olc
 			renderer->DestroyDevice(); return olc::OK;
 		}
 
-		virtual olc::rcode SetMousePos(const int32_t& x, const int32_t& y) override 
+		virtual olc::rcode LockMousePos(const int32_t& x, const int32_t& y) override 
 		{
+			// FIXME:
+			//emscripten_request_pointerlock("#canvas", true);
+			EM_ASM({
+				let canvas = document.querySelector('canvas');
+				canvas.requestPointerLock = canvas.requestPointerLock ||
+                            canvas.mozRequestPointerLock;
+
+				canvas.onclick = () => canvas.requestPointerLock();
+
+				document.addEventListener('pointerlockchange', lockChangeAlert, false);
+
+				function lockChangeAlert() {
+					document.addEventListener("mousemove", (ev) => console.log(ev.x, ev.y), false);
+				}
+			});
 			return olc::rcode::OK;
 		}
 
