@@ -152,23 +152,24 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 
 	// Calculate camera rotation based on Mouse Position
 	olc::vi2d vMouse = GameEngine.GetMousePos();
+	GameEngine.DrawCircle(vMouse.x, vMouse.y, 7);
+
 	if (bStart) {
 		vMouseLast.x = 125.0f;
 		vMouseLast.y = 124.0f;
 		bStart = false;
 	}
 
-	vMouseOffset.x = ((float)vMouse.x - vMouseLast.x) * MOUSE_SPEED;
-	vMouseOffset.y = (vMouseLast.y - (float)vMouse.y) * MOUSE_SPEED;
+	vMouseOffset.x = (float)((int32_t)((float)vMouse.x - vMouseLast.x) * MOUSE_SPEED);
+	vMouseOffset.y = (float)((int32_t)(vMouseLast.y - (float)vMouse.y) * MOUSE_SPEED);
 
+	if (bFixedMousePos) {
+		GameEngine.LockMousePos(iScreenWidth / 2, iScreenHeight / 2);
+		vMouse = GameEngine.GetLockedMousePos();
+	}
 
-	vMouseLast.x = bFixedMousePos ? 125.0f : (float)vMouse.x;
-	vMouseLast.y = bFixedMousePos ? 124.0f : (float)vMouse.y;
-
-	GameEngine.DrawCircle(vMouse.x, vMouse.y, 15);
-
-	//if (bFixedMousePos) GameEngine.LockMousePos(125, 125);
-
+	vMouseLast.x = (float)vMouse.x;
+	vMouseLast.y = (float)vMouse.y;
 
 
 
@@ -213,10 +214,7 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 		//vCamera.x += CAMERA_STEP * fElapsedTime * vLookDir.x;
 		vCamera -= sPoint3D::normalize(vLookDir.cross(vUp)) * CAMERA_STEP * fElapsedTime;
 
-	if (GameEngine.GetKey(olc::Q).bPressed) {
-		bFixedMousePos = !bFixedMousePos;
-		GameEngine.LockMousePos(125, 125);
-	}
+	if (GameEngine.GetKey(olc::Q).bPressed) bFixedMousePos = !bFixedMousePos;
 
 
 

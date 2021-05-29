@@ -207,7 +207,7 @@ struct sField {
 #define TRIANGLE_QAUD		6u
 
 #define CAMERA_STEP			4.0f
-#define MOUSE_SPEED			0.7f
+#define MOUSE_SPEED			0.5f
 
 
 class GraphicsEngine {
