@@ -907,6 +907,8 @@ namespace olc
 		const olc::vi2d& GetMousePos() const;
 		// Set Mouse position based on x and y
 		void LockMousePos(const int32_t x, const int32_t y);
+		// Gets Locked Mouse Position
+		const olc::vi2d& GetLockedMousePos() const;
 
 	public: // Utility
 		// Returns the width of the screen in "pixels"
@@ -1052,6 +1054,7 @@ namespace olc
 		olc::vi2d	vPixelSize = { 4, 4 };
 		olc::vi2d   vScreenPixelSize = { 4, 4 };
 		olc::vi2d	vMousePos = { 0, 0 };
+		olc::vi2d	vLockedMousePos = { 0, 0 };
 		int32_t		nMouseWheelDelta = 0;
 		olc::vi2d	vMousePosCache = { 0, 0 };
 		olc::vi2d   vMouseWindowPos = { 0, 0 };
@@ -1100,6 +1103,7 @@ namespace olc
 	public:
 		// "Break In" Functions
 		void olc_UpdateMouse(int32_t x, int32_t y);
+		void olc_UpdateLockedMouse(int32_t x, int32_t y);
 		void olc_UpdateMouseWheel(int32_t delta);
 		void olc_UpdateWindowSize(int32_t x, int32_t y);
 		void olc_UpdateViewport();
@@ -1961,10 +1965,16 @@ namespace olc
 		// Calculate "scale" offset
 		x = (int32_t)((float)x * ((float)(vWindowSize.x - (float)(2 * vViewPos.x)) / ((float)vScreenSize.x * (float)vPixelSize.x)));
 		y = (int32_t)((float)y * ((float)(vWindowSize.y - (float)(2 * vViewPos.y)) / ((float)vScreenSize.y * (float)vPixelSize.y)));
+
 		// Offset by the start of the canvas
 		x += vViewPos.x;
 		y += vViewPos.y;
 		platform->LockMousePos(x, y);
+	}
+
+	const olc::vi2d& PixelGameEngine::GetLockedMousePos() const
+	{
+		return vLockedMousePos;
 	}
 
 	int32_t PixelGameEngine::GetMouseWheel() const
@@ -3042,6 +3052,24 @@ namespace olc
 		if (vMousePosCache.x < 0) vMousePosCache.x = 0;
 		if (vMousePosCache.y < 0) vMousePosCache.y = 0;
 	}
+
+	// Don't know the best how to save most of the code above 
+	// and at the same time change vLockedMousePos, so right now
+	// it's some thing like this
+	void PixelGameEngine::olc_UpdateLockedMouse(int32_t x, int32_t y)
+	{
+		// Full Screen mode may have a weird viewport we must clamp to
+		x -= vViewPos.x;
+		y -= vViewPos.y;
+		vLockedMousePos.x = (int32_t)(((float)x / (float)(vWindowSize.x - (vViewPos.x * 2)) * (float)vScreenSize.x));
+		vLockedMousePos.y = (int32_t)(((float)y / (float)(vWindowSize.y - (vViewPos.y * 2)) * (float)vScreenSize.y));
+		if (vMousePosCache.x >= (int32_t)vScreenSize.x)	vLockedMousePos.x = vScreenSize.x - 1;
+		if (vMousePosCache.y >= (int32_t)vScreenSize.y)	vLockedMousePos.y = vScreenSize.y - 1;
+		if (vMousePosCache.x < 0) vLockedMousePos.x = 0;
+		if (vMousePosCache.y < 0) vLockedMousePos.y = 0;
+	}
+
+
 
 	void PixelGameEngine::olc_UpdateMouseState(int32_t button, bool state)
 	{
@@ -4535,6 +4563,7 @@ namespace olc
 		virtual olc::rcode LockMousePos(const int32_t& x, const int32_t& y) override 
 		{ 
 			POINT pPos = { x, y };
+			ptrPGE->olc_UpdateLockedMouse(x, y);
 
 			// Shift mouse by the start of canvas
 			ClientToScreen(olc_hWnd, &pPos);
@@ -5293,21 +5322,17 @@ namespace olc
 
 		virtual olc::rcode LockMousePos(const int32_t& x, const int32_t& y) override 
 		{
-			// FIXME:
-			//emscripten_request_pointerlock("#canvas", true);
-			EM_ASM({
-				let canvas = document.querySelector('canvas');
-				canvas.requestPointerLock = canvas.requestPointerLock ||
-                            canvas.mozRequestPointerLock;
+			EmscriptenPointerlockChangeEvent pLockStat;
+			emscripten_get_pointerlock_status(&pLockStat);
 
-				canvas.onclick = () => canvas.requestPointerLock();
+			if (!pLockStat.isActive) {
+				emscripten_request_pointerlock("#canvas", true);
 
-				document.addEventListener('pointerlockchange', lockChangeAlert, false);
+				EmscriptenMouseEvent mState;
+				emscripten_get_mouse_status(&mState);
 
-				function lockChangeAlert() {
-					document.addEventListener("mousemove", (ev) => console.log(ev.x, ev.y), false);
-				}
-			});
+				ptrPGE->olc_UpdateLockedMouse(mState.targetX, mState.targetY);
+			}
 			return olc::rcode::OK;
 		}
 
@@ -5594,8 +5619,13 @@ namespace olc
 		static EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent* e, void* userData)
 		{
 			//Mouse Movement
-			if (eventType == EMSCRIPTEN_EVENT_MOUSEMOVE)
-				ptrPGE->olc_UpdateMouse(e->targetX, e->targetY);
+			if (eventType == EMSCRIPTEN_EVENT_MOUSEMOVE) {
+				EmscriptenPointerlockChangeEvent pLockStat;
+				emscripten_get_pointerlock_status(&pLockStat);
+
+				if (!pLockStat.isActive) ptrPGE->olc_UpdateMouse(e->targetX, e->targetY);
+				else ptrPGE->olc_UpdateMouse(e->targetX + ((e->movementX / 4) * 4), e->targetY + ((e->movementY / 4) * 4));
+			}
 
 
 			//Mouse button press
