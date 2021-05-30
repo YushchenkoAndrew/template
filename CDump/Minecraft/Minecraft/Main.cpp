@@ -1,5 +1,8 @@
 #define OLC_PGE_APPLICATION
 #include "GraphicsEngine.h"
+#include "Json.h"
+
+char JSON::cCurr = '\0';
 
 class Minecraft : public olc::PixelGameEngine {
 public:
@@ -26,8 +29,10 @@ private:
 
 int main()
 {
-    Minecraft demo;
-    if (demo.Construct(250, 250, 4, 4))
-        demo.Start();
+    //Minecraft demo;
+    //if (demo.Construct(250, 250, 4, 4))
+    //    demo.Start();
+
+    JSON::parse("Test.json");
     return 0;
 }
