@@ -33,6 +33,7 @@ int main()
     //if (demo.Construct(250, 250, 4, 4))
     //    demo.Start();
 
-    JSON::parse("Test.json");
+    JSON::json_t json = JSON::parse("Test.json");
+    JSON::Print(json);
     return 0;
 }

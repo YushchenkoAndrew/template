@@ -1,8 +1,1 @@
-{
-  "test": "Hello world",
-  "Num": 15,
-  "obj": {
-    "name": "obj",
-    "size" :  18.52
-  }
-}
+"test"
