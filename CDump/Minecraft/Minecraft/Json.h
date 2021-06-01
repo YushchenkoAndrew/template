@@ -15,6 +15,7 @@ enum class value_t {
 	JSON
 };
 
+struct sMap;
 
 class jObject {
 public:
@@ -22,14 +23,28 @@ public:
 
 	template<typename T>
 	void SetValue(T v, value_t t) {
-		if (value != NULL) free(value);
+		//if (value != NULL) free(value);
 
 		type = t;
-		size = sizeof(v);
+		size = sizeof(T);
 		value = malloc(size);
-		if (value != NULL) memcpy(value, &v, sizeof(v));
+		if (value != NULL) memcpy(value, &v, sizeof(T));
 		else size = 0u;
 	}
+
+	//template<>
+	//void SetValue(sMap*& v, value_t t) {
+	//	if (value != NULL) free(value);
+
+	//	type = t;
+	//	size = sizeof(v);
+	//	value = (void *)v;
+	//	//value = malloc(size);
+	//	//if (value != NULL) memcpy(value, &v, sizeof(v));
+	//	//else size = 0u;
+	//}
+
+
 
 	//template<>
 	//void SetValue(std::map<std::string, value_t> v, value_t t) {
@@ -59,7 +74,33 @@ public:
 	size_t size = 0;
 };
 
-typedef std::map<std::string, jObject> json_t;
+class sMap {
+public:
+	std::string key;
+	//jObject* value;
+	jObject value;
+
+	sMap* next;
+
+	//jObject*& operator[] (const std::string& str) {
+	//	key = str;
+	//	return value;
+	//}
+};
+
+//struct sMap {
+//	std::string key;
+//	jObject* value;
+//
+//	sMap* next;
+//
+//	jObject*& operator[] (const std::string& str) {
+//		key = str;
+//		return value;
+//	}
+//};
+
+//typedef std::map<std::string, jObject> json_t;
 
 
 //template <typename T>
@@ -223,7 +264,11 @@ private:
 		SkipBlanks(iFile);
 
 		uint8_t bFirst = 1u;
-		std::map<std::string, jObject> json;
+		//std::map<std::string, jObject> json;
+
+		sMap json;
+		//sMap* json = (sMap*)malloc(sizeof(sMap));
+		//if ((void *)json == NULL) return 0u;
 
 		while (cCurr != '}' && !iFile.eof()) {
 			if (!bFirst) {
@@ -236,11 +281,20 @@ private:
 			SkipBlanks(iFile);
 			SkipColon(iFile);
 
-			jObject value;
-			ParseValue(iFile, value);
+
+			//jObject* value = (jObject *)malloc(sizeof(jObject));
+
+			//jObject value;
+			//ParseValue(iFile, value);
 
 
-			json[*((std::string*)key.value)] = value;
+			//(*json)[*((std::string*)key.value)] = value;
+			json.key = *((std::string*)key.value);
+			//json->value = value;
+
+			ParseValue(iFile, json.value);
+
+			//json[*((std::string*)key.value)] = value;
 
 			//json[std::get<std::string>(key)] = value;
 			bFirst = 0u;
@@ -250,8 +304,9 @@ private:
 
 		sVar.SetValue(json, value_t::JSON);
 
-		std::map<std::string, jObject>* temp = reinterpret_cast<std::map<std::string, jObject>*>(sVar.value);
-		printf("%d", *((int32_t *)(*temp)["test"].value));
+
+		//std::map<std::string, jObject>* temp = reinterpret_cast<std::map<std::string, jObject>*>(sVar.value);
+		//printf("%d", *((int32_t *)(*temp)["test"].value));
 
 		//sVar = jObject(json);
 		//sVar.type = JSON::MAP;
@@ -289,6 +344,12 @@ public:
 		//std::map<std::string, jObject> temp = *((std::map<std::string, jObject>*)json.value);
 
 		//jObject temp = (*((std::map<std::string, jObject>*)json.value))["test"];
+
+
+		printf("%s", ((std::string*)((*(sMap*)json.value).value).value)->c_str());
+		//printf("%d", *(int32_t*)((*(sMap*)json.value).value).value);
+
+		//printf("%d", *(int32_t *)((*(sMap*)json.value).value).value);
 
 		//printf("%s", (*((std::string *)json.value)).c_str());
 		//printf("%.5f", *((float *)json.value));
