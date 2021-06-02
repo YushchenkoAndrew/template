@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <vector>
 
 
 enum class value_t {
@@ -10,110 +11,71 @@ enum class value_t {
 	INT32,
 	FLOAT,
 	STRING,
-	JSON
+	JSON,
+	LIST
 };
 
 template <typename T>
-struct Map2Type {
-	const std::string v;
-	inline Map2Type(const std::string& v_) : v(v_) {}
+struct Type2Type {
+	inline Type2Type() {}
+	inline ~Type2Type() {}
 };
-
-class sMap;
 
 class jObject {
 public:
-
-
-	//template<typename T>
-	//void SetValue(T v, value_t t) {
-	//	//if (value != NULL) free(value);
-
-	//	type = t;
-	//	size = sizeof(T);
-	//	value = malloc(size);
-	//	if (value != NULL) memcpy(value, &v, sizeof(T));
-	//	else size = 0u;
-	//}
-
 	template<typename T>
 	void SetValue(const T& v, const value_t t) {
 		type = t;
 		value = std::make_shared<T>(v);
 	}
 
-
-
-	// TODO: Delete Tree
-	~jObject() {
-		//if (value == NULL) return;
-		//if (type != value_t::JSON) free(value);
+	template<typename T>
+	void SetValue(Type2Type<T>, const value_t t) {
+		type = t;
+		value = std::make_shared<T>();
 	}
 
 	template<typename T>
-	T* GetValue() {
-		return std::static_pointer_cast<T>(value).get();
+	void MoveValue(std::shared_ptr<T>& dst) const {
+		dst = std::move(std::static_pointer_cast<T>(value));
 	}
 
-public:
-	//std::string key;
-	//void* value = NULL;
+	template<typename T>
+	T* GetValue() const {
+		return value.get() != nullptr ? std::static_pointer_cast<T>(value).get() : nullptr;
+	}
+
+	const value_t GetType() {
+		return type;
+	}
+
+private:
 	std::shared_ptr<void> value;
 	value_t type = value_t::UNDEFINED;
 };
 
-//class sMap {
-//public:
-//
-//	//sMap() {}
-//
-//	//sMap(sMap* ptr) : value(ptr->value), key(ptr->key) {
-//	//	std::cout << ptr->key;
-//	//}
-//
-//	void SetValue(const std::string& k, const jObject& v) {
-//		if (next != nullptr) return next.get()->SetValue(k, v);
-//
-//		key = k;
-//		value = v;
-//	}
-//
-//
-//	template<typename T>
-//	T* operator[] (Map2Type<T> key) {
-//		std::cout << key.v;
-//		//if (std::string(K) != key && next != nullptr) return (*next.get())[k];
-//		//else return nullptr;
-//		return value.GetValue<T>();
-//	}
-//
-//public:
-//	std::string key;
-//	//jObject* value;
-//	jObject value;
-//
-//	//sMap* next;
-//	std::unique_ptr<sMap> next;
-//	//std::unique_ptr<sMap> prev;
-//};
-
 typedef std::map<std::string, jObject> json_t;
+typedef std::vector<jObject> list_t;
 
 class JSON {
 
 private:
-	static void SkipComma(std::ifstream& iFile) {
+	static uint8_t SkipComma(std::ifstream& iFile) {
 		if (cCurr != ',') {
 			printf("Expected \",\"\n");
+			return 0u;
 		}
 		iFile.get(cCurr);
+		return 1u;
 	}
 
-	static void SkipColon(std::ifstream& iFile) {
+	static uint8_t SkipColon(std::ifstream& iFile) {
 		if (cCurr != ':') {
 			printf("Expected \":\"\n");
+			return 0u;
 		}
 		iFile.get(cCurr);
+		return 1u;
 	}
 
 
@@ -127,9 +89,12 @@ private:
 		std::string sValue = "";
 		iFile.get(cCurr);
 		while (cCurr != '"' && !iFile.eof()) {
+			if (cCurr == '\\') iFile.get(cCurr);
 			sValue += cCurr;
 			iFile.get(cCurr);
 		}
+
+		if (cCurr != '"') return 0;
 		
 		sVar.SetValue(sValue, value_t::STRING);
 		iFile.get(cCurr);
@@ -159,7 +124,9 @@ private:
 			}
 		}
 		
-		if (iNum == 0 && fNum == 0.0f) return 0u;
+		// Quick fix with sSign check, just in the case of 0
+		// don't assign sign to it
+		if (iNum == 0 && fNum == 0.0f && cSign != '0') return 0u;
 
 		if (fNum == 0.0f) {
 			iNum *= cSign == '-' ? -1 : 1;
@@ -178,20 +145,9 @@ private:
 		SkipBlanks(iFile);
 
 		uint8_t bFirst = 1u;
-		//std::map<std::string, jObject> json;
 
-		//sVar.SetValue(sMap, value_t::JSON);
-		//sMap* json = sVar.GetValue<sMap>();
-
-		sVar.value = std::make_shared<json_t>();
+		sVar.SetValue(Type2Type<json_t>(), value_t::JSON);
 		json_t* json = sVar.GetValue<json_t>();
-
-		//sVar.value = std::make_shared<sMap>();
-		//sMap* json = sVar.GetValue<sMap>();
-
-		//sMap json;
-		//sMap* json = (sMap*)malloc(sizeof(sMap));
-		//if ((void *)json == NULL) return 0u;
 
 		while (cCurr != '}' && !iFile.eof()) {
 			if (!bFirst) {
@@ -200,98 +156,79 @@ private:
 			}
 
 			jObject key;
-			ParseString(iFile, key);
+			if (!ParseString(iFile, key) || key.GetType() != value_t::STRING) return 0u;
+
 			SkipBlanks(iFile);
-			SkipColon(iFile);
 
-
-			//jObject* value = (jObject *)malloc(sizeof(jObject));
-
-			//jObject value;
-			//ParseValue(iFile, value);
-
-			ParseValue(iFile, (*json)[*key.GetValue<std::string>()]);
-			//ParseValue(iFile, json->value);
-
-
-			//(*json)[*((std::string*)key.value)] = value;
-			//json.key = *((std::string*)key.value);
-			//json->value = value;
-
-			//ParseValue(iFile, json.value);
-
-			//json->SetValue(*key.GetValue<std::string>(), value);
-
-			//json[*((std::string*)key.value)] = value;
-
-			//json[std::get<std::string>(key)] = value;
+			if (!SkipColon(iFile) || !ParseValue(iFile, (*json)[*key.GetValue<std::string>()])) return 0u;
 			bFirst = 0u;
 		}
 
-		//printf("%d", *((int32_t *)json["test"].value));
-
-		//sVar.SetValue(new sMap(&json), value_t::JSON);
-		//sVar.SetValue(json, value_t::JSON);
-
-		//printf("%d", *json->GetValue<int32_t>(std::string("test")));
-
-		//std::map<std::string, jObject>* temp = reinterpret_cast<std::map<std::string, jObject>*>(sVar.value);
-		//printf("%d", *((int32_t *)(*temp)["test"].value));
-
-		//sVar = jObject(json);
-		//sVar.type = JSON::MAP;
-		//sVar.value = json;
+		if (cCurr != '}') return 0u;
 
 		iFile.get(cCurr);
 		return 1u;
 	}
 
-	static void ParseValue(std::ifstream& iFile, jObject& sVar) {
+	static uint8_t ParseList(std::ifstream& iFile, jObject& sVar) {
+		if (cCurr != '[') return 0u;
+		iFile.get(cCurr);
 		SkipBlanks(iFile);
 
-		if (!ParseString(iFile, sVar) && !ParseNumber(iFile, sVar)
-			&& !ParseObject(iFile, sVar)
-			) {
-			printf("Exception: Unknown type\n");
+		uint8_t bFirst = 1u;
+
+		sVar.SetValue(Type2Type<list_t>(), value_t::LIST);
+		list_t* list = sVar.GetValue<list_t>();
+
+		while (cCurr != ']' && !iFile.eof()) {
+			if (!bFirst) {
+				if (!SkipComma(iFile)) return 0u;
+			}
+
+			list->push_back(jObject());
+			if (!ParseValue(iFile, list->back())) return 0u;
+			bFirst = 0u;
 		}
 
+		if (cCurr != ']') return 0u;
+
+		iFile.get(cCurr);
+		return 1u;
+	}
+
+	// Didn't implement true/false and null
+	static uint8_t ParseValue(std::ifstream& iFile, jObject& sVar) {
+		SkipBlanks(iFile);
+
+		if (!ParseString(iFile, sVar) && !ParseNumber(iFile, sVar) && !ParseObject(iFile, sVar) && !ParseList(iFile, sVar)) {
+			printf("Exception: Unknown type\n");
+			return 0u;
+		}
 
 		SkipBlanks(iFile);
+		return 1u;
 	}
 
 
 public:
-	static void parse(const std::string& sPath) {
+	static uint8_t parse(const std::string& sPath, std::shared_ptr<json_t>& json) {
 		std::ifstream iFile;
 		iFile.open(sPath);
-		//if (!iFile.is_open()) {
-		//	printf("Unable to open file");
-		//	return;
-		//}
+		if (!iFile.is_open()) {
+			printf("Unable to open file");
+			return 0u;
+		}
 
-		jObject json;
+		jObject obj;
 		iFile.get(cCurr);
-		ParseValue(iFile, json);
-
-		printf("%d\n", *(*json.GetValue<json_t>())["test"].GetValue<int32_t>());
-		printf("%.5f\n", *(*json.GetValue<json_t>())["test2"].GetValue<float>());
-		printf("%s\n", (*(*json.GetValue<json_t>())["test3"].GetValue<json_t>())["test"].GetValue<std::string>()->c_str());
-		//printf("%d", *(*json.GetValue<sMap>())[Map2Type<int32_t>(std::string("test"))]);
-		//printf("%d", *json.GetValue<sMap>()->GetValue<int32_t>(std::string("test")));
-		//printf("%s", json.GetValue<sMap>()->key.c_str());
-		//printf("%s", json.GetValue<std::string>()->c_str());
-		//printf("%.5f", *json.GetValue<float>());
-		//printf("%.5f", *(std::static_pointer_cast<float>(json.value)).get());
-
-		//std::map<std::string, jObject> temp = *((std::map<std::string, jObject>*)json.value);
-
-		//jObject temp = (*((std::map<std::string, jObject>*)json.value))["test"];
+		uint8_t err = ParseValue(iFile, obj);
 
 
-		//printf("%s", ((std::string*)((*(sMap*)json.value).value).value)->c_str());
+		if (obj.GetType() == value_t::JSON) obj.MoveValue(json);
+		else err = 0u;
 
 		iFile.close();
-		//return std::any_cast<json_t>(json.value);
+		return err;
 	}
 
 private:

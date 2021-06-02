@@ -32,8 +32,13 @@ int main()
     //Minecraft demo;
     //if (demo.Construct(250, 250, 4, 4))
     //    demo.Start();
+    
+    std::shared_ptr<json_t> json;
+    if (JSON::parse("Test.json", json)) {
+        printf("%.2f\n", *(*json.get())["test2"].GetValue<float>());
+	    printf("%s\n", (*json.get())["obj"].GetValue<json_t>()->at("test").GetValue<std::string>()->c_str());
+	    printf("%d\n", *(*json.get())["arr"].GetValue<list_t>()->at(1).GetValue<int32_t>());
+    }
 
-    JSON::parse("Test.json");
-    //JSON::Print(json);
     return 0;
 }
