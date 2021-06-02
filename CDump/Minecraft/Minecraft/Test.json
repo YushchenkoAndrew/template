@@ -4,5 +4,6 @@
   "obj": {
     "test":  "Hello world"
   },
-  "arr": [ 0, 6, 5 ]
+  "arr": [ 0, 6, 5 ],
+  "test3":  false
 }

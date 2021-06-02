@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 
+#define KEYWORDS_SIZE 3
 
 enum class value_t {
 	UNDEFINED,
@@ -12,8 +13,13 @@ enum class value_t {
 	FLOAT,
 	STRING,
 	JSON,
-	LIST
+	LIST,
+	BOOL
 };
+
+const char* sKeywords[KEYWORDS_SIZE] = { "null$", "true$", "false$" };
+const bool vKeywords[KEYWORDS_SIZE] = { NULL, true, false };
+const value_t tKeywords[KEYWORDS_SIZE] = { value_t::UNDEFINED, value_t::BOOL, value_t::BOOL };
 
 template <typename T>
 struct Type2Type {
@@ -57,70 +63,71 @@ private:
 typedef std::map<std::string, jObject> json_t;
 typedef std::vector<jObject> list_t;
 
+
 class JSON {
 
 private:
 	static uint8_t SkipComma(std::ifstream& iFile) {
-		if (cCurr != ',') {
+		if (cCurr() != ',') {
 			printf("Expected \",\"\n");
 			return 0u;
 		}
-		iFile.get(cCurr);
+		iFile.get(cCurr());
 		return 1u;
 	}
 
 	static uint8_t SkipColon(std::ifstream& iFile) {
-		if (cCurr != ':') {
+		if (cCurr() != ':') {
 			printf("Expected \":\"\n");
 			return 0u;
 		}
-		iFile.get(cCurr);
+		iFile.get(cCurr());
 		return 1u;
 	}
 
 
 private:
 	static void SkipBlanks(std::ifstream& iFile) {
-		while ((cCurr == ' ' || cCurr == '\n' || cCurr == '\t' || cCurr == '\r') && iFile >> cCurr);
+		while ((cCurr() == ' ' || cCurr() == '\n' || cCurr() == '\t' || cCurr() == '\r') && iFile >> cCurr());
 	}
 
 	static uint8_t ParseString(std::ifstream& iFile, jObject& sVar) {
-		if (cCurr != '"') return 0u;
+		if (cCurr() != '"') return 0u;
 		std::string sValue = "";
-		iFile.get(cCurr);
-		while (cCurr != '"' && !iFile.eof()) {
-			if (cCurr == '\\') iFile.get(cCurr);
-			sValue += cCurr;
-			iFile.get(cCurr);
+		iFile.get(cCurr());
+		while (cCurr() != '"' && !iFile.eof()) {
+			if (cCurr() == '\\') iFile.get(cCurr());
+			sValue += cCurr();
+			iFile.get(cCurr());
 		}
 
-		if (cCurr != '"') return 0;
+		if (cCurr() != '"') return 0;
 		
 		sVar.SetValue(sValue, value_t::STRING);
-		iFile.get(cCurr);
+		iFile.get(cCurr());
 		return 1u;
 	}
 
 	static uint8_t ParseNumber(std::ifstream& iFile, jObject& sVar) {
-		const char cSign = cCurr;
+		const char cSign = cCurr();
 		int32_t iNum = 0;
 		float fNum = 0.0f;
-		if (cCurr == '-') iFile.get(cCurr);
+		if (cCurr() == '-') iFile.get(cCurr());
 
 		// Parse Integer part of Number
-		while (cCurr >= '0' && cCurr <= '9' && !iFile.eof()) {
-			iNum = iNum * 10 + cCurr - (int32_t)'0';
-			iFile.get(cCurr);
+		while (cCurr() >= '0' && cCurr() <= '9' && !iFile.eof()) {
+			iNum = iNum * 10 + cCurr() - (int32_t)'0';
+			iFile.get(cCurr());
 		}
 
 		// Parse Float part of Number
-		if (cCurr == '.') {
-			iFile.get(cCurr);
+		if (cCurr() == '.') {
+			iFile.get(cCurr());
 			float fPos = 0.1f;
-			while (cCurr >= '0' && cCurr <= '9' && !iFile.eof()) {
-				fNum += (cCurr - (float)'0') * fPos;
+			while (cCurr() >= '0' && cCurr() <= '9' && !iFile.eof()) {
+				fNum += (cCurr() - (float)'0') * fPos;
 				fPos *= 0.1f;
-				iFile.get(cCurr);
+				iFile.get(cCurr());
 			}
 		}
 		
@@ -140,8 +147,8 @@ private:
 	}
 
 	static uint8_t ParseObject(std::ifstream& iFile, jObject& sVar) {
-		if (cCurr != '{') return 0u;
-		iFile.get(cCurr);
+		if (cCurr() != '{') return 0u;
+		iFile.get(cCurr());
 		SkipBlanks(iFile);
 
 		uint8_t bFirst = 1u;
@@ -149,7 +156,7 @@ private:
 		sVar.SetValue(Type2Type<json_t>(), value_t::JSON);
 		json_t* json = sVar.GetValue<json_t>();
 
-		while (cCurr != '}' && !iFile.eof()) {
+		while (cCurr() != '}' && !iFile.eof()) {
 			if (!bFirst) {
 				SkipComma(iFile);
 				SkipBlanks(iFile);
@@ -164,15 +171,15 @@ private:
 			bFirst = 0u;
 		}
 
-		if (cCurr != '}') return 0u;
+		if (cCurr() != '}') return 0u;
 
-		iFile.get(cCurr);
+		iFile.get(cCurr());
 		return 1u;
 	}
 
 	static uint8_t ParseList(std::ifstream& iFile, jObject& sVar) {
-		if (cCurr != '[') return 0u;
-		iFile.get(cCurr);
+		if (cCurr() != '[') return 0u;
+		iFile.get(cCurr());
 		SkipBlanks(iFile);
 
 		uint8_t bFirst = 1u;
@@ -180,7 +187,7 @@ private:
 		sVar.SetValue(Type2Type<list_t>(), value_t::LIST);
 		list_t* list = sVar.GetValue<list_t>();
 
-		while (cCurr != ']' && !iFile.eof()) {
+		while (cCurr() != ']' && !iFile.eof()) {
 			if (!bFirst) {
 				if (!SkipComma(iFile)) return 0u;
 			}
@@ -190,17 +197,34 @@ private:
 			bFirst = 0u;
 		}
 
-		if (cCurr != ']') return 0u;
+		if (cCurr() != ']') return 0u;
 
-		iFile.get(cCurr);
+		iFile.get(cCurr());
 		return 1u;
+	}
+
+	static uint8_t ParseKeywords(std::ifstream& iFile, jObject& sVar) {
+		int32_t j = 0;
+		for (int32_t i= 0; i < KEYWORDS_SIZE; i++) {
+			while (sKeywords[i][j] != '$' && sKeywords[i][j] == cCurr() && !iFile.eof()) {
+				iFile.get(cCurr());
+				j++;
+			}
+
+			if (sKeywords[i][j] == '$') {
+				sVar.SetValue(vKeywords[i], tKeywords[i]);
+				return 1u;
+			}
+		}
+
+		return 0u;
 	}
 
 	// Didn't implement true/false and null
 	static uint8_t ParseValue(std::ifstream& iFile, jObject& sVar) {
 		SkipBlanks(iFile);
 
-		if (!ParseString(iFile, sVar) && !ParseNumber(iFile, sVar) && !ParseObject(iFile, sVar) && !ParseList(iFile, sVar)) {
+		if (!ParseString(iFile, sVar) && !ParseNumber(iFile, sVar) && !ParseObject(iFile, sVar) && !ParseList(iFile, sVar) && !ParseKeywords(iFile, sVar)) {
 			printf("Exception: Unknown type\n");
 			return 0u;
 		}
@@ -220,7 +244,7 @@ public:
 		}
 
 		jObject obj;
-		iFile.get(cCurr);
+		iFile.get(cCurr());
 		uint8_t err = ParseValue(iFile, obj);
 
 
@@ -232,5 +256,9 @@ public:
 	}
 
 private:
-	static char cCurr;
+	// Use Singleton Meyers
+	static inline char& cCurr() {
+		static char cCurr;
+		return cCurr;
+	}
 };

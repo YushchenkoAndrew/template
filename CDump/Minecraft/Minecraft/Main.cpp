@@ -2,8 +2,6 @@
 #include "GraphicsEngine.h"
 #include "Json.h"
 
-char JSON::cCurr = '\0';
-
 class Minecraft : public olc::PixelGameEngine {
 public:
     Minecraft() {
@@ -38,6 +36,7 @@ int main()
         printf("%.2f\n", *(*json.get())["test2"].GetValue<float>());
 	    printf("%s\n", (*json.get())["obj"].GetValue<json_t>()->at("test").GetValue<std::string>()->c_str());
 	    printf("%d\n", *(*json.get())["arr"].GetValue<list_t>()->at(1).GetValue<int32_t>());
+	    printf("%d\n", *(*json.get())["test3"].GetValue<bool>());
     }
 
     return 0;
