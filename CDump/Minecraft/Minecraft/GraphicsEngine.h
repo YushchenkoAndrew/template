@@ -241,5 +241,5 @@ private:
 
 	// FIXME:
 	bool bStart = true;
-	bool bFixedMousePos = true;
+	bool bFixedMousePos = false;
 };
