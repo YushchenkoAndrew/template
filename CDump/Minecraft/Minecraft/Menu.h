@@ -2,35 +2,42 @@
 #include "olcPixelGameEngine.h"
 #include "Json.h"
 
-class cMenu {
+#define PATCH_SIZE 8
+
+
+class Menu {
 
 public:
-	cMenu() { 
+	Menu() { 
 		sName = "root";
 	}
 
+	Menu(const std::string& name) { 
+		sName = name;
+	}
+
 	void Load(const std::string& path);
-	void Draw(olc::PixelGameEngine& GameEngine, float fElapsedTime);
+	void Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, float fElapsedTime, olc::vi2d& vOffset);
 
 protected:
-	void Build(const std::shared_ptr<json_t>& json);
+	void Build(const list_t& list);
 
 public:
 
 	//// Setters
-	cMenu& SetTable(int32_t row, int32_t col) { vCellTable = { row, col }; return *this; }
-	cMenu& SetId(int32_t id) { nId = id; return *this; }
-	cMenu& SetEnable(bool flag) { bEnable = flag; return *this; }
+	Menu& SetTable(int32_t row, int32_t col) { vTable = { row, col }; return *this; }
+	Menu& SetId(int32_t id) { nId = id; return *this; }
+	Menu& SetEnable(bool flag) { bEnable = flag; return *this; }
 
 	// Getters
-	//std::string& GetName() { return sName; }
+	std::string& GetName() { return sName; }
 	int32_t& GetId() { return nId; }
-	//olc::vi2d GetSize() { return { (int32_t)sName.size(), 1 }; }
+	olc::vi2d GetSize() { return { int32_t(sName.size()), 1 }; }
 
 	// Additional func
 	bool HasItems() { return !items.empty(); }
 
-	cMenu& operator[] (const std::string& key) { return items[key]; }
+	Menu& operator[] (const std::string& key) { return items[key]; }
 
 protected:
 	std::string sName;
@@ -38,11 +45,13 @@ protected:
 
 	int32_t nId = -1;
 	int32_t nRows = 0;
-	int32_t nVisibleRows = 0;
+	int32_t nVisibleRow = 0;
 
-	olc::vi2d vCellTable = { 1, 0 };
+	olc::vi2d vTable = { 1, 0 };
 	olc::vi2d vCellSize = { 0, 0 };
 	olc::vi2d vCellPadding = { 2, 0 };
+	olc::vi2d vSizeInPatch = { 0, 0 };
+	olc::vi2d vPatch = { PATCH_SIZE, PATCH_SIZE };
 
-	std::map<std::string, cMenu> items;
+	std::map<std::string, Menu> items;
 };

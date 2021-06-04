@@ -10,6 +10,7 @@ public:
 
     bool OnUserCreate() override {
         cEngine3D.Construct(ScreenHeight(), ScreenWidth());
+        cMenu.Load("./assets/Menu.json");
 
 
         sprMenu = std::make_unique<olc::Sprite>("./assets/Sprite-0001.png");
@@ -21,16 +22,15 @@ public:
     bool OnUserUpdate(float fElapsedTime) override {
         cEngine3D.Draw(*this, fElapsedTime);
 
-        SetPixelMode(olc::Pixel::MASK);
-        olc::vi2d mouse = GetMousePos();
-        DrawDecal(mouse, decMenu.get());
-        SetPixelMode(olc::Pixel::NORMAL);
+        olc::vi2d vOffset = { 10, 10 };
+        cMenu.Draw(*this, decMenu, 0.0f, vOffset);
 
         return true;
     }
 
 private:
     GraphicsEngine cEngine3D;
+    Menu cMenu;
     std::unique_ptr<olc::Sprite> sprMenu;
     std::unique_ptr<olc::Decal> decMenu;
 
