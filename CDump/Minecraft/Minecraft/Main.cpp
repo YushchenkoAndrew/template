@@ -1,6 +1,6 @@
 #define OLC_PGE_APPLICATION
 #include "GraphicsEngine.h"
-#include "Json.h"
+#include "Menu.h"
 
 class Minecraft : public olc::PixelGameEngine {
 public:
@@ -10,34 +10,37 @@ public:
 
     bool OnUserCreate() override {
         cEngine3D.Construct(ScreenHeight(), ScreenWidth());
+
+
+        sprMenu = std::make_unique<olc::Sprite>("./assets/Sprite-0001.png");
+        decMenu = std::make_unique<olc::Decal>(sprMenu.get());
+
         return true;
     }
 
     bool OnUserUpdate(float fElapsedTime) override {
-
         cEngine3D.Draw(*this, fElapsedTime);
+
+        SetPixelMode(olc::Pixel::MASK);
+        olc::vi2d mouse = GetMousePos();
+        DrawDecal(mouse, decMenu.get());
+        SetPixelMode(olc::Pixel::NORMAL);
 
         return true;
     }
 
 private:
     GraphicsEngine cEngine3D;
+    std::unique_ptr<olc::Sprite> sprMenu;
+    std::unique_ptr<olc::Decal> decMenu;
 
 };
 
 int main()
 {
-    //Minecraft demo;
-    //if (demo.Construct(250, 250, 4, 4))
-    //    demo.Start();
+    Minecraft demo;
+    if (demo.Construct(250, 250, 4, 4))
+        demo.Start();
     
-    std::shared_ptr<json_t> json;
-    if (JSON::parse("Test.json", json)) {
-        printf("%.2f\n", *(*json.get())["test2"].GetValue<float>());
-	    printf("%s\n", (*json.get())["obj"].GetValue<json_t>()->at("test").GetValue<std::string>()->c_str());
-	    printf("%d\n", *(*json.get())["arr"].GetValue<list_t>()->at(1).GetValue<int32_t>());
-	    printf("%d\n", *(*json.get())["test3"].GetValue<bool>());
-    }
-
     return 0;
 }
