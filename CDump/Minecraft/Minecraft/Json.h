@@ -17,10 +17,6 @@ enum class value_t {
 	BOOL
 };
 
-const char* sKeywords[KEYWORDS_SIZE] = { "null$", "true$", "false$" };
-const bool vKeywords[KEYWORDS_SIZE] = { NULL, true, false };
-const value_t tKeywords[KEYWORDS_SIZE] = { value_t::UNDEFINED, value_t::BOOL, value_t::BOOL };
-
 template <typename T>
 struct Type2Type {
 	inline Type2Type() {}
@@ -261,4 +257,9 @@ private:
 		static char cCurr;
 		return cCurr;
 	}
+
+	static const char* sKeywords[KEYWORDS_SIZE];
+	static const bool vKeywords[KEYWORDS_SIZE];
+	static const value_t tKeywords[KEYWORDS_SIZE];
 };
+
