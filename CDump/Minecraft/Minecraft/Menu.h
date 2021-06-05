@@ -17,7 +17,7 @@ public:
 	}
 
 	void Load(const std::string& path);
-	void Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, float fElapsedTime, olc::vi2d& vOffset);
+	void Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, olc::vi2d& vOffset, float& fElapsedTime);
 
 protected:
 	void Build(const list_t& list);
@@ -37,7 +37,16 @@ public:
 	// Additional func
 	bool HasItems() { return !items.empty(); }
 
-	Menu& operator[] (const std::string& key) { return items[key]; }
+	void OnMove(olc::vi2d vMove);
+	void OnConfirm();
+
+	Menu& operator[] (const std::string& key) {
+		if (itemIndex.count(key) == 0) {
+			itemIndex[key] = items.size();
+			items.push_back(Menu(key));
+		}
+		return items[itemIndex[key]];
+	}
 
 protected:
 	std::string sName;
@@ -53,5 +62,6 @@ protected:
 	olc::vi2d vSizeInPatch = { 0, 0 };
 	olc::vi2d vPatch = { PATCH_SIZE, PATCH_SIZE };
 
-	std::map<std::string, Menu> items;
+	std::map<std::string, size_t> itemIndex;
+	std::vector<Menu> items;
 };
