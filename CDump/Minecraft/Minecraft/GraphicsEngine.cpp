@@ -14,7 +14,15 @@ void GraphicsEngine::Construct(int32_t iHeight, int32_t iWidth) {
 	mCube += sField::CubeMap(0.0f, -5.0f);
 	mCube += sField::CubeMap(0.0f, 0.0f, 5.0f);
 	mCube += sField::CubeMap(0.0f, 0.0f, -5.0f);
+
+	// Create a simple map
+	for (int32_t i = -10; i < 10; i++) {
+		for (int32_t j = -10; j < 10; j++) {
+			mCube += sField::CubeMap((float)i, -20.0f, (float)j);
+		}
+	}
 }
+
 Matrix4D GraphicsEngine::CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget) {
 	sPoint3D vUp = { 0.0f, 1.0f, 0.0f };
 	sPoint3D vDirection = sPoint3D::normalize(vPos - vTarget);
@@ -267,25 +275,30 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 
 			std::list<sTriangle> listClippedTr = { trProjected };
 			ClipByScreenEdge(listClippedTr);
-			trPainted.insert(trPainted.end(), listClippedTr.begin(), listClippedTr.end());
+			//trPainted.insert(trPainted.end(), listClippedTr.begin(), listClippedTr.end());
 
-			//for (auto& trClipped : listClippedTr) {
-			//	GameEngine.FillTriangle(
-			//		(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
-			//		(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
-			//		(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
-			//		olc::Pixel(color, color, color)
-			//		//olc::WHITE
-			//	);
+			for (auto& trClipped : listClippedTr) {
+				GameEngine.FillTriangle(
+					(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
+					(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
+					(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
+					//olc::Pixel(color, color, color)
+					olc::WHITE
+				);
 
-			//	GameEngine.DrawTriangle(
-			//		(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
-			//		(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
-			//		(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
-			//		olc::BLACK
-			//	);
-			//}
+				GameEngine.DrawTriangle(
+					(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
+					(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
+					(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
+					olc::BLACK
+					//olc::WHITE
+				);
+			}
 		}
+
+		continue;
+		// FIXME: Change Code bellow by using Z-buffering
+		// Code bellow getting extremely awful performance result 
 
 		// Painter's algorithm
 		std::sort(trPainted.begin(), trPainted.end(), [](sTriangle& tr1, sTriangle& tr2) { return tr1.AvgZ() < tr2.AvgZ(); });
