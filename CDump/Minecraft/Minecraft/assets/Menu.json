@@ -1,25 +1,25 @@
 {
   "name": "root",
-  "enable":  true,
-  "size": [ 1, 2 ],
-  "id":  -1,
+  "enable": true,
+  "size": [1, 2],
+  "id": -1,
   "items": [
     {
       "name": "Attack",
-      "enable":  true,
+      "enable": true,
       "id": 101
     },
     {
       "name": "Magic",
-      "enable":  true,
-      "size": [ 1, 2 ],
-      "id":  -1,
+      "enable": true,
+      "size": [1, 2],
+      "id": -1,
       "items": [
         {
           "name": "White",
-          "enable":  true,
-          "size": [ 3, 6 ],
-          "id":  -1,
+          "enable": true,
+          "size": [3, 6],
+          "id": -1,
           "items": [
             {
               "name": "Cure",
@@ -29,7 +29,7 @@
             {
               "name": "GOD will",
               "enable": false,
-              "id":  402
+              "id": 402
             }
           ]
         }
