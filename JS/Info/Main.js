@@ -1,24 +1,7 @@
-const xhrUpdate = new XMLHttpRequest();
-xhrUpdate.open("POST", "/projects/db/Visitor", true);
-
 const xhr = new XMLHttpRequest();
 xhr.open("GET", "/projects/db/tables?name=Views,Visitor", true);
 xhr.setRequestHeader("Content-Type", "application/json");
 xhr.send();
-
-$.get("https://www.cloudflare.com/cdn-cgi/trace", (data) => {
-  xhrUpdate.setRequestHeader("Content-Type", "application/json");
-
-  data = data.split("\n");
-
-  xhrUpdate.send(
-    JSON.stringify({
-      ip: data[2].split("=")[1],
-      Country: data[8].split("=")[1],
-      Visit_Date: new Date().toISOString().slice(0, 10),
-    })
-  );
-});
 
 google.charts.load("current", {
   packages: ["geochart"],
