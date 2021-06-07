@@ -1,8 +1,8 @@
 {
   "name": "root",
-  "enable": true,
   "size": [1, 2],
   "id": -1,
+  "enable": true,
   "items": [
     {
       "name": "Attack",
@@ -11,24 +11,24 @@
     },
     {
       "name": "Magic",
-      "enable": true,
       "size": [1, 2],
       "id": -1,
+      "enable": true,
       "items": [
         {
           "name": "White",
-          "enable": true,
           "size": [3, 6],
           "id": -1,
+          "enable": false,
           "items": [
             {
               "name": "Cure",
-              "enable": true,
+              "enable": false,
               "id": 401
             },
             {
               "name": "GOD will",
-              "enable": false,
+              "enable": true,
               "id": 402
             }
           ]
