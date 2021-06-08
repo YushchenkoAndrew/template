@@ -10,7 +10,7 @@ void MenuManager::OnMove(olc::PixelGameEngine& GameEngine) {
 		else stMenu.pop_back();
 	}
 
-	if (stMenu.empty()) return;
+	if (stMenu.empty()) { isInUse = false; return; }
 
 	// Move though menu
 	if (GameEngine.GetKey(olc::W).bPressed) stMenu.back()->OnMove({  0, -1  });
@@ -21,11 +21,10 @@ void MenuManager::OnMove(olc::PixelGameEngine& GameEngine) {
 	if (GameEngine.GetKey(olc::Z).bPressed) {
 		// FIXME: 
 		Menu* next = stMenu.back()->OnConfirm();
-		if (next != stMenu.back()) {
+		if (next != nullptr) {
 			if (next->IsEnabled()) stMenu.push_back(next);
 		}
-		else currId = next->GetId();
-		printf("HERE %d\n", currId);
+		else currId = stMenu.back()->SelectItem()->GetId();
 	}
 }
 

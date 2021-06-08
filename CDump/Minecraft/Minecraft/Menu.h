@@ -31,7 +31,7 @@ public:
 
 	// Getters
 	std::string& GetName() { return sName; }
-	int32_t& GetId() { return nId; }
+	int32_t GetId() { return nId; }
 	olc::vi2d GetSize() { return { int32_t(sName.size()), 1 }; }
 	olc::vi2d& GetCursor() { return vCursor; }
 	bool IsEnabled() { return bEnable; }
@@ -40,11 +40,13 @@ public:
 	bool HasItems() { return !items.empty(); }
 
 	void OnMove(olc::vi2d vMove);
+	Menu* SelectItem() { return &items[nCursorItem]; }
 
 	Menu* OnConfirm() {
 	    if (items[nCursorItem].HasItems()) return &items[nCursorItem];
-	    return this;
+		return nullptr;
 	}
+
 
 	Menu& operator[] (const std::string& key) {
 		if (itemIndex.count(key) == 0) {

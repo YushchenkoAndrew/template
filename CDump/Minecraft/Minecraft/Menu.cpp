@@ -7,6 +7,7 @@ void Menu::Load(const std::string& path) {
     auto size = json.get()->at("size").GetValue<list_t>();
     SetTable(*size->at(0).GetValue<int32_t>(), *size->at(1).GetValue<int32_t>());
     SetEnable(*json.get()->at("enable").GetValue<bool>());
+    SetId(*json->at("id").GetValue<int32_t>());
     Build(*json.get()->at("items").GetValue<list_t>());
 }
 
