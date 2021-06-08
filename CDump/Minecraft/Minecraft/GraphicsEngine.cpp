@@ -290,6 +290,7 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime, 
 					olc::WHITE
 				);
 
+				if (mManager.bHappening(402))
 				GameEngine.DrawTriangle(
 					(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
 					(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
