@@ -1,26 +1,45 @@
 #include "MenuManager.h"
 
 void MenuManager::OnMove(olc::PixelGameEngine& GameEngine) {
-	// Move though menu
-	if (GameEngine.GetKey(olc::W).bPressed) stMenu.back()->OnMove({ 0, 1 });
-	if (GameEngine.GetKey(olc::S).bPressed) stMenu.back()->OnMove({ 0,-1 });
-	if (GameEngine.GetKey(olc::A).bPressed) stMenu.back()->OnMove({ 1, 0 });
-	if (GameEngine.GetKey(olc::D).bPressed) stMenu.back()->OnMove({-1, 0 });
+	// Update id
+	prevId = currId;
 
-	// Functions: Go back and Confirm
-	if (GameEngine.GetKey(olc::X).bPressed) stMenu.pop_back();
+	// Functions: Go back and Open Menu
+	if (GameEngine.GetKey(olc::X).bPressed) {
+		if (stMenu.empty()) Open(&cMenu);
+		else stMenu.pop_back();
+	}
+
+	if (stMenu.empty()) return;
+
+	// Move though menu
+	if (GameEngine.GetKey(olc::W).bPressed) stMenu.back()->OnMove({  0, -1  });
+	if (GameEngine.GetKey(olc::S).bPressed) stMenu.back()->OnMove({  0,  1  });
+	if (GameEngine.GetKey(olc::A).bPressed) stMenu.back()->OnMove({ -1,  0  });
+	if (GameEngine.GetKey(olc::D).bPressed) stMenu.back()->OnMove({  1,  0  });
+
 	if (GameEngine.GetKey(olc::Z).bPressed) {
-		// TODO:
-		stMenu.back()->OnConfirm();
+		// FIXME: 
+		Menu* next = stMenu.back()->OnConfirm();
+		if (next != stMenu.back()) {
+			if (next->IsEnabled()) stMenu.push_back(next);
+		}
+		else currId = next->GetId();
+		printf("HERE %d\n", currId);
 	}
 }
 
 void MenuManager::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, olc::vi2d vOffset, float& fTime) {
-	if (stMenu.empty()) return;
 	OnMove(GameEngine);
+	if (stMenu.empty()) return;
 
 	for (auto& item : stMenu) {
 		item->Draw(GameEngine, decMenu, vOffset, fTime);
 		vOffset += { 10, 10 };
 	}
+
+    olc::Pixel::Mode currMode = GameEngine.GetPixelMode();
+    GameEngine.SetPixelMode(olc::Pixel::MASK);
+	GameEngine.DrawPartialDecal(stMenu.back()->GetCursor(), decMenu.get(), olc::vi2d(2, 3) * PATCH_SIZE, {PATCH_SIZE, PATCH_SIZE});
+    GameEngine.SetPixelMode(currMode);
 }

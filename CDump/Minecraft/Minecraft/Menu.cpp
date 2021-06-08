@@ -24,27 +24,42 @@ void Menu::Build(const list_t& list) {
             (*this)[key].Build(*json->at("items").GetValue<list_t>());
         }
 
-        vCellSize.x = (*this)[key].GetSize().x > vCellSize.x ? (*this)[key].GetSize().x : vCellSize.x;
-        vCellSize.y = (*this)[key].GetSize().y > vCellSize.y ? (*this)[key].GetSize().y : vCellSize.y;
+        vItemSize.x = (*this)[key].GetSize().x > vItemSize.x ? (*this)[key].GetSize().x : vItemSize.x;
+        vItemSize.y = (*this)[key].GetSize().y > vItemSize.y ? (*this)[key].GetSize().y : vItemSize.y;
     }
 
-    vSizeInPatch.x = vTable.x * vCellSize.x + (vTable.x - 1) * vCellPadding.x + 2;
-    vSizeInPatch.y = vTable.y * vCellSize.y + (vTable.y - 1) * vCellPadding.y + 2;
+    vSizeInPatch.x = vTable.x * vItemSize.x + (vTable.x - 1) * vItemPadding.x + 2;
+    vSizeInPatch.y = vTable.y * vItemSize.y + (vTable.y - 1) * vItemPadding.y + 2;
 
     nRows = (items.size() / vTable.x) + (items.size() % vTable.x > 0 ? 1 : 0);
 }
 
 void Menu::OnMove(olc::vi2d vMove) {
-    // TODO:
-}
+    vCursorPos += vMove;
 
-void Menu::OnConfirm() {
-    // TODO:
+    // Correct Cursor Position
+    if (vCursorPos.x == vTable.x) vCursorPos.x = vTable.x - 1;
+    if (vCursorPos.y == nRows) vCursorPos.y = nRows - 1;
+    if (vCursorPos.x < 0) vCursorPos.x = 0;
+    if (vCursorPos.y < 0) vCursorPos.y = 0;
+
+    // Move "pages"
+    if (vCursorPos.y < nVisibleRow) nVisibleRow -= (nVisibleRow - 1 < 0) ? 0 : 1;
+    if (vCursorPos.y > (nVisibleRow + vTable.y - 1)) nVisibleRow += (nVisibleRow + 1 > nRows - vTable.y) ? 0 : 1;
+
+    nCursorItem = vCursorPos.y * vTable.x + vCursorPos.x;
+
+    if (nCursorItem >= int32_t(items.size())) {
+        vCursorPos.y = int32_t(items.size() / vTable.x);
+        vCursorPos.x = int32_t(items.size() % vTable.x) - 1;
+        nCursorItem = int32_t(items.size()) - 1;
+    }
 }
 
 void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, olc::vi2d& vOffset, float& fTime) {
     olc::vi2d vPatchPos = { 0, 0 };
 
+    olc::Pixel::Mode currMode = GameEngine.GetPixelMode();
     GameEngine.SetPixelMode(olc::Pixel::MASK);
 
     for (vPatchPos.x = 0; vPatchPos.x < vSizeInPatch.x; vPatchPos.x++) {
@@ -62,33 +77,33 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
     }
 
 
-    olc::vi2d vCell = { 0, 0 };
+    olc::vi2d vItem = { 0, 0 };
     int32_t nTopLeftItem = nVisibleRow * vTable.x;
     int32_t nBottomRigh = nTopLeftItem + vTable.y * vTable.x;
     int32_t nVisiable = (nBottomRigh < items.size() ? nBottomRigh : items.size()) - nTopLeftItem;
 
     if (nTopLeftItem > 0) {
-        olc::vi2d vSource = { 0, 3 };
-        olc::vi2d vAnimated = { 0, (int32_t)((sinf(fTime) - 1.0f) * 1.5f) };
+        olc::vi2d vSource = { 1, 3 };
+        // FIXME: Not the best solution, the easier way just to create asssets and Animated class / script
+        //olc::vi2d vAnimated = { 0, (int32_t)((sinf(fTime) - 1.0f) * 1.5f) };
         vPatchPos = { vSizeInPatch.x - 2, 0 };
-        olc::vi2d vPos = vPatchPos * PATCH_SIZE + vOffset + vAnimated;
+        olc::vi2d vPos = vPatchPos * PATCH_SIZE + vOffset;
         GameEngine.DrawPartialDecal(vPos, decMenu.get(), vSource * PATCH_SIZE, vPatch);
     }
     
     if ((nRows - nTopLeftItem) > vTable.y) {
         olc::vi2d vSource = { 0, 3 };
-        olc::vi2d vAnimated = { 0, (int32_t)((sinf(fTime) + 1.0f) * 1.5f) };
         vPatchPos = { vSizeInPatch.x - 2, vSizeInPatch.y - 1 };
-        olc::vi2d vPos = vPatchPos * PATCH_SIZE + vOffset + vAnimated;
+        olc::vi2d vPos = vPatchPos * PATCH_SIZE + vOffset;
         GameEngine.DrawPartialDecal(vPos, decMenu.get(), vSource * PATCH_SIZE, vPatch);
     }
 
     for (int32_t i = 0; i < nVisiable; i++) {
-        vCell.x = i % vTable.x;
-        vCell.y = i / vTable.x;
+        vItem.x = i % vTable.x;
+        vItem.y = i / vTable.x;
 
-        vPatchPos.x = vCell.x * (vCellSize.x + vCellPadding.x) + 1;
-        vPatchPos.y = vCell.y * (vCellSize.y + vCellPadding.y) + 1;
+        vPatchPos.x = vItem.x * (vItemSize.x + vItemPadding.x) + 1;
+        vPatchPos.y = vItem.y * (vItemSize.y + vItemPadding.y) + 1;
 
         olc::vi2d vPos = vPatchPos * PATCH_SIZE + vOffset;
         
@@ -97,10 +112,13 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
         if (!items[nTopLeftItem + i].HasItems()) continue;
 
         olc::vi2d vSource = { 3, 0 };
-        olc::vi2d vAnimated = { (int32_t)((sinf(fTime) + 1.0f) * 1.5f), 0 };
-        vPatchPos.x += vCellSize.x;
-        vPos = vPatchPos * PATCH_SIZE + vOffset + vAnimated;
+        vPatchPos.x += vItemSize.x;
+        vPos = vPatchPos * PATCH_SIZE + vOffset;
         GameEngine.DrawPartialDecal(vPos, decMenu.get(), vSource * PATCH_SIZE, vPatch);
     }
-    GameEngine.SetPixelMode(olc::Pixel::NORMAL);
+
+    vCursor.x = (vCursorPos.x * (vItemSize.x + vItemPadding.x)) * PATCH_SIZE + vOffset.x - PATCH_SIZE;
+    vCursor.y = ((vCursorPos.y - nVisibleRow) * (vItemSize.y + vItemPadding.y)) * PATCH_SIZE + vOffset.y + PATCH_SIZE;
+
+    GameEngine.SetPixelMode(currMode);
 }
