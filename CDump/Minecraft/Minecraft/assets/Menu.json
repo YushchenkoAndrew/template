@@ -17,9 +17,9 @@
       "items": [
         {
           "name": "White",
-          "size": [3, 6],
+          "size": [2, 3],
           "id": -1,
-          "enable": false,
+          "enable": true,
           "items": [
             {
               "name": "Cure",
