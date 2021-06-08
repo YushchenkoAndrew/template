@@ -143,20 +143,8 @@ void GraphicsEngine::ClipByScreenEdge(std::list<sTriangle>& listClippedTr) {
 	}
 }
 
-
-void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) {
-	GameEngine.Clear(olc::BLACK);
-
-	Matrix4D mRotation, mTranslated;
-	fTheta += 1.0f * fElapsedTime;
-
-	// Rotation ZX
-	//mRotation = Matrix4D::RoutationOZ(0.3f) * Matrix4D::RoutationOX(0.5f);
-	mRotation = Matrix4D::Identity();
-
-	// Translated
-	mTranslated = Matrix4D::Translation(0.0f, 0.0f, 3.0f);
-
+// Camera Methods
+void GraphicsEngine::CameraLookAt(olc::PixelGameEngine &GameEngine) {
 
 	// Calculate camera rotation based on Mouse Position
 	olc::vi2d vMouse = GameEngine.GetMousePos();
@@ -197,15 +185,15 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 	};
 
 	vLookDir = sPoint3D::normalize(vLookDir);
+}
 
+void GraphicsEngine::CameraMove(olc::PixelGameEngine &GameEngine, float fElapsedTime) {
 	sPoint3D vUp = { 0.0f, 1.0f, 0.0f };
-	
+
 	if (GameEngine.GetKey(olc::W).bHeld && !GameEngine.GetKey(olc::SHIFT).bHeld)
-		//vCamera.z += CAMERA_STEP * fElapsedTime * vLookDir.z;
 		vCamera -= vLookDir * CAMERA_STEP * fElapsedTime;
 
 	if (GameEngine.GetKey(olc::S).bHeld && !GameEngine.GetKey(olc::SHIFT).bHeld)
-		//vCamera.z -= CAMERA_STEP * fElapsedTime * vLookDir.z;
 		vCamera += vLookDir * CAMERA_STEP * fElapsedTime;
 
 	if (GameEngine.GetKey(olc::W).bHeld && GameEngine.GetKey(olc::SHIFT).bHeld)
@@ -215,17 +203,33 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime) 
 		vCamera.y -= CAMERA_STEP * fElapsedTime;
 
 	if (GameEngine.GetKey(olc::D).bHeld)
-		//vCamera.x -= CAMERA_STEP * fElapsedTime * vLookDir.x;
 		vCamera += sPoint3D::normalize(vLookDir.cross(vUp)) * CAMERA_STEP * fElapsedTime;
 
 	if (GameEngine.GetKey(olc::A).bHeld)
-		//vCamera.x += CAMERA_STEP * fElapsedTime * vLookDir.x;
 		vCamera -= sPoint3D::normalize(vLookDir.cross(vUp)) * CAMERA_STEP * fElapsedTime;
 
 	if (GameEngine.GetKey(olc::ESCAPE).bPressed) bFixedMousePos = false;
 	if (GameEngine.GetMouse(0).bPressed) bFixedMousePos = true;
+}
 
 
+void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime, MenuManager& mManager) {
+	GameEngine.Clear(olc::BLACK);
+
+	Matrix4D mRotation, mTranslated;
+	fTheta += 1.0f * fElapsedTime;
+
+	// Rotation ZX
+	//mRotation = Matrix4D::RoutationOZ(0.3f) * Matrix4D::RoutationOX(0.5f);
+	mRotation = Matrix4D::Identity();
+
+	// Translated
+	mTranslated = Matrix4D::Translation(0.0f, 0.0f, 3.0f);
+
+
+	CameraLookAt(GameEngine);
+	if (!mManager.InUse()) CameraMove(GameEngine, fElapsedTime);
+	
 
 	//sPoint3D vTarget = { 1.0f, 1.0f, 1.0f };
 	//vLookDir = vTarget * Matrix4D::RoutationOY(fYaw) * Matrix4D::RoutationOZ(fPitch);

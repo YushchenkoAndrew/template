@@ -1,5 +1,6 @@
 #pragma once
 #include "olcPixelGameEngine.h"
+#include "MenuManager.h"
 
 struct Matrix4D {
 	float MA[4][4] = { 0 };
@@ -220,7 +221,11 @@ public:
 	sPoint3D IntersectionLinePlane(sPoint3D& pPlane, sPoint3D& vPlane, sPoint3D& pStart, sPoint3D& pEnd);
 	uint8_t ClipTriangle(sPoint3D pPlane, sPoint3D vPlane, sTriangle& iTr, sTriangle& oTr1, sTriangle& oTr2);
 	void ClipByScreenEdge(std::list<sTriangle>& listClippedTr);
-	void Draw(olc::PixelGameEngine& GameEngine, float fElapsedTime);
+
+	void CameraLookAt(olc::PixelGameEngine &GameEngine);
+	void CameraMove(olc::PixelGameEngine &GameEngine, float fElapsedTime);
+
+	void Draw(olc::PixelGameEngine& GameEngine, float fElapsedTime, MenuManager& mManager);
 
 private:
 	int32_t iScreenHeight = 0;
