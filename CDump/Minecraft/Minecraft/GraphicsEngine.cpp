@@ -3,6 +3,11 @@
 void GraphicsEngine::Construct(int32_t iHeight, int32_t iWidth) {
 	iScreenHeight = iHeight; iScreenWidth = iWidth;
 
+	vMouseLast.x = (float)iScreenWidth / 2.0f;
+	vMouseLast.y = (float)iScreenHeight / 2.0f;
+
+	zBuffer.assign(iHeight * iWidth, 0.0f);
+
 	// Projection Matrix
 	mProjection = Matrix4D::Projection((float)iScreenHeight / (float)iScreenWidth, 90.0f, 1000.0f, 0.1f);
 
@@ -150,12 +155,6 @@ void GraphicsEngine::CameraLookAt(olc::PixelGameEngine &GameEngine) {
 	olc::vi2d vMouse = GameEngine.GetMousePos();
 	GameEngine.DrawCircle(vMouse.x, vMouse.y, 7);
 
-	if (bStart) {
-		vMouseLast.x = 125.0f;
-		vMouseLast.y = 124.0f;
-		bStart = false;
-	}
-
 	vMouseOffset.x = (float)((int32_t)((float)vMouse.x - vMouseLast.x) * MOUSE_SPEED);
 	vMouseOffset.y = (float)((int32_t)(vMouseLast.y - (float)vMouse.y) * MOUSE_SPEED);
 
@@ -254,8 +253,8 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime, 
 
 		if (normal.prod(trTranslated.p[0] - vCamera) > 0.0f) continue;
 			
-		//sPoint3D light{ 3.0f, 3.0f, 3.0f };
-		//int32_t color = (int32_t)(normal.prod(light.normalize()) * 255);
+		sPoint3D light{ 0.0f, 7.0f, 0.0f };
+		int32_t color = (int32_t)(normal.prod(light.normalize()) * 255);
 
 		trView.p[0] = trTranslated.p[0] * mView;
 		trView.p[1] = trTranslated.p[1] * mView;
@@ -282,22 +281,23 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime, 
 			//trPainted.insert(trPainted.end(), listClippedTr.begin(), listClippedTr.end());
 
 			for (auto& trClipped : listClippedTr) {
-				GameEngine.FillTriangle(
-					(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
-					(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
-					(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
-					//olc::Pixel(color, color, color)
-					olc::WHITE
-				);
+				if (!mManager.GetState((int32_t)eMenuStates::COLOR_DIS).bHeld) {
+					GameEngine.FillTriangle(
+						(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
+						(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
+						(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
+						mManager.GetState((int32_t)eMenuStates::SHADOW_EN).bHeld ? olc::Pixel(color, color, color) : olc::WHITE
+					);
+				}
 
-				if (mManager.bHappening(402))
-				GameEngine.DrawTriangle(
-					(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
-					(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
-					(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
-					olc::BLACK
-					//olc::WHITE
-				);
+				if (!mManager.GetState((int32_t)eMenuStates::EDGE_DIS).bHeld) {
+					GameEngine.DrawTriangle(
+						(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
+						(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
+						(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
+						mManager.GetState((int32_t)eMenuStates::COLOR_DIS).bHeld ? olc::WHITE : olc::BLACK
+					);
+				}
 			}
 		}
 
@@ -330,3 +330,5 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime, 
 }
 
 
+void GraphicsEngine::DrawTriangle(olc::PixelGameEngine &GameEngine, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, olc::Pixel p) {
+}
