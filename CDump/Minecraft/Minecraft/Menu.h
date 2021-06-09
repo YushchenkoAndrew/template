@@ -3,21 +3,29 @@
 #include "Json.h"
 
 #define PATCH_SIZE 8
+#define STATE_GROUP(id)	(int32_t)((id) & ~(int32_t)0x0F)
+#define STATE_INDEX(id)	(int32_t)((id) & (int32_t)0x0E)
+#define STATE_CHANGE_ALL(id) (int32_t)((id) & (int32_t)0x01)
+
+struct sMenuState {
+	bool bPressed;
+	bool bRealeased;
+	bool bHeld;
+};
+
+typedef std::map<int32_t, std::map<int32_t, sMenuState>> menustate_t;
 
 
 class Menu {
 
 public:
-	Menu() { 
-		sName = "root";
-	}
-
-	Menu(const std::string& name) { 
-		sName = name;
-	}
+	Menu() { sName = "root"; }
+	Menu(const std::string& name) { sName = name; }
 
 	void Load(const std::string& path);
 	void Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, olc::vi2d& vOffset, float& fElapsedTime);
+
+	void InitStates(menustate_t& mMenuState);
 
 protected:
 	void Build(const list_t& list);

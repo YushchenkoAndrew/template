@@ -35,6 +35,15 @@ void Menu::Build(const list_t& list) {
     nRows = (items.size() / vTable.x) + (items.size() % vTable.x > 0 ? 1 : 0);
 }
 
+void Menu::InitStates(menustate_t& mMenuState) {
+    if (nId > 0)
+        mMenuState[STATE_GROUP(nId)][STATE_INDEX(nId)] = { false, false, false };
+
+    for (auto& item : items) {
+        item.InitStates(mMenuState);
+    }
+}
+
 void Menu::OnMove(olc::vi2d vMove) {
     vCursorPos += vMove;
 
