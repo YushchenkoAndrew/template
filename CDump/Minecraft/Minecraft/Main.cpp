@@ -2,6 +2,10 @@
 #include "GraphicsEngine.h"
 #include "MenuManager.h"
 
+// Check Memory Leaking
+//#define MEM_TRACK
+//#include "MemTrack.h"
+
 
 class Minecraft : public olc::PixelGameEngine {
 public:
