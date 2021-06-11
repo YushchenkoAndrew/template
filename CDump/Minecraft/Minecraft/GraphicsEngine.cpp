@@ -221,7 +221,7 @@ void GraphicsEngine::Update(olc::PixelGameEngine& GameEngine, MenuManager& mMana
 }
 
 void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManager) {
-	sPoint3D light{ 0.0f, 7.0f, 0.0f };
+	sPoint3D light{ 0.0f, -2.0f, 0.0f };
 	zBuffer.assign(iScreenHeight * iScreenWidth, 0.0f);
 
 	sPoint3D normal, vect1, vect2;
@@ -241,7 +241,10 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 		normal = sPoint3D::normalize(vect1.cross(vect2));
 
 		if (normal.prod(trTranslated.p[0] - vCamera) > 0.0f) continue;
-		int32_t color = (int32_t)(normal.prod(light.normalize()) * 255);
+		//int32_t color = (int32_t)(normal.prod(light.normalize())) * 255;
+		sPoint3D dxLight = (trTranslated.p[0] + trTranslated.p[1] + trTranslated.p[2]) / 3 - light;
+		int32_t color = (int32_t)(1000 / (dxLight.length() + 1)) % 255;
+
 
 		trView.p[0] = trTranslated.p[0] * mView;
 		trView.p[1] = trTranslated.p[1] * mView;
