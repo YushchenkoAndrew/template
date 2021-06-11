@@ -166,8 +166,6 @@ void GraphicsEngine::CameraLookAt(olc::PixelGameEngine &GameEngine) {
 	vMouseLast.x = (float)vMouse.x;
 	vMouseLast.y = (float)vMouse.y;
 
-
-
 	fYaw += vMouseOffset.x;
 	fPitch += vMouseOffset.y;
 
@@ -186,7 +184,7 @@ void GraphicsEngine::CameraLookAt(olc::PixelGameEngine &GameEngine) {
 	vLookDir = sPoint3D::normalize(vLookDir);
 }
 
-void GraphicsEngine::CameraMove(olc::PixelGameEngine &GameEngine, float fElapsedTime) {
+void GraphicsEngine::CameraMove(olc::PixelGameEngine &GameEngine, float& fElapsedTime) {
 	sPoint3D vUp = { 0.0f, 1.0f, 0.0f };
 
 	if (GameEngine.GetKey(olc::W).bHeld && !GameEngine.GetKey(olc::SHIFT).bHeld)
@@ -211,49 +209,38 @@ void GraphicsEngine::CameraMove(olc::PixelGameEngine &GameEngine, float fElapsed
 	if (GameEngine.GetMouse(0).bPressed) bFixedMousePos = true;
 }
 
-
-void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime, MenuManager& mManager) {
-	GameEngine.Clear(olc::BLACK);
-
-	Matrix4D mRotation, mTranslated;
-	fTheta += 1.0f * fElapsedTime;
-
-	// Rotation ZX
-	//mRotation = Matrix4D::RoutationOZ(0.3f) * Matrix4D::RoutationOX(0.5f);
-	mRotation = Matrix4D::Identity();
-
-	// Translated
-	mTranslated = Matrix4D::Translation(0.0f, 0.0f, 3.0f);
-
+void GraphicsEngine::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime) {
+	if (mManager.InUse()) return;
 
 	CameraLookAt(GameEngine);
-	if (!mManager.InUse()) CameraMove(GameEngine, fElapsedTime);
-	
+	CameraMove(GameEngine, fElapsedTime);
 
-	//sPoint3D vTarget = { 1.0f, 1.0f, 1.0f };
-	//vLookDir = vTarget * Matrix4D::RoutationOY(fYaw) * Matrix4D::RoutationOZ(fPitch);
-	sPoint3D vTarget = vCamera - vLookDir;
-	Matrix4D mView = Matrix4D::Invert(CameraPointAt(vCamera, vTarget));
+	// Calculate camera direction and View Matrix
+	vTarget = vCamera - vLookDir;
+	mView = Matrix4D::Invert(CameraPointAt(vCamera, vTarget));
+}
 
+void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManager) {
+	sPoint3D light{ 0.0f, 7.0f, 0.0f };
+	zBuffer.assign(iScreenHeight * iScreenWidth, 0.0f);
 
-	std::vector<sTriangle> trPainted;
+	sPoint3D normal, vect1, vect2;
+	sTriangle trProjected, trTranslated, trView;
+
+	sTriangle trClipped[2];
+	std::list<sTriangle> listClippedTr;
 
 	for (auto& tr : mCube.tr) {
-		sTriangle trProjected, trTranslated, trView;
-
-		trTranslated.p[0] = tr.p[0] * mRotation * mTranslated;
-		trTranslated.p[1] = tr.p[1] * mRotation * mTranslated;
-		trTranslated.p[2] = tr.p[2] * mRotation * mTranslated;
+		trTranslated.p[0] = tr.p[0] * mTranslated;
+		trTranslated.p[1] = tr.p[1] * mTranslated;
+		trTranslated.p[2] = tr.p[2] * mTranslated;
 
 
-		sPoint3D normal, vect1, vect2;
 		vect1 = trTranslated.p[1] - trTranslated.p[0];
 		vect2 = trTranslated.p[2] - trTranslated.p[0];
 		normal = sPoint3D::normalize(vect1.cross(vect2));
 
 		if (normal.prod(trTranslated.p[0] - vCamera) > 0.0f) continue;
-			
-		sPoint3D light{ 0.0f, 7.0f, 0.0f };
 		int32_t color = (int32_t)(normal.prod(light.normalize()) * 255);
 
 		trView.p[0] = trTranslated.p[0] * mView;
@@ -261,7 +248,6 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime, 
 		trView.p[2] = trTranslated.p[2] * mView;
 
 
-		sTriangle trClipped[2];
 		uint8_t nClippedTr = ClipTriangle({ 0.0f, 0.0f, -0.1f }, { 0.0f, 0.0f, -1.0f }, trView, trClipped[0], trClipped[1]);
 
 		for (uint8_t i = 0; i < nClippedTr; i++) {
@@ -275,60 +261,195 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, float fElapsedTime, 
 			trProjected.p[2].x *= 0.5f * (float)iScreenWidth; trProjected.p[2].y *= 0.5f * (float)iScreenHeight;
 
 
-
-			std::list<sTriangle> listClippedTr = { trProjected };
+			listClippedTr.clear();
+			listClippedTr.push_back(trProjected);
 			ClipByScreenEdge(listClippedTr);
-			//trPainted.insert(trPainted.end(), listClippedTr.begin(), listClippedTr.end());
 
 			for (auto& trClipped : listClippedTr) {
-				if (!mManager.GetState((int32_t)eMenuStates::COLOR_DIS).bHeld) {
-					GameEngine.FillTriangle(
-						(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
-						(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
-						(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
-						mManager.GetState((int32_t)eMenuStates::SHADOW_EN).bHeld ? olc::Pixel(color, color, color) : olc::WHITE
+				if (!mManager.GetState(eMenuStates::COLOR_DIS).bHeld) {
+					//GameEngine.FillTriangle(
+					DrawTriangle(GameEngine,
+						(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y, (int32_t)trClipped.p[0].z,
+						(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y, (int32_t)trClipped.p[1].z,
+						(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y, (int32_t)trClipped.p[2].z,
+						mManager.GetState(eMenuStates::SHADOW_EN).bHeld ? olc::Pixel(color, color, color) : olc::WHITE
 					);
 				}
 
-				if (!mManager.GetState((int32_t)eMenuStates::EDGE_DIS).bHeld) {
+				if (!mManager.GetState(eMenuStates::EDGE_DIS).bHeld) {
 					GameEngine.DrawTriangle(
 						(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
 						(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
 						(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
-						mManager.GetState((int32_t)eMenuStates::COLOR_DIS).bHeld ? olc::WHITE : olc::BLACK
+						mManager.GetState(eMenuStates::COLOR_DIS).bHeld ? olc::WHITE : olc::BLACK
 					);
 				}
 			}
 		}
-
-		continue;
-		// FIXME: Change Code bellow by using Z-buffering
-		// Code bellow getting extremely awful performance result 
-
-		// Painter's algorithm
-		std::sort(trPainted.begin(), trPainted.end(), [](sTriangle& tr1, sTriangle& tr2) { return tr1.AvgZ() < tr2.AvgZ(); });
-
-
-		for (auto& trClipped : trPainted) {
-			GameEngine.FillTriangle(
-				(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
-				(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
-				(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
-				//olc::Pixel(color, color, color)
-				olc::WHITE
-			);
-
-			GameEngine.DrawTriangle(
-				(int32_t)trClipped.p[0].x, (int32_t)trClipped.p[0].y,
-				(int32_t)trClipped.p[1].x, (int32_t)trClipped.p[1].y,
-				(int32_t)trClipped.p[2].x, (int32_t)trClipped.p[2].y,
-				olc::BLACK
-			);
-		}
-
 	}
 }
 
 
-void GraphicsEngine::DrawTriangle(olc::PixelGameEngine &GameEngine, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, olc::Pixel p) {
+// Using this implementation of  Bresenham method
+// https://www.avrfreaks.net/sites/default/files/triangles.c
+void GraphicsEngine::DrawTriangle(olc::PixelGameEngine &GameEngine, int32_t x1, int32_t y1, int32_t z1, int32_t x2, int32_t y2, int32_t z2, int32_t x3, int32_t y3, int32_t z3, olc::Pixel p) {
+	int32_t signx1 = 1;
+	int32_t signx2 = 1;
+	bool bChanged1 = false;
+	bool bChanged2 = false;
+	bool bLoopEnd = false;
+
+	int32_t t1xp, t2xp;
+	int32_t xMin, xMax;
+
+	auto DrawLine = [&](int sx, int ex, int ny) { for (int i = sx; i <= ex; i++) GameEngine.Draw(i, ny, p); };
+
+    // Sort vertices's
+	if (y1 > y2) { swap(y1, y2); swap(x1, x2); swap(z1, z2); }
+	if (y1 > y3) { swap(y1, y3); swap(x1, x3); swap(z1, z3); }
+	if (y2 > y3) { swap(y2, y3); swap(x2, x3); swap(z2, z3); }
+
+	// Starting points
+	int32_t t1x = x1;
+	int32_t t2x = x1;
+	int32_t y = y1;
+
+	int32_t dx1, dx2;
+	int32_t dy1 = y2 - y1;
+	int32_t dy2 = y3 - y1;
+
+	if ((dx1 = x2 - x1) < 0) { dx1 = -dx1; signx1 = -1; } 
+	if ((dx2 = x3 - x1) < 0) { dx2 = -dx2; signx2 = -1; }
+
+	if (dy1 > dx1) { swap(dx1, dy1); bChanged1 = true; }
+	if (dy2 > dx2) { swap(dy2, dx2); bChanged2 = true; }
+	
+	int32_t e1, e2 = dx2 >> 1;
+
+    // Flat top, just process the second half
+	if (y1 != y2) {
+		e1 = dx1 >> 1;
+
+		for (uint8_t i = 0; i < dx1;) {
+			t1xp = 0; t2xp = 0;
+
+			xMin = std::min(t1x, t2x);
+			xMax = std::max(t1x, t2x);
+
+			bLoopEnd = false;
+
+			// process first line until y value is about to change
+			while (i < dx1 && ++i) {
+				e1 += dy1;
+
+				while (e1 >= dx1) {
+					e1 -= dx1;
+					bLoopEnd = !bChanged1;
+					if (!bChanged1) break;
+					t1xp = signx1;
+				}
+
+				if (bChanged1 || bLoopEnd) break;
+				t1x += signx1;
+			}
+
+			bLoopEnd = false;
+
+			// process second line until y value is about to change
+			while (1) {
+				e2 += dy2;
+				while (e2 >= dx2) {
+					e2 -= dx2;
+					bLoopEnd = !bChanged2;
+					if (!bChanged2) break;
+					t2xp = signx2;
+				}
+
+				if (bChanged2 || bLoopEnd) break;
+				t2x += signx2;
+			}
+
+			xMin = std::min(xMin, std::min(t1x, t2x));
+			xMax = std::max(xMax, std::max(t1x, t2x));
+
+			// Draw line from min to max points found on the y
+			DrawLine(xMin, xMax, y);
+
+			// Now increase y
+			if (!bChanged1) t1x += signx1;
+			if (!bChanged2) t2x += signx2;
+
+			t1x += t1xp;
+			t2x += t2xp;
+			if (++y == y2) break;
+		}
+	}
+	
+	// Second half
+	dx1 = x3 - x2;
+	dy1 = y3 - y2;
+	t1x = x2;
+
+	if (dx1 < 0) { dx1 = -dx1; signx1 = -1; }
+	else signx1 = 1;
+
+	if (dy1 > dx1) { swap(dy1, dx1); bChanged1 = true; }
+	else bChanged1 = false;
+	
+	e1 = dx1 >> 1;
+	
+	for (uint8_t i = 0; i <= dx1; i++) {
+		t1xp = 0; t2xp = 0;
+
+		xMin = std::min(t1x, t2x);
+		xMax = std::max(t1x, t2x);
+
+		bLoopEnd = false;
+
+	    // process first line until y value is about to change
+		while (i < dx1) {
+			e1 += dy1;
+			while (e1 >= dx1) {
+				e1 -= dx1;
+				bLoopEnd = !bChanged1;
+				if (!bChanged1) break;
+				t1xp = signx1;
+			}
+
+			if (bChanged1 || bLoopEnd) break;
+			t1x += signx1;
+			if (i < dx1) i++;
+		}
+
+		bLoopEnd = false;
+
+        // process second line until y value is about to change
+		while (t2x != x3) {
+			e2 += dy2;
+			while (e2 >= dx2) {
+				e2 -= dx2;
+				bLoopEnd = !bChanged2;
+				if (!bChanged2) break;
+				t2xp = signx2;
+			}
+
+			if (bChanged2 || bLoopEnd) break;
+			t2x += signx2;
+		}
+
+		xMin = std::min(xMin, std::min(t1x, t2x));
+		xMax = std::max(xMax, std::max(t1x, t2x));
+
+		// Draw line from min to max points found on the y
+		DrawLine(xMin, xMax, y);
+
+		// Now increase y
+		if(!bChanged1) t1x += signx1;
+		if(!bChanged2) t2x += signx2;
+
+		t1x += t1xp;
+		t2x += t2xp;
+		if(++y > y3) return;
+	}
+
 }
