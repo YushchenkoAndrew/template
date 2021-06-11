@@ -20,11 +20,13 @@ public:
     }
 
     bool OnUserUpdate(float fElapsedTime) override {
-        mManger.Draw(*this, decMenu, { 10, 10 }, fTime);
+        mManger.Update(*this);
+        cEngine3D.Update(*this, mManger, fElapsedTime);
 
-        cEngine3D.Draw(*this, fElapsedTime, mManger);
 
-        fTime = (fTime <= (3.14159f * 2.0f - 0.1f)) ? fTime + 0.01f : 3.14159f * 2.0f - fTime;
+	    Clear(olc::BLACK);
+        mManger.Draw(*this, decMenu, { 10, 10 }, fElapsedTime);
+        cEngine3D.Draw(*this, mManger);
         return true;
     }
 
@@ -33,9 +35,6 @@ private:
     MenuManager mManger;
     std::unique_ptr<olc::Sprite> sprMenu;
     std::unique_ptr<olc::Decal> decMenu;
-
-    float fTime = 0.0f;
-
 };
 
 int main()

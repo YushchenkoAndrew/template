@@ -1,12 +1,14 @@
 #include "MenuManager.h"
 
-void MenuManager::UpdateState() {
+void MenuManager::Update(olc::PixelGameEngine& GameEngine) {
 	for (auto& group : mMenuState) {
 		for (auto& grItem : group.second) {
 			grItem.second.bRealeased = false;
 			grItem.second.bPressed = false;
 		}
 	}
+
+	OnMove(GameEngine);
 }
 
 void MenuManager::OnConfirm() {
@@ -50,9 +52,6 @@ void MenuManager::OnMove(olc::PixelGameEngine& GameEngine) {
 }
 
 void MenuManager::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, olc::vi2d vOffset, float& fTime) {
-	UpdateState();
-	OnMove(GameEngine);
-
 	if (stMenu.empty()) return;
 
 	for (auto& item : stMenu) {
