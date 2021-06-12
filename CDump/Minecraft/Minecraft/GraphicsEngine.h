@@ -16,7 +16,7 @@ public:
 	GraphicsEngine(): mTranslated(Matrix4D::Translation(0.0f, 0.0f, 3.0f)) {}
 	~GraphicsEngine() {}
 
-	void Construct(int32_t iHeight, int32_t iWidth);
+	void Init(int32_t iHeight, int32_t iWidth);
 	void Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime);
 
 	void Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager);
@@ -31,9 +31,10 @@ private:
 	uint8_t ClipTriangle(sPoint3D pPlane, sPoint3D vPlane, sTriangle& iTr, sTriangle& oTr1, sTriangle& oTr2);
 	void ClipByScreenEdge(std::list<sTriangle>& listClippedTr);
 
-
-
 	inline void swap(int32_t& x, int32_t& y) { x = x ^ y; y = x ^ y; x = x ^ y; }
+
+public:
+	std::vector<sTriangle> trMap;
 
 
 private:
@@ -42,8 +43,6 @@ private:
 
 	float fYaw = 0.0f;
 	float fPitch = 0.0f;
-
-	sField mCube;
 
 	Matrix4D mTranslated;
 	Matrix4D mProjection;

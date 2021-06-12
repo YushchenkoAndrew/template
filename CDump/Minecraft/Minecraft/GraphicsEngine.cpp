@@ -1,6 +1,6 @@
 #include "GraphicsEngine.h"
 
-void GraphicsEngine::Construct(int32_t iHeight, int32_t iWidth) {
+void GraphicsEngine::Init(int32_t iHeight, int32_t iWidth) {
 	iScreenHeight = iHeight; iScreenWidth = iWidth;
 
 	vMouseLast.x = (float)iScreenWidth / 2.0f;
@@ -11,21 +11,21 @@ void GraphicsEngine::Construct(int32_t iHeight, int32_t iWidth) {
 	// Projection Matrix
 	mProjection = Matrix4D::Projection((float)iScreenHeight / (float)iScreenWidth, 90.0f, 1000.0f, 0.1f);
 
-	// TEMP: Create better solution for Cube Map Init
-	mCube.tr = sField::CubeMap();
-	mCube += sField::CubeMap(5.0f);
-	mCube += sField::CubeMap(-5.0f);
-	mCube += sField::CubeMap(0.0f, 5.0f);
-	mCube += sField::CubeMap(0.0f, -5.0f);
-	mCube += sField::CubeMap(0.0f, 0.0f, 5.0f);
-	mCube += sField::CubeMap(0.0f, 0.0f, -5.0f);
+	//// TEMP: Create better solution for Cube Map Init
+	//mCube.tr = sField::CubeMap();
+	//mCube += sField::CubeMap(5.0f);
+	//mCube += sField::CubeMap(-5.0f);
+	//mCube += sField::CubeMap(0.0f, 5.0f);
+	//mCube += sField::CubeMap(0.0f, -5.0f);
+	//mCube += sField::CubeMap(0.0f, 0.0f, 5.0f);
+	//mCube += sField::CubeMap(0.0f, 0.0f, -5.0f);
 
-	// Create a simple map
-	for (int32_t i = -10; i < 10; i++) {
-		for (int32_t j = -10; j < 10; j++) {
-			mCube += sField::CubeMap((float)i, -20.0f, (float)j);
-		}
-	}
+	//// Create a simple map
+	//for (int32_t i = -10; i < 10; i++) {
+	//	for (int32_t j = -10; j < 10; j++) {
+	//		mCube += sField::CubeMap((float)i, -20.0f, (float)j);
+	//	}
+	//}
 }
 
 Matrix4D GraphicsEngine::CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget) {
@@ -230,7 +230,7 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 	sTriangle trClipped[2];
 	std::list<sTriangle> listClippedTr;
 
-	for (auto& tr : mCube.tr) {
+	for (auto& tr : trMap) {
 		trTranslated.p[0] = tr.p[0] * mTranslated;
 		trTranslated.p[1] = tr.p[1] * mTranslated;
 		trTranslated.p[2] = tr.p[2] * mTranslated;
