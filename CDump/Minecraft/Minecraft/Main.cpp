@@ -1,25 +1,29 @@
 #define OLC_PGE_APPLICATION
 #include "GraphicsEngine.h"
 #include "MenuManager.h"
+#include "Minecraft.h"
 
 // Check Memory Leaking
 //#define MEM_TRACK
 //#include "MemTrack.h"
 
 
-class Minecraft : public olc::PixelGameEngine {
+class Game : public olc::PixelGameEngine {
 public:
-    Minecraft() {
+    Game() {
         sAppName = "Minecraft";
     }
 
     bool OnUserCreate() override {
-        cEngine3D.Construct(ScreenHeight(), ScreenWidth());
+        mMinecraft.Init();
+        cEngine3D.Init(ScreenHeight(), ScreenWidth());
         mManger.Init("./assets/Menu.json");
+
+        mMinecraft.LoadMap(cEngine3D.trMap);
+
 
         sprMenu = std::make_unique<olc::Sprite>("./assets/Sprite-0001.png");
         decMenu = std::make_unique<olc::Decal>(sprMenu.get());
-
         return true;
     }
 
@@ -35,15 +39,17 @@ public:
     }
 
 private:
+    Minecraft mMinecraft;
     GraphicsEngine cEngine3D;
     MenuManager mManger;
+
     std::unique_ptr<olc::Sprite> sprMenu;
     std::unique_ptr<olc::Decal> decMenu;
 };
 
 int main()
 {
-    Minecraft demo;
+    Game demo;
     if (demo.Construct(250, 250, 4, 4))
         demo.Start();
     
