@@ -1,35 +1,71 @@
 {
   "name": "root",
-  "enable":  true,
   "size": [ 1, 2 ],
-  "id":  -1,
+  "id": -1,
+  "enable": true,
   "items": [
     {
       "name": "Attack",
-      "enable":  true,
+      "enable": true,
       "id": 101
     },
     {
-      "name": "Magic",
-      "enable":  true,
-      "size": [ 1, 2 ],
-      "id":  -1,
+      "name": "Debug",
+      "size": [ 1, 4 ],
+      "id": -1,
+      "enable": true,
       "items": [
         {
-          "name": "White",
-          "enable":  true,
-          "size": [ 3, 6 ],
-          "id":  -1,
+          "name": "Edges",
+          "size": [ 2, 1 ],
+          "id": -1,
+          "enable": true,
           "items": [
             {
-              "name": "Cure",
+              "name": "Enable",
               "enable": true,
-              "id": 401
+              "id": 17
             },
             {
-              "name": "GOD will",
-              "enable": false,
-              "id":  402
+              "name": "Disable",
+              "enable": true,
+              "id": 19
+            }
+          ]
+        },
+        {
+          "name": "Shadow",
+          "size": [ 2, 1 ],
+          "id": -1,
+          "enable": true,
+          "items": [
+            {
+              "name": "Enable",
+              "enable": true,
+              "id": 33
+            },
+            {
+              "name": "Disable",
+              "enable": true,
+              "id": 35
+            }
+          ]
+        },
+        {
+          "name": "Color",
+          "size": [ 2, 1 ],
+          "id": -1,
+          "enable": true,
+          "items": [
+            {
+              "name": "Enable",
+              "enable": true,
+              "id": 49
+            },
+            {
+              "name": "Disable",
+              "enable": true,
+              "id": 51
             }
           ]
         }
