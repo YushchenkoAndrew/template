@@ -1,5 +1,5 @@
 #define OLC_PGE_APPLICATION
-#include "olcPixelGameEngine.h"
+#include "lib/olcPixelGameEngine.h"
 
 
 #define INDEX(X, Y, STEP) (((Y) * (STEP)) + (X))

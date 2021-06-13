@@ -1,5 +1,5 @@
 #define OLC_PGE_APPLICATION
-#include "olcPixelGameEngine.h"
+#include "lib/olcPixelGameEngine.h"
 #include "BinaryTree.h"
 
 #include <stdio.h>
