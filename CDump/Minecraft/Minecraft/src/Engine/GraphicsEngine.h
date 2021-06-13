@@ -1,6 +1,6 @@
 #pragma once
-#include "olcPixelGameEngine.h"
-#include "MenuManager.h"
+#include "lib/olcPixelGameEngine.h"
+#include "src/Menu/MenuManager.h"
 #include "Objects3D.h"
 
 #define TRIANGLE_OUTSIDE	12u

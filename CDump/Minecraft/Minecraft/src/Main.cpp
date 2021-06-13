@@ -1,11 +1,11 @@
 #define OLC_PGE_APPLICATION
-#include "GraphicsEngine.h"
-#include "MenuManager.h"
+#include "Engine/GraphicsEngine.h"
+#include "Menu/MenuManager.h"
 #include "Minecraft.h"
 
 // Check Memory Leaking
 //#define MEM_TRACK
-//#include "MemTrack.h"
+//#include "include/MemTrack.h"
 
 
 class Game : public olc::PixelGameEngine {

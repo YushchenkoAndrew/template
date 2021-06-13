@@ -1,6 +1,6 @@
 #pragma once
-#include "olcPixelGameEngine.h"
-#include "Json.h"
+#include "lib/olcPixelGameEngine.h"
+#include "include/Json.h"
 
 #define PATCH_SIZE 8
 #define STATE_GROUP(id)	(int32_t)((id) & ~(int32_t)0x0F)

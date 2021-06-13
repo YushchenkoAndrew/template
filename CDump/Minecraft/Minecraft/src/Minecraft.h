@@ -1,5 +1,5 @@
 #pragma once
-#include "GraphicsEngine.h"
+#include "Engine/GraphicsEngine.h"
 
 #define CHUNK_SIZE 24
 #define GET_INDEX(X, Y, Z) ((X) + (Y) * CHUNK_SIZE + (Z) * CHUNK_SIZE * CHUNK_SIZE)
