@@ -2,30 +2,17 @@
 
 void GraphicsEngine::Init(int32_t iHeight, int32_t iWidth) {
 	iScreenHeight = iHeight; iScreenWidth = iWidth;
+	zBuffer.assign(iHeight * iWidth, 0.0f);
 
 	vMouseLast.x = (float)iScreenWidth / 2.0f;
 	vMouseLast.y = (float)iScreenHeight / 2.0f;
 
-	zBuffer.assign(iHeight * iWidth, 0.0f);
-
 	// Projection Matrix
 	mProjection = Matrix4D::Projection((float)iScreenHeight / (float)iScreenWidth, 90.0f, 1000.0f, 0.1f);
 
-	//// TEMP: Create better solution for Cube Map Init
-	//mCube.tr = sField::CubeMap();
-	//mCube += sField::CubeMap(5.0f);
-	//mCube += sField::CubeMap(-5.0f);
-	//mCube += sField::CubeMap(0.0f, 5.0f);
-	//mCube += sField::CubeMap(0.0f, -5.0f);
-	//mCube += sField::CubeMap(0.0f, 0.0f, 5.0f);
-	//mCube += sField::CubeMap(0.0f, 0.0f, -5.0f);
 
-	//// Create a simple map
-	//for (int32_t i = -10; i < 10; i++) {
-	//	for (int32_t j = -10; j < 10; j++) {
-	//		mCube += sField::CubeMap((float)i, -20.0f, (float)j);
-	//	}
-	//}
+	blLight.Init(0.0f, -2.0f, 0.0f);
+	blLight.LoadBlock(trMap);
 }
 
 Matrix4D GraphicsEngine::CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget) {
@@ -221,7 +208,7 @@ void GraphicsEngine::Update(olc::PixelGameEngine& GameEngine, MenuManager& mMana
 }
 
 void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManager) {
-	sPoint3D light{ 0.0f, -2.0f, 0.0f };
+	//sPoint3D light{ 0.0f, -2.0f, 0.0f };
 	zBuffer.assign(iScreenHeight * iScreenWidth, 0.0f);
 
 	sPoint3D normal, vect1, vect2;
@@ -242,8 +229,9 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 
 		if (normal.prod(trTranslated.p[0] - vCamera) > 0.0f) continue;
 		//int32_t color = (int32_t)(normal.prod(light.normalize())) * 255;
-		sPoint3D dxLight = (trTranslated.p[0] + trTranslated.p[1] + trTranslated.p[2]) / 3 - light;
-		int32_t color = (int32_t)(1000 / (dxLight.length() + 1)) % 255;
+		//sPoint3D dxLight = (trTranslated.p[0] + trTranslated.p[1] + trTranslated.p[2]) / 3 - light;
+		//int32_t color = (int32_t)(1000 / (dxLight.length() + 1)) % 255;
+		int32_t color = blLight.GetLight((trTranslated.p[0] + trTranslated.p[1] + trTranslated.p[2]) / 3);
 
 
 		trView.p[0] = trTranslated.p[0] * mView;

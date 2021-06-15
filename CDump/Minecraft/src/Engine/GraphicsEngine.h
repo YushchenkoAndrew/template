@@ -2,6 +2,7 @@
 #include "lib/olcPixelGameEngine.h"
 #include "src/Menu/MenuManager.h"
 #include "Objects3D.h"
+#include "Lighting.h"
 
 #define TRIANGLE_OUTSIDE	12u
 #define TRIANGLE_INSIDE		3u
@@ -17,7 +18,7 @@ public:
 	~GraphicsEngine() {}
 
 	void Init(int32_t iHeight, int32_t iWidth);
-	void Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime);
+	void Update(olc::PixelGameEngine& GameEngine,MenuManager& mManager, float& fElapsedTime);
 
 	void Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager);
 	void DrawTriangle(olc::PixelGameEngine& GameEngine, int32_t x1, int32_t y1, int32_t z1, int32_t x2, int32_t y2, int32_t z2, int32_t x3, int32_t y3, int32_t z3, olc::Pixel p);
@@ -58,4 +59,6 @@ private:
 
 	std::vector<float> zBuffer;
 	std::vector<sTriangle> trPainted;
+
+	AmbientLigh blLight;
 };

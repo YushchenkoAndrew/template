@@ -161,6 +161,8 @@ struct sPoint3D {
 };
 
 
+
+
 struct sTriangle {
 	sPoint3D p[3];
 
@@ -169,38 +171,30 @@ struct sTriangle {
 	inline float AvgZ() { return (p[0].z + p[1].z + p[2].z) / 3.0f; }
 };
 
-struct sField {
-	std::vector<sTriangle> tr;
 
 
-	static std::vector<sTriangle> CubeMap(float fXOffset = 0.0f, float fYOffset = 0.0f, float fZOffset = 0.0f) {
-		return {
-			{ fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 0.0f,    fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 0.0f },
-			{ fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 0.0f },
 
-			{ fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 1.0f },
-			{ fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 1.0f,    fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 1.0f },
+#define NORTH_MASK	((1 << 0))
+#define SOUTH_MASK	((1 << 1))
+#define EAST_MASK	((1 << 2))
+#define WEST_MASK	((1 << 3))
+#define UP_MASK		((1 << 4))
+#define DOWN_MASK	((1 << 5))
+#define EXIST_MASK	((1 << 6))
 
-			{ fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 1.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 1.0f },
-			{ fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 1.0f },
+#define IS_NORTH_N(X)	(((X) & NORTH_MASK))
+#define IS_SOUTH_N(X)	((X) & SOUTH_MASK)
+#define IS_EAST_N(X)	((X) & EAST_MASK)
+#define IS_WEST_N(X)	((X) & WEST_MASK)
+#define IS_UP_N(X)		((X) & UP_MASK)
+#define IS_DOWN_N(X)	((X) & DOWN_MASK)
+#define IS_EXIST(X)		((X) & EXIST_MASK)
 
-			{ fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 0.0f },
-			{ fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 0.0f,    fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 0.0f },
+struct sBlock {
+	void SetPos(float x, float y, float z) { vPos.x = x; vPos.y = y; vPos.z = z; }
+	void LoadMap(std::vector<sTriangle>& vMap);
 
-			{ fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 0.0f,    fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 1.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 1.0f },
-			{ fXOffset + 0.0f, fYOffset + 1.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 1.0f,    fXOffset + 1.0f, fYOffset + 1.0f, fZOffset + 0.0f },
-
-			{ fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 0.0f },
-			{ fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 1.0f,    fXOffset + 0.0f, fYOffset + 0.0f, fZOffset + 0.0f,    fXOffset + 1.0f, fYOffset + 0.0f, fZOffset + 0.0f }
-		};
-	}
-
-	sField operator + (const std::vector<sTriangle>& right) const { 
-		sField res; res.tr.reserve(this->tr.size() + right.size());
-		res.tr.insert(res.tr.end(), this->tr.begin(), this->tr.end()); res.tr.insert(res.tr.end(), right.begin(), right.end());
-		return res; 
-	}
-	sField& operator += (const std::vector<sTriangle>& right) { this->tr.reserve(this->tr.size() + right.size()); this->tr.insert(this->tr.end(), right.begin(), right.end()); return *this; }
+	sPoint3D vPos;
+	uint8_t bStatus;
 };
-
 
