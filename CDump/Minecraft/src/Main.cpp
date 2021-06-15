@@ -1,4 +1,3 @@
-#define OLC_PGE_APPLICATION
 #include "Engine/GraphicsEngine.h"
 #include "Menu/MenuManager.h"
 #include "Minecraft.h"
@@ -15,11 +14,8 @@ public:
     }
 
     bool OnUserCreate() override {
-        mMinecraft.Init();
-        cEngine3D.Init(ScreenHeight(), ScreenWidth());
-        mManger.Init("./assets/Menu.json");
-
-        mMinecraft.LoadMap(cEngine3D.trMap);
+        mManager.Init("./assets/Menu.json");
+        mMinecraft.Init(ScreenHeight(), ScreenWidth());
 
 
         sprMenu = std::make_unique<olc::Sprite>("./assets/Sprite-0001.png");
@@ -28,20 +24,19 @@ public:
     }
 
     bool OnUserUpdate(float fElapsedTime) override {
-        mManger.Update(*this);
-        cEngine3D.Update(*this, mManger, fElapsedTime);
+        mManager.Update(*this);
+        mMinecraft.Update(*this, mManager, fElapsedTime);
 
 
 	    Clear(olc::BLACK);
-        mManger.Draw(*this, decMenu, { 10, 10 }, fElapsedTime);
-        cEngine3D.Draw(*this, mManger);
-        return true;
+        mManager.Draw(*this, decMenu, { 10, 10 }, fElapsedTime);
+        mMinecraft.Draw(*this, mManager);
+        return !mManager.GetState(101).bPressed;
     }
 
 private:
     Minecraft mMinecraft;
-    GraphicsEngine cEngine3D;
-    MenuManager mManger;
+    MenuManager mManager;
 
     std::unique_ptr<olc::Sprite> sprMenu;
     std::unique_ptr<olc::Decal> decMenu;
