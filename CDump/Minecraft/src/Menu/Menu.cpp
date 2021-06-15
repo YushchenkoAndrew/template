@@ -90,7 +90,7 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
     olc::vi2d vItem = { 0, 0 };
     int32_t nTopLeftItem = nVisibleRow * vTable.x;
     int32_t nBottomRigh = nTopLeftItem + vTable.y * vTable.x;
-    int32_t nVisiable = (nBottomRigh < items.size() ? nBottomRigh : items.size()) - nTopLeftItem;
+    int32_t nVisiable = ((size_t)nBottomRigh < items.size() ? nBottomRigh : items.size()) - nTopLeftItem;
 
     if (nTopLeftItem > 0) {
         olc::vi2d vSource = { 1, 3 };

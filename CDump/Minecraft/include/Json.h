@@ -5,6 +5,7 @@
 #include <fstream>
 #include <map>
 #include <vector>
+#include "include/Typelist.h"
 
 #define KEYWORDS_SIZE 3
 
@@ -16,12 +17,6 @@ enum class value_t {
 	JSON,
 	LIST,
 	BOOL
-};
-
-template <typename T>
-struct Type2Type {
-	inline Type2Type() {}
-	inline ~Type2Type() {}
 };
 
 class jObject {

@@ -17,7 +17,7 @@ public:
 	GraphicsEngine(): mTranslated(Matrix4D::Translation(0.0f, 0.0f, 3.0f)) {}
 	~GraphicsEngine() {}
 
-	void Init(int32_t iHeight, int32_t iWidth);
+	void Init(int32_t iHeight, int32_t iWidth, std::unique_ptr<Light> pLightSrc = std::make_unique<AmbientLigh>());
 	void Update(olc::PixelGameEngine& GameEngine,MenuManager& mManager, float& fElapsedTime);
 
 	void Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager);
@@ -60,5 +60,5 @@ private:
 	std::vector<float> zBuffer;
 	std::vector<sTriangle> trPainted;
 
-	AmbientLigh blLight;
+	std::unique_ptr<Light> lightSrc;
 };

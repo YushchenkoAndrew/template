@@ -119,6 +119,7 @@ struct sPoint3D {
 
 	static inline sPoint3D normalize(const sPoint3D& p) { return p / sPoint3D::length(p); }
 	static inline float length(const sPoint3D& p) { return sqrtf(p.x * p.x + p.y * p.y + p.z * p.z); }
+	static inline float prod(const sPoint3D& right, const sPoint3D& left) { return right.x * left.x + right.y * left.y + right.z * left.z; }
 
 	inline sPoint3D normalize() const { return sPoint3D::normalize(*this); }
 	inline float length() const { return sPoint3D::length(*this); }

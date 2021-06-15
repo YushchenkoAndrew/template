@@ -41,7 +41,7 @@ void sChunk::LoadMap(std::vector<sTriangle>& vMap) {
 
 
 void Minecraft::Init(int32_t iHeight, int32_t iWidth) {
-    cEngine3D.Init(iHeight, iWidth);
+	cEngine3D.Init(iHeight, iWidth);
 
 	for (auto& chunk : vChunk) {
 		chunk.Init(temp); 
