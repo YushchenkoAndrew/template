@@ -143,16 +143,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="lib\olcPixelGameEngine.cpp" />
     <ClCompile Include="src\Engine\GraphicsEngine.cpp" />
     <ClCompile Include="include\Json.cpp" />
+    <ClCompile Include="src\Engine\Objects3D.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Menu\Menu.cpp" />
     <ClCompile Include="src\Menu\MenuManager.cpp" />
+    <ClCompile Include="src\Minecraft.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine\GraphicsEngine.h" />
     <ClInclude Include="include\Json.h" />
     <ClInclude Include="include\MemTrack.h" />
+    <ClInclude Include="src\Engine\Lighting.h" />
     <ClInclude Include="src\Menu\Menu.h" />
     <ClInclude Include="src\Menu\MenuManager.h" />
     <ClInclude Include="src\Minecraft.h" />

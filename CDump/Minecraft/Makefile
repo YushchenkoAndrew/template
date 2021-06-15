@@ -1,7 +1,7 @@
 EM_CC=em++
 
 LIB=-I./
-INCLUDE=include/*.cpp
+INCLUDE=include/*.cpp lib/*.cpp
 SOURCE=src
 
 DIRS=Engine Menu

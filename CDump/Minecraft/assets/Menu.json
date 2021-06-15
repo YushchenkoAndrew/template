@@ -5,11 +5,6 @@
   "enable": true,
   "items": [
     {
-      "name": "Attack",
-      "enable": true,
-      "id": 101
-    },
-    {
       "name": "Debug",
       "size": [ 1, 4 ],
       "id": -1,
@@ -70,6 +65,11 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Exit",
+      "enable": true,
+      "id": 101
     }
   ]
 }
