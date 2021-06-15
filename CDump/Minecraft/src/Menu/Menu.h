@@ -42,7 +42,6 @@ public:
 	int32_t GetId() { return nId; }
 	olc::vi2d GetSize() { return { int32_t(sName.size()), 1 }; }
 	olc::vi2d& GetCursor() { return vCursor; }
-	bool IsEnabled() { return bEnable; }
 
 	// Additional func
 	bool HasItems() { return !items.empty(); }

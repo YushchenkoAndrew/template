@@ -9,6 +9,8 @@ namespace eMenuStates {
 		SHADOW_DIS = 35,
 		COLOR_EN = 49,
 		COLOR_DIS = 51,
+		DISTRIBUTE_EN = 65,
+		DISTRIBUTE_DIS = 67,
 	};
 }
 

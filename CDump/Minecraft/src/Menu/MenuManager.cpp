@@ -15,11 +15,10 @@ void MenuManager::OnConfirm() {
 	Menu* next = stMenu.back()->OnConfirm();
 
 	if (next != nullptr) {
-		if (next->IsEnabled()) stMenu.push_back(next);
+		stMenu.push_back(next);
 		return;
 	}
 
-	if (!stMenu.back()->SelectItem()->IsEnabled()) return;
 	nId = stMenu.back()->SelectItem()->GetId();
 
 	if (STATE_CHANGE_ALL(nId)) {

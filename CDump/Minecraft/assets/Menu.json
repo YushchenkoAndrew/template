@@ -2,23 +2,23 @@
   "name": "root",
   "size": [ 1, 2 ],
   "id": -1,
-  "enable": true,
+  "enable": false,
   "items": [
     {
       "name": "Debug",
       "size": [ 1, 4 ],
       "id": -1,
-      "enable": true,
+      "enable": false,
       "items": [
         {
           "name": "Edges",
           "size": [ 2, 1 ],
           "id": -1,
-          "enable": true,
+          "enable": false,
           "items": [
             {
               "name": "Enable",
-              "enable": true,
+              "enable": false,
               "id": 17
             },
             {
@@ -30,36 +30,64 @@
         },
         {
           "name": "Shadow",
-          "size": [ 2, 1 ],
+          "size": [ 1, 2 ],
           "id": -1,
-          "enable": true,
+          "enable": false,
           "items": [
             {
-              "name": "Enable",
-              "enable": true,
-              "id": 33
+              "name": "Shadow",
+              "size": [ 2, 1 ],
+              "id": -1,
+              "enable": false,
+              "items": [
+                {
+                  "name": "Enable",
+                  "enable": false,
+                  "id": 33
+                },
+                {
+                  "name": "Disable",
+                  "enable": false,
+                  "id": 35
+                }
+              ]
             },
             {
-              "name": "Disable",
-              "enable": true,
-              "id": 35
+              "name": "Distribute",
+              "size": [ 2, 1 ],
+              "id": -1,
+              "enable": false,
+              "items": [
+                {
+                  "name": "Enable",
+                  "enable": false,
+                  "id": 65
+                },
+                {
+                  "name": "Disable",
+                  "enable": false,
+                  "id": 67
+                }
+              ]
             }
+
+
           ]
         },
         {
           "name": "Color",
           "size": [ 2, 1 ],
           "id": -1,
-          "enable": true,
+          "enable": false,
           "items": [
             {
               "name": "Enable",
-              "enable": true,
+              "enable": false,
               "id": 49
             },
             {
               "name": "Disable",
-              "enable": true,
+              "enable": false,
               "id": 51
             }
           ]

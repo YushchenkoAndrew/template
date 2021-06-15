@@ -37,7 +37,7 @@ void Menu::Build(const list_t& list) {
 
 void Menu::InitStates(menustate_t& mMenuState) {
     if (nId > 0)
-        mMenuState[STATE_GROUP(nId)][STATE_INDEX(nId)] = { false, false, false };
+        mMenuState[STATE_GROUP(nId)][STATE_INDEX(nId)] = { false, false, bEnable };
 
     for (auto& item : items) {
         item.InitStates(mMenuState);
@@ -117,7 +117,7 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
 
         olc::vi2d vPos = vPatchPos * PATCH_SIZE + vOffset;
         
-        GameEngine.DrawStringDecal(vPos, items[nTopLeftItem + i].sName, items[nTopLeftItem + i].bEnable ? olc::WHITE : olc::DARK_GREY);
+        GameEngine.DrawStringDecal(vPos, items[nTopLeftItem + i].sName, olc::WHITE);
 
         if (!items[nTopLeftItem + i].HasItems()) continue;
 
