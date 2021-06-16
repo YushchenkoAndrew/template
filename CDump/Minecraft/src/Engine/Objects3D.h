@@ -120,10 +120,12 @@ struct sPoint3D {
 	static inline sPoint3D normalize(const sPoint3D& p) { return p / sPoint3D::length(p); }
 	static inline float length(const sPoint3D& p) { return sqrtf(p.x * p.x + p.y * p.y + p.z * p.z); }
 	static inline float prod(const sPoint3D& right, const sPoint3D& left) { return right.x * left.x + right.y * left.y + right.z * left.z; }
+	static inline float Avg(const sPoint3D& p) { return (p.x + p.y + p.z) / 3.0f; }
 
 	inline sPoint3D normalize() const { return sPoint3D::normalize(*this); }
 	inline float length() const { return sPoint3D::length(*this); }
 	inline float prod(const sPoint3D& right) const { return this->x * right.x + this->y * right.y + this->z * right.z; }
+	inline float Avg() const { return (this->x + this->y + this->z) / 3.0f; }
 	inline sPoint3D cross(const sPoint3D& right) const { 
 		return {
 			this->y * right.z - this->z * right.y,
@@ -170,6 +172,10 @@ struct sTriangle {
 	inline float AvgX() { return (p[0].x + p[1].x + p[2].x) / 3.0f; }
 	inline float AvgY() { return (p[0].y + p[1].y + p[2].y) / 3.0f; }
 	inline float AvgZ() { return (p[0].z + p[1].z + p[2].z) / 3.0f; }
+	sPoint3D Avg() { return (p[0] + p[1] + p[2]) / 3.0f; }
+
+
+	sPoint3D& operator[] (const int32_t i) { return p[i]; }
 };
 
 
