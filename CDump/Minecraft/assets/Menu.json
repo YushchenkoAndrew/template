@@ -18,12 +18,12 @@
           "items": [
             {
               "name": "Enable",
-              "enable": true,
+              "enable": false,
               "id": 17
             },
             {
               "name": "Disable",
-              "enable": false,
+              "enable": true,
               "id": 19
             }
           ]
@@ -42,7 +42,7 @@
               "items": [
                 {
                   "name": "Enable",
-                  "enable": false,
+                  "enable": true,
                   "id": 33
                 },
                 {
@@ -65,7 +65,7 @@
                 },
                 {
                   "name": "Disable",
-                  "enable": false,
+                  "enable": true,
                   "id": 67
                 }
               ]

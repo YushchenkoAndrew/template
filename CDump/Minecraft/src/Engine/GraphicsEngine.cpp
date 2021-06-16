@@ -279,11 +279,13 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 
 // Using this implementation of  Bresenham method
 void GraphicsEngine::DrawTriangle(olc::PixelGameEngine &GameEngine, int32_t x1, int32_t y1, int32_t z1, int32_t x2, int32_t y2, int32_t z2, int32_t x3, int32_t y3, int32_t z3, olc::Pixel p) {
-	float dax = 0.0f;
-	float dbx = 0.0f;
+	float dax = 1.0f;
+	float dbx = 1.0f;
+	float daz = 1.0f;
+	float dbz = 1.0f;
 
 	auto DrawLine = [&](int32_t sx, int32_t ex, int32_t y, float sz, float ez) {
-		float step = 1.0f / (float)(ex - sx);
+		float step =  1.0f / (float)(ex - sx);
 		float q = 0.0f;
 
 		for (int i = sx; i <= ex; i++) {
@@ -304,20 +306,20 @@ void GraphicsEngine::DrawTriangle(olc::PixelGameEngine &GameEngine, int32_t x1, 
 
 	int32_t dx1 = x2 - x1;
 	int32_t dy1 = y2 - y1;
-	float dz1 = (float)(z2 - z1);
+	int32_t dz1 = z2 - z1;
 
 	int32_t dx2 = x3 - x1;
 	int32_t dy2 = y3 - y1;
-	float dz2 = (float)(z3 - z1);
+	int32_t dz2 = z3 - z1;
 
 	if (dy1) {
 		dax = dx1 / (float)abs(dy1);
-		dz1 = dz1 / (float)abs(dy1);
+		daz = dz1 / (float)abs(dy1);
 	}
 
 	if (dy2) {
 		dbx = dx2 / (float)abs(dy2);
-		dz2 = dz2 / (float)abs(dy2);
+		dbz = dz2 / (float)abs(dy2);
 	}
 
 	if (dy1) {
@@ -325,8 +327,8 @@ void GraphicsEngine::DrawTriangle(olc::PixelGameEngine &GameEngine, int32_t x1, 
 			int32_t sx = x1 + (int32_t)((i - y1) * dax);
 			int32_t ex = x1 + (int32_t)((i - y1) * dbx);
 
-			float sz = (float)z1 + (float)(i - y1) * dz1;
-			float ez = (float)z1 + (float)(i - y1) * dz2;
+			float sz = (float)z1 + (float)(i - y1) * daz;
+			float ez = (float)z1 + (float)(i - y1) * dbz;
 
 			if (sx > ex) { swap(sx, ex); swap(sz, ez); }
 			DrawLine(sx, ex, i, sz, ez);
@@ -337,21 +339,19 @@ void GraphicsEngine::DrawTriangle(olc::PixelGameEngine &GameEngine, int32_t x1, 
 	dy1 = y3 - y2;
 	dz1 = z3 - z2;
 
-	if (dy1) {
-		dax = dx1 / (float)abs(dy1);
-		dz1 = dz1 / (float)abs(dy1);
-	}
-
 	if (!dy1) return;
+
+	dax = dx1 / (float)abs(dy1);
+	daz = dz1 / (float)abs(dy1);
 
 	for (int32_t i = y2; i <= y3; i++) {
 		int32_t sx = x2 + (int32_t)((i - y2) * dax);
 		int32_t ex = x1 + (int32_t)((i - y1) * dbx);
 
-		float sz = (float)z2 + (float)(i - y2) * dz1;
-		float ez = (float)z1 + (float)(i - y1) * dz2;
+		float sz = (float)z2 + (float)(i - y2) * daz;
+		float ez = (float)z1 + (float)(i - y1) * dbz;
 
 		if (sx > ex) { swap(sx, ex); swap(sz, ez); }
-		DrawLine(sx, ex, i,sz, ez);
+		DrawLine(sx, ex, i, sz, ez);
 	}
 }
