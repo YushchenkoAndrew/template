@@ -33,6 +33,7 @@ private:
 	void ClipByScreenEdge(std::list<sTriangle>& listClippedTr);
 
 	inline void swap(int32_t& x, int32_t& y) { x = x ^ y; y = x ^ y; x = x ^ y; }
+	inline void swap(float& x, float& y) { float z = x; x = y; y = z; }
 
 public:
 	std::vector<sTriangle> trMap;

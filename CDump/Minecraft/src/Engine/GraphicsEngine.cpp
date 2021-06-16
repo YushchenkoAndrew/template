@@ -278,165 +278,80 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 
 
 // Using this implementation of  Bresenham method
-// https://www.avrfreaks.net/sites/default/files/triangles.c
 void GraphicsEngine::DrawTriangle(olc::PixelGameEngine &GameEngine, int32_t x1, int32_t y1, int32_t z1, int32_t x2, int32_t y2, int32_t z2, int32_t x3, int32_t y3, int32_t z3, olc::Pixel p) {
-	int32_t signx1 = 1;
-	int32_t signx2 = 1;
-	bool bChanged1 = false;
-	bool bChanged2 = false;
-	bool bLoopEnd = false;
+	float dax = 0.0f;
+	float dbx = 0.0f;
 
-	int32_t t1xp, t2xp;
-	int32_t xMin, xMax;
+	auto DrawLine = [&](int32_t sx, int32_t ex, int32_t y, float sz, float ez) {
+		float step = 1.0f / (float)(ex - sx);
+		float q = 0.0f;
 
-	auto DrawLine = [&](int sx, int ex, int ny) { for (int i = sx; i <= ex; i++) GameEngine.Draw(i, ny, p); };
+		for (int i = sx; i <= ex; i++) {
+			float z = 1.0f / ((1.0f - q) / sz + q / ez);
+			q += step;
+
+			if (z > zBuffer[y * iScreenWidth + i]) {
+				GameEngine.Draw(i, y, p);
+				zBuffer[y * iScreenWidth + i] = z;
+			}
+		}
+	};
 
     // Sort vertices's
 	if (y1 > y2) { swap(y1, y2); swap(x1, x2); swap(z1, z2); }
 	if (y1 > y3) { swap(y1, y3); swap(x1, x3); swap(z1, z3); }
 	if (y2 > y3) { swap(y2, y3); swap(x2, x3); swap(z2, z3); }
 
-	// Starting points
-	int32_t t1x = x1;
-	int32_t t2x = x1;
-	int32_t y = y1;
-
-	int32_t dx1, dx2;
+	int32_t dx1 = x2 - x1;
 	int32_t dy1 = y2 - y1;
+	float dz1 = (float)(z2 - z1);
+
+	int32_t dx2 = x3 - x1;
 	int32_t dy2 = y3 - y1;
+	float dz2 = (float)(z3 - z1);
 
-	if ((dx1 = x2 - x1) < 0) { dx1 = -dx1; signx1 = -1; } 
-	if ((dx2 = x3 - x1) < 0) { dx2 = -dx2; signx2 = -1; }
+	if (dy1) {
+		dax = dx1 / (float)abs(dy1);
+		dz1 = dz1 / (float)abs(dy1);
+	}
 
-	if (dy1 > dx1) { swap(dx1, dy1); bChanged1 = true; }
-	if (dy2 > dx2) { swap(dy2, dx2); bChanged2 = true; }
-	
-	int32_t e1, e2 = dx2 >> 1;
+	if (dy2) {
+		dbx = dx2 / (float)abs(dy2);
+		dz2 = dz2 / (float)abs(dy2);
+	}
 
-    // Flat top, just process the second half
-	if (y1 != y2) {
-		e1 = dx1 >> 1;
+	if (dy1) {
+		for (int32_t i = y1; i <= y2; i++) {
+			int32_t sx = x1 + (int32_t)((i - y1) * dax);
+			int32_t ex = x1 + (int32_t)((i - y1) * dbx);
 
-		for (uint8_t i = 0; i < dx1;) {
-			t1xp = 0; t2xp = 0;
+			float sz = (float)z1 + (float)(i - y1) * dz1;
+			float ez = (float)z1 + (float)(i - y1) * dz2;
 
-			xMin = std::min(t1x, t2x);
-			xMax = std::max(t1x, t2x);
-
-			bLoopEnd = false;
-
-			// process first line until y value is about to change
-			while (i < dx1 && ++i) {
-				e1 += dy1;
-
-				while (e1 >= dx1) {
-					e1 -= dx1;
-					bLoopEnd = !bChanged1;
-					if (!bChanged1) break;
-					t1xp = signx1;
-				}
-
-				if (bChanged1 || bLoopEnd) break;
-				t1x += signx1;
-			}
-
-			bLoopEnd = false;
-
-			// process second line until y value is about to change
-			while (1) {
-				e2 += dy2;
-				while (e2 >= dx2) {
-					e2 -= dx2;
-					bLoopEnd = !bChanged2;
-					if (!bChanged2) break;
-					t2xp = signx2;
-				}
-
-				if (bChanged2 || bLoopEnd) break;
-				t2x += signx2;
-			}
-
-			xMin = std::min(xMin, std::min(t1x, t2x));
-			xMax = std::max(xMax, std::max(t1x, t2x));
-
-			// Draw line from min to max points found on the y
-			DrawLine(xMin, xMax, y);
-
-			// Now increase y
-			if (!bChanged1) t1x += signx1;
-			if (!bChanged2) t2x += signx2;
-
-			t1x += t1xp;
-			t2x += t2xp;
-			if (++y == y2) break;
+			if (sx > ex) { swap(sx, ex); swap(sz, ez); }
+			DrawLine(sx, ex, i, sz, ez);
 		}
 	}
-	
-	// Second half
+
 	dx1 = x3 - x2;
 	dy1 = y3 - y2;
-	t1x = x2;
+	dz1 = z3 - z2;
 
-	if (dx1 < 0) { dx1 = -dx1; signx1 = -1; }
-	else signx1 = 1;
-
-	if (dy1 > dx1) { swap(dy1, dx1); bChanged1 = true; }
-	else bChanged1 = false;
-	
-	e1 = dx1 >> 1;
-	
-	for (uint8_t i = 0; i <= dx1; i++) {
-		t1xp = 0; t2xp = 0;
-
-		xMin = std::min(t1x, t2x);
-		xMax = std::max(t1x, t2x);
-
-		bLoopEnd = false;
-
-	    // process first line until y value is about to change
-		while (i < dx1) {
-			e1 += dy1;
-			while (e1 >= dx1) {
-				e1 -= dx1;
-				bLoopEnd = !bChanged1;
-				if (!bChanged1) break;
-				t1xp = signx1;
-			}
-
-			if (bChanged1 || bLoopEnd) break;
-			t1x += signx1;
-			if (i < dx1) i++;
-		}
-
-		bLoopEnd = false;
-
-        // process second line until y value is about to change
-		while (t2x != x3) {
-			e2 += dy2;
-			while (e2 >= dx2) {
-				e2 -= dx2;
-				bLoopEnd = !bChanged2;
-				if (!bChanged2) break;
-				t2xp = signx2;
-			}
-
-			if (bChanged2 || bLoopEnd) break;
-			t2x += signx2;
-		}
-
-		xMin = std::min(xMin, std::min(t1x, t2x));
-		xMax = std::max(xMax, std::max(t1x, t2x));
-
-		// Draw line from min to max points found on the y
-		DrawLine(xMin, xMax, y);
-
-		// Now increase y
-		if(!bChanged1) t1x += signx1;
-		if(!bChanged2) t2x += signx2;
-
-		t1x += t1xp;
-		t2x += t2xp;
-		if(++y > y3) return;
+	if (dy1) {
+		dax = dx1 / (float)abs(dy1);
+		dz1 = dz1 / (float)abs(dy1);
 	}
 
+	if (!dy1) return;
+
+	for (int32_t i = y2; i <= y3; i++) {
+		int32_t sx = x2 + (int32_t)((i - y2) * dax);
+		int32_t ex = x1 + (int32_t)((i - y1) * dbx);
+
+		float sz = (float)z2 + (float)(i - y2) * dz1;
+		float ez = (float)z1 + (float)(i - y1) * dz2;
+
+		if (sx > ex) { swap(sx, ex); swap(sz, ez); }
+		DrawLine(sx, ex, i,sz, ez);
+	}
 }
