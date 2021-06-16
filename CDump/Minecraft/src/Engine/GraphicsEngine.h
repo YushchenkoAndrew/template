@@ -17,7 +17,7 @@ public:
 	GraphicsEngine(): mTranslated(Matrix4D::Translation(0.0f, 0.0f, 3.0f)) {}
 	~GraphicsEngine() {}
 
-	void Init(int32_t iHeight, int32_t iWidth, std::unique_ptr<Light> pLightSrc = std::make_unique<AmbientLigh>());
+	void Init(int32_t iHeight, int32_t iWidth, std::unique_ptr<Light> pLightSrc = std::make_unique<LambertLightModel>());
 	void Update(olc::PixelGameEngine& GameEngine,MenuManager& mManager, float& fElapsedTime);
 
 	void Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager);
@@ -49,7 +49,7 @@ private:
 	Matrix4D mProjection;
 	Matrix4D mView;
 
-	sPoint3D vCamera = { 0.0f, 0.0f, 10.0f };
+	sPoint3D vCamera = { -1.0f,  1.0f, -1.0f };
 	sPoint3D vLookDir;
 	sPoint3D vTarget;
 
