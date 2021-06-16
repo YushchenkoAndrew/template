@@ -31,7 +31,7 @@ public:
 	    Clear(olc::BLACK);
         mManager.Draw(*this, decMenu, { 10, 10 }, fElapsedTime);
         mMinecraft.Draw(*this, mManager);
-        return !mManager.GetState(101).bPressed;
+        return !mManager.GetState(eMenuStates::EXIT).bPressed;
     }
 
 private:

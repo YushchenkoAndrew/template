@@ -6,7 +6,7 @@
 struct sChunk {
 	sChunk() { vBlock.reserve(CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE); }
 
-	void Init(int32_t(*fMapGen)(int32_t, int32_t));
+	void Init(int32_t(*fMapGen)(int32_t, int32_t), sPoint3D vOffset);
 	void LoadMap(std::vector<sTriangle>& vMap);
 
 	std::vector<sBlock> vBlock;

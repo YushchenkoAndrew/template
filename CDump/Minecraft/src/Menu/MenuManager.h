@@ -11,6 +11,7 @@ namespace eMenuStates {
 		COLOR_DIS = 51,
 		DISTRIBUTE_EN = 65,
 		DISTRIBUTE_DIS = 67,
+		EXIT = 80
 	};
 }
 
