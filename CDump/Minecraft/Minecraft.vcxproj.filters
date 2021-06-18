@@ -71,6 +71,9 @@
     <ClInclude Include="include\Typelist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Noise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\Sprite-0001.png">

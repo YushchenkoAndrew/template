@@ -126,6 +126,7 @@ struct sPoint3D {
 	inline float length() const { return sPoint3D::length(*this); }
 	inline float prod(const sPoint3D& right) const { return this->x * right.x + this->y * right.y + this->z * right.z; }
 	inline float Avg() const { return (this->x + this->y + this->z) / 3.0f; }
+	inline float GetW(const Matrix4D& MA) { return this->x * MA.MA[0][3] + this->y * MA.MA[1][3] + this->z * MA.MA[2][3] + MA.MA[3][3]; }
 	inline sPoint3D cross(const sPoint3D& right) const { 
 		return {
 			this->y * right.z - this->z * right.y,
