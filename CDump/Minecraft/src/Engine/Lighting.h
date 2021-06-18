@@ -6,12 +6,14 @@ public:
 	virtual void Init(float x, float y, float z) = 0;
 	virtual void LoadBlock(std::vector<sTriangle>& vMap) = 0;
 	virtual int32_t GetLight(const sPoint3D& vTriangle, const sPoint3D& normal, bool bDistribute) = 0;
+	virtual ~Light() {}
 };
 
 
 class LambertLightModel : public Light {
 public:
 	LambertLightModel() : vPos({ 0.0f, 0.0f, 0.0f }), blLightSrc({ 0.0f, 0.0f, 0.0f, EXIST_MASK }) {}
+	~LambertLightModel() override {}
 
 	void Init(float x, float y, float z) override {
 		vPos.x = x; vPos.y = y; vPos.z = z;
