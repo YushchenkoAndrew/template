@@ -3,6 +3,7 @@
 #include "src/Menu/MenuManager.h"
 #include "Objects3D.h"
 #include "Lighting.h"
+//#include "include/Typelist.h"
 
 #define TRIANGLE_OUTSIDE	12u
 #define TRIANGLE_INSIDE		3u
@@ -12,16 +13,20 @@
 #define CAMERA_STEP			4.0f
 #define MOUSE_SPEED			0.5f
 
+class Minecraft;
+
 class GraphicsEngine {
 public:
-	GraphicsEngine(): mTranslated(Matrix4D::Translation(0.0f, 0.0f, 3.0f)) {}
+
+	template<class T>
+	GraphicsEngine(Type2Type<T>): mTranslated(Matrix4D::Translation(0.0f, 0.0f, 3.0f)), lightSrc(std::make_unique<T>()) {}
 	~GraphicsEngine() {}
 
-	void Init(int32_t iHeight, int32_t iWidth, std::unique_ptr<Light> pLightSrc = std::make_unique<LambertLightModel>());
+	void Init(int32_t iHeight, int32_t iWidth);
 	void Update(olc::PixelGameEngine& GameEngine,MenuManager& mManager, float& fElapsedTime);
 
 	void Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager);
-	void DrawTriangle(olc::PixelGameEngine& GameEngine, int32_t x1, int32_t y1, int32_t z1, int32_t x2, int32_t y2, int32_t z2, int32_t x3, int32_t y3, int32_t z3, olc::Pixel p);
+	void DrawTriangle(olc::PixelGameEngine& GameEngine, int32_t x1, int32_t y1, float z1, int32_t x2, int32_t y2, float z2, int32_t x3, int32_t y3, float z3, olc::Pixel p);
 
 private:
 	Matrix4D CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget);
@@ -35,9 +40,8 @@ private:
 	inline void swap(int32_t& x, int32_t& y) { x = x ^ y; y = x ^ y; x = x ^ y; }
 	inline void swap(float& x, float& y) { float z = x; x = y; y = z; }
 
-public:
-	std::vector<sTriangle> trMap;
 
+	friend class Minecraft;
 
 private:
 	int32_t iScreenHeight = 0;
@@ -58,6 +62,7 @@ private:
 	olc::vf2d vMouseLast;
 	bool bFixedMousePos = false;
 
+	std::vector<sTriangle> trMap;
 	std::vector<float> zBuffer;
 	std::vector<sTriangle> trPainted;
 

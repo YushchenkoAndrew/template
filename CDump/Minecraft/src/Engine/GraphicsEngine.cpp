@@ -1,6 +1,6 @@
 #include "GraphicsEngine.h"
 
-void GraphicsEngine::Init(int32_t iHeight, int32_t iWidth, std::unique_ptr<Light> pLightSrc) {
+void GraphicsEngine::Init(int32_t iHeight, int32_t iWidth) {
 	iScreenHeight = iHeight; iScreenWidth = iWidth;
 	zBuffer.assign(iHeight * iWidth, 0.0f);
 
@@ -10,7 +10,6 @@ void GraphicsEngine::Init(int32_t iHeight, int32_t iWidth, std::unique_ptr<Light
 	// Projection Matrix
 	mProjection = Matrix4D::Projection((float)iScreenHeight / (float)iScreenWidth, 90.0f, 1000.0f, 0.1f);
 
-	lightSrc = std::move(pLightSrc);
 	lightSrc->Init(-10.0f, 10.0f, 10.0f);
 	lightSrc->LoadBlock(trMap);
 }
@@ -254,11 +253,10 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 
 			for (auto& trClipped : listClippedTr) {
 				if (mManager.GetState(eMenuStates::COLOR_EN).bHeld) {
-					//GameEngine.FillTriangle(
 					DrawTriangle(GameEngine,
-						(int32_t)trClipped[0].x, (int32_t)trClipped[0].y, (int32_t)trClipped[0].z,
-						(int32_t)trClipped[1].x, (int32_t)trClipped[1].y, (int32_t)trClipped[1].z,
-						(int32_t)trClipped[2].x, (int32_t)trClipped[2].y, (int32_t)trClipped[2].z,
+						(int32_t)trClipped[0].x, (int32_t)trClipped[0].y, trClipped[0].z,
+						(int32_t)trClipped[1].x, (int32_t)trClipped[1].y, trClipped[1].z,
+						(int32_t)trClipped[2].x, (int32_t)trClipped[2].y, trClipped[2].z,
 						mManager.GetState(eMenuStates::SHADOW_EN).bHeld ? olc::Pixel(color, color, color) : olc::WHITE
 					);
 				}
@@ -278,7 +276,9 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 
 
 // Using this implementation of  Bresenham method
-void GraphicsEngine::DrawTriangle(olc::PixelGameEngine &GameEngine, int32_t x1, int32_t y1, int32_t z1, int32_t x2, int32_t y2, int32_t z2, int32_t x3, int32_t y3, int32_t z3, olc::Pixel p) {
+// http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html#pointintrianglearticle
+// https://www.scratchapixel.com/lessons/3d-basic-rendering/rasterization-practical-implementation/visibility-problem-depth-buffer-depth-interpolation
+void GraphicsEngine::DrawTriangle(olc::PixelGameEngine &GameEngine, int32_t x1, int32_t y1, float z1, int32_t x2, int32_t y2, float z2, int32_t x3, int32_t y3, float z3, olc::Pixel p) {
 	float dax = 1.0f;
 	float dbx = 1.0f;
 	float daz = 1.0f;
@@ -306,11 +306,11 @@ void GraphicsEngine::DrawTriangle(olc::PixelGameEngine &GameEngine, int32_t x1, 
 
 	int32_t dx1 = x2 - x1;
 	int32_t dy1 = y2 - y1;
-	int32_t dz1 = z2 - z1;
+	float dz1 = z2 - z1;
 
 	int32_t dx2 = x3 - x1;
 	int32_t dy2 = y3 - y1;
-	int32_t dz2 = z3 - z1;
+	float dz2 = z3 - z1;
 
 	if (dy1) {
 		dax = dx1 / (float)abs(dy1);
@@ -327,8 +327,8 @@ void GraphicsEngine::DrawTriangle(olc::PixelGameEngine &GameEngine, int32_t x1, 
 			int32_t sx = x1 + (int32_t)((i - y1) * dax);
 			int32_t ex = x1 + (int32_t)((i - y1) * dbx);
 
-			float sz = (float)z1 + (float)(i - y1) * daz;
-			float ez = (float)z1 + (float)(i - y1) * dbz;
+			float sz = (float)z1 + (float)((i - y1) * daz);
+			float ez = (float)z1 + (float)((i - y1) * dbz);
 
 			if (sx > ex) { swap(sx, ex); swap(sz, ez); }
 			DrawLine(sx, ex, i, sz, ez);
@@ -348,8 +348,8 @@ void GraphicsEngine::DrawTriangle(olc::PixelGameEngine &GameEngine, int32_t x1, 
 		int32_t sx = x2 + (int32_t)((i - y2) * dax);
 		int32_t ex = x1 + (int32_t)((i - y1) * dbx);
 
-		float sz = (float)z2 + (float)(i - y2) * daz;
-		float ez = (float)z1 + (float)(i - y1) * dbz;
+		float sz = (float)z2 + (float)((i - y2) * daz);
+		float ez = (float)z1 + (float)((i - y1) * dbz);
 
 		if (sx > ex) { swap(sx, ex); swap(sz, ez); }
 		DrawLine(sx, ex, i, sz, ez);
