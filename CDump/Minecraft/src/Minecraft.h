@@ -20,7 +20,7 @@ static int32_t temp(int32_t, int32_t) { return CHUNK_SIZE; }
 
 class Minecraft {
 public:
-	Minecraft() : vChunk({ {} }) {}
+	Minecraft() : cEngine3D(Type2Type<LambertLightModel>()), vChunk({ {} }) {}
 	~Minecraft() {}
 
 	void Init(int32_t iHeight, int32_t iWidth);

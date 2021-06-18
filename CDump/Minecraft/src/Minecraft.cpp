@@ -7,9 +7,7 @@ void sChunk::Init(int32_t (*fMapGen)(int32_t, int32_t), sPoint3D vOffset) {
 				// Maybe just send the vector of Hight for each point
 				int32_t zLevel = fMapGen(x, y);
 
-				vBlock.push_back({(float)x * 2 + vOffset.x, (float)y * 2 + vOffset.y, (float)z * 2 + vOffset.z, 0});
-				vBlock[GET_INDEX(x, y, z)].bStatus |= EXIST_MASK;
-				continue;
+				vBlock.push_back({(float)x + vOffset.x, (float)y + vOffset.y, (float)z + vOffset.z, 0});
 				if (z > zLevel) break;
 
 				vBlock[GET_INDEX(x, y, z)].bStatus |= EXIST_MASK;
