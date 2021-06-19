@@ -1,36 +1,5 @@
 #include "Minecraft.h"
 
-void sChunk::Init(int32_t (*fMapGen)(int32_t, int32_t), sPoint3D vOffset) {
-	for (int32_t z = 0; z < CHUNK_SIZE; z++) {
-		for (int32_t y = 0; y < CHUNK_SIZE; y++) {
-			for (int32_t x = 0; x < CHUNK_SIZE; x++) {
-				// Maybe just send the vector of Hight for each point
-				int32_t zLevel = fMapGen(x, y);
-
-				vBlock.push_back({(float)x + vOffset.x, (float)y + vOffset.y, (float)z + vOffset.z, 0});
-				if (z > zLevel) break;
-
-				vBlock[GET_INDEX(x, y, z)].bStatus |= EXIST_MASK;
-
-				if (x != 0 && IS_EXIST(vBlock[GET_INDEX(x - 1, y, z)].bStatus)) {
-					vBlock[GET_INDEX(x - 1, y, z)].bStatus |= EAST_MASK;
-					vBlock[GET_INDEX(x, y, z)].bStatus |= WEST_MASK;
-				}
-
-				if (y != 0 && IS_EXIST(vBlock[GET_INDEX(x, y - 1, z)].bStatus)) {
-					vBlock[GET_INDEX(x, y - 1, z)].bStatus |= UP_MASK;
-					vBlock[GET_INDEX(x, y, z)].bStatus |= DOWN_MASK;
-				}
-
-				if (z != 0 && IS_EXIST(vBlock[GET_INDEX(x, y, z - 1)].bStatus)) {
-					vBlock[GET_INDEX(x, y, z - 1)].bStatus |= SOUTH_MASK;
-					vBlock[GET_INDEX(x, y, z)].bStatus |= NORTH_MASK;
-				}
-			}
-		}
-	}
-}
-
 void sChunk::LoadMap(std::vector<sTriangle>& vMap) {
 	for (auto& block : vBlock) {
 		block.LoadMap(vMap);
@@ -43,17 +12,29 @@ void sChunk::LoadMap(std::vector<sTriangle>& vMap) {
 void Minecraft::Init(int32_t iHeight, int32_t iWidth) {
 	cEngine3D.Init(iHeight, iWidth);
 
-	for (auto& chunk : vChunk) {
-		chunk.Init(temp, { 0.0f, 0.0f, 0.0f });
-		chunk.LoadMap(cEngine3D.trMap);
-	}
+	InitMap(Type2Type<FractalNoise>());
 }
 
 void Minecraft::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime) {
 	cEngine3D.Update(GameEngine, mManager, fElapsedTime);
+
+	if (mManager.GetState(eMenuStates::TRUE_NOISE).bPressed) InitMap(Type2Type<TrueNoise>());
+	if (mManager.GetState(eMenuStates::PERLIN_NOISE).bPressed) InitMap(Type2Type<PerlinNoise>());
+	if (mManager.GetState(eMenuStates::FRACTAL_NOISE).bPressed) InitMap(Type2Type<FractalNoise>());
 }
 
 
 void Minecraft::Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager) {
 	cEngine3D.Draw(GameEngine, mManager);
+
+	if (mManager.GetState(eMenuStates::DRAW_NOISE_YES).bHeld) DrawNoise(GameEngine);
+}
+
+void Minecraft::DrawNoise(olc::PixelGameEngine& GameEngine) {
+	for (int32_t x = 0; x < NOISE_MAP_SIZE; x++) {
+		for (int32_t y = 0; y < NOISE_MAP_SIZE; y++) {
+			int32_t color = (int32_t)(FractalNoise::Noise((float)x, (float)y) * 255.0f);
+			GameEngine.Draw(x, y, olc::Pixel(color, color, color));
+		}
+	}
 }
