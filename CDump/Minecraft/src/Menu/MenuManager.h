@@ -11,6 +11,11 @@ namespace eMenuStates {
 		COLOR_DIS = 51,
 		DISTRIBUTE_EN = 65,
 		DISTRIBUTE_DIS = 67,
+		DRAW_NOISE_YES = 97,
+		DRAW_NOISE_NO = 99,
+		TRUE_NOISE = 113,
+		PERLIN_NOISE = 115,
+		FRACTAL_NOISE = 117,
 		EXIT = 80
 	};
 }

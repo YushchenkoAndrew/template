@@ -6,89 +6,145 @@
   "items": [
     {
       "name": "Debug",
-      "size": [ 1, 4 ],
+      "size": [ 1, 2 ],
       "id": -1,
       "enable": false,
       "items": [
         {
-          "name": "Edges",
-          "size": [ 2, 1 ],
+          "name": "Draw",
+          "size": [ 1, 5 ],
           "id": -1,
           "enable": false,
           "items": [
             {
-              "name": "Enable",
+              "name": "Edges",
+              "size": [ 2, 1 ],
+              "id": -1,
               "enable": false,
-              "id": 17
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": true,
+                  "id": 17
+                },
+                {
+                  "name": "No",
+                  "enable": false,
+                  "id": 19
+                }
+              ]
             },
-            {
-              "name": "Disable",
-              "enable": true,
-              "id": 19
-            }
-          ]
-        },
-        {
-          "name": "Shadow",
-          "size": [ 1, 2 ],
-          "id": -1,
-          "enable": false,
-          "items": [
             {
               "name": "Shadow",
-              "size": [ 2, 1 ],
+              "size": [ 1, 2 ],
               "id": -1,
               "enable": false,
               "items": [
                 {
-                  "name": "Enable",
-                  "enable": true,
-                  "id": 33
+                  "name": "Shadow",
+                  "size": [ 2, 1 ],
+                  "id": -1,
+                  "enable": false,
+                  "items": [
+                    {
+                      "name": "Yes",
+                      "enable": false,
+                      "id": 33
+                    },
+                    {
+                      "name": "No",
+                      "enable": true,
+                      "id": 35
+                    }
+                  ]
                 },
                 {
-                  "name": "Disable",
+                  "name": "Distribute",
+                  "size": [ 2, 1 ],
+                  "id": -1,
                   "enable": false,
-                  "id": 35
+                  "items": [
+                    {
+                      "name": "Yes",
+                      "enable": false,
+                      "id": 65
+                    },
+                    {
+                      "name": "No",
+                      "enable": true,
+                      "id": 67
+                    }
+                  ]
                 }
               ]
             },
             {
-              "name": "Distribute",
+              "name": "Color",
               "size": [ 2, 1 ],
               "id": -1,
               "enable": false,
               "items": [
                 {
-                  "name": "Enable",
-                  "enable": false,
-                  "id": 65
+                  "name": "Yes",
+                  "enable": true,
+                  "id": 49
                 },
                 {
-                  "name": "Disable",
+                  "name": "No",
+                  "enable": false,
+                  "id": 51
+                }
+              ]
+            },
+            {
+              "name": "Noise",
+              "size": [ 2, 1 ],
+              "id": -1,
+              "enable": false,
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": false,
+                  "id": 97
+                },
+                {
+                  "name": "No",
                   "enable": true,
-                  "id": 67
+                  "id": 99
                 }
               ]
             }
-
-
           ]
         },
         {
-          "name": "Color",
-          "size": [ 2, 1 ],
+          "name": "Alg",
+          "size": [ 1, 4 ],
           "id": -1,
           "enable": false,
           "items": [
             {
-              "name": "Enable",
-              "enable": true,
-              "id": 49
-            },
-            {
-              "name": "Disable",
+              "name": "Rand",
+              "size": [ 1, 3 ],
+              "id": -1,
               "enable": false,
-              "id": 51
+              "items": [
+                {
+                  "name": "TrueNoise",
+                  "id": 113,
+                  "enable": false
+                },
+                {
+                  "name": "PerlinNoise",
+                  "id": 115,
+                  "enable": false
+                },
+                {
+                  "name": "FractalNoise",
+                  "id": 117,
+                  "enable": true
+                }
+
+              ]
             }
           ]
         }

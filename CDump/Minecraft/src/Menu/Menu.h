@@ -73,7 +73,7 @@ protected:
 
 	olc::vi2d vTable = { 1, 0 };
 	olc::vi2d vItemSize = { 0, 0 };
-	olc::vi2d vItemPadding = { 1, 0 };
+	olc::vi2d vItemPadding = { 2, 0 };
 	olc::vi2d vSizeInPatch = { 0, 0 };
 	olc::vi2d vPatch = { PATCH_SIZE, PATCH_SIZE };
 
