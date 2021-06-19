@@ -119,12 +119,12 @@ struct sPoint3D {
 
 	static inline sPoint3D normalize(const sPoint3D& p) { return p / sPoint3D::length(p); }
 	static inline float length(const sPoint3D& p) { return sqrtf(p.x * p.x + p.y * p.y + p.z * p.z); }
-	static inline float prod(const sPoint3D& right, const sPoint3D& left) { return right.x * left.x + right.y * left.y + right.z * left.z; }
+	static inline float dot(const sPoint3D& right, const sPoint3D& left) { return right.x * left.x + right.y * left.y + right.z * left.z; }
 	static inline float Avg(const sPoint3D& p) { return (p.x + p.y + p.z) / 3.0f; }
 
 	inline sPoint3D normalize() const { return sPoint3D::normalize(*this); }
 	inline float length() const { return sPoint3D::length(*this); }
-	inline float prod(const sPoint3D& right) const { return this->x * right.x + this->y * right.y + this->z * right.z; }
+	inline float dot(const sPoint3D& right) const { return this->x * right.x + this->y * right.y + this->z * right.z; }
 	inline float Avg() const { return (this->x + this->y + this->z) / 3.0f; }
 	inline float GetW(const Matrix4D& MA) { return this->x * MA.MA[0][3] + this->y * MA.MA[1][3] + this->z * MA.MA[2][3] + MA.MA[3][3]; }
 	inline sPoint3D cross(const sPoint3D& right) const { 

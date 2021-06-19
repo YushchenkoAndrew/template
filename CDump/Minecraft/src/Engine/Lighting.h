@@ -24,7 +24,7 @@ public:
 
 	int32_t GetLight(const sPoint3D& vTriangle, const sPoint3D& normal, bool bDistribute) override {
 		sPoint3D vIncomingLight = sPoint3D::normalize(vPos - vTriangle);
-		sPoint3D vLightIntesity = vSrcIntensity * vDiffusion * fmaxf(sPoint3D::prod(vIncomingLight, normal), 0.0f);
+		sPoint3D vLightIntesity = vSrcIntensity * vDiffusion * fmaxf(sPoint3D::dot(vIncomingLight, normal), 0.0f);
 		if (bDistribute) vLightIntesity = sPoint3D::normalize(vLightIntesity);
 		return (int32_t)(vLightIntesity.Avg() * 240.0f);
 	}

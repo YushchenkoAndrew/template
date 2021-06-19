@@ -10,7 +10,7 @@ void GraphicsEngine::Init(int32_t iHeight, int32_t iWidth) {
 	// Projection Matrix
 	mProjection = Matrix4D::Projection((float)iScreenHeight / (float)iScreenWidth, 90.0f, 1000.0f, 0.1f);
 
-	lightSrc->Init(-10.0f, 10.0f, 10.0f);
+	lightSrc->Init(10.0f, 30.0f, 10.0f);
 	lightSrc->LoadBlock(trMap);
 }
 
@@ -30,8 +30,8 @@ Matrix4D GraphicsEngine::CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget) {
 
 sPoint3D GraphicsEngine::IntersectionLinePlane(sPoint3D& pPlane, sPoint3D& vPlane, sPoint3D& pStart, sPoint3D& pEnd) {
 	sPoint3D nPlane = vPlane.normalize();
-	float ad = pStart.prod(nPlane);
-	float t = (nPlane.prod(pPlane) - ad) / (pEnd.prod(nPlane) - ad);
+	float ad = pStart.dot(nPlane);
+	float t = (nPlane.dot(pPlane) - ad) / (pEnd.dot(nPlane) - ad);
 	return pStart + (pEnd - pStart) * t;
 }
 
@@ -39,7 +39,7 @@ uint8_t GraphicsEngine::ClipTriangle(sPoint3D pPlane, sPoint3D vPlane, sTriangle
 	sPoint3D nPlane = vPlane.normalize();
 
 	// Find distance from point to plane
-	auto dist = [&](sPoint3D& p) { return nPlane.prod(p) - nPlane.prod(pPlane); };
+	auto dist = [&](sPoint3D& p) { return nPlane.dot(p) - nPlane.dot(pPlane); };
 
 	uint32_t uInside = 0u; uint32_t uOutside = 0u;
 	sPoint3D arrInside[3]; sPoint3D arrOutside[3];
@@ -225,7 +225,7 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 		vect2 = trTranslated[2] - trTranslated[0];
 		normal = sPoint3D::normalize(vect1.cross(vect2));
 
-		if (normal.prod(trTranslated.p[0] - vCamera) > 0.0f) continue;
+		if (normal.dot(trTranslated.p[0] - vCamera) > 0.0f) continue;
 		int32_t color = lightSrc->GetLight(tr.Avg(), normal, mManager.GetState(eMenuStates::DISTRIBUTE_EN).bHeld);
 
 
