@@ -1,14 +1,14 @@
 #include "GraphicsEngine.h"
 
 void GraphicsEngine::Init(int32_t iHeight, int32_t iWidth) {
-	iScreenHeight = iHeight; iScreenWidth = iWidth;
+	cDraw.Init(iHeight, iWidth);
 	zBuffer.assign(iHeight * iWidth, 0.0f);
 
-	vMouseLast.x = (float)iScreenWidth / 2.0f;
-	vMouseLast.y = (float)iScreenHeight / 2.0f;
+	vMouseLast.x = (float)iWidth / 2.0f;
+	vMouseLast.y = (float)iHeight / 2.0f;
 
 	// Projection Matrix
-	mProjection = Matrix4D::Projection((float)iScreenHeight / (float)iScreenWidth, 90.0f, 1000.0f, 0.1f);
+	mProjection = Matrix4D::Projection((float)iHeight / (float)iWidth, 90.0f, 1000.0f, 0.1f);
 
 	lightSrc->Init(10.0f, 30.0f, 10.0f);
 	lightSrc->LoadBlock(trMap);
@@ -104,8 +104,8 @@ uint8_t GraphicsEngine::ClipTriangle(sPoint3D pPlane, sPoint3D vPlane, sTriangle
 }
 
 void GraphicsEngine::ClipByScreenEdge(std::list<sTriangle>& listClippedTr) {
-	float fWidth = (float)iScreenWidth - 1.0f;
-	float fHeight = (float)iScreenHeight - 1.0f;
+	float fWidth = (float)cDraw.nScreenWidth - 1.0f;
+	float fHeight = (float)cDraw.nScreenHeight - 1.0f;
 
 	size_t nUnClippedTr = 1u;
 	sTriangle trClipped[2];
@@ -145,7 +145,7 @@ void GraphicsEngine::CameraLookAt(olc::PixelGameEngine &GameEngine) {
 	vMouseOffset.y = (float)((int32_t)(vMouseLast.y - (float)vMouse.y) * MOUSE_SPEED);
 
 	if (bFixedMousePos) {
-		GameEngine.LockMousePos((int32_t)(iScreenWidth / 2), (int32_t)(iScreenHeight / 2));
+		GameEngine.LockMousePos((int32_t)(cDraw.nScreenWidth / 2), (int32_t)(cDraw.nScreenHeight / 2));
 		vMouse = GameEngine.GetLockedMousePos();
 	}
 
@@ -197,6 +197,7 @@ void GraphicsEngine::CameraMove(olc::PixelGameEngine &GameEngine, float& fElapse
 
 void GraphicsEngine::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime) {
 	if (mManager.InUse()) return;
+	cDraw.Update();
 
 	CameraLookAt(GameEngine);
 	CameraMove(GameEngine, fElapsedTime);
@@ -207,8 +208,6 @@ void GraphicsEngine::Update(olc::PixelGameEngine& GameEngine, MenuManager& mMana
 }
 
 void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManager) {
-	zBuffer.assign(iScreenHeight * iScreenWidth, 0.0f);
-
 	sPoint3D normal, vect1, vect2;
 	sTriangle trProjected, trTranslated, trView;
 
@@ -242,9 +241,9 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 			trProjected[1] = trClipped[i][1] * mProjection + 1.0f;
 			trProjected[2] = trClipped[i][2] * mProjection + 1.0f;
 
-			trProjected[0].x *= 0.5f * (float)iScreenWidth; trProjected[0].y *= 0.5f * (float)iScreenHeight;
-			trProjected[1].x *= 0.5f * (float)iScreenWidth; trProjected[1].y *= 0.5f * (float)iScreenHeight;
-			trProjected[2].x *= 0.5f * (float)iScreenWidth; trProjected[2].y *= 0.5f * (float)iScreenHeight;
+			trProjected[0].x *= 0.5f * (float)cDraw.nScreenWidth; trProjected[0].y *= 0.5f * (float)cDraw.nScreenHeight;
+			trProjected[1].x *= 0.5f * (float)cDraw.nScreenWidth; trProjected[1].y *= 0.5f * (float)cDraw.nScreenHeight;
+			trProjected[2].x *= 0.5f * (float)cDraw.nScreenWidth; trProjected[2].y *= 0.5f * (float)cDraw.nScreenHeight;
 
 
 			listClippedTr.clear();
@@ -253,7 +252,7 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 
 			for (auto& trClipped : listClippedTr) {
 				if (mManager.GetState(eMenuStates::COLOR_EN).bHeld) {
-					DrawTriangle(GameEngine,
+					cDraw.FillTriangle(GameEngine,
 						(int32_t)trClipped[0].x, (int32_t)trClipped[0].y, trClipped[0].z,
 						(int32_t)trClipped[1].x, (int32_t)trClipped[1].y, trClipped[1].z,
 						(int32_t)trClipped[2].x, (int32_t)trClipped[2].y, trClipped[2].z,
@@ -262,10 +261,11 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 				}
 
 				if (mManager.GetState(eMenuStates::EDGE_EN).bHeld) {
-					GameEngine.DrawTriangle(
-						(int32_t)trClipped[0].x, (int32_t)trClipped[0].y,
-						(int32_t)trClipped[1].x, (int32_t)trClipped[1].y,
-						(int32_t)trClipped[2].x, (int32_t)trClipped[2].y,
+					//GameEngine.DrawTriangle(
+					cDraw.DrawTriangle(GameEngine,
+						(int32_t)trClipped[0].x, (int32_t)trClipped[0].y, trClipped[0].z,
+						(int32_t)trClipped[1].x, (int32_t)trClipped[1].y, trClipped[1].z,
+						(int32_t)trClipped[2].x, (int32_t)trClipped[2].y, trClipped[2].z,
 						mManager.GetState(eMenuStates::COLOR_DIS).bHeld ? olc::WHITE : olc::BLACK
 					);
 				}
@@ -274,84 +274,3 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 	}
 }
 
-
-// Using this implementation of  Bresenham method
-// http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html#pointintrianglearticle
-// https://www.scratchapixel.com/lessons/3d-basic-rendering/rasterization-practical-implementation/visibility-problem-depth-buffer-depth-interpolation
-void GraphicsEngine::DrawTriangle(olc::PixelGameEngine &GameEngine, int32_t x1, int32_t y1, float z1, int32_t x2, int32_t y2, float z2, int32_t x3, int32_t y3, float z3, olc::Pixel p) {
-	float dax = 1.0f;
-	float dbx = 1.0f;
-	float daz = 1.0f;
-	float dbz = 1.0f;
-
-	auto DrawLine = [&](int32_t sx, int32_t ex, int32_t y, float sz, float ez) {
-		float step =  1.0f / (float)(ex - sx);
-		float q = 0.0f;
-
-		for (int i = sx; i <= ex; i++) {
-			float z = 1.0f / ((1.0f - q) / sz + q / ez);
-			q += step;
-
-			if (z > zBuffer[y * iScreenWidth + i]) {
-				GameEngine.Draw(i, y, p);
-				zBuffer[y * iScreenWidth + i] = z;
-			}
-		}
-	};
-
-    // Sort vertices's
-	if (y1 > y2) { swap(y1, y2); swap(x1, x2); swap(z1, z2); }
-	if (y1 > y3) { swap(y1, y3); swap(x1, x3); swap(z1, z3); }
-	if (y2 > y3) { swap(y2, y3); swap(x2, x3); swap(z2, z3); }
-
-	int32_t dx1 = x2 - x1;
-	int32_t dy1 = y2 - y1;
-	float dz1 = z2 - z1;
-
-	int32_t dx2 = x3 - x1;
-	int32_t dy2 = y3 - y1;
-	float dz2 = z3 - z1;
-
-	if (dy1) {
-		dax = dx1 / (float)abs(dy1);
-		daz = dz1 / (float)abs(dy1);
-	}
-
-	if (dy2) {
-		dbx = dx2 / (float)abs(dy2);
-		dbz = dz2 / (float)abs(dy2);
-	}
-
-	if (dy1) {
-		for (int32_t i = y1; i <= y2; i++) {
-			int32_t sx = x1 + (int32_t)((i - y1) * dax);
-			int32_t ex = x1 + (int32_t)((i - y1) * dbx);
-
-			float sz = (float)z1 + (float)((i - y1) * daz);
-			float ez = (float)z1 + (float)((i - y1) * dbz);
-
-			if (sx > ex) { swap(sx, ex); swap(sz, ez); }
-			DrawLine(sx, ex, i, sz, ez);
-		}
-	}
-
-	dx1 = x3 - x2;
-	dy1 = y3 - y2;
-	dz1 = z3 - z2;
-
-	if (!dy1) return;
-
-	dax = dx1 / (float)abs(dy1);
-	daz = dz1 / (float)abs(dy1);
-
-	for (int32_t i = y2; i <= y3; i++) {
-		int32_t sx = x2 + (int32_t)((i - y2) * dax);
-		int32_t ex = x1 + (int32_t)((i - y1) * dbx);
-
-		float sz = (float)z2 + (float)((i - y2) * daz);
-		float ez = (float)z1 + (float)((i - y1) * dbz);
-
-		if (sx > ex) { swap(sx, ex); swap(sz, ez); }
-		DrawLine(sx, ex, i, sz, ez);
-	}
-}

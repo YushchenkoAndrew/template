@@ -1,9 +1,10 @@
 #pragma once
 #include "lib/olcPixelGameEngine.h"
 #include "src/Menu/MenuManager.h"
+#include "include/Typelist.h"
 #include "Objects3D.h"
 #include "Lighting.h"
-//#include "include/Typelist.h"
+#include "Draw3D.h"
 
 #define TRIANGLE_OUTSIDE	12u
 #define TRIANGLE_INSIDE		3u
@@ -26,7 +27,6 @@ public:
 	void Update(olc::PixelGameEngine& GameEngine,MenuManager& mManager, float& fElapsedTime);
 
 	void Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager);
-	void DrawTriangle(olc::PixelGameEngine& GameEngine, int32_t x1, int32_t y1, float z1, int32_t x2, int32_t y2, float z2, int32_t x3, int32_t y3, float z3, olc::Pixel p);
 
 private:
 	Matrix4D CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget);
@@ -37,15 +37,11 @@ private:
 	uint8_t ClipTriangle(sPoint3D pPlane, sPoint3D vPlane, sTriangle& iTr, sTriangle& oTr1, sTriangle& oTr2);
 	void ClipByScreenEdge(std::list<sTriangle>& listClippedTr);
 
-	inline void swap(int32_t& x, int32_t& y) { x = x ^ y; y = x ^ y; x = x ^ y; }
-	inline void swap(float& x, float& y) { float z = x; x = y; y = z; }
-
 
 	friend class Minecraft;
 
 private:
-	int32_t iScreenHeight = 0;
-	int32_t iScreenWidth = 0;
+	Draw3D cDraw;
 
 	float fYaw = 0.0f;
 	float fPitch = 0.0f;
