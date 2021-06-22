@@ -1,4 +1,3 @@
-#pragma once
 #include "Draw3D.h"
 
 void Draw3D::Init(int32_t iHeight, int32_t iWidth) {

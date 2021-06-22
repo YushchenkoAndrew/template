@@ -36,12 +36,14 @@ public:
 	Menu& SetTable(int32_t row, int32_t col) { vTable = { row, col }; return *this; }
 	Menu& SetId(int32_t id) { nId = id; return *this; }
 	Menu& SetEnable(bool flag) { bEnable = flag; return *this; }
+	void SetScale(float scale) { nSpriteScale = scale; }
 
 	// Getters
 	std::string& GetName() { return sName; }
 	int32_t GetId() { return nId; }
 	olc::vi2d GetSize() { return { int32_t(sName.size()), 1 }; }
 	olc::vi2d& GetCursor() { return vCursor; }
+	float GetScale() { return nSpriteScale; }
 
 	// Additional func
 	bool HasItems() { return !items.empty(); }
@@ -76,6 +78,7 @@ protected:
 	olc::vi2d vItemPadding = { 2, 0 };
 	olc::vi2d vSizeInPatch = { 0, 0 };
 	olc::vi2d vPatch = { PATCH_SIZE, PATCH_SIZE };
+	float nSpriteScale = 1.0f;
 
 	int32_t nCursorItem = 0;
 	olc::vi2d vCursorPos = { 0, 0 };

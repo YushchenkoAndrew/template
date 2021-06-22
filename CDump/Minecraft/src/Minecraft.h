@@ -2,11 +2,6 @@
 #include "Engine/GraphicsEngine.h"
 #include "include/Noise.h"
 
-#define NOISE_MAP_SIZE 100
-
-#define MAP_SIZE 1
-#define MAP_INDEX(X, Z) ((Z) + (X) * MAP_SIZE)
-
 #define CHUNK_SIZE 24
 #define CHUNK_INDEX(X, Y, Z) ((Y) + (X) * CHUNK_SIZE + (Z) * CHUNK_SIZE * CHUNK_SIZE)
 
@@ -63,28 +58,32 @@ private:
 
 class Minecraft {
 public:
-	Minecraft() : cEngine3D(Type2Type<LambertLightModel>()) { vChunk.assign(MAP_SIZE * MAP_SIZE, {}); }
+	Minecraft() : cEngine3D(Type2Type<LambertLightModel>()) {}
 	~Minecraft() {}
 
-	void Init(int32_t iHeight, int32_t iWidth);
+	void Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig);
 	void Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime);
 	void Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager);
 
 private:
 	void DrawNoise(olc::PixelGameEngine& GameEngine);
+	inline int32_t MapIndex(int32_t x, int32_t z) { return z + x * nMapSize; }
 
 	template <class T>
 	void InitMap(Type2Type<T>) {
 		cEngine3D.trMap.clear();
-		for (int32_t x = 0; x < MAP_SIZE; x++) {
-			for (int32_t z = 0; z < MAP_SIZE; z++) {
-				vChunk[MAP_INDEX(x, z)].Init({ (float)x, 0.0f, (float)z }, Type2Type<T>());
-				vChunk[MAP_INDEX(x, z)].LoadMap(cEngine3D.trMap);
+		for (int32_t x = 0; x < nMapSize; x++) {
+			for (int32_t z = 0; z < nMapSize; z++) {
+				vChunk[MapIndex(x, z)].Init({ (float)x, 0.0f, (float)z }, Type2Type<T>());
+				vChunk[MapIndex(x, z)].LoadMap(cEngine3D.trMap);
 			}
 		}
 	}
 
 private:
+	int32_t nMapSize;
+	int32_t nNoiseSize;
+
 	std::vector<sChunk> vChunk;
 	GraphicsEngine cEngine3D;
 };

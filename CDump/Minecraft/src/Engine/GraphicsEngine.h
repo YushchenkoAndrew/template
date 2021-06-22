@@ -2,6 +2,7 @@
 #include "lib/olcPixelGameEngine.h"
 #include "src/Menu/MenuManager.h"
 #include "include/Typelist.h"
+#include "include/LuaScript.h"
 #include "Objects3D.h"
 #include "Lighting.h"
 #include "Draw3D.h"

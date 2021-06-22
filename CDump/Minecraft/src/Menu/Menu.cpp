@@ -18,6 +18,7 @@ void Menu::Build(const list_t& list) {
 
         (*this)[key].SetEnable(*json->at("enable").GetValue<bool>());
         (*this)[key].SetId(*json->at("id").GetValue<int32_t>());
+        (*this)[key].SetScale(nSpriteScale);
 
         if (json->find("items") != json->end()) {
             auto size = json->at("size").GetValue<list_t>();
@@ -74,7 +75,7 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
 
     for (vPatchPos.x = 0; vPatchPos.x < vSizeInPatch.x; vPatchPos.x++) {
         for (vPatchPos.y = 0; vPatchPos.y < vSizeInPatch.y; vPatchPos.y++) {
-            olc::vi2d vPos = vPatchPos * PATCH_SIZE + vOffset;
+            olc::vi2d vPos = vPatchPos * PATCH_SIZE * (int32_t)nSpriteScale + vOffset;
 
             olc::vi2d vSource = { 5, 1 };
             if (vPatchPos.x == 0) vSource.x--;
@@ -82,7 +83,7 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
             if (vPatchPos.x == vSizeInPatch.x - 1) vSource.x++;
             if (vPatchPos.y == vSizeInPatch.y - 1) vSource.y++;
 
-            GameEngine.DrawPartialDecal(vPos, decMenu.get(), vSource * PATCH_SIZE, vPatch);
+            GameEngine.DrawPartialDecal(vPos, decMenu.get(), vSource * PATCH_SIZE, vPatch, { nSpriteScale, nSpriteScale });
         }
     }
 
@@ -97,15 +98,15 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
         // FIXME: Not the best solution, the easier way just to create asssets and Animated class / script
         //olc::vi2d vAnimated = { 0, (int32_t)((sinf(fTime) - 1.0f) * 1.5f) };
         vPatchPos = { vSizeInPatch.x - 2, 0 };
-        olc::vi2d vPos = vPatchPos * PATCH_SIZE + vOffset;
-        GameEngine.DrawPartialDecal(vPos, decMenu.get(), vSource * PATCH_SIZE, vPatch);
+        olc::vi2d vPos = vPatchPos * PATCH_SIZE * (int32_t)nSpriteScale + vOffset;
+        GameEngine.DrawPartialDecal(vPos, decMenu.get(), vSource * PATCH_SIZE, vPatch, { nSpriteScale, nSpriteScale });
     }
     
     if ((nRows - nTopLeftItem) > vTable.y) {
         olc::vi2d vSource = { 0, 3 };
         vPatchPos = { vSizeInPatch.x - 2, vSizeInPatch.y - 1 };
         olc::vi2d vPos = vPatchPos * PATCH_SIZE + vOffset;
-        GameEngine.DrawPartialDecal(vPos, decMenu.get(), vSource * PATCH_SIZE, vPatch);
+        GameEngine.DrawPartialDecal(vPos, decMenu.get(), vSource * PATCH_SIZE, vPatch, { nSpriteScale, nSpriteScale });
     }
 
     for (int32_t i = 0; i < nVisiable; i++) {
@@ -115,20 +116,20 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
         vPatchPos.x = vItem.x * (vItemSize.x + vItemPadding.x) + 1;
         vPatchPos.y = vItem.y * (vItemSize.y + vItemPadding.y) + 1;
 
-        olc::vi2d vPos = vPatchPos * PATCH_SIZE + vOffset;
+        olc::vi2d vPos = vPatchPos * PATCH_SIZE * (int32_t)nSpriteScale + vOffset;
         
-        GameEngine.DrawStringDecal(vPos, items[nTopLeftItem + i].sName, olc::WHITE);
+        GameEngine.DrawStringDecal(vPos, items[nTopLeftItem + i].sName, olc::WHITE, { nSpriteScale, nSpriteScale });
 
         if (!items[nTopLeftItem + i].HasItems()) continue;
 
         olc::vi2d vSource = { 3, 0 };
         vPatchPos.x += vItemSize.x;
-        vPos = vPatchPos * PATCH_SIZE + vOffset;
-        GameEngine.DrawPartialDecal(vPos, decMenu.get(), vSource * PATCH_SIZE, vPatch);
+        vPos = vPatchPos * PATCH_SIZE * (int32_t)nSpriteScale + vOffset;
+        GameEngine.DrawPartialDecal(vPos, decMenu.get(), vSource * PATCH_SIZE, vPatch, { nSpriteScale, nSpriteScale });
     }
 
-    vCursor.x = (vCursorPos.x * (vItemSize.x + vItemPadding.x)) * PATCH_SIZE + vOffset.x - PATCH_SIZE;
-    vCursor.y = ((vCursorPos.y - nVisibleRow) * (vItemSize.y + vItemPadding.y)) * PATCH_SIZE + vOffset.y + PATCH_SIZE;
+    vCursor.x = (vCursorPos.x * (vItemSize.x + vItemPadding.x)) * PATCH_SIZE * (int32_t)nSpriteScale + vOffset.x;
+    vCursor.y = ((vCursorPos.y - nVisibleRow) * (vItemSize.y + vItemPadding.y) + 1) * PATCH_SIZE * (int32_t)nSpriteScale + vOffset.y;
 
     GameEngine.SetPixelMode(currMode);
 }

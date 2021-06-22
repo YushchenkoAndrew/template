@@ -1,6 +1,7 @@
 #include "Engine/GraphicsEngine.h"
 #include "Menu/MenuManager.h"
 #include "Minecraft.h"
+#include "include/LuaScript.h"
 
 // Check Memory Leaking
 //#define MEM_TRACK
@@ -9,16 +10,16 @@
 
 class Game : public olc::PixelGameEngine {
 public:
-    Game() {
+    Game(LuaScript& config): luaConfig(config) {
         sAppName = "Minecraft";
     }
 
     bool OnUserCreate() override {
-        mManager.Init("./assets/Menu.json");
-        mMinecraft.Init(ScreenHeight(), ScreenWidth());
+        mManager.Init(luaConfig.GetString("menuConfig"), luaConfig.GetNumber("menuSpriteScale"));
+        mMinecraft.Init(ScreenHeight(), ScreenWidth(), luaConfig);
 
 
-        sprMenu = std::make_unique<olc::Sprite>("./assets/Sprite-0001.png");
+        sprMenu = std::make_unique<olc::Sprite>(luaConfig.GetString("menuSprite"));
         decMenu = std::make_unique<olc::Decal>(sprMenu.get());
         return true;
     }
@@ -29,7 +30,7 @@ public:
 
 
 	    Clear(olc::BLACK);
-        mManager.Draw(*this, decMenu, { 10, 10 }, fElapsedTime);
+        mManager.Draw(*this, decMenu, fElapsedTime);
         mMinecraft.Draw(*this, mManager);
         return !mManager.GetState(eMenuStates::EXIT).bPressed;
     }
@@ -37,6 +38,7 @@ public:
 private:
     Minecraft mMinecraft;
     MenuManager mManager;
+    LuaScript luaConfig;
 
     std::unique_ptr<olc::Sprite> sprMenu;
     std::unique_ptr<olc::Decal> decMenu;
@@ -44,8 +46,13 @@ private:
 
 int main()
 {
-    Game demo;
-    if (demo.Construct(250, 250, 4, 4))
+    LuaScript luaConfig;
+    if (!luaConfig.Init("src/lua/Config.lua")) return 0;
+
+    int32_t nPixel = luaConfig.GetInt32("nPixel");
+
+    Game demo(luaConfig);
+    if (demo.Construct(luaConfig.GetInt32("nScreenWidth"), luaConfig.GetInt32("nScreenHeight"), nPixel, nPixel)) 
         demo.Start();
     
     return 0;

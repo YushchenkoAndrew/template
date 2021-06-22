@@ -50,16 +50,17 @@ void MenuManager::OnMove(olc::PixelGameEngine& GameEngine) {
 	if (GameEngine.GetKey(olc::Z).bPressed) OnConfirm();
 }
 
-void MenuManager::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, olc::vi2d vOffset, float& fTime) {
+void MenuManager::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, float& fTime) {
 	if (stMenu.empty()) return;
+	olc::vi2d vOffset = this->vOffset;
 
 	for (auto& item : stMenu) {
 		item->Draw(GameEngine, decMenu, vOffset, fTime);
-		vOffset += { 20, 20 };
+		vOffset += { 20 * (int32_t)item->GetScale() , 20 * (int32_t)item->GetScale() };
 	}
 
     olc::Pixel::Mode currMode = GameEngine.GetPixelMode();
     GameEngine.SetPixelMode(olc::Pixel::MASK);
-	GameEngine.DrawPartialDecal(stMenu.back()->GetCursor(), decMenu.get(), olc::vi2d(2, 3) * PATCH_SIZE, {PATCH_SIZE, PATCH_SIZE});
+	GameEngine.DrawPartialDecal(stMenu.back()->GetCursor(), decMenu.get(), olc::vi2d(2, 3) * PATCH_SIZE, { PATCH_SIZE, PATCH_SIZE }, { stMenu.back()->GetScale(), stMenu.back()->GetScale() });
     GameEngine.SetPixelMode(currMode);
 }

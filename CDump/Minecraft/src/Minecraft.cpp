@@ -9,7 +9,11 @@ void sChunk::LoadMap(std::vector<sTriangle>& vMap) {
 
 
 
-void Minecraft::Init(int32_t iHeight, int32_t iWidth) {
+void Minecraft::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
+	nMapSize = luaConfig.GetInt32("nMapSize");
+	nNoiseSize = luaConfig.GetInt32("nNoiseSize");
+
+	vChunk.assign(nMapSize * nMapSize, {}); 
 	cEngine3D.Init(iHeight, iWidth);
 
 	InitMap(Type2Type<FractalNoise>());
@@ -31,8 +35,8 @@ void Minecraft::Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager) {
 }
 
 void Minecraft::DrawNoise(olc::PixelGameEngine& GameEngine) {
-	for (int32_t x = 0; x < NOISE_MAP_SIZE; x++) {
-		for (int32_t y = 0; y < NOISE_MAP_SIZE; y++) {
+	for (int32_t x = 0; x < nNoiseSize; x++) {
+		for (int32_t y = 0; y < nNoiseSize; y++) {
 			int32_t color = (int32_t)(FractalNoise::Noise((float)x, (float)y) * 255.0f);
 			GameEngine.Draw(x, y, olc::Pixel(color, color, color));
 		}

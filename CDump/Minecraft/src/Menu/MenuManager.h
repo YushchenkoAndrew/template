@@ -22,12 +22,14 @@ namespace eMenuStates {
 
 class MenuManager {
 public:
-	void Init(const std::string& path) { cMenu.Load(path); cMenu.InitStates(mMenuState); }
+	MenuManager(): vOffset({ 10, 10 }) {}
+
+	void Init(const std::string& path, float scale) { cMenu.SetScale(scale); cMenu.Load(path); cMenu.InitStates(mMenuState); }
 	void Open(Menu* pMenu) { Close(); stMenu.push_back(pMenu); isInUse = true; }
 	void Close() { stMenu.clear(); }
 
 	void Update(olc::PixelGameEngine& GameEngine);
-	void Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, olc::vi2d vOffset, float& fTime);
+	void Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, float& fTime);
 
 	sMenuState& GetState(int32_t nId) { return mMenuState[STATE_GROUP(nId)][STATE_INDEX(nId)]; }
 	bool InUse() { return isInUse; }
@@ -40,6 +42,7 @@ private:
 	Menu cMenu;
 	std::list<Menu*> stMenu;
 	menustate_t mMenuState;
+	const olc::vi2d vOffset;
 
 	int32_t nId = -1;
 	bool isInUse = false;
