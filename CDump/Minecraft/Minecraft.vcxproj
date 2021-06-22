@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\LuaScript.cpp" />
     <ClCompile Include="lib\olcPixelGameEngine.cpp" />
     <ClCompile Include="src\Engine\Draw3D.cpp" />
     <ClCompile Include="src\Engine\GraphicsEngine.cpp" />
@@ -173,6 +174,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\Menu.json" />
+    <None Include="src\lua\Config.lua" />
     <None Include="src\lua\Json.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
