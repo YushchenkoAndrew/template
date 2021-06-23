@@ -12,8 +12,6 @@
 #define TRIANGLE_SMALL		9u
 #define TRIANGLE_QAUD		6u
 
-#define CAMERA_STEP			4.0f
-#define MOUSE_SPEED			0.5f
 
 class Minecraft;
 
@@ -24,7 +22,7 @@ public:
 	GraphicsEngine(Type2Type<T>): mTranslated(Matrix4D::Translation(0.0f, 0.0f, 3.0f)), lightSrc(std::make_unique<T>()) {}
 	~GraphicsEngine() {}
 
-	void Init(int32_t iHeight, int32_t iWidth);
+	void Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig);
 	void Update(olc::PixelGameEngine& GameEngine,MenuManager& mManager, float& fElapsedTime);
 
 	void Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager);
@@ -44,6 +42,9 @@ private:
 private:
 	Draw3D cDraw;
 
+	float nCameraStep = 4.0f;
+	float nMouseSpeed = 0.5f;
+
 	float fYaw = 0.0f;
 	float fPitch = 0.0f;
 
@@ -60,7 +61,6 @@ private:
 	bool bFixedMousePos = false;
 
 	std::vector<sTriangle> trMap;
-	std::vector<float> zBuffer;
 	std::vector<sTriangle> trPainted;
 
 	std::unique_ptr<Light> lightSrc;

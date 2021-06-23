@@ -1,8 +1,7 @@
 #include "GraphicsEngine.h"
 
-void GraphicsEngine::Init(int32_t iHeight, int32_t iWidth) {
+void GraphicsEngine::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
 	cDraw.Init(iHeight, iWidth);
-	zBuffer.assign(iHeight * iWidth, 0.0f);
 
 	vMouseLast.x = (float)iWidth / 2.0f;
 	vMouseLast.y = (float)iHeight / 2.0f;
@@ -10,8 +9,11 @@ void GraphicsEngine::Init(int32_t iHeight, int32_t iWidth) {
 	// Projection Matrix
 	mProjection = Matrix4D::Projection((float)iHeight / (float)iWidth, 90.0f, 1000.0f, 0.1f);
 
-	lightSrc->Init(10.0f, 30.0f, 10.0f);
+	lightSrc->Init(luaConfig);
 	lightSrc->LoadBlock(trMap);
+
+	nCameraStep = luaConfig.GetValue<float>("nCameraStep");
+	nMouseSpeed = luaConfig.GetValue<float>("nMouseSpeed");
 }
 
 Matrix4D GraphicsEngine::CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget) {
@@ -141,8 +143,8 @@ void GraphicsEngine::CameraLookAt(olc::PixelGameEngine &GameEngine) {
 	olc::vi2d vMouse = GameEngine.GetMousePos();
 	GameEngine.DrawCircle(vMouse.x, vMouse.y, 7);
 
-	vMouseOffset.x = (float)((int32_t)((float)vMouse.x - vMouseLast.x) * MOUSE_SPEED);
-	vMouseOffset.y = (float)((int32_t)(vMouseLast.y - (float)vMouse.y) * MOUSE_SPEED);
+	vMouseOffset.x = (float)((int32_t)((float)vMouse.x - vMouseLast.x) * nMouseSpeed);
+	vMouseOffset.y = (float)((int32_t)(vMouseLast.y - (float)vMouse.y) * nMouseSpeed);
 
 	if (bFixedMousePos) {
 		GameEngine.LockMousePos((int32_t)(cDraw.nScreenWidth / 2), (int32_t)(cDraw.nScreenHeight / 2));
@@ -174,22 +176,22 @@ void GraphicsEngine::CameraMove(olc::PixelGameEngine &GameEngine, float& fElapse
 	sPoint3D vUp = { 0.0f, 1.0f, 0.0f };
 
 	if (GameEngine.GetKey(olc::W).bHeld && !GameEngine.GetKey(olc::SHIFT).bHeld)
-		vCamera -= vLookDir * CAMERA_STEP * fElapsedTime;
+		vCamera -= vLookDir * nCameraStep * fElapsedTime;
 
 	if (GameEngine.GetKey(olc::S).bHeld && !GameEngine.GetKey(olc::SHIFT).bHeld)
-		vCamera += vLookDir * CAMERA_STEP * fElapsedTime;
+		vCamera += vLookDir * nCameraStep * fElapsedTime;
 
 	if (GameEngine.GetKey(olc::W).bHeld && GameEngine.GetKey(olc::SHIFT).bHeld)
-		vCamera.y += CAMERA_STEP * fElapsedTime;
+		vCamera.y += nCameraStep * fElapsedTime;
 
 	if (GameEngine.GetKey(olc::S).bHeld && GameEngine.GetKey(olc::SHIFT).bHeld)
-		vCamera.y -= CAMERA_STEP * fElapsedTime;
+		vCamera.y -= nCameraStep * fElapsedTime;
 
 	if (GameEngine.GetKey(olc::D).bHeld)
-		vCamera += sPoint3D::normalize(vLookDir.cross(vUp)) * CAMERA_STEP * fElapsedTime;
+		vCamera += sPoint3D::normalize(vLookDir.cross(vUp)) * nCameraStep * fElapsedTime;
 
 	if (GameEngine.GetKey(olc::A).bHeld)
-		vCamera -= sPoint3D::normalize(vLookDir.cross(vUp)) * CAMERA_STEP * fElapsedTime;
+		vCamera -= sPoint3D::normalize(vLookDir.cross(vUp)) * nCameraStep * fElapsedTime;
 
 	if (GameEngine.GetKey(olc::ESCAPE).bPressed) bFixedMousePos = false;
 	if (GameEngine.GetMouse(0).bPressed) bFixedMousePos = true;

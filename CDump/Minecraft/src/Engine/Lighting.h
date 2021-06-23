@@ -1,9 +1,11 @@
 #pragma once
 #include "Objects3D.h"
+#include "include/LuaScript.h"
 
 class Light {
 public:
 	virtual void Init(float x, float y, float z) = 0;
+	virtual void Init(LuaScript& luaConfig) = 0;
 	virtual void LoadBlock(std::vector<sTriangle>& vMap) = 0;
 	virtual int32_t GetLight(const sPoint3D& vTriangle, const sPoint3D& normal, bool bDistribute) = 0;
 	virtual ~Light() {}
@@ -18,6 +20,13 @@ public:
 	void Init(float x, float y, float z) override {
 		vPos.x = x; vPos.y = y; vPos.z = z;
 		blLightSrc.SetPos(x, y, z);
+	}
+
+	void Init(LuaScript& luaConfig) override {
+		vPos.x = luaConfig.GetTableValue<float>("vLightSource", "x");
+		vPos.y = luaConfig.GetTableValue<float>("vLightSource", "y");
+		vPos.z = luaConfig.GetTableValue<float>("vLightSource", "z");
+		blLightSrc.SetPos(vPos.x, vPos.y, vPos.z);
 	}
 
 	void LoadBlock(std::vector<sTriangle>& vMap) override { blLightSrc.LoadMap(vMap); }
