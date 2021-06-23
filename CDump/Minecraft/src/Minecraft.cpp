@@ -10,11 +10,11 @@ void sChunk::LoadMap(std::vector<sTriangle>& vMap) {
 
 
 void Minecraft::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
-	nMapSize = luaConfig.GetInt32("nMapSize");
-	nNoiseSize = luaConfig.GetInt32("nNoiseSize");
+	nMapSize = luaConfig.GetValue<int32_t>("nMapSize");
+	nNoiseSize = luaConfig.GetValue<int32_t>("nNoiseSize");
 
 	vChunk.assign(nMapSize * nMapSize, {}); 
-	cEngine3D.Init(iHeight, iWidth);
+	cEngine3D.Init(iHeight, iWidth, luaConfig);
 
 	InitMap(Type2Type<FractalNoise>());
 }
