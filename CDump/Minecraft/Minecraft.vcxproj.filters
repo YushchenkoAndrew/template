@@ -42,9 +42,6 @@
     <ClCompile Include="src\Engine\Draw3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\LuaScript.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\olcPixelGameEngine.h">

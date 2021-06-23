@@ -143,7 +143,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\LuaScript.cpp" />
     <ClCompile Include="lib\olcPixelGameEngine.cpp" />
     <ClCompile Include="src\Engine\Draw3D.cpp" />
     <ClCompile Include="src\Engine\GraphicsEngine.cpp" />
