@@ -1,5 +1,6 @@
 #pragma once
 #include "lib/olcPixelGameEngine.h"
+#include "include/LuaScript.h"
 #include "include/Json.h"
 
 #define PATCH_SIZE 8

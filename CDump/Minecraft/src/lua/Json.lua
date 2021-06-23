@@ -140,15 +140,19 @@ function ParseValue()
 end
 
 
-function Parse_JSON(path)
+function ParseJSON(path)
 	file = io.open(path, "r")
 	if not file then
 		print("Unable to open file")
-		return
+		return nil
 	end
 
 	cCurr = file:read(1)
-	return ParseValue()
+
+	result = ParseValue()
+	StringifyJSON(result, 0)
+
+	return result
 end
 
 
@@ -158,13 +162,13 @@ function RepeatStr(str, n)
 	return result
 end
 
-function Stringify_JSON(json, i)
+function StringifyJSON(json, i)
 	if (json == nil) then return end
 
 	for key, value in pairs(json) do
 		if (type(value) == "table") then
 			print(RepeatStr("  ", i) .. key .. " => ")
-			Stringify_JSON(value, i + 1)
+			StringifyJSON(value, i + 1)
 		else
 			print(RepeatStr("  ", i) ..  key .. " => " .. tostring(value))
 		end
@@ -172,5 +176,5 @@ function Stringify_JSON(json, i)
 end
 
 
--- Temporary
-Stringify_JSON(Parse_JSON("./assets/Menu.json"), 0)
+-- Test
+-- StringifyJSON(ParseJSON("../../assets/Menu.json"), 0)

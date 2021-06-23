@@ -1,14 +1,26 @@
 #include "Menu.h"
 
 void Menu::Load(const std::string& path) {
-    std::shared_ptr<json_t> json;
-    if (!JSON::parse(path, json)) return;
+    LuaScript luaJson;
+    if (!luaJson.Init("src/lua/Json.lua")) return;
+    //std::shared_ptr<json_t> json;
+    //if (!JSON::parse(path, json)) return;
 
-    auto size = json.get()->at("size").GetValue<list_t>();
-    SetTable(*size->at(0).GetValue<int32_t>(), *size->at(1).GetValue<int32_t>());
-    SetEnable(*json.get()->at("enable").GetValue<bool>());
-    SetId(*json->at("id").GetValue<int32_t>());
-    Build(*json.get()->at("items").GetValue<list_t>());
+    luaJson.CallFunction("ParseJSON", path, 1);
+
+    printf("id = %d\n", luaJson.GetTableValue<int32_t>(nullptr, "id"));
+    printf("name = %s\n", luaJson.GetTableValue<const char*>(nullptr, "name"));
+
+    luaJson.GetTableValue<int32_t>(nullptr, "size");
+    std::vector<int32_t> size = luaJson.GetArray<int32_t>(nullptr, 2);
+    for (auto& value : size) printf("?%d = ", value);
+    //printf("y = %d\n", luaJson.GetTableValue<int32_t>(nullptr, 2));
+
+    //auto size = json.get()->at("size").GetValue<list_t>();
+    //SetTable(*size->at(0).GetValue<int32_t>(), *size->at(1).GetValue<int32_t>());
+    //SetEnable(*json.get()->at("enable").GetValue<bool>());
+    //SetId(*json->at("id").GetValue<int32_t>());
+    //Build(*json.get()->at("items").GetValue<list_t>());
 }
 
 void Menu::Build(const list_t& list) {
