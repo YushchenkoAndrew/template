@@ -3,40 +3,42 @@
 void Menu::Load(const std::string& path) {
     LuaScript luaJson;
     if (!luaJson.Init("src/lua/Json.lua")) return;
-    //std::shared_ptr<json_t> json;
-    //if (!JSON::parse(path, json)) return;
 
-    luaJson.CallFunction("ParseJSON", path, 1);
+    luaJson.CallFunction("ParseJSON", { path }, 1);
 
-    printf("id = %d\n", luaJson.GetTableValue<int32_t>(nullptr, "id"));
-    printf("name = %s\n", luaJson.GetTableValue<const char*>(nullptr, "name"));
+    SetEnable(luaJson.GetTableValue<bool>(nullptr, "enable"));
+    SetId(luaJson.GetTableValue<int32_t>(nullptr, "id"));
 
     luaJson.GetTableValue<int32_t>(nullptr, "size");
-    std::vector<int32_t> size = luaJson.GetArray<int32_t>(nullptr, 2);
-    for (auto& value : size) printf("?%d = ", value);
-    //printf("y = %d\n", luaJson.GetTableValue<int32_t>(nullptr, 2));
+    SetTable(luaJson.GetArray<int32_t>());
+    luaJson.Pop();
 
-    //auto size = json.get()->at("size").GetValue<list_t>();
-    //SetTable(*size->at(0).GetValue<int32_t>(), *size->at(1).GetValue<int32_t>());
-    //SetEnable(*json.get()->at("enable").GetValue<bool>());
-    //SetId(*json->at("id").GetValue<int32_t>());
-    //Build(*json.get()->at("items").GetValue<list_t>());
+    luaJson.GetTableValue<bool>(nullptr, "items");
+    Build(luaJson);
+    luaJson.Pop();
 }
 
-void Menu::Build(const list_t& list) {
-    for (auto& obj : list) {
-        auto json = obj.GetValue<json_t>();
-        std::string key = *json->at("name").GetValue<std::string>();
+void Menu::Build(LuaScript& luaJson) {
+    for (int32_t i = 0u; i < luaJson.Length(); i++) {
+        luaJson.GetTableValue<bool>(nullptr, i + 1);
 
-        (*this)[key].SetEnable(*json->at("enable").GetValue<bool>());
-        (*this)[key].SetId(*json->at("id").GetValue<int32_t>());
+        std::string key = luaJson.GetTableValue<const char*>(nullptr, "name");
+
+        (*this)[key].SetId(luaJson.GetTableValue<int32_t>(nullptr, "id"));
+        (*this)[key].SetEnable(luaJson.GetTableValue<bool>(nullptr, "enable"));
         (*this)[key].SetScale(nSpriteScale);
 
-        if (json->find("items") != json->end()) {
-            auto size = json->at("size").GetValue<list_t>();
-            (*this)[key].SetTable(*size->at(0).GetValue<int32_t>(), *size->at(1).GetValue<int32_t>());
-            (*this)[key].Build(*json->at("items").GetValue<list_t>());
+        if (luaJson.IsKeyExist(nullptr, "items")) {
+            luaJson.GetTableValue<int32_t>(nullptr, "size");
+            (*this)[key].SetTable(luaJson.GetArray<int32_t>());
+            luaJson.Pop();
+
+			luaJson.GetTableValue<bool>(nullptr, "items");
+			(*this)[key].Build(luaJson);
+			luaJson.Pop();
         }
+
+        luaJson.Pop();
 
         vItemSize.x = (*this)[key].GetSize().x > vItemSize.x ? (*this)[key].GetSize().x : vItemSize.x;
         vItemSize.y = (*this)[key].GetSize().y > vItemSize.y ? (*this)[key].GetSize().y : vItemSize.y;

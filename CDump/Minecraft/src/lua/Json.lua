@@ -149,10 +149,7 @@ function ParseJSON(path)
 
 	cCurr = file:read(1)
 
-	result = ParseValue()
-	StringifyJSON(result, 0)
-
-	return result
+	return ParseValue()
 end
 
 

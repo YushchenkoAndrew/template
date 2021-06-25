@@ -29,12 +29,13 @@ public:
 	void InitStates(menustate_t& mMenuState);
 
 protected:
-	void Build(const list_t& list);
+	void Build(LuaScript& luaJson);
 
 public:
 
 	// Setters
 	Menu& SetTable(int32_t row, int32_t col) { vTable = { row, col }; return *this; }
+	Menu& SetTable(const std::vector<int32_t>& vSize) { vTable = { vSize[0], vSize[1] }; return *this; }
 	Menu& SetId(int32_t id) { nId = id; return *this; }
 	Menu& SetEnable(bool flag) { bEnable = flag; return *this; }
 	void SetScale(float scale) { nSpriteScale = scale; }

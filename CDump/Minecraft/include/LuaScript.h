@@ -21,7 +21,7 @@ extern "C" {
 class LuaScript {
 public:
 	LuaScript() : L(luaL_newstate()) { luaL_openlibs(L); }
-	~LuaScript() { lua_close(L); }
+	~LuaScript() { lua_settop(L, 0); lua_close(L); }
 
 	bool Init(const char* path) { return CheckState(luaL_dofile(L, path)); }
 	bool Init(const std::string& path) { return CheckState(luaL_dofile(L, path.c_str())); }
@@ -70,6 +70,14 @@ public:
 		return lua_toboolean(L, -1);
 	}
 
+	bool GetTable(const char* table) {
+		if (table != nullptr) {
+			if (sPrevTable != table) lua_getglobal(L, table);
+			else sPrevTable = table;
+		}
+
+		return lua_istable(L, -1);
+	}
 
 	template<class T>
 	T GetTableValue(const char* table, const char* key) {
@@ -103,12 +111,27 @@ public:
 		return value;
 	}
 
+	bool IsKeyExist(const char* table, const char* key) {
+		if (table != nullptr) {
+			if (sPrevTable != table) lua_getglobal(L, table);
+			else sPrevTable = table;
+		}
+
+		if (!lua_istable(L, -1)) return false;
+		lua_pushstring(L, key);
+		lua_gettable(L, -2);
+		bool res = !lua_isnil(L, -1);
+		lua_pop(L, 1);
+		return res;
+	}
+
 	template <class T>
-	std::vector<T> GetArray(const char* table, int32_t nSize) {
-		if (table != nullptr)  lua_getglobal(L, table);
+	std::vector<T> GetArray(const char* arr = nullptr) {
+		if (arr != nullptr) lua_getglobal(L, arr);
 		if (!lua_istable(L, -1)) return {};
 
 		std::vector<T> res;
+		int32_t nSize = (int32_t)lua_rawlen(L, -1);
 		for (int32_t i = 0; i < nSize; i++) {
 			lua_pushinteger(L, i + 1);
 			lua_gettable(L, -2);
@@ -118,20 +141,37 @@ public:
 		return res;
 	}
 
+	int32_t Length() { return lua_istable(L, -1) ? (int32_t)lua_rawlen(L, -1) : 0; }
+
 	// Stack function
 	void Pop(int32_t n = 1) { lua_pop(L, n); }
 
+	template <class T> void Push(T value);
+	template<> void Push(int32_t value) { lua_pushinteger(L, value); }
+	template<> void Push(float value) { lua_pushnumber(L, value); }
+	template<> void Push(std::string value) { lua_pushstring(L, value.c_str()); }
+	template<> void Push(const char* value) { lua_pushstring(L, value); }
+	template<> void Push(bool value) { lua_pushboolean(L, value); }
 
 
-	// FIXME: 
-	//template<class T>
-	void CallFunction(const char* func, const std::string& argv, int32_t nRes = 0) {
+
+	template<class T>
+	void CallFunction(const char* func, const std::initializer_list<T> argv, int32_t nRes = 0) {
 		lua_getglobal(L, func);
 		if (!lua_isfunction(L, -1)) return;
-		//for (auto& value : argv) 
-			lua_pushstring(L, argv.c_str());
-		CheckState(lua_pcall(L, 1, nRes, 0));
+		for (auto& value : argv)
+			Push(value);
+		CheckState(lua_pcall(L, argv.size(), nRes, 0));
 	}
+
+
+	void CallFunction(const char* func, int32_t nRes = 0) {
+		lua_getglobal(L, func);
+		if (!lua_isfunction(L, -1)) return;
+		CheckState(lua_pcall(L, 0, nRes, 0));
+	}
+
+
 
 private:
 	lua_State* const L;
