@@ -9,9 +9,8 @@ class sChunk {
 public:
 	sChunk() { vBlock.reserve(CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE); }
 
-	// TODO: Do not include cube side of the neighbor chunk
 	template <class T>
-	void Init(sPoint3D vOffset, Type2Type<T>) {
+	void Init(sPoint3D vOffset,sChunk* pWestChunk, sChunk* pNorthChunk,  Type2Type<T>) {
 		vOffset *= CHUNK_SIZE;
 		vBlock.clear();
 
@@ -39,6 +38,18 @@ public:
 
 					if (z != 0 && IS_EXIST(vBlock[CHUNK_INDEX(x, y, z - 1)].bStatus)) {
 						vBlock[CHUNK_INDEX(x, y, z - 1)].bStatus |= SOUTH_MASK;
+						vBlock[CHUNK_INDEX(x, y, z)].bStatus |= NORTH_MASK;
+					}
+
+
+					// Check neighbors Chunk
+					if (x == 0 && pWestChunk != nullptr && IS_EXIST(pWestChunk->vBlock[CHUNK_INDEX(CHUNK_SIZE - 1, y, z)].bStatus)) {
+						pWestChunk->vBlock[CHUNK_INDEX(CHUNK_SIZE - 1, y, z)].bStatus |= EAST_MASK;
+						vBlock[CHUNK_INDEX(x, y, z)].bStatus |= WEST_MASK;
+					}
+
+					if (z == 0 && pNorthChunk != nullptr && IS_EXIST(pNorthChunk->vBlock[CHUNK_INDEX(x, y, CHUNK_SIZE - 1)].bStatus)) {
+						pNorthChunk->vBlock[CHUNK_INDEX(x, y, CHUNK_SIZE - 1)].bStatus |= SOUTH_MASK;
 						vBlock[CHUNK_INDEX(x, y, z)].bStatus |= NORTH_MASK;
 					}
 				}
@@ -74,8 +85,12 @@ private:
 		cEngine3D.trMap.clear();
 		for (int32_t x = 0; x < nMapSize; x++) {
 			for (int32_t z = 0; z < nMapSize; z++) {
-				vChunk[MapIndex(x, z)].Init({ (float)x, 0.0f, (float)z }, Type2Type<T>());
-				vChunk[MapIndex(x, z)].LoadMap(cEngine3D.trMap);
+				vChunk[MapIndex(x, z)].Init(
+					{ (float)x, 0.0f, (float)z },
+					x ? &vChunk[MapIndex(x - 1, z)] : nullptr,
+					z ? &vChunk[MapIndex(x, z - 1)] : nullptr,
+					Type2Type<T>()
+				);
 			}
 		}
 	}

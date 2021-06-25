@@ -17,6 +17,7 @@ void Minecraft::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
 	cEngine3D.Init(iHeight, iWidth, luaConfig);
 
 	InitMap(Type2Type<FractalNoise>());
+	for (auto& chunk : vChunk) chunk.LoadMap(cEngine3D.trMap);
 }
 
 void Minecraft::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime) {
