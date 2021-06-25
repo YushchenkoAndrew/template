@@ -38,7 +38,7 @@ public:
 private:
     Minecraft mMinecraft;
     MenuManager mManager;
-    LuaScript luaConfig;
+    LuaScript& luaConfig;
 
     std::unique_ptr<olc::Sprite> sprMenu;
     std::unique_ptr<olc::Decal> decMenu;
