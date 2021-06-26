@@ -1,0 +1,22 @@
+{
+  "MenuCursor": {
+    "path": "assets/Sprite-0001.png",
+    "size": [8, 8],
+    "scale": [1, 1],
+    "mode": "LOOP",
+    "states": {
+      "click": [
+        {
+          "path": null,
+          "duration": 100,
+          "pos": { "x": 2, "y": 3 }
+        },
+        {
+          "path": null,
+          "duration": 101,
+          "pos": { "x": 3, "y": 3 }
+        }
+      ]
+    }
+  }
+}

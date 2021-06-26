@@ -14,5 +14,6 @@ nNoiseSize = 100
 vLightSource = { x = 10.0, y = 30.0, z = 10.0 }
 
 -- Player Config
+vCamera = { x = 0.0, y = 25.0, z = 0.0 }
 nCameraStep = 8.0
 nMouseSpeed = 0.5
