@@ -96,8 +96,8 @@ private:
 	}
 
 private:
-	int32_t nMapSize;
-	int32_t nNoiseSize;
+	int32_t nMapSize = 1;
+	int32_t nNoiseSize = 0;
 
 	std::vector<sChunk> vChunk;
 	GraphicsEngine cEngine3D;

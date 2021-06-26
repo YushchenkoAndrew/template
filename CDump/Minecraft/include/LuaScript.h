@@ -89,7 +89,7 @@ public:
 		if (!lua_istable(L, -1)) return NULL;
 		lua_pushstring(L, key);
 		lua_gettable(L, -2);
-		if (lua_istable(L, -1)) return NULL;
+		if (lua_istable(L, -1) || lua_isfunction(L, -1)) return NULL;
 		T value = GetValue<T>();
 		lua_pop(L, 1);
 		return value;
@@ -105,7 +105,7 @@ public:
 		if (!lua_istable(L, -1)) return NULL;
 		lua_pushinteger(L, index);
 		lua_gettable(L, -2);
-		if (lua_istable(L, -1)) return NULL;
+		if (lua_istable(L, -1) || lua_isfunction(L, -1)) return NULL;
 		T value = GetValue<T>();
 		lua_pop(L, 1);
 		return value;
@@ -157,7 +157,7 @@ public:
 
 	template<class T>
 	void CallFunction(const char* func, const std::initializer_list<T> argv, int32_t nRes = 0) {
-		lua_getglobal(L, func);
+		if (func != nullptr) lua_getglobal(L, func);
 		if (!lua_isfunction(L, -1)) return;
 		for (auto& value : argv)
 			Push(value);
@@ -166,9 +166,27 @@ public:
 
 
 	void CallFunction(const char* func, int32_t nRes = 0) {
-		lua_getglobal(L, func);
+		if (func != nullptr) lua_getglobal(L, func);
 		if (!lua_isfunction(L, -1)) return;
 		CheckState(lua_pcall(L, 0, nRes, 0));
+	}
+
+
+	template<class T>
+	void CallMethod(const char* table, const char* func, const std::initializer_list<T> argv, int32_t nRes = 0) {
+		if (table != nullptr) {
+			if (sPrevTable != table) lua_getglobal(L, table);
+			else sPrevTable = table;
+		}
+
+		if (!lua_istable(L, -1)) return;
+		lua_pushstring(L, func);
+		lua_gettable(L, -2);
+		if (!lua_isfunction(L, -1)) return;
+		lua_pushstring(L, table); 
+		for (auto& value : argv)
+			Push(value);
+		CheckState(lua_pcall(L, argv.size() + 1, nRes, 0));
 	}
 
 

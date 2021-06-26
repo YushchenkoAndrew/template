@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="lib\olcPixelGameEngine.cpp" />
+    <ClCompile Include="src\Engine\Camera.cpp" />
     <ClCompile Include="src\Engine\Draw3D.cpp" />
     <ClCompile Include="src\Engine\GraphicsEngine.cpp" />
     <ClCompile Include="include\Json.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="include\Noise.h" />
     <ClInclude Include="include\Typelist.h" />
     <ClInclude Include="include\LuaScript.h" />
+    <ClInclude Include="src\Engine\Camera.h" />
     <ClInclude Include="src\Engine\Draw3D.h" />
     <ClInclude Include="src\Engine\GraphicsEngine.h" />
     <ClInclude Include="include\Json.h" />
