@@ -4,9 +4,9 @@ nScreenHeight = 250
 nPixel = 4
 
 -- assets files
-menuConfig = "assets/Menu.json"
-menuSprite = "assets/Sprite-0001.png"
-menuSpriteScale = 1.0
+sMenuConfig = "assets/Menu.json"
+sMenuSprite = "assets/Sprite-0001.png"
+sMenuSpriteScale = 1.0
 
 -- World config
 nMapSize = 4

@@ -15,11 +15,11 @@ public:
     }
 
     bool OnUserCreate() override {
-        mManager.Init(luaConfig.GetValue<std::string>("menuConfig"), luaConfig.GetValue<float>("menuSpriteScale"));
+        mManager.Init(luaConfig.GetValue<std::string>("sMenuConfig"), luaConfig.GetValue<float>("sMenuSpriteScale"));
         mMinecraft.Init(ScreenHeight(), ScreenWidth(), luaConfig);
 
 
-        sprMenu = std::make_unique<olc::Sprite>(luaConfig.GetValue<std::string>("menuSprite"));
+        sprMenu = std::make_unique<olc::Sprite>(luaConfig.GetValue<std::string>("sMenuSprite"));
         decMenu = std::make_unique<olc::Decal>(sprMenu.get());
         return true;
     }

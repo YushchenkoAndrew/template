@@ -1,7 +1,7 @@
 #pragma once
 #include "lib/olcPixelGameEngine.h"
 #include "include/LuaScript.h"
-#include "include/Json.h"
+#include "include/Typelist.h"
 
 #define PATCH_SIZE 8
 #define STATE_GROUP(id)	(int32_t)((id) & ~(int32_t)0x0F)
