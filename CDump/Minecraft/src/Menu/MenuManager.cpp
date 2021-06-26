@@ -61,6 +61,6 @@ void MenuManager::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::De
 
     olc::Pixel::Mode currMode = GameEngine.GetPixelMode();
     GameEngine.SetPixelMode(olc::Pixel::MASK);
-	GameEngine.DrawPartialDecal(stMenu.back()->GetCursor(), decMenu.get(), olc::vi2d(2, 3) * PATCH_SIZE, { PATCH_SIZE, PATCH_SIZE }, { stMenu.back()->GetScale(), stMenu.back()->GetScale() });
+	//GameEngine.DrawPartialDecal(stMenu.back()->GetCursor(), decMenu.get(), olc::vi2d(2, 3) * PATCH_SIZE, { PATCH_SIZE, PATCH_SIZE }, { stMenu.back()->GetScale(), stMenu.back()->GetScale() });
     GameEngine.SetPixelMode(currMode);
 }

@@ -1,65 +1,68 @@
 
--- Local variables
-local file = nil
-local cCurr = ""
-local error = false
-local Keywords = { "true", "false", "null" }
-local KeywordsValue = { ["true"] = true, ["false"] = false, ["null"] = nil }
+-- Init Object
+JSON = {
+	file = nil,
+	cCurr = "",
+	error = false,
+	tKeywords = { "true", "false", "null" },
+	tKeywordsValue = { ["true"] = true, ["false"] = false, ["null"] = nil }
+}
+
 
 -- Skip Functions
-function SkipComma()
-	if (cCurr ~= ",") then error = true; return false end
-		cCurr = file:read(1)
+function JSON:SkipComma()
+	if (JSON.cCurr ~= ",") then JSON.error = true; return false end
+		JSON.cCurr = JSON.file:read(1)
 	return true
 end
 
-function SkipColon()
-	if (cCurr ~= ":") then error = true; return false end
-		cCurr = file:read(1)
+function JSON:SkipColon()
+	if (JSON.cCurr ~= ":") then JSON.error = true; return false end
+		JSON.cCurr = JSON.file:read(1)
 	return true
 end
 
 
-function SkipBlanks()
-	while (cCurr == " " or cCurr == "\n" or cCurr == "\t" or cCurr == "\r") do
-		cCurr = file:read(1)
+function JSON:SkipBlanks()
+	while (JSON.cCurr == " " or JSON.cCurr == "\n" or JSON.cCurr == "\t" or JSON.cCurr == "\r") do
+		JSON.cCurr = JSON.file:read(1)
 	end
 end
 
 
 -- Basic Parsers
-function ParseString()
-	if (cCurr ~= "\"") then return nil end
-	cCurr = file:read(1)
+function JSON:ParseString()
+	if (JSON.cCurr ~= "\"") then return nil end
+	JSON.cCurr = JSON.file:read(1)
 	local str = ""
-	while (cCurr ~= "\"" and cCurr ~= nil) do
-		if (cCurr == "\\") then cCurr = file:read(1) end
-		str = str .. cCurr
-		cCurr = file:read(1)
+	while (JSON.cCurr ~= "\"" and JSON.cCurr ~= nil) do
+		if (JSON.cCurr == "\\") then JSON.cCurr = JSON.file:read(1) end
+		str = str .. JSON.cCurr
+		JSON.cCurr = JSON.file:read(1)
 	end
 
-	if (cCurr ~= "\"") then error = true; return nil end
-	cCurr = file:read(1)
+	if (JSON.cCurr ~= "\"") then JSON.error = true; return nil end
+	JSON.cCurr = JSON.file:read(1)
 	return str
 end
 
-function ParseNumber()
-	local sign = cCurr
+function JSON:ParseNumber()
+	local sign = JSON.cCurr
 	local num = 0
-	if (cCurr == "-") then cCurr = file:read(1) end
+	if (JSON.cCurr == "-") then JSON.cCurr = JSON.file:read(1) end
 
-	while (cCurr >= "0" and cCurr <= "9") do
-		num = num * 10 +  cCurr
-		cCurr = file:read(1)
+	while (JSON.cCurr >= "0" and JSON.cCurr <= "9") do
+		num = num * 10 + JSON.cCurr
+		JSON.cCurr = JSON.file:read(1)
 	end
 
-	if (cCurr == ".") then
-		cCurr = file:read(1)
+	if (JSON.cCurr == ".") then
+		JSON.cCurr = JSON.file:read(1)
 		local fPos = 0.1
-		while (cCurr >= "0" and cCurr <= "9") do
-			num = num + cCurr * fPos
+		while (JSON.cCurr >= "0" and JSON.cCurr <= "9") do
+			num = num + JSON.cCurr * fPos
 			fPos = fPos * 0.1
-			cCurr = file:read(1)
+			JSON.cCurr = JSON.file:read(1)
 		end
 	end
 
@@ -69,109 +72,109 @@ function ParseNumber()
 	return num
 end
 
-function ParseObject()
-	if (cCurr ~= "{") then return nil end
-	cCurr = file:read(1)
-	SkipBlanks()
+function JSON:ParseObject()
+	if (JSON.cCurr ~= "{") then return nil end
+	JSON.cCurr = JSON.file:read(1)
+	JSON:SkipBlanks()
 
 	local json = {}
 	local first = true
-	while (cCurr ~= "}" and cCurr ~= nil) do
-		if (not first and (not SkipComma() or SkipBlanks())) then
+	while (JSON.cCurr ~= "}" and JSON.cCurr ~= nil) do
+		if (not first and (not JSON:SkipComma() or JSON:SkipBlanks())) then
 			return nil
 		end
 
-		local key = ParseString()
-		if (not key or SkipBlanks() or not SkipColon()) then return nil end
+		local key = JSON:ParseString()
+		if (not key or JSON:SkipBlanks() or not JSON:SkipColon()) then return nil end
 
-		json[key] = ParseValue()
+		json[key] = JSON:ParseValue()
 		first = false
 	end
 
-	if (cCurr ~= "}") then error = true; return nil end
-	cCurr = file:read(1)
+	if (JSON.cCurr ~= "}") then JSON.error = true; return nil end
+	JSON.cCurr = JSON.file:read(1)
 	return json
 end
 
-function ParseList()
-	if (cCurr ~= "[") then return nil end
-	cCurr = file:read(1)
-	SkipBlanks()
+function JSON:ParseList()
+	if (JSON.cCurr ~= "[") then return nil end
+	JSON.cCurr = JSON.file:read(1)
+	JSON:SkipBlanks()
 
 	local list = {}
 	local first = true
-	while (cCurr ~= "]" and cCurr ~= nil) do
-		if (not first and not SkipComma()) then return nil end
+	while (JSON.cCurr ~= "]" and JSON.cCurr ~= nil) do
+		if (not first and not JSON:SkipComma()) then return nil end
 
-		list[#list + 1] = ParseValue()
+		list[#list + 1] = JSON:ParseValue()
 		if (not list[#list]) then return nil end
 		first = false
 	end
 
-	if (cCurr ~= "]") then error = true; return nil end
-	cCurr = file:read(1)
+	if (JSON.cCurr ~= "]") then JSON.error = true; return nil end
+	JSON.cCurr = JSON.file:read(1)
 	return list
 end
 
-function ParseKeywords()
+function JSON:ParseKeywords()
 	local j = 1
-	for key, value in pairs(Keywords) do
-		while (#value > j and value:sub(j, j) == cCurr and cCurr ~= nil) do
-			cCurr = file:read(1)
+	for key, value in pairs(JSON.tKeywords) do
+		while (#value > j and value:sub(j, j) == JSON.cCurr and JSON.cCurr ~= nil) do
+			JSON.cCurr = JSON.file:read(1)
 			j = j + 1
 		end
 
 		if (#value == j) then
-			cCurr = file:read(1)
-			return KeywordsValue[value]
+			JSON.cCurr = JSON.file:read(1)
+			return JSON.tKeywordsValue[value]
 		end
 	end
 
 	return nil
 end
 
-function ParseValue()
-	SkipBlanks()
+function JSON:ParseValue()
+	JSON:SkipBlanks()
 
-	local value = ParseString() or ParseNumber() or ParseObject() or ParseList() or ParseKeywords()
+	local value = JSON:ParseString() or JSON:ParseNumber() or JSON:ParseObject() or JSON:ParseList() or JSON:ParseKeywords()
 
-	SkipBlanks()
+	JSON:SkipBlanks()
 	return value
 end
 
 
-function ParseJSON(path)
-	file = io.open(path, "r")
-	if not file then
+function JSON:Parse(path)
+	JSON.file = io.open(path, "r")
+	if not JSON.file then
 		print("Unable to open file")
 		return nil
 	end
 
-	cCurr = file:read(1)
+	JSON.cCurr = JSON.file:read(1)
 
-	return ParseValue()
+	return JSON.ParseValue()
 end
 
 
-function RepeatStr(str, n)
+function JSON:RepeatStr(str, n)
 	local result = ""
 	for i = 1, n, 1 do result = result .. str end
 	return result
 end
 
-function StringifyJSON(json, i)
+function JSON:Stringify(json, i)
 	if (json == nil) then return end
 
 	for key, value in pairs(json) do
 		if (type(value) == "table") then
-			print(RepeatStr("  ", i) .. key .. " => ")
-			StringifyJSON(value, i + 1)
+			print(JSON:RepeatStr("  ", i) .. key .. " => ")
+			JSON:Stringify(value, i + 1)
 		else
-			print(RepeatStr("  ", i) ..  key .. " => " .. tostring(value))
+			print(JSON:RepeatStr("  ", i) ..  key .. " => " .. tostring(value))
 		end
 	end
 end
 
 
 -- Test
--- StringifyJSON(ParseJSON("../../assets/Menu.json"), 0)
+-- JSON:Stringify(JSON:Parse("../../assets/Menu.json"), 0)

@@ -4,7 +4,7 @@ void Menu::Load(const std::string& path) {
     LuaScript luaJson;
     if (!luaJson.Init("src/lua/Json.lua")) return;
 
-    luaJson.CallFunction("ParseJSON", { path }, 1);
+    luaJson.CallMethod("JSON", "Parse", { path }, 1);
 
     SetEnable(luaJson.GetTableValue<bool>(nullptr, "enable"));
     SetId(luaJson.GetTableValue<int32_t>(nullptr, "id"));
@@ -144,6 +144,8 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
 
     vCursor.x = (vCursorPos.x * (vItemSize.x + vItemPadding.x)) * PATCH_SIZE * (int32_t)nSpriteScale + vOffset.x;
     vCursor.y = ((vCursorPos.y - nVisibleRow) * (vItemSize.y + vItemPadding.y) + 1) * PATCH_SIZE * (int32_t)nSpriteScale + vOffset.y;
+
+	GameEngine.DrawPartialDecal(vCursor, decMenu.get(), olc::vi2d(2, 3) * PATCH_SIZE, { PATCH_SIZE, PATCH_SIZE }, { nSpriteScale, nSpriteScale });
 
     GameEngine.SetPixelMode(currMode);
 }
