@@ -24,7 +24,7 @@ class MenuManager {
 public:
 	MenuManager(): vOffset({ 10, 10 }) {}
 
-	void Init(const std::string& path, float scale) { cMenu.SetScale(scale); cMenu.Load(path); cMenu.InitStates(mMenuState); }
+	void Init(const std::string& path, LuaScript& luaConfig);
 	void Open(Menu* pMenu) { Close(); stMenu.push_back(pMenu); isInUse = true; }
 	void Close() { stMenu.clear(); }
 

@@ -1,5 +1,13 @@
 #include "Menu.h"
 
+void Menu::Init(LuaScript& luaConfig) {
+	nSpriteScale = luaConfig.GetValue<float>("sMenuSpriteScale");
+
+    luaConfig.GetTableValue<bool>("MenuSprites", "MENU");
+    SetSprites(SPRITES::MENU, luaConfig.GetArray<int32_t>());
+    luaConfig.Pop();
+}
+
 void Menu::Load(const std::string& path) {
     LuaScript luaJson;
     if (!luaJson.Init("src/lua/Json.lua")) return;
@@ -27,6 +35,7 @@ void Menu::Build(LuaScript& luaJson) {
         (*this)[key].SetId(luaJson.GetTableValue<int32_t>(nullptr, "id"));
         (*this)[key].SetEnable(luaJson.GetTableValue<bool>(nullptr, "enable"));
         (*this)[key].SetScale(nSpriteScale);
+        (*this)[key].SetSprites(vSprites);
 
         if (luaJson.IsKeyExist(nullptr, "items")) {
             luaJson.GetTableValue<int32_t>(nullptr, "size");
@@ -91,7 +100,7 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
         for (vPatchPos.y = 0; vPatchPos.y < vSizeInPatch.y; vPatchPos.y++) {
             olc::vi2d vPos = vPatchPos * PATCH_SIZE * (int32_t)nSpriteScale + vOffset;
 
-            olc::vi2d vSource = { 5, 1 };
+            olc::vi2d vSource = vSprites[SPRITES::MENU];
             if (vPatchPos.x == 0) vSource.x--;
             if (vPatchPos.y == 0) vSource.y--;
             if (vPatchPos.x == vSizeInPatch.x - 1) vSource.x++;
@@ -132,7 +141,7 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
 
         olc::vi2d vPos = vPatchPos * PATCH_SIZE * (int32_t)nSpriteScale + vOffset;
         
-        GameEngine.DrawStringDecal(vPos, items[nTopLeftItem + i].sName, olc::WHITE, { nSpriteScale, nSpriteScale });
+        GameEngine.DrawStringDecal(vPos, items[nTopLeftItem + i].sName, olc::Pixel(251, 245, 239), { nSpriteScale, nSpriteScale });
 
         if (!items[nTopLeftItem + i].HasItems()) continue;
 

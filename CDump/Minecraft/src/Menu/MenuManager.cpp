@@ -1,5 +1,11 @@
 #include "MenuManager.h"
 
+void MenuManager::Init(const std::string& path, LuaScript& luaConfig) {
+	cMenu.Init(luaConfig);
+	cMenu.Load(path);
+	cMenu.InitStates(mMenuState); 
+}
+
 void MenuManager::Update(olc::PixelGameEngine& GameEngine) {
 	for (auto& group : mMenuState) {
 		for (auto& grItem : group.second) {

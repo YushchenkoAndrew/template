@@ -15,7 +15,7 @@ public:
     }
 
     bool OnUserCreate() override {
-        mManager.Init(luaConfig.GetValue<std::string>("sMenuConfig"), luaConfig.GetValue<float>("sMenuSpriteScale"));
+        mManager.Init(luaConfig.GetValue<std::string>("sMenuConfig"), luaConfig);
         mMinecraft.Init(ScreenHeight(), ScreenWidth(), luaConfig);
 
 

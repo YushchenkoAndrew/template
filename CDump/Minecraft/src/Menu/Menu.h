@@ -14,15 +14,22 @@ struct sMenuState {
 	bool bHeld;
 };
 
+namespace SPRITES {
+	enum {
+		MENU
+	};
+};
+
 typedef std::map<int32_t, std::map<int32_t, sMenuState>> menustate_t;
 
 
 class Menu {
 
 public:
-	Menu() { sName = "root"; }
+	Menu() { sName = "root"; vSprites.assign(1, {}); }
 	Menu(const std::string& name) { sName = name; }
 
+	void Init(LuaScript& luaConfig);
 	void Load(const std::string& path);
 	void Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, olc::vi2d& vOffset, float& fElapsedTime);
 
@@ -39,6 +46,8 @@ public:
 	Menu& SetId(int32_t id) { nId = id; return *this; }
 	Menu& SetEnable(bool flag) { bEnable = flag; return *this; }
 	void SetScale(float scale) { nSpriteScale = scale; }
+	void SetSprites(int nSprite, std::vector<int32_t> vSource) { vSprites[nSprite] = { vSource[0], vSource[1] }; }
+	void SetSprites(std::vector<olc::vi2d>& vSource) { vSprites = vSource; }
 
 	// Getters
 	std::string& GetName() { return sName; }
@@ -88,4 +97,5 @@ protected:
 
 	std::map<std::string, size_t> itemIndex;
 	std::vector<Menu> items;
+	std::vector<olc::vi2d> vSprites;
 };
