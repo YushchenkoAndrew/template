@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "Typelist.h"
 
 extern "C" {
 #include "lua54/include/lua.h"
@@ -154,7 +155,6 @@ public:
 	template<> void Push(bool value) { lua_pushboolean(L, value); }
 
 
-
 	template<class T>
 	void CallFunction(const char* func, const std::initializer_list<T> argv, int32_t nRes = 0) {
 		if (func != nullptr) lua_getglobal(L, func);
@@ -169,6 +169,16 @@ public:
 		if (func != nullptr) lua_getglobal(L, func);
 		if (!lua_isfunction(L, -1)) return;
 		CheckState(lua_pcall(L, 0, nRes, 0));
+	}
+
+
+	template<class T, class U>
+	void CallFunction(const char* func, TypeList<T, U>, int32_t nRes = 0) {
+		if (func != nullptr) lua_getglobal(L, func);
+		if (!lua_isfunction(L, -1)) return;
+		Push(T::GetValue());
+		int32_t size = InitArgs<U>() + 1;
+		CheckState(lua_pcall(L, size, nRes, 0));
 	}
 
 
@@ -189,7 +199,35 @@ public:
 		CheckState(lua_pcall(L, argv.size() + 1, nRes, 0));
 	}
 
+	template<class T, class U>
+	void CallMethod(const char* table, const char* func, TypeList<T, U>, int32_t nRes = 0) {
+		if (table != nullptr) {
+			if (sPrevTable != table) lua_getglobal(L, table);
+			else sPrevTable = table;
+		}
 
+		if (!lua_istable(L, -1)) return;
+		lua_pushstring(L, func);
+		lua_gettable(L, -2);
+
+		if (!lua_isfunction(L, -1)) return;
+		lua_pushstring(L, table); 
+		Push(T::GetValue());
+		int32_t size = InitArgs<U>() + 1;
+		CheckState(lua_pcall(L, size, nRes, 0));
+	}
+
+private:
+	template <class T>
+	int32_t InitArgs() {
+		Push(T::Head::GetValue());
+		return InitArgs<T::Tail>() + 1;
+	}
+
+	template <>
+	int32_t InitArgs<NullType>() {
+		return 0;
+	}
 
 private:
 	lua_State* const L;
