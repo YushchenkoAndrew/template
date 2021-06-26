@@ -2,32 +2,13 @@
 
 void GraphicsEngine::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
 	cDraw.Init(iHeight, iWidth);
-
-	vMouseLast.x = (float)iWidth / 2.0f;
-	vMouseLast.y = (float)iHeight / 2.0f;
+	cCamera.Init(iHeight, iWidth, luaConfig);
 
 	// Projection Matrix
 	mProjection = Matrix4D::Projection((float)iHeight / (float)iWidth, 90.0f, 1000.0f, 0.1f);
 
 	lightSrc->Init(luaConfig);
 	lightSrc->LoadBlock(trMap);
-
-	nCameraStep = luaConfig.GetValue<float>("nCameraStep");
-	nMouseSpeed = luaConfig.GetValue<float>("nMouseSpeed");
-}
-
-Matrix4D GraphicsEngine::CameraPointAt(sPoint3D& vPos, sPoint3D& vTarget) {
-	sPoint3D vUp = { 0.0f, 1.0f, 0.0f };
-	sPoint3D vDirection = sPoint3D::normalize(vPos - vTarget);
-	sPoint3D vNewRight = vUp.cross(vDirection).normalize();
-	sPoint3D vNewUp = vDirection.cross(vNewRight);
-
-	Matrix4D m;
-	m.MA[0][0] = vNewRight.x;	m.MA[0][1] = vNewRight.y;	m.MA[0][2] = vNewRight.z;	m.MA[0][3] = 0.0f;
-	m.MA[1][0] = vNewUp.x;		m.MA[1][1] = vNewUp.y;		m.MA[1][2] = vNewUp.z;		m.MA[1][3] = 0.0f;
-	m.MA[2][0] = vDirection.x;	m.MA[2][1] = vDirection.y;	m.MA[2][2] = vDirection.z;	m.MA[2][3] = 0.0f;
-	m.MA[3][0] = vPos.x;		m.MA[3][1] = vPos.y;		m.MA[3][2] = vPos.z;		m.MA[3][3] = 1.0f;
-	return m;
 }
 
 sPoint3D GraphicsEngine::IntersectionLinePlane(sPoint3D& pPlane, sPoint3D& vPlane, sPoint3D& pStart, sPoint3D& pEnd) {
@@ -136,77 +117,10 @@ void GraphicsEngine::ClipByScreenEdge(std::list<sTriangle>& listClippedTr) {
 	}
 }
 
-// Camera Methods
-void GraphicsEngine::CameraLookAt(olc::PixelGameEngine &GameEngine) {
-
-	// Calculate camera rotation based on Mouse Position
-	olc::vi2d vMouse = GameEngine.GetMousePos();
-	GameEngine.DrawCircle(vMouse.x, vMouse.y, 7);
-
-	vMouseOffset.x = (float)((int32_t)((float)vMouse.x - vMouseLast.x) * nMouseSpeed);
-	vMouseOffset.y = (float)((int32_t)(vMouseLast.y - (float)vMouse.y) * nMouseSpeed);
-
-	if (bFixedMousePos) {
-		GameEngine.LockMousePos((int32_t)(cDraw.nScreenWidth / 2), (int32_t)(cDraw.nScreenHeight / 2));
-		vMouse = GameEngine.GetLockedMousePos();
-	}
-
-	vMouseLast.x = (float)vMouse.x;
-	vMouseLast.y = (float)vMouse.y;
-
-	fYaw += vMouseOffset.x;
-	fPitch += vMouseOffset.y;
-
-	if (fPitch > 89.0f) fPitch = 89.0f;
-	if (fPitch < -89.0f) fPitch = -89.0f;
-
-	auto funcToRadians = [](const float fAngle) { return fAngle * 0.5f / 180.0f * 3.14159f; };
-
-
-	vLookDir = { 
-		cosf(funcToRadians(fYaw)) * cos(funcToRadians(fPitch)),
-		sinf(funcToRadians(fPitch)),
-		sinf(funcToRadians(fYaw)) * cos(funcToRadians(fPitch)),
-	};
-
-	vLookDir = sPoint3D::normalize(vLookDir);
-}
-
-void GraphicsEngine::CameraMove(olc::PixelGameEngine &GameEngine, float& fElapsedTime) {
-	sPoint3D vUp = { 0.0f, 1.0f, 0.0f };
-
-	if (GameEngine.GetKey(olc::W).bHeld && !GameEngine.GetKey(olc::SHIFT).bHeld)
-		vCamera -= vLookDir * nCameraStep * fElapsedTime;
-
-	if (GameEngine.GetKey(olc::S).bHeld && !GameEngine.GetKey(olc::SHIFT).bHeld)
-		vCamera += vLookDir * nCameraStep * fElapsedTime;
-
-	if (GameEngine.GetKey(olc::W).bHeld && GameEngine.GetKey(olc::SHIFT).bHeld)
-		vCamera.y += nCameraStep * fElapsedTime;
-
-	if (GameEngine.GetKey(olc::S).bHeld && GameEngine.GetKey(olc::SHIFT).bHeld)
-		vCamera.y -= nCameraStep * fElapsedTime;
-
-	if (GameEngine.GetKey(olc::D).bHeld)
-		vCamera += sPoint3D::normalize(vLookDir.cross(vUp)) * nCameraStep * fElapsedTime;
-
-	if (GameEngine.GetKey(olc::A).bHeld)
-		vCamera -= sPoint3D::normalize(vLookDir.cross(vUp)) * nCameraStep * fElapsedTime;
-
-	if (GameEngine.GetKey(olc::ESCAPE).bPressed) bFixedMousePos = false;
-	if (GameEngine.GetMouse(0).bPressed) bFixedMousePos = true;
-}
-
 void GraphicsEngine::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime) {
 	if (mManager.InUse()) return;
 	cDraw.Update();
-
-	CameraLookAt(GameEngine);
-	CameraMove(GameEngine, fElapsedTime);
-
-	// Calculate camera direction and View Matrix
-	vTarget = vCamera - vLookDir;
-	mView = Matrix4D::Invert(CameraPointAt(vCamera, vTarget));
+	cCamera.Update(GameEngine, fElapsedTime);
 }
 
 void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManager) {
@@ -226,13 +140,13 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 		vect2 = trTranslated[2] - trTranslated[0];
 		normal = sPoint3D::normalize(vect1.cross(vect2));
 
-		if (normal.dot(trTranslated.p[0] - vCamera) > 0.0f) continue;
+		if (normal.dot(trTranslated.p[0] - cCamera.vPos) > 0.0f) continue;
 		int32_t color = lightSrc->GetLight(tr.Avg(), normal, mManager.GetState(eMenuStates::DISTRIBUTE_EN).bHeld);
 
 
-		trView[0] = trTranslated[0] * mView;
-		trView[1] = trTranslated[1] * mView;
-		trView[2] = trTranslated[2] * mView;
+		trView[0] = trTranslated[0] * cCamera.mView;
+		trView[1] = trTranslated[1] * cCamera.mView;
+		trView[2] = trTranslated[2] * cCamera.mView;
 
 
 		uint8_t nClippedTr = ClipTriangle({ 0.0f, 0.0f, -0.1f }, { 0.0f, 0.0f, -1.0f }, trView, trClipped[0], trClipped[1]);
