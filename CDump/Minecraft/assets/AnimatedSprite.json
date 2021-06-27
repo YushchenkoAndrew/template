@@ -3,20 +3,23 @@
     "path": "assets/Sprite-0001.png",
     "size": [8, 8],
     "scale": [1, 1],
-    "mode": "LOOP",
+    "begin": "click",
     "states": {
-      "click": [
-        {
-          "path": null,
-          "duration": 100,
-          "pos": { "x": 2, "y": 3 }
-        },
-        {
-          "path": null,
-          "duration": 101,
-          "pos": { "x": 3, "y": 3 }
-        }
-      ]
+      "click": {
+        "mode": "LOOP",
+        "frames": [
+          {
+            "path": null,
+            "duration": 1,
+            "pos": { "x": 2, "y": 3 }
+          },
+          {
+            "path": null,
+            "duration": 2,
+            "pos": { "x": 3, "y": 3 }
+          }
+        ]
+      }
     }
   }
 }
