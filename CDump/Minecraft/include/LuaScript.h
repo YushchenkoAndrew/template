@@ -145,6 +145,7 @@ public:
 	int32_t Length() { return lua_istable(L, -1) ? (int32_t)lua_rawlen(L, -1) : 0; }
 
 	// Stack function
+	void ClearStack() { lua_settop(L, 0); }
 	void Pop(int32_t n = 1) { lua_pop(L, n); }
 
 	template <class T> void Push(T value);
@@ -209,11 +210,10 @@ public:
 		if (!lua_istable(L, -1)) return;
 		lua_pushstring(L, func);
 		lua_gettable(L, -2);
-
 		if (!lua_isfunction(L, -1)) return;
 		lua_pushstring(L, table); 
 		Push(T::GetValue());
-		int32_t size = InitArgs<U>() + 1;
+		int32_t size = InitArgs<U>() + 2;
 		CheckState(lua_pcall(L, size, nRes, 0));
 	}
 
