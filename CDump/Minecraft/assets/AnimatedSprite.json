@@ -7,6 +7,7 @@
     "states": {
       "click": {
         "mode": "LOOP",
+        "next": true,
         "frames": [
           {
             "path": null,
