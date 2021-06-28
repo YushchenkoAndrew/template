@@ -31,7 +31,7 @@ public:
 
 	void Init(LuaScript& luaConfig);
 	void Load(const std::string& path);
-	void Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, olc::vi2d& vOffset, float& fElapsedTime);
+	void Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, olc::vi2d& vOffset, LuaScript& luaAnimated);
 
 	void InitStates(menustate_t& mMenuState);
 
@@ -97,5 +97,7 @@ protected:
 
 	std::map<std::string, size_t> itemIndex;
 	std::vector<Menu> items;
+
 	std::vector<olc::vi2d> vSprites;
+	std::vector<float> vSource, vSize, vScale;
 };

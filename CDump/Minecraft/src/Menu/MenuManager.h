@@ -40,6 +40,7 @@ private:
 
 private:
 	Menu cMenu;
+	LuaScript luaAnimated;
 	std::list<Menu*> stMenu;
 	menustate_t mMenuState;
 	const olc::vi2d vOffset;

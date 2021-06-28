@@ -4,6 +4,9 @@ void MenuManager::Init(const std::string& path, LuaScript& luaConfig) {
 	cMenu.Init(luaConfig);
 	cMenu.Load(path);
 	cMenu.InitStates(mMenuState); 
+
+	luaAnimated.Init("src/lua/Animated.lua");
+	luaAnimated.CallMethod("Animated", "Init", { luaConfig.GetValue<const char*>("sMenuAnimated") });
 }
 
 void MenuManager::Update(olc::PixelGameEngine& GameEngine) {
@@ -14,6 +17,7 @@ void MenuManager::Update(olc::PixelGameEngine& GameEngine) {
 		}
 	}
 
+	luaAnimated.ClearStack();
 	OnMove(GameEngine);
 }
 
@@ -60,8 +64,11 @@ void MenuManager::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::De
 	if (stMenu.empty()) return;
 	olc::vi2d vOffset = this->vOffset;
 
+	AnyType<float>::GetValue() = fTime;
+	AnyType<int32_t>::GetValue() = 1;
 	for (auto& item : stMenu) {
-		item->Draw(GameEngine, decMenu, vOffset, fTime);
+		item->Draw(GameEngine, decMenu, vOffset, luaAnimated);
+		AnyType<int32_t>::GetValue()++;
 		vOffset += { 20 * (int32_t)item->GetScale() , 20 * (int32_t)item->GetScale() };
 	}
 }

@@ -6,6 +6,11 @@ void Menu::Init(LuaScript& luaConfig) {
     luaConfig.GetTableValue<bool>("MenuSprites", "MENU");
     SetSprites(SPRITES::MENU, luaConfig.GetArray<int32_t>());
     luaConfig.Pop();
+
+    //luaConfig.GetTableValue<bool>("MenuSprites", "RIGHT_CURSOR");
+    //SetSprites(SPRITES::MENU, luaConfig.GetArray<int32_t>());
+    //luaConfig.Pop();
+
 }
 
 void Menu::Load(const std::string& path) {
@@ -90,7 +95,7 @@ void Menu::OnMove(olc::vi2d vMove) {
     }
 }
 
-void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, olc::vi2d& vOffset, float& fTime) {
+void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, olc::vi2d& vOffset, LuaScript& luaAnimated) {
     olc::vi2d vPatchPos = { 0, 0 };
 
     olc::Pixel::Mode currMode = GameEngine.GetPixelMode();
@@ -117,20 +122,51 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
     int32_t nVisiable = ((size_t)nBottomRigh < items.size() ? nBottomRigh : items.size()) - nTopLeftItem;
 
     if (nTopLeftItem > 0) {
-        olc::vi2d vSource = { 1, 3 };
-        // FIXME: Not the best solution, the easier way just to create asssets and Animated class / script
-        //olc::vi2d vAnimated = { 0, (int32_t)((sinf(fTime) - 1.0f) * 1.5f) };
+        AnyType<const char*>::GetValue() = "UpCursor";
+        luaAnimated.CallMethod("Animated", "GetFrame", TypeList<AnyType<float>, TypeList<AnyType<const char*>, TypeList<AnyType<int32_t>, NullType>>>(), 1);
+
+        luaAnimated.GetTableValue<bool>(nullptr, "offset");
+        vSource = luaAnimated.GetArray<float>();
+        luaAnimated.Pop();
+
+        luaAnimated.GetTableValue<bool>(nullptr, "size");
+        vSize = luaAnimated.GetArray<float>();
+        luaAnimated.Pop();
+
+        luaAnimated.GetTableValue<bool>(nullptr, "scale");
+        vScale = luaAnimated.GetArray<float>();
+        luaAnimated.Pop();
+
+
+
         vPatchPos = { vSizeInPatch.x - 2, 0 };
         olc::vi2d vPos = vPatchPos * PATCH_SIZE * (int32_t)nSpriteScale + vOffset;
-        GameEngine.DrawPartialDecal(vPos, decMenu.get(), vSource * PATCH_SIZE, vPatch, { nSpriteScale, nSpriteScale });
+        GameEngine.DrawPartialDecal(vPos, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0], vScale[1] });
     }
     
     if ((nRows - nTopLeftItem) > vTable.y) {
-        olc::vi2d vSource = { 0, 3 };
+        AnyType<const char*>::GetValue() = "DownCursor";
+        luaAnimated.CallMethod("Animated", "GetFrame", TypeList<AnyType<float>, TypeList<AnyType<const char*>, TypeList<AnyType<int32_t>, NullType>>>(), 1);
+
+        luaAnimated.GetTableValue<bool>(nullptr, "offset");
+        vSource = luaAnimated.GetArray<float>();
+        luaAnimated.Pop();
+
+        luaAnimated.GetTableValue<bool>(nullptr, "size");
+        vSize = luaAnimated.GetArray<float>();
+        luaAnimated.Pop();
+
+        luaAnimated.GetTableValue<bool>(nullptr, "scale");
+        vScale = luaAnimated.GetArray<float>();
+        luaAnimated.Pop();
+
+
         vPatchPos = { vSizeInPatch.x - 2, vSizeInPatch.y - 1 };
         olc::vi2d vPos = vPatchPos * PATCH_SIZE + vOffset;
-        GameEngine.DrawPartialDecal(vPos, decMenu.get(), vSource * PATCH_SIZE, vPatch, { nSpriteScale, nSpriteScale });
+        GameEngine.DrawPartialDecal(vPos, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0], vScale[1] });
     }
+
+    int32_t nId = AnyType<int32_t>::GetValue();
 
     for (int32_t i = 0; i < nVisiable; i++) {
         vItem.x = i % vTable.x;
@@ -145,16 +181,50 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
 
         if (!items[nTopLeftItem + i].HasItems()) continue;
 
-        olc::vi2d vSource = { 3, 0 };
+        AnyType<const char*>::GetValue() = "RightCursor";
+        luaAnimated.CallMethod("Animated", "GetFrame", TypeList<AnyType<float>, TypeList<AnyType<const char*>, TypeList<AnyType<int32_t>, NullType>>>(), 1);
+
+        luaAnimated.GetTableValue<bool>(nullptr, "offset");
+        vSource = luaAnimated.GetArray<float>();
+        luaAnimated.Pop();
+
+        luaAnimated.GetTableValue<bool>(nullptr, "size");
+        vSize = luaAnimated.GetArray<float>();
+        luaAnimated.Pop();
+
+        luaAnimated.GetTableValue<bool>(nullptr, "scale");
+        vScale = luaAnimated.GetArray<float>();
+        luaAnimated.Pop();
+
         vPatchPos.x += vItemSize.x;
         vPos = vPatchPos * PATCH_SIZE * (int32_t)nSpriteScale + vOffset;
-        GameEngine.DrawPartialDecal(vPos, decMenu.get(), vSource * PATCH_SIZE, vPatch, { nSpriteScale, nSpriteScale });
+        GameEngine.DrawPartialDecal(vPos, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0], vScale[1] });
+
+		AnyType<int32_t>::GetValue()++;
     }
 
-    vCursor.x = (vCursorPos.x * (vItemSize.x + vItemPadding.x)) * PATCH_SIZE * (int32_t)nSpriteScale + vOffset.x;
-    vCursor.y = ((vCursorPos.y - nVisibleRow) * (vItemSize.y + vItemPadding.y) + 1) * PATCH_SIZE * (int32_t)nSpriteScale + vOffset.y;
+    vCursor.x = (int32_t)((vCursorPos.x * (vItemSize.x + vItemPadding.x) + 0.5f) * PATCH_SIZE * nSpriteScale) + vOffset.x;
+    vCursor.y = (int32_t)(((vCursorPos.y - nVisibleRow) * (vItemSize.y + vItemPadding.y) + 0.5f) * PATCH_SIZE * nSpriteScale) + vOffset.y;
 
-	GameEngine.DrawPartialDecal(vCursor, decMenu.get(), olc::vi2d(2, 3) * PATCH_SIZE, { PATCH_SIZE, PATCH_SIZE }, { nSpriteScale, nSpriteScale });
+    // FIXME: Fix bug with creating unique id
+    AnyType<int32_t>::GetValue() = nId;
+    AnyType<const char*>::GetValue() = "Cursor";
+    luaAnimated.CallMethod("Animated", "GetFrame", TypeList<AnyType<float>, TypeList<AnyType<const char*>, TypeList<AnyType<int32_t>, NullType>>>(), 1);
+
+    luaAnimated.GetTableValue<bool>(nullptr, "offset");
+    vSource = luaAnimated.GetArray<float>();
+    luaAnimated.Pop();
+
+    luaAnimated.GetTableValue<bool>(nullptr, "size");
+    vSize = luaAnimated.GetArray<float>();
+    luaAnimated.Pop();
+
+    luaAnimated.GetTableValue<bool>(nullptr, "scale");
+    vScale = luaAnimated.GetArray<float>();
+    luaAnimated.Pop();
+
+
+    GameEngine.DrawPartialDecal(vCursor, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0], vScale[1] });
 
     GameEngine.SetPixelMode(currMode);
 }
