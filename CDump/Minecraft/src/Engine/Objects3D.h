@@ -1,4 +1,5 @@
 #pragma once
+#include "lib/olcPixelGameEngine.h"
 #include <stdint.h>
 #include <cmath>
 #include <vector>
@@ -181,7 +182,6 @@ struct sTriangle {
 
 
 
-
 #define NORTH_MASK	((1 << 0))
 #define SOUTH_MASK	((1 << 1))
 #define EAST_MASK	((1 << 2))
@@ -201,9 +201,21 @@ struct sTriangle {
 struct sBlock {
 	void SetPos(float x, float y, float z) { vPos.x = x; vPos.y = y; vPos.z = z; }
 	void SetPos(sPoint3D vPos) { this->vPos = vPos; }
-	void LoadMap(std::vector<sTriangle>& vMap);
+	void Update();
+
+	void SetColor(uint8_t red, uint8_t green, uint8_t blue) { nColor = ((uint32_t)red << 16) | ((uint32_t)green << 8) | blue; }
+	olc::Pixel GetColor() { return { GetRed(), GetGreen(), GetBlue() }; }
+	olc::Pixel GetColor(float fBrightness) { return GetColor() * fBrightness; }
+
+	inline uint8_t GetRed() { return (uint8_t)((nColor & 0xFF0000) >> 16); }
+	inline uint8_t GetGreen() { return (uint8_t)((nColor & 0xFF00) >> 8); }
+	inline uint8_t GetBlue() { return (uint8_t)((nColor & 0xFF)); }
+
 
 	sPoint3D vPos;
-	uint8_t bStatus;
+	uint8_t bStatus = 0u;
+	uint32_t nColor = 0xFFFFFF;
+
+	std::vector<sTriangle> vMap;
 };
 

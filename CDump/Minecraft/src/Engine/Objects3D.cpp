@@ -1,6 +1,8 @@
 #include "Objects3D.h"
 
-void sBlock::LoadMap(std::vector<sTriangle>& vMap) {
+void sBlock::Update() {
+	vMap.clear();
+
 	if (!IS_EXIST(bStatus)) return;
 
 	if (!IS_NORTH_N(bStatus)) {
@@ -33,4 +35,3 @@ void sBlock::LoadMap(std::vector<sTriangle>& vMap) {
 			vMap.push_back({ vPos.x + 0.5f, vPos.y - 0.5f, vPos.z + 0.5f,    vPos.x - 0.5f, vPos.y - 0.5f, vPos.z - 0.5f,    vPos.x + 0.5f, vPos.y - 0.5f, vPos.z - 0.5f });
 	}
 }
-
