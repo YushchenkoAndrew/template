@@ -10,7 +10,7 @@ sMenuSprite = "assets/Sprite-0002.png"
 sMenuSpriteScale = 1.0
 
 -- World config
-nMapSize = 1
+nMapSize = 4
 nNoiseSize = 100
 vLightSource = { x = 10.0, y = 30.0, z = 10.0 }
 
