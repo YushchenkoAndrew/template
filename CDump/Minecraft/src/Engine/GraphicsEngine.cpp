@@ -8,7 +8,7 @@ void GraphicsEngine::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig)
 	mProjection = Matrix4D::Projection((float)iHeight / (float)iWidth, 90.0f, 1000.0f, 0.1f);
 
 	lightSrc->Init(luaConfig);
-	lightSrc->LoadBlock(trMap);
+	lightSrc->LoadBlock(vpBlocks);
 }
 
 sPoint3D GraphicsEngine::IntersectionLinePlane(sPoint3D& pPlane, sPoint3D& vPlane, sPoint3D& pStart, sPoint3D& pEnd) {
@@ -130,60 +130,62 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 	sTriangle trClipped[2];
 	std::list<sTriangle> listClippedTr;
 
-	for (auto& tr : trMap) {
-		trTranslated[0] = tr[0] * mTranslated;
-		trTranslated[1] = tr[1] * mTranslated;
-		trTranslated[2] = tr[2] * mTranslated;
+	for (auto& block : vpBlocks) {
+		for (auto& tr : block->vMap) {
+			trTranslated[0] = tr[0] * mTranslated;
+			trTranslated[1] = tr[1] * mTranslated;
+			trTranslated[2] = tr[2] * mTranslated;
 
 
-		vect1 = trTranslated[1] - trTranslated[0];
-		vect2 = trTranslated[2] - trTranslated[0];
-		normal = sPoint3D::normalize(vect1.cross(vect2));
+			vect1 = trTranslated[1] - trTranslated[0];
+			vect2 = trTranslated[2] - trTranslated[0];
+			normal = sPoint3D::normalize(vect1.cross(vect2));
 
-		if (normal.dot(trTranslated.p[0] - cCamera.vPos) > 0.0f) continue;
-		int32_t color = lightSrc->GetLight(tr.Avg(), normal, mManager.GetState(eMenuStates::DISTRIBUTE_EN).bHeld);
-
-
-		trView[0] = trTranslated[0] * cCamera.mView;
-		trView[1] = trTranslated[1] * cCamera.mView;
-		trView[2] = trTranslated[2] * cCamera.mView;
+			if (normal.dot(trTranslated.p[0] - cCamera.vPos) > 0.0f) continue;
+			float brightness = lightSrc->GetBrightness(tr.Avg(), normal, mManager.GetState(eMenuStates::DISTRIBUTE_EN).bHeld);
 
 
-		uint8_t nClippedTr = ClipTriangle({ 0.0f, 0.0f, -0.1f }, { 0.0f, 0.0f, -1.0f }, trView, trClipped[0], trClipped[1]);
-
-		for (uint8_t i = 0; i < nClippedTr; i++) {
-
-			trProjected[0] = trClipped[i][0] * mProjection + 1.0f;
-			trProjected[1] = trClipped[i][1] * mProjection + 1.0f;
-			trProjected[2] = trClipped[i][2] * mProjection + 1.0f;
-
-			trProjected[0].x *= 0.5f * (float)cDraw.nScreenWidth; trProjected[0].y *= 0.5f * (float)cDraw.nScreenHeight;
-			trProjected[1].x *= 0.5f * (float)cDraw.nScreenWidth; trProjected[1].y *= 0.5f * (float)cDraw.nScreenHeight;
-			trProjected[2].x *= 0.5f * (float)cDraw.nScreenWidth; trProjected[2].y *= 0.5f * (float)cDraw.nScreenHeight;
+			trView[0] = trTranslated[0] * cCamera.mView;
+			trView[1] = trTranslated[1] * cCamera.mView;
+			trView[2] = trTranslated[2] * cCamera.mView;
 
 
-			listClippedTr.clear();
-			listClippedTr.push_back(trProjected);
-			ClipByScreenEdge(listClippedTr);
+			uint8_t nClippedTr = ClipTriangle({ 0.0f, 0.0f, -0.1f }, { 0.0f, 0.0f, -1.0f }, trView, trClipped[0], trClipped[1]);
 
-			for (auto& trClipped : listClippedTr) {
-				if (mManager.GetState(eMenuStates::COLOR_EN).bHeld) {
-					cDraw.FillTriangle(GameEngine,
-						(int32_t)trClipped[0].x, (int32_t)trClipped[0].y, trClipped[0].z,
-						(int32_t)trClipped[1].x, (int32_t)trClipped[1].y, trClipped[1].z,
-						(int32_t)trClipped[2].x, (int32_t)trClipped[2].y, trClipped[2].z,
-						mManager.GetState(eMenuStates::SHADOW_EN).bHeld ? olc::Pixel(color, color, color) : olc::WHITE
-					);
-				}
+			for (uint8_t i = 0; i < nClippedTr; i++) {
 
-				if (mManager.GetState(eMenuStates::EDGE_EN).bHeld) {
-					//GameEngine.DrawTriangle(
-					cDraw.DrawTriangle(GameEngine,
-						(int32_t)trClipped[0].x, (int32_t)trClipped[0].y, trClipped[0].z,
-						(int32_t)trClipped[1].x, (int32_t)trClipped[1].y, trClipped[1].z,
-						(int32_t)trClipped[2].x, (int32_t)trClipped[2].y, trClipped[2].z,
-						mManager.GetState(eMenuStates::COLOR_DIS).bHeld ? olc::WHITE : olc::BLACK
-					);
+				trProjected[0] = trClipped[i][0] * mProjection + 1.0f;
+				trProjected[1] = trClipped[i][1] * mProjection + 1.0f;
+				trProjected[2] = trClipped[i][2] * mProjection + 1.0f;
+
+				trProjected[0].x *= 0.5f * (float)cDraw.nScreenWidth; trProjected[0].y *= 0.5f * (float)cDraw.nScreenHeight;
+				trProjected[1].x *= 0.5f * (float)cDraw.nScreenWidth; trProjected[1].y *= 0.5f * (float)cDraw.nScreenHeight;
+				trProjected[2].x *= 0.5f * (float)cDraw.nScreenWidth; trProjected[2].y *= 0.5f * (float)cDraw.nScreenHeight;
+
+
+				listClippedTr.clear();
+				listClippedTr.push_back(trProjected);
+				ClipByScreenEdge(listClippedTr);
+
+				for (auto& trClipped : listClippedTr) {
+					if (mManager.GetState(eMenuStates::COLOR_EN).bHeld) {
+						cDraw.FillTriangle(GameEngine,
+							(int32_t)trClipped[0].x, (int32_t)trClipped[0].y, trClipped[0].z,
+							(int32_t)trClipped[1].x, (int32_t)trClipped[1].y, trClipped[1].z,
+							(int32_t)trClipped[2].x, (int32_t)trClipped[2].y, trClipped[2].z,
+							mManager.GetState(eMenuStates::SHADOW_EN).bHeld ? block->GetColor(brightness) : block->GetColor()
+						);
+					}
+
+					if (mManager.GetState(eMenuStates::EDGE_EN).bHeld) {
+						//GameEngine.DrawTriangle(
+						cDraw.DrawTriangle(GameEngine,
+							(int32_t)trClipped[0].x, (int32_t)trClipped[0].y, trClipped[0].z,
+							(int32_t)trClipped[1].x, (int32_t)trClipped[1].y, trClipped[1].z,
+							(int32_t)trClipped[2].x, (int32_t)trClipped[2].y, trClipped[2].z,
+							mManager.GetState(eMenuStates::COLOR_DIS).bHeld ? olc::WHITE : olc::BLACK
+						);
+					}
 				}
 			}
 		}

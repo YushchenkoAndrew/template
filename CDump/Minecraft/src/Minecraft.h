@@ -11,7 +11,7 @@ public:
 	sChunk() { vBlock.reserve(CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE); }
 
 	template <class T>
-	void Init(sPoint3D vOffset,sChunk* pWestChunk, sChunk* pNorthChunk,  Type2Type<T>) {
+	void Init(sPoint3D vOffset,sChunk* pWestChunk, sChunk* pNorthChunk) {
 		vOffset *= CHUNK_SIZE;
 		vBlock.clear();
 
@@ -59,11 +59,10 @@ public:
 	}
 
 
-	void LoadMap(std::vector<sTriangle>& vMap);
+	void LoadMap(std::vector<sBlock*>& vpBlock);
 
-	sBlock GetBlock(int32_t x, int32_t y, int32_t z) {
-		return vBlock[CHUNK_INDEX(x, y, z)];
-	}
+	void SetBlock(int32_t x, int32_t y, int32_t z);
+	void ResetBlock(int32_t x, int32_t y, int32_t z);
 
 private:
 	std::vector<sBlock> vBlock;
@@ -81,20 +80,21 @@ public:
 	void Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime);
 	void Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager);
 
+	void SetBlock(int32_t x, int32_t y, int32_t z);
+	void ResetBlock(int32_t x, int32_t y, int32_t z);
+
 private:
 	void DrawNoise(olc::PixelGameEngine& GameEngine);
 	inline int32_t MapIndex(int32_t x, int32_t z) { return z + x * nMapSize; }
 
 	template <class T>
 	void InitMap(Type2Type<T>) {
-		cEngine3D.trMap.clear();
 		for (int32_t x = 0; x < nMapSize; x++) {
 			for (int32_t z = 0; z < nMapSize; z++) {
-				vChunk[MapIndex(x, z)].Init(
+				vChunk[MapIndex(x, z)].Init<T>(
 					{ (float)x, 0.0f, (float)z },
 					x ? &vChunk[MapIndex(x - 1, z)] : nullptr,
-					z ? &vChunk[MapIndex(x, z - 1)] : nullptr,
-					Type2Type<T>()
+					z ? &vChunk[MapIndex(x, z - 1)] : nullptr
 				);
 			}
 		}

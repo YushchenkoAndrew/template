@@ -42,7 +42,7 @@ private:
 	Matrix4D mTranslated;
 	Matrix4D mProjection;
 
-	std::vector<sTriangle> trMap;
+	std::vector<sBlock*> vpBlocks;
 	std::vector<sTriangle> trPainted;
 
 	std::unique_ptr<Light> lightSrc;

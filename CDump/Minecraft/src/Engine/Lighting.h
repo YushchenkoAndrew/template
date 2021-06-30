@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "Objects3D.h"
 #include "include/LuaScript.h"
 
@@ -6,8 +7,8 @@ class Light {
 public:
 	virtual void Init(float x, float y, float z) = 0;
 	virtual void Init(LuaScript& luaConfig) = 0;
-	virtual void LoadBlock(std::vector<sTriangle>& vMap) = 0;
-	virtual int32_t GetLight(const sPoint3D& vTriangle, const sPoint3D& normal, bool bDistribute) = 0;
+	virtual void LoadBlock(std::vector<sBlock*>& vpBlocks) = 0;
+	virtual float GetBrightness(const sPoint3D& vTriangle, const sPoint3D& normal, bool bDistribute) = 0;
 	virtual ~Light() {}
 };
 
@@ -26,16 +27,21 @@ public:
 		vPos.x = luaConfig.GetTableValue<float>("vLightSource", "x");
 		vPos.y = luaConfig.GetTableValue<float>("vLightSource", "y");
 		vPos.z = luaConfig.GetTableValue<float>("vLightSource", "z");
-		blLightSrc.SetPos(vPos.x, vPos.y, vPos.z);
+		blLightSrc.SetPos(vPos);
 	}
 
-	void LoadBlock(std::vector<sTriangle>& vMap) override { blLightSrc.LoadMap(vMap); }
+	void LoadBlock(std::vector<sBlock*>& vpBlocks) override { 
+		vpBlocks.push_back(&blLightSrc);
 
-	int32_t GetLight(const sPoint3D& vTriangle, const sPoint3D& normal, bool bDistribute) override {
+		blLightSrc.SetColor(0xFF, 0xFF, 0xA0);
+		blLightSrc.Update();
+	}
+
+	float GetBrightness(const sPoint3D& vTriangle, const sPoint3D& normal, bool bDistribute) override {
 		sPoint3D vIncomingLight = sPoint3D::normalize(vPos - vTriangle);
 		sPoint3D vLightIntesity = vSrcIntensity * vDiffusion * fmaxf(sPoint3D::dot(vIncomingLight, normal), 0.0f);
 		if (bDistribute) vLightIntesity = sPoint3D::normalize(vLightIntesity);
-		return (int32_t)(vLightIntesity.Avg() * 240.0f);
+		return vLightIntesity.Avg();
 	}
 
 private:
