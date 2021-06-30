@@ -93,10 +93,14 @@ void Menu::OnMove(olc::vi2d vMove) {
         vCursorPos.x = int32_t(items.size() % vTable.x) - 1;
         nCursorItem = int32_t(items.size()) - 1;
     }
+
 }
 
 void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, olc::vi2d& vOffset, LuaScript& luaAnimated) {
     olc::vi2d vPatchPos = { 0, 0 };
+
+    vCursor.x = (int32_t)((vCursorPos.x * (vItemSize.x + vItemPadding.x)) * PATCH_SIZE * nSpriteScale) + vOffset.x;
+    vCursor.y = (int32_t)(((vCursorPos.y - nVisibleRow) * (vItemSize.y + vItemPadding.y) + 1) * PATCH_SIZE * nSpriteScale) + vOffset.y;
 
     olc::Pixel::Mode currMode = GameEngine.GetPixelMode();
     GameEngine.SetPixelMode(olc::Pixel::MASK);
@@ -166,7 +170,25 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
         GameEngine.DrawPartialDecal(vPos, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0], vScale[1] });
     }
 
-    int32_t nId = AnyType<int32_t>::GetValue();
+
+    AnyType<const char*>::GetValue() = "Cursor";
+    luaAnimated.CallMethod("Animated", "GetFrame", TypeList<AnyType<float>, TypeList<AnyType<const char*>, TypeList<AnyType<int32_t>, NullType>>>(), 1);
+
+    luaAnimated.GetTableValue<bool>(nullptr, "offset");
+    vSource = luaAnimated.GetArray<float>();
+    luaAnimated.Pop();
+
+    luaAnimated.GetTableValue<bool>(nullptr, "size");
+    vSize = luaAnimated.GetArray<float>();
+    luaAnimated.Pop();
+
+    luaAnimated.GetTableValue<bool>(nullptr, "scale");
+    vScale = luaAnimated.GetArray<float>();
+    luaAnimated.Pop();
+
+    GameEngine.DrawPartialDecal(vCursor, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0], vScale[1] });
+
+
 
     for (int32_t i = 0; i < nVisiable; i++) {
         vItem.x = i % vTable.x;
@@ -202,29 +224,6 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
 
 		AnyType<int32_t>::GetValue()++;
     }
-
-    vCursor.x = (int32_t)((vCursorPos.x * (vItemSize.x + vItemPadding.x) + 0.5f) * PATCH_SIZE * nSpriteScale) + vOffset.x;
-    vCursor.y = (int32_t)(((vCursorPos.y - nVisibleRow) * (vItemSize.y + vItemPadding.y) + 0.5f) * PATCH_SIZE * nSpriteScale) + vOffset.y;
-
-    // FIXME: Fix bug with creating unique id
-    AnyType<int32_t>::GetValue() = nId;
-    AnyType<const char*>::GetValue() = "Cursor";
-    luaAnimated.CallMethod("Animated", "GetFrame", TypeList<AnyType<float>, TypeList<AnyType<const char*>, TypeList<AnyType<int32_t>, NullType>>>(), 1);
-
-    luaAnimated.GetTableValue<bool>(nullptr, "offset");
-    vSource = luaAnimated.GetArray<float>();
-    luaAnimated.Pop();
-
-    luaAnimated.GetTableValue<bool>(nullptr, "size");
-    vSize = luaAnimated.GetArray<float>();
-    luaAnimated.Pop();
-
-    luaAnimated.GetTableValue<bool>(nullptr, "scale");
-    vScale = luaAnimated.GetArray<float>();
-    luaAnimated.Pop();
-
-
-    GameEngine.DrawPartialDecal(vCursor, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0], vScale[1] });
 
     GameEngine.SetPixelMode(currMode);
 }

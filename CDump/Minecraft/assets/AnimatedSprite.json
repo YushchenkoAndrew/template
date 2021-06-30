@@ -11,32 +11,32 @@
           {
             "path": null,
             "duration": 0.2,
+            "pos": { "x": 0, "y": 3 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 1, "y": 3 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 2, "y": 3 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 3, "y": 3 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
             "pos": { "x": 4, "y": 3 }
           },
           {
             "path": null,
             "duration": 0.1,
             "pos": { "x": 5, "y": 3 }
-          },
-          {
-            "path": null,
-            "duration": 0.1,
-            "pos": { "x": 6, "y": 3 }
-          },
-          {
-            "path": null,
-            "duration": 0.1,
-            "pos": { "x": 7, "y": 3 }
-          },
-          {
-            "path": null,
-            "duration": 0.1,
-            "pos": { "x": 8, "y": 3 }
-          },
-          {
-            "path": null,
-            "duration": 0.1,
-            "pos": { "x": 9, "y": 3 }
           }
         ]
       }
@@ -55,32 +55,32 @@
           {
             "path": null,
             "duration": 0.2,
+            "pos": { "x": 0, "y": 5 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 1, "y": 5 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 2, "y": 5 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 3, "y": 5 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
             "pos": { "x": 4, "y": 5 }
           },
           {
             "path": null,
             "duration": 0.1,
             "pos": { "x": 5, "y": 5 }
-          },
-          {
-            "path": null,
-            "duration": 0.1,
-            "pos": { "x": 6, "y": 5 }
-          },
-          {
-            "path": null,
-            "duration": 0.1,
-            "pos": { "x": 7, "y": 5 }
-          },
-          {
-            "path": null,
-            "duration": 0.1,
-            "pos": { "x": 8, "y": 5 }
-          },
-          {
-            "path": null,
-            "duration": 0.1,
-            "pos": { "x": 9, "y": 5 }
           }
         ]
       }
@@ -99,32 +99,32 @@
           {
             "path": null,
             "duration": 0.2,
+            "pos": { "x": 0, "y": 6 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 1, "y": 6 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 2, "y": 6 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 3, "y": 6 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
             "pos": { "x": 4, "y": 6 }
           },
           {
             "path": null,
             "duration": 0.1,
             "pos": { "x": 5, "y": 6 }
-          },
-          {
-            "path": null,
-            "duration": 0.1,
-            "pos": { "x": 6, "y": 6 }
-          },
-          {
-            "path": null,
-            "duration": 0.1,
-            "pos": { "x": 7, "y": 6 }
-          },
-          {
-            "path": null,
-            "duration": 0.1,
-            "pos": { "x": 8, "y": 6 }
-          },
-          {
-            "path": null,
-            "duration": 0.1,
-            "pos": { "x": 9, "y": 6 }
           }
         ]
       }
@@ -133,7 +133,7 @@
 
   "Cursor": {
     "path": "assets/Sprite-0002.png",
-    "size": [8, 16],
+    "size": [8, 8],
     "scale": [1, 1],
     "states": {
       "idle": {
@@ -143,12 +143,32 @@
           {
             "path": null,
             "duration": 0.2,
-            "pos": { "x": 0, "y": 3 }
+            "pos": { "x": 0, "y": 7 }
           },
           {
             "path": null,
             "duration": 0.1,
-            "pos": { "x": 2, "y": 3 }
+            "pos": { "x": 1, "y": 7 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 2, "y": 7 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 3, "y": 7 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 4, "y": 7 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 5, "y": 7 }
           }
         ]
       }

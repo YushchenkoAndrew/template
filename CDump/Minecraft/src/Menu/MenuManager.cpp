@@ -68,7 +68,11 @@ void MenuManager::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::De
 	AnyType<int32_t>::GetValue() = 1;
 	for (auto& item : stMenu) {
 		item->Draw(GameEngine, decMenu, vOffset, luaAnimated);
-		AnyType<int32_t>::GetValue()++;
 		vOffset += { 20 * (int32_t)item->GetScale() , 20 * (int32_t)item->GetScale() };
+
+		// Such approach is fine as long as
+		// Im not using more then 15 element for one
+		// iteration
+		AnyType<int32_t>::GetValue() += 0x10;
 	}
 }

@@ -22,7 +22,7 @@ end
 
 
 function Animated:AddStateMachine(sName, nId)
-  print("[lua] CREATED " .. sName)
+  print("[lua] CREATED [" .. nId .. "] " .. sName)
 
   -- Create Frame StateMachine (NextFrame) for each State
   local sprites = Animated.sprites[sName]
@@ -106,7 +106,8 @@ end
 
 
 function Animated:GetFrame(fElapsedTime, sName, nId)
-  if nId > #Animated.sprites[sName].NextState then Animated:AddStateMachine(sName, nId) end
+  -- if nId > #Animated.sprites[sName].NextState then Animated:AddStateMachine(sName, nId) end
+  if Animated.sprites[sName].NextState[nId] == nil then Animated:AddStateMachine(sName, nId) end
 
   local stMachine = Animated.sprites[sName].NextState[nId]
   if (coroutine.status(stMachine) == "dead") then return nil end
