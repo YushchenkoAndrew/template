@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/GraphicsEngine.h"
+#include "Engine/Collision.h"
 #include "include/Noise.h"
 
 #define CHUNK_SIZE 24
@@ -59,6 +60,10 @@ public:
 
 
 	void LoadMap(std::vector<sTriangle>& vMap);
+
+	sBlock GetBlock(int32_t x, int32_t y, int32_t z) {
+		return vBlock[CHUNK_INDEX(x, y, z)];
+	}
 
 private:
 	std::vector<sBlock> vBlock;
