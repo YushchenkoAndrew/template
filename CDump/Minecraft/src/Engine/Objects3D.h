@@ -200,6 +200,7 @@ struct sTriangle {
 
 struct sBlock {
 	void SetPos(float x, float y, float z) { vPos.x = x; vPos.y = y; vPos.z = z; }
+	void SetPos(sPoint3D vPos) { this->vPos = vPos; }
 	void LoadMap(std::vector<sTriangle>& vMap);
 
 	sPoint3D vPos;

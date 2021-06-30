@@ -15,6 +15,7 @@ public:
 	void Move(olc::PixelGameEngine& GameEngine, float& fElapsedTime);
 
 	inline Matrix4D GetViewMatrix() { return mView; }
+	inline sPoint3D GetPos() { return vPos; }
 
 
 	friend class GraphicsEngine;
