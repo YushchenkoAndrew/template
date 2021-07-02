@@ -9,7 +9,7 @@ void sChunk::LoadMap(std::vector<sBlock*>& vpBlock) {
 	
 }
 
-void sChunk::SetBlock(int32_t x, int32_t y, int32_t z) {
+void sChunk::SetBlock(int32_t x, int32_t y, int32_t z, sChunk* pWestChunk, sChunk* pNorthChunk) {
 	vBlock[CHUNK_INDEX(x, y, z)].bStatus |= EXIST_MASK;
 
 	if (x != 0 && IS_EXIST(vBlock[CHUNK_INDEX(x - 1, y, z)].bStatus)) {
@@ -27,14 +27,64 @@ void sChunk::SetBlock(int32_t x, int32_t y, int32_t z) {
 		vBlock[CHUNK_INDEX(x, y, z)].bStatus |= NORTH_MASK;
 	}
 
+	// Check neighbors Chunk
+	if (x == 0 && pWestChunk != nullptr && IS_EXIST(pWestChunk->vBlock[CHUNK_INDEX(CHUNK_SIZE - 1, y, z)].bStatus)) {
+		pWestChunk->vBlock[CHUNK_INDEX(CHUNK_SIZE - 1, y, z)].bStatus |= EAST_MASK;
+		pWestChunk->vBlock[CHUNK_INDEX(CHUNK_SIZE - 1, y, z)].Update();
+		vBlock[CHUNK_INDEX(x, y, z)].bStatus |= WEST_MASK;
+	}
+
+	if (z == 0 && pNorthChunk != nullptr && IS_EXIST(pNorthChunk->vBlock[CHUNK_INDEX(x, y, CHUNK_SIZE - 1)].bStatus)) {
+		pNorthChunk->vBlock[CHUNK_INDEX(x, y, CHUNK_SIZE - 1)].bStatus |= SOUTH_MASK;
+		pNorthChunk->vBlock[CHUNK_INDEX(x, y, CHUNK_SIZE - 1)].Update();
+		vBlock[CHUNK_INDEX(x, y, z)].bStatus |= NORTH_MASK;
+	}
+
+
 	vBlock[CHUNK_INDEX(x, y, z)].Update();
 }
 
 
-void sChunk::ResetBlock(int32_t x, int32_t y, int32_t z) {
+void sChunk::ResetBlock(int32_t x, int32_t y, int32_t z, sChunk* pWestChunk, sChunk* pNorthChunk) {
+	vBlock[CHUNK_INDEX(x, y, z)].bStatus &= ~EXIST_MASK;
+
+	if (x != 0 && IS_EXIST(vBlock[CHUNK_INDEX(x - 1, y, z)].bStatus)) {
+		vBlock[CHUNK_INDEX(x - 1, y, z)].bStatus &= ~EAST_MASK;
+		vBlock[CHUNK_INDEX(x, y, z)].bStatus &= ~WEST_MASK;
+	}
+
+	if (y != 0 && IS_EXIST(vBlock[CHUNK_INDEX(x, y - 1, z)].bStatus)) {
+		vBlock[CHUNK_INDEX(x, y - 1, z)].bStatus &= ~UP_MASK;
+		vBlock[CHUNK_INDEX(x, y, z)].bStatus &= ~DOWN_MASK;
+	}
+
+	if (z != 0 && IS_EXIST(vBlock[CHUNK_INDEX(x, y, z - 1)].bStatus)) {
+		vBlock[CHUNK_INDEX(x, y, z - 1)].bStatus &= ~SOUTH_MASK;
+		vBlock[CHUNK_INDEX(x, y, z)].bStatus &= ~NORTH_MASK;
+	}
+
+
+	// Check neighbors Chunk
+	if (x == 0 && pWestChunk != nullptr && IS_EXIST(pWestChunk->vBlock[CHUNK_INDEX(CHUNK_SIZE - 1, y, z)].bStatus)) {
+		pWestChunk->vBlock[CHUNK_INDEX(CHUNK_SIZE - 1, y, z)].bStatus &= ~EAST_MASK;
+		pWestChunk->vBlock[CHUNK_INDEX(CHUNK_SIZE - 1, y, z)].Update();
+		vBlock[CHUNK_INDEX(x, y, z)].bStatus &= ~WEST_MASK;
+	}
+
+	if (z == 0 && pNorthChunk != nullptr && IS_EXIST(pNorthChunk->vBlock[CHUNK_INDEX(x, y, CHUNK_SIZE - 1)].bStatus)) {
+		pNorthChunk->vBlock[CHUNK_INDEX(x, y, CHUNK_SIZE - 1)].bStatus &= ~SOUTH_MASK;
+		pNorthChunk->vBlock[CHUNK_INDEX(x, y, CHUNK_SIZE - 1)].Update();
+		vBlock[CHUNK_INDEX(x, y, z)].bStatus &= ~NORTH_MASK;
+	}
+
+
+	vBlock[CHUNK_INDEX(x, y, z)].Update();
 }
 
 
+sBlock* const sChunk::GetBlock(int32_t x, int32_t y, int32_t z) {
+	return &vBlock[CHUNK_INDEX(x, y, z)];
+}
 
 
 
@@ -48,7 +98,8 @@ void Minecraft::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
 	InitMap(Type2Type<FractalNoise>());
 	for (auto& chunk : vChunk) chunk.LoadMap(cEngine3D.vpBlocks);
 
-	SetBlock(25, CHUNK_SIZE - 1, 1);
+	SetBlock(23, CHUNK_SIZE - 1, 0);
+	SetBlock(24, CHUNK_SIZE - 1, 0);
 }
 
 void Minecraft::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime) {
@@ -63,19 +114,21 @@ void Minecraft::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, 
 	// TEMP:
 	//sBlock blCamera;
 	//blCamera.SetPos(cEngine3D.cCamera.GetPos());
-	//blCamera.vPos.z += 5.0f;
+	//float temp = blCamera.vPos.z;
+	////blCamera.vPos.z -= 2.0f;
 
 	//for (int32_t x = -1; x < 2; x++) {
 	//	for (int32_t y = -1; y < 2; y++) {
 	//		for (int32_t z = -1; z < 2; z++) {
-	//			sBlock blNext = vChunk[0].GetBlock((int32_t)blCamera.vPos.x + x, (int32_t)blCamera.vPos.y + y, (int32_t)blCamera.vPos.z + z);
+	//			sBlock* blNext = GetBlock((int32_t)(blCamera.vPos.x + x), (int32_t)(blCamera.vPos.y + y), (int32_t)(blCamera.vPos.z + z));
+	//			if (blNext == nullptr || !IS_EXIST(blNext->bStatus)) continue;
 
-	//			if (BlockCollision::IsCollide(blCamera, blNext)) {
-	//				printf("Collide - (%d, %d, %d)\n", (int32_t)blCamera.vPos.x + x, (int32_t)blCamera.vPos.y + y, (int32_t)blCamera.vPos.z + z);
+	//			if (BlockCollision::IsCollide(&blCamera, blNext)) {
+	//				//printf("Collide - (%d, %d, %d)\n", (int32_t)blCamera.vPos.x + x, (int32_t)blCamera.vPos.y + y, (int32_t)blCamera.vPos.z + z);
 
-	//				blNext.bStatus |= EXIST_MASK;
-	//				blNext.bStatus &= ~(DOWN_MASK | UP_MASK | WEST_MASK | EAST_MASK | SOUTH_MASK | NORTH_MASK);
-	//				blNext.LoadMap(cEngine3D.trMap);
+	//				blCamera.vPos.z = temp;
+	//				cEngine3D.cCamera.SetPos(blCamera.vPos + blCamera.vPos - blNext->vPos);
+	//				//blCamera.vPos.z -= 2.0f;
 	//			}
 	//		}
 	//	}
@@ -97,18 +150,35 @@ void Minecraft::DrawNoise(olc::PixelGameEngine& GameEngine) {
 	}
 }
 
+sBlock* const Minecraft::GetBlock(int32_t x, int32_t y, int32_t z) {
+	int32_t x_ = x / CHUNK_SIZE;
+	int32_t z_ = z / CHUNK_SIZE;
+	int32_t index = MapIndex(x_, z_);
+	if (x < 0 || z < 0 || index >= int32_t(vChunk.size()) || y > CHUNK_SIZE) return nullptr;
+	return vChunk[index].GetBlock(x % CHUNK_SIZE, y, z % CHUNK_SIZE);
+}
 
 
 void Minecraft::SetBlock(int32_t x, int32_t y, int32_t z) {
-	int32_t index = MapIndex(x / CHUNK_SIZE, z / CHUNK_SIZE);
-	if (index >= vChunk.size() || y > CHUNK_SIZE) return;
-	vChunk[index].SetBlock(x, y, z);
+	int32_t x_ = x / CHUNK_SIZE;
+	int32_t z_ = z / CHUNK_SIZE;
+	int32_t index = MapIndex(x_, z_);
+	if (x < 0 || z < 0 || index >= int32_t(vChunk.size()) || y > CHUNK_SIZE) return;
+	vChunk[index].SetBlock(
+		x % CHUNK_SIZE, y, z % CHUNK_SIZE,
+		x_ ? &vChunk[MapIndex(x_ - 1, z_)] : nullptr,
+		z_ ? &vChunk[MapIndex(x_, z_ - 1)] : nullptr);
 }
 
 
 void Minecraft::ResetBlock(int32_t x, int32_t y, int32_t z) {
-	int32_t index = MapIndex(x / CHUNK_SIZE, z / CHUNK_SIZE);
-	if (index >= vChunk.size() || y > CHUNK_SIZE) return;
-	vChunk[index].ResetBlock(x, y, z);
+	int32_t x_ = x / CHUNK_SIZE;
+	int32_t z_ = z / CHUNK_SIZE;
+	int32_t index = MapIndex(x_, z_);
+	if (x < 0 || z < 0 || index >= int32_t(vChunk.size()) || y > CHUNK_SIZE) return;
+	vChunk[index].ResetBlock(
+		x % CHUNK_SIZE, y, z % CHUNK_SIZE,
+		x_ ? &vChunk[MapIndex(x_ - 1, z_)] : nullptr,
+		z_ ? &vChunk[MapIndex(x_, z_ - 1)] : nullptr);
 }
 

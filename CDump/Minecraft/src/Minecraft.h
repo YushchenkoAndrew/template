@@ -11,7 +11,7 @@ public:
 	sChunk() { vBlock.reserve(CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE); }
 
 	template <class T>
-	void Init(sPoint3D vOffset,sChunk* pWestChunk, sChunk* pNorthChunk) {
+	void Init(sPoint3D vOffset, sChunk* pWestChunk, sChunk* pNorthChunk) {
 		vOffset *= CHUNK_SIZE;
 		vBlock.clear();
 
@@ -61,8 +61,9 @@ public:
 
 	void LoadMap(std::vector<sBlock*>& vpBlock);
 
-	void SetBlock(int32_t x, int32_t y, int32_t z);
-	void ResetBlock(int32_t x, int32_t y, int32_t z);
+	sBlock* const GetBlock(int32_t x, int32_t y, int32_t z);
+	void SetBlock(int32_t x, int32_t y, int32_t z, sChunk* pWestChunk, sChunk* pNorthChunk);
+	void ResetBlock(int32_t x, int32_t y, int32_t z, sChunk* pWestChunk, sChunk* pNorthChunk);
 
 private:
 	std::vector<sBlock> vBlock;
@@ -80,6 +81,7 @@ public:
 	void Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime);
 	void Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager);
 
+	sBlock* const GetBlock(int32_t x, int32_t y, int32_t z);
 	void SetBlock(int32_t x, int32_t y, int32_t z);
 	void ResetBlock(int32_t x, int32_t y, int32_t z);
 
