@@ -21,5 +21,5 @@ nMouseSpeed = 0.5
 
 -- Menu Config
 MenuSprites = {
-  MENU = { 11, 1 },
+  MENU = { 8, 2 },
 }
