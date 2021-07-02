@@ -17,6 +17,8 @@ public:
 	inline Matrix4D GetViewMatrix() { return mView; }
 	inline sPoint3D GetPos() { return vPos; }
 
+	inline void SetPos(sPoint3D vPos) { this->vPos = vPos; }
+
 
 	friend class GraphicsEngine;
 
