@@ -40,6 +40,8 @@ void MenuManager::OnConfirm() {
 
 	mMenuState[STATE_GROUP(nId)][STATE_INDEX(nId)].bPressed = true;
 	mMenuState[STATE_GROUP(nId)][STATE_INDEX(nId)].bHeld = true;
+
+	if (nId != -1) stMenu.pop_back();
 }
 
 
