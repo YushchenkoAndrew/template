@@ -24,6 +24,11 @@ struct TypeList {
 *   AnyType<const char*>::GetValue() = "Test";
 *   AnyType<int32_t>::GetValue() = 2;
 *   luaJson.CallFunction("Test", TypeList<AnyType<const char *>, TypeList<AnyType<int32_t>, NullType>>(), 1);
+*
+*
+*	~ Initialize several values with the same type simultaneously
+*   AnyType<std::initializer_list<const char*>>::GetValue() = {"TEMP", "HELLO WORLD"};
+*	
 * 
 *	~ But be aware of that you can't initialize the same type twice
 *	because it will return already initialized one
@@ -31,8 +36,8 @@ struct TypeList {
 
 template<class T>
 struct AnyType {
-	static inline volatile T& GetValue() {
-		static volatile T value;
+	static inline T& GetValue() {
+		static T value;
 		return value;
 	}
 };

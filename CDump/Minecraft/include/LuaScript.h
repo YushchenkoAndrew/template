@@ -148,12 +148,17 @@ public:
 	void ClearStack() { lua_settop(L, 0); }
 	void Pop(int32_t n = 1) { lua_pop(L, n); }
 
-	template <class T> void Push(T value);
-	template<> void Push(int32_t value) { lua_pushinteger(L, value); }
-	template<> void Push(float value) { lua_pushnumber(L, value); }
-	template<> void Push(std::string value) { lua_pushstring(L, value.c_str()); }
-	template<> void Push(const char* value) { lua_pushstring(L, value); }
-	template<> void Push(bool value) { lua_pushboolean(L, value); }
+	template <class T> uint8_t Push(T value);
+	template<> uint8_t Push(int32_t value) { lua_pushinteger(L, value);  return 1u; }
+	template<> uint8_t Push(float value) { lua_pushnumber(L, value); return 1u; }
+	template<> uint8_t Push(std::string value) { lua_pushstring(L, value.c_str()); return 1u; }
+	template<> uint8_t Push(const char* value) { lua_pushstring(L, value); return 1u; }
+	template<> uint8_t Push(bool value) { lua_pushboolean(L, value); return 1u; }
+
+	template<class T> uint8_t Push(const std::initializer_list<T> list) { 
+		for (auto& value : list) Push(value);
+		return uint8_t(list.size());
+	}
 
 
 	template<class T>
@@ -177,8 +182,7 @@ public:
 	void CallFunction(const char* func, TypeList<T, U>, int32_t nRes = 0) {
 		if (func != nullptr) lua_getglobal(L, func);
 		if (!lua_isfunction(L, -1)) return;
-		Push(T::GetValue());
-		int32_t size = InitArgs<U>() + 1;
+		int32_t size = Push(T::GetValue()) + InitArgs<U>();
 		CheckState(lua_pcall(L, size, nRes, 0));
 	}
 
@@ -212,16 +216,14 @@ public:
 		lua_gettable(L, -2);
 		if (!lua_isfunction(L, -1)) return;
 		lua_pushstring(L, table); 
-		Push(T::GetValue());
-		int32_t size = InitArgs<U>() + 2;
+		int32_t size = Push(T::GetValue()) + InitArgs<U>() + 1;
 		CheckState(lua_pcall(L, size, nRes, 0));
 	}
 
 private:
 	template <class T>
 	int32_t InitArgs() {
-		Push(T::Head::GetValue());
-		return InitArgs<T::Tail>() + 1;
+		return InitArgs<T::Tail>() + Push(T::Head::GetValue());
 	}
 
 	template <>
