@@ -113,6 +113,24 @@ struct Matrix4D {
 	}
 };
 
+
+struct sPoint2D {
+	float x = 0.0f;
+	float y = 0.0f;
+
+	static inline sPoint2D normalize(const sPoint2D& p) { return p / sPoint2D::length(p); }
+	static inline float length(const sPoint2D& p) { return sqrtf(p.x * p.x + p.y * p.y); }
+	static inline float dot(const sPoint2D& right, const sPoint2D& left) { return right.x * left.x + right.y * left.y; }
+
+	inline float dot(const sPoint2D& right) const { return this->x * right.x + this->y * right.y; }
+
+	sPoint2D operator + (const sPoint2D& right) const { return sPoint2D{ this->x + right.x, this->y + right.y }; }
+	sPoint2D operator - (const sPoint2D& right) const { return sPoint2D{ this->x - right.x, this->y - right.y }; }
+	sPoint2D operator / (const float& w) const { return sPoint2D{ this->x / w, this->y / w }; }
+};
+
+
+
 struct sPoint3D {
 	float x = 0.0f;
 	float y = 0.0f;
