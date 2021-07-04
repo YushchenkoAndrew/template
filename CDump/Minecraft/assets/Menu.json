@@ -113,6 +113,42 @@
                   "id": 99
                 }
               ]
+            },
+            {
+              "name": "Collision",
+              "size": [1, 3],
+              "id": -1,
+              "enable": false,
+              "items": [
+                {
+                  "name": "Rectangle",
+                  "id": 129,
+                  "enable": false
+                },
+                {
+                  "name": "Diagonal",
+                  "id": 131,
+                  "enable": true
+                },
+                {
+                  "name": "Static",
+                  "size": [1, 3],
+                  "id": -1,
+                  "enable": false,
+                  "items": [
+                    {
+                      "name": "Diagonal",
+                      "id": 133,
+                      "enable": false
+                    }
+                  ]
+                },
+                {
+                  "name": "Inaff",
+                  "id": 141,
+                  "enable": false
+                }
+              ]
             }
           ]
         },
@@ -142,6 +178,19 @@
                   "name": "FractalNoise",
                   "id": 117,
                   "enable": true
+                }
+              ]
+            },
+            {
+              "name": "Collision",
+              "size": [1, 3],
+              "id": -1,
+              "enable": false,
+              "items": [
+                {
+                  "name": "Diagonal",
+                  "id": -1,
+                  "enable": false
                 }
               ]
             }
