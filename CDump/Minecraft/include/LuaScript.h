@@ -148,16 +148,16 @@ public:
 	void ClearStack() { lua_settop(L, 0); }
 	void Pop(int32_t n = 1) { lua_pop(L, n); }
 
-	template <class T> uint8_t Push(T value);
-	template<> uint8_t Push(int32_t value) { lua_pushinteger(L, value);  return 1u; }
-	template<> uint8_t Push(float value) { lua_pushnumber(L, value); return 1u; }
-	template<> uint8_t Push(std::string value) { lua_pushstring(L, value.c_str()); return 1u; }
-	template<> uint8_t Push(const char* value) { lua_pushstring(L, value); return 1u; }
-	template<> uint8_t Push(bool value) { lua_pushboolean(L, value); return 1u; }
+	template <class T> int32_t Push(T value) { return 0; }
+	template<> int32_t Push(int32_t value) { lua_pushinteger(L, value);  return 1; }
+	template<> int32_t Push(float value) { lua_pushnumber(L, value); return 1; }
+	template<> int32_t Push(std::string value) { lua_pushstring(L, value.c_str()); return 1; }
+	template<> int32_t Push(const char* value) { lua_pushstring(L, value); return 1; }
+	template<> int32_t Push(bool value) { lua_pushboolean(L, value); return 1; }
 
-	template<class T> uint8_t Push(const std::initializer_list<T> list) { 
+	template<class T> int32_t Push(const std::initializer_list<T> list) { 
 		for (auto& value : list) Push(value);
-		return uint8_t(list.size());
+		return int32_t(list.size());
 	}
 
 
@@ -223,7 +223,7 @@ public:
 private:
 	template <class T>
 	int32_t InitArgs() {
-		return InitArgs<T::Tail>() + Push(T::Head::GetValue());
+		return  Push(T::Head::GetValue()) + InitArgs<T::Tail>();
 	}
 
 	template <>
