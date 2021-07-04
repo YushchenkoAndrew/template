@@ -92,6 +92,9 @@ void Minecraft::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
 	nMapSize = luaConfig.GetValue<int32_t>("nMapSize");
 	nNoiseSize = luaConfig.GetValue<int32_t>("nNoiseSize");
 
+	// TEMP:
+	//vMainBlock = { iWidth / 2 - 50, iHeight / 2 - 50 };
+
 	vChunk.assign(nMapSize * nMapSize, {}); 
 	cEngine3D.Init(iHeight, iWidth, luaConfig);
 
@@ -108,7 +111,6 @@ void Minecraft::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, 
 	if (mManager.GetState(eMenuStates::TRUE_NOISE).bPressed) InitMap(Type2Type<TrueNoise>());
 	if (mManager.GetState(eMenuStates::PERLIN_NOISE).bPressed) InitMap(Type2Type<PerlinNoise>());
 	if (mManager.GetState(eMenuStates::FRACTAL_NOISE).bPressed) InitMap(Type2Type<FractalNoise>());
-
 
 
 	// TEMP:
@@ -136,9 +138,17 @@ void Minecraft::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, 
 }
 
 void Minecraft::Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager) {
-	cEngine3D.Draw(GameEngine, mManager);
+	bool bFreeToDraw = true;
 
-	if (mManager.GetState(eMenuStates::DRAW_NOISE_YES).bHeld) DrawNoise(GameEngine);
+	if (mManager.GetState(eMenuStates::DRAW_NOISE_YES).bHeld) { DrawNoise(GameEngine); bFreeToDraw = false; }
+
+	// Collision
+	if (mManager.GetState(eMenuStates::DRAW_RECTANGLE_COLLISION).bHeld) { DrawCollision<sRectanleCollision>(GameEngine); bFreeToDraw = false; }
+	if (mManager.GetState(eMenuStates::DRAW_DIAGONAL_COLLISION).bHeld) { DrawCollision<sDiagonalCollision>(GameEngine); bFreeToDraw = false; }
+	if (mManager.GetState(eMenuStates::DRAW_DIAGONAL_STAT_COLLISION).bHeld) { DrawCollision<sDiagonalStaticCollision>(GameEngine); bFreeToDraw = false; }
+
+
+	if (bFreeToDraw) cEngine3D.Draw(GameEngine, mManager);
 }
 
 void Minecraft::DrawNoise(olc::PixelGameEngine& GameEngine) {
