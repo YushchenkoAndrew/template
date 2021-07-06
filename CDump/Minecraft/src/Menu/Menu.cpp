@@ -1,10 +1,12 @@
 #include "Menu.h"
 
 void Menu::Init(LuaScript& luaConfig) {
-	nSpriteScale = luaConfig.GetValue<float>("sMenuSpriteScale");
+	nSpriteScale = luaConfig.GetTableValue<float>(nullptr, "sMenuSpriteScale");
 
-    luaConfig.GetTableValue<bool>("MenuSprites", "MENU");
+    luaConfig.GetTableValue<bool>(nullptr, "MenuSprites");
+    luaConfig.GetTableValue<bool>(nullptr, "MENU");
     SetSprites(SPRITES::MENU, luaConfig.GetArray<int32_t>());
+    luaConfig.Pop();
     luaConfig.Pop();
 
     //luaConfig.GetTableValue<bool>("MenuSprites", "RIGHT_CURSOR");

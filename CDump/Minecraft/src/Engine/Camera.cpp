@@ -6,14 +6,17 @@ void Camera::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
 	vMouseLast.x = (float)iWidth / 2.0f;
 	vMouseLast.y = (float)iHeight / 2.0f;
 
-	nCameraStep = luaConfig.GetValue<float>("nCameraStep");
-	nMouseSpeed = luaConfig.GetValue<float>("nMouseSpeed");
+	nCameraStep = luaConfig.GetTableValue<float>(nullptr, "nCameraStep");
+	nMouseSpeed = luaConfig.GetTableValue<float>(nullptr, "nMouseSpeed");
 
+
+	luaConfig.GetTableValue<bool>(nullptr, "vCamera"),
 	vPos = {
-		luaConfig.GetTableValue<float>("vCamera", "x"),
-		luaConfig.GetTableValue<float>("vCamera", "y"),
-		luaConfig.GetTableValue<float>("vCamera", "z")
+		luaConfig.GetTableValue<float>(nullptr, "x"),
+		luaConfig.GetTableValue<float>(nullptr, "y"),
+		luaConfig.GetTableValue<float>(nullptr, "z")
 	};
+	luaConfig.Pop();
 }
 
 Matrix4D Camera::PointAt(sPoint3D& vPos, sPoint3D& vTarget) {

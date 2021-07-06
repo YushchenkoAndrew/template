@@ -89,11 +89,8 @@ sBlock* const sChunk::GetBlock(int32_t x, int32_t y, int32_t z) {
 
 
 void Minecraft::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
-	nMapSize = luaConfig.GetValue<int32_t>("nMapSize");
-	nNoiseSize = luaConfig.GetValue<int32_t>("nNoiseSize");
-
-	// TEMP:
-	//vMainBlock = { iWidth / 2 - 50, iHeight / 2 - 50 };
+	nMapSize = luaConfig.GetTableValue<int32_t>(nullptr, "nMapSize");
+	nNoiseSize = luaConfig.GetTableValue<int32_t>(nullptr, "nNoiseSize");
 
 	vChunk.assign(nMapSize * nMapSize, {}); 
 	cEngine3D.Init(iHeight, iWidth, luaConfig);
@@ -143,7 +140,7 @@ void Minecraft::Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager) {
 	if (mManager.GetState(eMenuStates::DRAW_NOISE_YES).bHeld) { DrawNoise(GameEngine); bFreeToDraw = false; }
 
 	// Collision
-	if (mManager.GetState(eMenuStates::DRAW_RECTANGLE_COLLISION).bHeld) { DrawCollision<sRectanleCollision>(GameEngine); bFreeToDraw = false; }
+	if (mManager.GetState(eMenuStates::DRAW_RECTANGLE_COLLISION).bHeld) { DrawCollision<sRectanleStaticCollision>(GameEngine); bFreeToDraw = false; }
 	if (mManager.GetState(eMenuStates::DRAW_DIAGONAL_COLLISION).bHeld) { DrawCollision<sDiagonalCollision>(GameEngine); bFreeToDraw = false; }
 	if (mManager.GetState(eMenuStates::DRAW_DIAGONAL_STAT_COLLISION).bHeld) { DrawCollision<sDiagonalStaticCollision>(GameEngine); bFreeToDraw = false; }
 

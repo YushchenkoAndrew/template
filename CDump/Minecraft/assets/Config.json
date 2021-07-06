@@ -1,0 +1,22 @@
+{
+  "nScreenWidth": 255,
+  "nScreenHeight": 255,
+  "nPixel": 4,
+
+  "sMenuConfig": "assets/Menu.json",
+  "sMenuAnimated": "assets/AnimatedSprite.json",
+  "sMenuSprite": "assets/Sprite-0002.png",
+  "sMenuSpriteScale": 1.0,
+
+  "nMapSize": 4,
+  "nNoiseSize": 100,
+  "vLightSource": { "x": 10.0, "y": 30.0, "z": 10.0 },
+
+  "vCamera": { "x": 2.0, "y": 25.0, "z": 2.0 },
+  "nCameraStep": 8.0,
+  "nMouseSpeed": 0.5,
+
+  "MenuSprites": {
+    "MENU": [8, 2]
+  }
+}

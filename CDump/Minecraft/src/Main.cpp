@@ -15,11 +15,11 @@ public:
     }
 
     bool OnUserCreate() override {
-        mManager.Init(luaConfig.GetValue<std::string>("sMenuConfig"), luaConfig);
+        mManager.Init(luaConfig.GetTableValue<std::string>(nullptr, "sMenuConfig"), luaConfig);
         mMinecraft.Init(ScreenHeight(), ScreenWidth(), luaConfig);
 
 
-        sprMenu = std::make_unique<olc::Sprite>(luaConfig.GetValue<std::string>("sMenuSprite"));
+        sprMenu = std::make_unique<olc::Sprite>(luaConfig.GetTableValue<std::string>(nullptr, "sMenuSprite"));
         decMenu = std::make_unique<olc::Decal>(sprMenu.get());
         return true;
     }
@@ -47,12 +47,13 @@ private:
 int main()
 {
     LuaScript luaConfig;
-    if (!luaConfig.Init("src/lua/Config.lua")) return 0;
+    if (!luaConfig.Init("src/lua/Json.lua")) return 0;
+    luaConfig.CallMethod("JSON", "Parse", { "assets/Config.json" }, 1);
 
-    int32_t nPixel = luaConfig.GetValue<int32_t>("nPixel");
+    int32_t nPixel = luaConfig.GetTableValue<int32_t>(nullptr, "nPixel");
 
     Game demo(luaConfig);
-    if (demo.Construct(luaConfig.GetValue<int32_t>("nScreenWidth"), luaConfig.GetValue<int32_t>("nScreenHeight"), nPixel, nPixel)) 
+    if (demo.Construct(luaConfig.GetTableValue<int32_t>(nullptr, "nScreenWidth"), luaConfig.GetTableValue<int32_t>(nullptr, "nScreenHeight"), nPixel, nPixel)) 
         demo.Start();
     
     return 0;

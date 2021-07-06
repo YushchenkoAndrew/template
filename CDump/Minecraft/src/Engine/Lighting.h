@@ -24,10 +24,12 @@ public:
 	}
 
 	void Init(LuaScript& luaConfig) override {
-		vPos.x = luaConfig.GetTableValue<float>("vLightSource", "x");
-		vPos.y = luaConfig.GetTableValue<float>("vLightSource", "y");
-		vPos.z = luaConfig.GetTableValue<float>("vLightSource", "z");
+		luaConfig.GetTableValue<bool>(nullptr, "vLightSource");
+		vPos.x = luaConfig.GetTableValue<float>(nullptr, "x");
+		vPos.y = luaConfig.GetTableValue<float>(nullptr, "y");
+		vPos.z = luaConfig.GetTableValue<float>(nullptr, "z");
 		blLightSrc.SetPos(vPos);
+		luaConfig.Pop();
 	}
 
 	void LoadBlock(std::vector<sBlock*>& vpBlocks) override { 

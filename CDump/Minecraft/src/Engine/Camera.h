@@ -23,8 +23,8 @@ public:
 	friend class GraphicsEngine;
 
 private:
-	int32_t nScreenHeight;
-	int32_t nScreenWidth;
+	int32_t nScreenHeight = 0;
+	int32_t nScreenWidth = 0;
 
 	float nCameraStep = 4.0f;
 	float nMouseSpeed = 0.5f;

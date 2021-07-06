@@ -6,7 +6,7 @@ void MenuManager::Init(const std::string& path, LuaScript& luaConfig) {
 	cMenu.InitStates(mMenuState); 
 
 	luaAnimated.Init("src/lua/Animated.lua");
-	luaAnimated.CallMethod("Animated", "Init", { luaConfig.GetValue<const char*>("sMenuAnimated") });
+	luaAnimated.CallMethod("Animated", "Init", { luaConfig.GetTableValue<const char*>(nullptr, "sMenuAnimated") });
 }
 
 void MenuManager::Update(olc::PixelGameEngine& GameEngine) {

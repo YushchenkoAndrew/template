@@ -123,12 +123,12 @@
                 {
                   "name": "Rectangle",
                   "id": 129,
-                  "enable": false
+                  "enable": true
                 },
                 {
                   "name": "Diagonal",
                   "id": 131,
-                  "enable": true
+                  "enable": false
                 },
                 {
                   "name": "Static",
