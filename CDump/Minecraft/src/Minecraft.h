@@ -104,11 +104,11 @@ private:
 
 	template <class T>
 	void DrawCollision(olc::PixelGameEngine& GameEngine) {
-		olc::vi2d vMainBlock = { GameEngine.ScreenWidth() / 2 - 50, GameEngine.ScreenHeight() / 2 - 50 };
-		olc::vi2d vMouse = GameEngine.GetMousePos() - olc::vi2d(10, 10);
+		olc::vi2d vMainBlock = { GameEngine.ScreenWidth() / 2, GameEngine.ScreenHeight() / 2 };
+		olc::vi2d vMouse = GameEngine.GetMousePos();
 	
-		GameEngine.DrawRect(vMainBlock, { 100, 100 }, T::IsCollide(vMainBlock, vMouse, { 100, 100 }, { 20, 20 }) ? olc::RED : olc::YELLOW);
-		GameEngine.DrawRect(vMouse, { 20, 20 }, olc::YELLOW);
+		GameEngine.DrawRect(vMainBlock - olc::vi2d(50, 50), { 100, 100 }, T::IsCollide(vMouse, vMainBlock, { 20, 20 }, { 100, 100 }) ? olc::RED : olc::YELLOW);
+		GameEngine.DrawRect(vMouse - olc::vi2d(10, 10), { 20, 20 }, olc::YELLOW);
 	}
 
 
