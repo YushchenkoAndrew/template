@@ -122,10 +122,13 @@ struct sPoint2D {
 	static inline float length(const sPoint2D& p) { return sqrtf(p.x * p.x + p.y * p.y); }
 	static inline float dot(const sPoint2D& right, const sPoint2D& left) { return right.x * left.x + right.y * left.y; }
 
+	inline sPoint2D normalize() const { return sPoint2D::normalize(*this); }
+	inline float length() const { return sPoint2D::length(*this); }
 	inline float dot(const sPoint2D& right) const { return this->x * right.x + this->y * right.y; }
 
 	sPoint2D operator + (const sPoint2D& right) const { return sPoint2D{ this->x + right.x, this->y + right.y }; }
 	sPoint2D operator - (const sPoint2D& right) const { return sPoint2D{ this->x - right.x, this->y - right.y }; }
+	sPoint2D operator * (const float& w) const { return sPoint2D{ this->x * w, this->y * w }; }
 	sPoint2D operator / (const float& w) const { return sPoint2D{ this->x / w, this->y / w }; }
 };
 
@@ -229,6 +232,26 @@ struct sBlock {
 	inline uint8_t GetGreen() { return (uint8_t)((nColor & 0xFF00) >> 8); }
 	inline uint8_t GetBlue() { return (uint8_t)((nColor & 0xFF)); }
 
+
+	template <class T>
+	bool IsCollide(sPoint3D& vPos) {
+		//if (!IS_EXIST(bStatus)) return false;
+
+		//if (!IS_NORTH_N(bStatus) && T::IsCollide(sPoint2D{vPos.x, vP})) {}
+
+		//if (!IS_SOUTH_N(bStatus)) {}
+
+		//if (!IS_EAST_N(bStatus)) {}
+
+		//if (!IS_WEST_N(bStatus)) {}
+
+		//if (!IS_UP_N(bStatus) && T::IsCollide(sPoint2D{ this->vPos.x , this->vPos.y }, sPoint2D{ vPos.x, vPos.y }, { 1, 1 }, { 1, 1 })) return true;
+		if (T::IsCollide(sPoint2D{ this->vPos.x , this->vPos.y }, sPoint2D{ vPos.x, vPos.y }, { 1, 1 }, { 1, 1 })) return true;
+
+		if (!IS_DOWN_N(bStatus)) {}
+
+		return false;
+	}
 
 	sPoint3D vPos;
 	uint8_t bStatus = 0u;

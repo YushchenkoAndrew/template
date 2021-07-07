@@ -111,27 +111,26 @@ void Minecraft::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, 
 
 
 	// TEMP:
-	//sBlock blCamera;
-	//blCamera.SetPos(cEngine3D.cCamera.GetPos());
-	//float temp = blCamera.vPos.z;
-	////blCamera.vPos.z -= 2.0f;
+	sBlock blCamera;
+	blCamera.SetPos(cEngine3D.cCamera.GetPos());
+	float temp = blCamera.vPos.z;
+	//blCamera.vPos.z -= 2.0f;
 
-	//for (int32_t x = -1; x < 2; x++) {
-	//	for (int32_t y = -1; y < 2; y++) {
-	//		for (int32_t z = -1; z < 2; z++) {
-	//			sBlock* blNext = GetBlock((int32_t)(blCamera.vPos.x + x), (int32_t)(blCamera.vPos.y + y), (int32_t)(blCamera.vPos.z + z));
-	//			if (blNext == nullptr || !IS_EXIST(blNext->bStatus)) continue;
+	for (int32_t x = -1; x < 2; x++) {
+		for (int32_t y = -1; y < 2; y++) {
+			for (int32_t z = -1; z < 2; z++) {
+				sBlock* blNext = GetBlock((int32_t)(blCamera.vPos.x + x), (int32_t)(blCamera.vPos.y + y), (int32_t)(blCamera.vPos.z + z));
+				if (blNext == nullptr) continue;
 
-	//			if (BlockCollision::IsCollide(&blCamera, blNext)) {
-	//				//printf("Collide - (%d, %d, %d)\n", (int32_t)blCamera.vPos.x + x, (int32_t)blCamera.vPos.y + y, (int32_t)blCamera.vPos.z + z);
+				if (blNext->IsCollide<sRectanleCollision>(blCamera.vPos)) {
+					//printf("Collide - (%d, %d, %d)\n", (int32_t)blCamera.vPos.x + x, (int32_t)blCamera.vPos.y + y, (int32_t)blCamera.vPos.z + z);
 
-	//				blCamera.vPos.z = temp;
-	//				cEngine3D.cCamera.SetPos(blCamera.vPos + blCamera.vPos - blNext->vPos);
-	//				//blCamera.vPos.z -= 2.0f;
-	//			}
-	//		}
-	//	}
-	//}
+					SetBlock((int32_t)(blCamera.vPos.x + x), (int32_t)(blCamera.vPos.y + y), (int32_t)(blCamera.vPos.z + z));
+					//blCamera.vPos.z -= 2.0f;
+				}
+			}
+		}
+	}
 }
 
 void Minecraft::Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager) {
@@ -140,9 +139,11 @@ void Minecraft::Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager) {
 	if (mManager.GetState(eMenuStates::DRAW_NOISE_YES).bHeld) { DrawNoise(GameEngine); bFreeToDraw = false; }
 
 	// Collision
-	if (mManager.GetState(eMenuStates::DRAW_RECTANGLE_COLLISION).bHeld) { DrawCollision<sRectanleStaticCollision>(GameEngine); bFreeToDraw = false; }
+	if (mManager.GetState(eMenuStates::DRAW_RECTANGLE_COLLISION).bHeld) { DrawCollision<sRectanleCollision>(GameEngine); bFreeToDraw = false; }
 	if (mManager.GetState(eMenuStates::DRAW_DIAGONAL_COLLISION).bHeld) { DrawCollision<sDiagonalCollision>(GameEngine); bFreeToDraw = false; }
 	if (mManager.GetState(eMenuStates::DRAW_DIAGONAL_STAT_COLLISION).bHeld) { DrawCollision<sDiagonalStaticCollision>(GameEngine); bFreeToDraw = false; }
+	if (mManager.GetState(eMenuStates::DRAW_AXIS_COLLISION).bHeld) { DrawCollision<sSeparatedAxisCollision>(GameEngine); bFreeToDraw = false; }
+	if (mManager.GetState(eMenuStates::DRAW_AXIS_STAT_COLLISION).bHeld) { DrawCollision<sSeparatedAxisStaticCollision>(GameEngine); bFreeToDraw = false; }
 
 
 	if (bFreeToDraw) cEngine3D.Draw(GameEngine, mManager);

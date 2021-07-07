@@ -123,11 +123,16 @@
                 {
                   "name": "Rectangle",
                   "id": 129,
-                  "enable": true
+                  "enable": false
                 },
                 {
                   "name": "Diagonal",
                   "id": 131,
+                  "enable": false
+                },
+                {
+                  "name": "Axis",
+                  "id": 135,
                   "enable": false
                 },
                 {
@@ -139,6 +144,11 @@
                     {
                       "name": "Diagonal",
                       "id": 133,
+                      "enable": false
+                    },
+                    {
+                      "name": "Axis",
+                      "id": 137,
                       "enable": false
                     }
                   ]
