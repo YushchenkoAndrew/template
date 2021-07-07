@@ -13,14 +13,98 @@ public:
 	}
 
 	template <class T>
-	static inline bool RectangleStaticCollision(T& v1Pos, const T& v2Pos, const T& v1Size, const T& v2Size) {
-		if (RectangleCollision(v1Pos, v2Pos, v1Size, v2Size)) {
-			// FIXME:
-			//v1Pos.x += v2Pos.x - v1Pos.x + (v2Size.x  + v1Size.x) / (v2Pos.x < v1Pos.x ? 2 : -2);
-			v1Pos.y += v2Pos.y - v1Pos.y + (v2Size.y  + v1Size.y) / (v2Pos.y < v1Pos.y ? 2 : -2);
-			return true;
+	static bool SeparatedAxisRectIntersection(const T& v1Pos, const T& v2Pos, const T& v1Size, const T& v2Size) {
+		const T* pv1Pos = &v1Pos; const T* pv1Size = &v1Size;
+		const T* pv2Pos = &v2Pos; const T* pv2Size = &v2Size;
+
+		for (int32_t k = 0; k < 2; k++) {
+			if (k) {
+				std::swap(pv1Pos, pv2Pos);
+				std::swap(pv1Size, pv2Size);
+			}
+
+			for (int32_t i = 0; i < 4; i++) {
+				T vStart = (GetRectCoords<T>(i) * (*pv1Size)) + (*pv1Pos);
+				T vEnd = (GetRectCoords<T>((i + 1) % 4) * (*pv1Size)) + (*pv1Pos);
+
+				T vProject = { vEnd.x - vStart.x, -(vEnd.y - vStart.y) };
+				float d = sqrtf((float)(vProject.x * vProject.x + vProject.y * vProject.y));
+				sPoint2D vNormalized = { (float)vProject.x / d, (float)vProject.y / d };
+
+				float p1Min = INFINITY;
+				float p1Max = -INFINITY;
+
+				float p2Min = INFINITY;
+				float p2Max = -INFINITY;
+
+				for (int32_t j = 0; j < 4; j++) {
+					T vPos = (GetRectCoords<T>(j) * (*pv1Size)) + (*pv1Pos);
+					float q = ((float)vPos.x * vNormalized.x + (float)vPos.y * vNormalized.y);
+					p1Min = std::min(p1Min, q);
+					p1Max = std::max(p1Max, q);
+
+					vPos = (GetRectCoords<T>(j) * (*pv2Size)) + (*pv2Pos);
+					q = ((float)vPos.x * vNormalized.x + (float)vPos.y * vNormalized.y);
+					p2Min = std::min(p2Min, q);
+					p2Max = std::max(p2Max, q);
+				}
+
+				if (!(p2Max >= p1Min && p1Max >= p2Min)) return false;
+			}
 		}
-		return false;
+
+		return true;
+	}
+
+	template <class T>
+	static bool SeparatedAxisStaticRectIntersection(T& v1Pos, const T& v2Pos, const T& v1Size, const T& v2Size) {
+		const T* pv1Pos = &v1Pos; const T* pv1Size = &v1Size;
+		const T* pv2Pos = &v2Pos; const T* pv2Size = &v2Size;
+
+		float fOverlap = INFINITY;
+
+		for (int32_t k = 0; k < 2; k++) {
+			if (k) {
+				std::swap(pv1Pos, pv2Pos);
+				std::swap(pv1Size, pv2Size);
+			}
+
+			for (int32_t i = 0; i < 4; i++) {
+				T vStart = (GetRectCoords<T>(i) * (*pv1Size)) + (*pv1Pos);
+				T vEnd = (GetRectCoords<T>((i + 1) % 4) * (*pv1Size)) + (*pv1Pos);
+
+				sPoint2D vProject = { vEnd.x - vStart.x, -(vEnd.y - vStart.y) };
+				vProject = vProject.normalize();
+
+				float p1Min = INFINITY;
+				float p1Max = -INFINITY;
+
+				float p2Min = INFINITY;
+				float p2Max = -INFINITY;
+
+				for (int32_t j = 0; j < 4; j++) {
+					T vPos = (GetRectCoords<T>(j) * (*pv1Size)) + (*pv1Pos);
+					float q = ((float)vPos.x * vProject.x + (float)vPos.y * vProject.y);
+					p1Min = std::min(p1Min, q);
+					p1Max = std::max(p1Max, q);
+
+					vPos = (GetRectCoords<T>(j) * (*pv2Size)) + (*pv2Pos);
+					q = ((float)vPos.x * vProject.x + (float)vPos.y * vProject.y);
+					p2Min = std::min(p2Min, q);
+					p2Max = std::max(p2Max, q);
+				}
+
+				if (!(p2Max >= p1Min && p1Max >= p2Min)) return false;
+				fOverlap = std::min(std::min(p1Max, p2Max) - std::max(p1Min, p2Min), fOverlap);
+			}
+		}
+
+		// FIXME: 
+		sPoint2D vPos = { v2Pos.x - v1Pos.x, v2Pos.y - v1Pos.y };
+		vPos = vPos.normalize() * fOverlap;
+
+		v1Pos.x -= vPos.x; v1Pos.y -= vPos.y;
+		return true;
 	}
 
 
@@ -129,14 +213,6 @@ struct sRectanleCollision {
 	}
 };
 
-struct sRectanleStaticCollision {
-	template<class T>
-	static inline bool IsCollide(T& v1Pos, const T& v2Pos, const T& v1Size, const T& v2Size) {
-		return Collision::RectangleStaticCollision(v1Pos, v2Pos, v1Size, v2Size);
-	}
-};
-
-
 struct sDiagonalCollision {
 	template<class T>
 	static inline bool IsCollide(const T& v1Pos, const T& v2Pos, const T& v1Size, const T& v2Size) {
@@ -146,9 +222,25 @@ struct sDiagonalCollision {
 
 struct sDiagonalStaticCollision {
 	template<class T>
-	static inline bool IsCollide(T& v1Pos, T& v2Pos, const T& v1Size, const T& v2Size) {
+	static inline bool IsCollide(T& v1Pos, const T& v2Pos, const T& v1Size, const T& v2Size) {
 		return Collision::DiagonalStaticRectIntesection(v1Pos, v2Pos, v1Size / 2, v2Size / 2);
 	}
 };
+
+struct sSeparatedAxisCollision {
+	template<class T>
+	static inline bool IsCollide(const T& v1Pos, const T& v2Pos, const T& v1Size, const T& v2Size) {
+		return Collision::SeparatedAxisRectIntersection(v1Pos, v2Pos, v1Size / 2, v2Size / 2);
+	}
+};
+
+struct sSeparatedAxisStaticCollision {
+	template<class T>
+	static inline bool IsCollide(T& v1Pos, const T& v2Pos, const T& v1Size, const T& v2Size) {
+		return Collision::SeparatedAxisStaticRectIntersection(v1Pos, v2Pos, v1Size / 2, v2Size / 2);
+	}
+};
+
+
 
 
