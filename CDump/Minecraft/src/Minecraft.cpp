@@ -95,8 +95,7 @@ void Minecraft::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
 	vChunk.assign(nMapSize * nMapSize, {}); 
 	cEngine3D.Init(iHeight, iWidth, luaConfig);
 
-	InitMap(Type2Type<FractalNoise>());
-	for (auto& chunk : vChunk) chunk.LoadMap(cEngine3D.vpBlocks);
+	InitMap(Type2Type<FractalNoise>(), mManager.GetState(eMenuStates::DRAW_OUTLINE).bHeld);
 
 	SetBlock(24, CHUNK_SIZE - 1, 0);
 	SetBlock(23, CHUNK_SIZE - 1, 0);
@@ -105,9 +104,16 @@ void Minecraft::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
 void Minecraft::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime) {
 	cEngine3D.Update(GameEngine, mManager, fElapsedTime);
 
-	if (mManager.GetState(eMenuStates::TRUE_NOISE).bPressed) InitMap(Type2Type<TrueNoise>());
-	if (mManager.GetState(eMenuStates::PERLIN_NOISE).bPressed) InitMap(Type2Type<PerlinNoise>());
-	if (mManager.GetState(eMenuStates::FRACTAL_NOISE).bPressed) InitMap(Type2Type<FractalNoise>());
+	const bool bOutline = mManager.GetState(eMenuStates::DRAW_OUTLINE).bHeld;
+	if (mManager.GetState(eMenuStates::TRUE_NOISE).bPressed) InitMap(Type2Type<TrueNoise>(), bOutline);
+	if (mManager.GetState(eMenuStates::PERLIN_NOISE).bPressed) InitMap(Type2Type<PerlinNoise>(), bOutline);
+	if (mManager.GetState(eMenuStates::FRACTAL_NOISE).bPressed) InitMap(Type2Type<FractalNoise>(),bOutline);
+
+	if (mManager.GetState(eMenuStates::DRAW_OUTLINE).bPressed || mManager.GetState(eMenuStates::DRAW_OUTLINE).bRealeased) {
+		if (mManager.GetState(eMenuStates::TRUE_NOISE).bHeld) InitMap(Type2Type<TrueNoise>(), bOutline);
+		if (mManager.GetState(eMenuStates::PERLIN_NOISE).bHeld) InitMap(Type2Type<PerlinNoise>(), bOutline);
+		if (mManager.GetState(eMenuStates::FRACTAL_NOISE).bHeld) InitMap(Type2Type<FractalNoise>(), bOutline);
+	}
 
 
 	//// TEMP:

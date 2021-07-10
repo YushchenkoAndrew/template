@@ -159,6 +159,24 @@
                   "enable": false
                 }
               ]
+            },
+            {
+              "name": "Outline",
+              "size": [2, 1],
+              "id": -1,
+              "enable": false,
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": false,
+                  "id": 161
+                },
+                {
+                  "name": "No",
+                  "enable": true,
+                  "id": 163
+                }
+              ]
             }
           ]
         },
