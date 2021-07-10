@@ -110,27 +110,27 @@ void Minecraft::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, 
 	if (mManager.GetState(eMenuStates::FRACTAL_NOISE).bPressed) InitMap(Type2Type<FractalNoise>());
 
 
-	// TEMP:
-	sBlock blCamera;
-	blCamera.SetPos(cEngine3D.cCamera.GetPos());
-	float temp = blCamera.vPos.z;
-	//blCamera.vPos.z -= 2.0f;
+	//// TEMP:
+	//sBlock blCamera;
+	//blCamera.SetPos(cEngine3D.cCamera.GetPos());
+	//float temp = blCamera.vPos.z;
+	////blCamera.vPos.z -= 2.0f;
 
-	for (int32_t x = -1; x < 2; x++) {
-		for (int32_t y = -1; y < 2; y++) {
-			for (int32_t z = -1; z < 2; z++) {
-				sBlock* blNext = GetBlock((int32_t)(blCamera.vPos.x + x), (int32_t)(blCamera.vPos.y + y), (int32_t)(blCamera.vPos.z + z));
-				if (blNext == nullptr) continue;
+	//for (int32_t x = -1; x < 2; x++) {
+	//	for (int32_t y = -1; y < 2; y++) {
+	//		for (int32_t z = -1; z < 2; z++) {
+	//			sBlock* blNext = GetBlock((int32_t)(blCamera.vPos.x + x), (int32_t)(blCamera.vPos.y + y), (int32_t)(blCamera.vPos.z + z));
+	//			if (blNext == nullptr) continue;
 
-				if (blNext->IsCollide<sRectanleCollision>(blCamera.vPos)) {
-					//printf("Collide - (%d, %d, %d)\n", (int32_t)blCamera.vPos.x + x, (int32_t)blCamera.vPos.y + y, (int32_t)blCamera.vPos.z + z);
+	//			if (blNext->IsCollide<sRectanleCollision>(blCamera.vPos)) {
+	//				//printf("Collide - (%d, %d, %d)\n", (int32_t)blCamera.vPos.x + x, (int32_t)blCamera.vPos.y + y, (int32_t)blCamera.vPos.z + z);
 
-					SetBlock((int32_t)(blCamera.vPos.x + x), (int32_t)(blCamera.vPos.y + y), (int32_t)(blCamera.vPos.z + z));
-					//blCamera.vPos.z -= 2.0f;
-				}
-			}
-		}
-	}
+	//				SetBlock((int32_t)(blCamera.vPos.x + x), (int32_t)(blCamera.vPos.y + y), (int32_t)(blCamera.vPos.z + z));
+	//				//blCamera.vPos.z -= 2.0f;
+	//			}
+	//		}
+	//	}
+	//}
 }
 
 void Minecraft::Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager) {
