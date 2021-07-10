@@ -232,6 +232,7 @@ struct sBlock {
 	inline uint8_t GetGreen() { return (uint8_t)((nColor & 0xFF00) >> 8); }
 	inline uint8_t GetBlue() { return (uint8_t)((nColor & 0xFF)); }
 
+	inline void SetMask(uint8_t nMask, bool bSet = true) { bStatus = bSet ? (bStatus | nMask) : (bStatus & ~nMask); }
 
 	template <class T>
 	bool IsCollide(sPoint3D& vPos) {

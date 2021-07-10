@@ -62,8 +62,7 @@ public:
 	void LoadMap(std::vector<sBlock*>& vpBlock);
 
 	sBlock* const GetBlock(int32_t x, int32_t y, int32_t z);
-	void SetBlock(int32_t x, int32_t y, int32_t z, sChunk* pWestChunk, sChunk* pNorthChunk);
-	void ResetBlock(int32_t x, int32_t y, int32_t z, sChunk* pWestChunk, sChunk* pNorthChunk);
+	void SetMaskBlock(int32_t x, int32_t y, int32_t z, bool bStatus, sChunk* pWestChunk, sChunk* pEastChunk, sChunk* pNorthChunk, sChunk* pSouthChunk);
 
 private:
 	std::vector<sBlock> vBlock;
