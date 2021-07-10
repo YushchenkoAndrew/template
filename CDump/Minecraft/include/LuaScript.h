@@ -182,7 +182,7 @@ public:
 	void CallFunction(const char* func, TypeList<T, U>, int32_t nRes = 0) {
 		if (func != nullptr) lua_getglobal(L, func);
 		if (!lua_isfunction(L, -1)) return;
-		int32_t size = Push(T::GetValue()) + InitArgs<U>();
+		int32_t size = Push(T::GetValue()) + InitArgs(U());
 		CheckState(lua_pcall(L, size, nRes, 0));
 	}
 
@@ -216,19 +216,19 @@ public:
 		lua_gettable(L, -2);
 		if (!lua_isfunction(L, -1)) return;
 		lua_pushstring(L, table); 
-		int32_t size = Push(T::GetValue()) + InitArgs<U>() + 1;
+		int32_t size = Push(T::GetValue()) + InitArgs(U()) + 1;
 		CheckState(lua_pcall(L, size, nRes, 0));
 	}
 
 private:
-	template <class T>
-	int32_t InitArgs() {
-		return  Push(T::Head::GetValue()) + InitArgs<T::Tail>();
+	template <class T, class U>
+	int32_t InitArgs(TypeList<T, U>) {
+		return Push(T::GetValue()) + InitArgs(U());
 	}
 
-	template <>
-	int32_t InitArgs<NullType>() {
-		return 0;
+	template <class T>
+	int32_t InitArgs(TypeList<T, NullType>) {
+		return Push(T::GetValue());
 	}
 
 private:
