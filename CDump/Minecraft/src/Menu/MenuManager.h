@@ -35,7 +35,7 @@ public:
 	void Close() { stMenu.clear(); }
 
 	void Update(olc::PixelGameEngine& GameEngine);
-	void Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, float& fTime);
+	void Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, const float& fTime);
 
 	sMenuState& GetState(int32_t nId) { return mMenuState[STATE_GROUP(nId)][STATE_INDEX(nId)]; }
 	bool InUse() { return isInUse; }

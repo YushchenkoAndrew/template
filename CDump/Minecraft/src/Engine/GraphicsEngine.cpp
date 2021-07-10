@@ -117,7 +117,7 @@ void GraphicsEngine::ClipByScreenEdge(std::list<sTriangle>& listClippedTr) {
 	}
 }
 
-void GraphicsEngine::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime) {
+void GraphicsEngine::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, const float& fElapsedTime) {
 	if (mManager.InUse()) return;
 	cDraw.Update();
 	cCamera.Update(GameEngine, fElapsedTime);

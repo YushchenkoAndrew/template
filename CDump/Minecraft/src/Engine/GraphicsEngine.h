@@ -22,7 +22,7 @@ public:
 	~GraphicsEngine() {}
 
 	void Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig);
-	void Update(olc::PixelGameEngine& GameEngine,MenuManager& mManager, float& fElapsedTime);
+	void Update(olc::PixelGameEngine& GameEngine,MenuManager& mManager, const float& fElapsedTime);
 
 	void Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager);
 

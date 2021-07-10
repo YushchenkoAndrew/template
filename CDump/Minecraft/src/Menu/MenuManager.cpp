@@ -62,7 +62,7 @@ void MenuManager::OnMove(olc::PixelGameEngine& GameEngine) {
 	if (GameEngine.GetKey(olc::Z).bPressed) OnConfirm();
 }
 
-void MenuManager::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, float& fTime) {
+void MenuManager::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, const float& fTime) {
 	if (stMenu.empty()) return;
 	olc::vi2d vOffset = this->vOffset;
 

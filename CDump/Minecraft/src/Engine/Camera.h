@@ -8,11 +8,11 @@ class GraphicsEngine;
 class Camera {
 public:
 	void Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig);
-	void Update(olc::PixelGameEngine& GameEngine, float& fElapsedTime);
+	void Update(olc::PixelGameEngine& GameEngine, const float& fElapsedTime);
 
 	Matrix4D PointAt(sPoint3D& vPos, sPoint3D& vTarget);
 	void LookAt(olc::PixelGameEngine& GameEngine);
-	void Move(olc::PixelGameEngine& GameEngine, float& fElapsedTime);
+	void Move(olc::PixelGameEngine& GameEngine, const float& fElapsedTime);
 
 	inline Matrix4D GetViewMatrix() { return mView; }
 	inline sPoint3D GetPos() { return vPos; }

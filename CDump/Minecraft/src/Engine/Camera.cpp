@@ -69,7 +69,7 @@ void Camera::LookAt(olc::PixelGameEngine &GameEngine) {
 	vLookDir = sPoint3D::normalize(vLookDir);
 }
 
-void Camera::Move(olc::PixelGameEngine &GameEngine, float& fElapsedTime) {
+void Camera::Move(olc::PixelGameEngine &GameEngine, const float& fElapsedTime) {
 	sPoint3D vUp = { 0.0f, 1.0f, 0.0f };
 
 	if (GameEngine.GetKey(olc::W).bHeld && !GameEngine.GetKey(olc::SHIFT).bHeld)
@@ -95,7 +95,7 @@ void Camera::Move(olc::PixelGameEngine &GameEngine, float& fElapsedTime) {
 }
 
 
-void Camera::Update(olc::PixelGameEngine& GameEngine, float& fElapsedTime) {
+void Camera::Update(olc::PixelGameEngine& GameEngine, const float& fElapsedTime) {
 	LookAt(GameEngine);
 	Move(GameEngine, fElapsedTime);
 
