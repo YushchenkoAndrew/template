@@ -15,33 +15,24 @@ public:
     }
 
     bool OnUserCreate() override {
-        mManager.Init(luaConfig.GetTableValue<std::string>(nullptr, "sMenuConfig"), luaConfig);
         mMinecraft.Init(ScreenHeight(), ScreenWidth(), luaConfig);
 
 
-        sprMenu = std::make_unique<olc::Sprite>(luaConfig.GetTableValue<std::string>(nullptr, "sMenuSprite"));
-        decMenu = std::make_unique<olc::Decal>(sprMenu.get());
         return true;
     }
 
     bool OnUserUpdate(float fElapsedTime) override {
-        mManager.Update(*this);
-        mMinecraft.Update(*this, mManager, fElapsedTime);
+        mMinecraft.Update(*this, fElapsedTime);
 
 
 	    Clear(olc::BLACK);
-        mManager.Draw(*this, decMenu, fElapsedTime);
-        mMinecraft.Draw(*this, mManager);
-        return !mManager.GetState(eMenuStates::EXIT).bPressed;
+        mMinecraft.Draw(*this, fElapsedTime);
+        return mMinecraft.IsFinished();
     }
 
 private:
     Minecraft mMinecraft;
-    MenuManager mManager;
     LuaScript& luaConfig;
-
-    std::unique_ptr<olc::Sprite> sprMenu;
-    std::unique_ptr<olc::Decal> decMenu;
 };
 
 int main()

@@ -92,6 +92,11 @@ void Minecraft::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
 	nMapSize = luaConfig.GetTableValue<int32_t>(nullptr, "nMapSize");
 	nNoiseSize = luaConfig.GetTableValue<int32_t>(nullptr, "nNoiseSize");
 
+	// Init Menu
+	mManager.Init(luaConfig.GetTableValue<std::string>(nullptr, "sMenuConfig"), luaConfig);
+    sprMenu = std::make_unique<olc::Sprite>(luaConfig.GetTableValue<std::string>(nullptr, "sMenuSprite"));
+    decMenu = std::make_unique<olc::Decal>(sprMenu.get());
+
 	vChunk.assign(nMapSize * nMapSize, {}); 
 	cEngine3D.Init(iHeight, iWidth, luaConfig);
 
@@ -101,7 +106,8 @@ void Minecraft::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
 	SetBlock(23, CHUNK_SIZE - 1, 0);
 }
 
-void Minecraft::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime) {
+void Minecraft::Update(olc::PixelGameEngine& GameEngine, const float& fElapsedTime) {
+	mManager.Update(GameEngine);
 	cEngine3D.Update(GameEngine, mManager, fElapsedTime);
 
 	const bool bOutline = mManager.GetState(eMenuStates::DRAW_OUTLINE).bHeld;
@@ -139,8 +145,9 @@ void Minecraft::Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, 
 	//}
 }
 
-void Minecraft::Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager) {
+void Minecraft::Draw(olc::PixelGameEngine& GameEngine, const float& fElapsedTime) {
 	bool bFreeToDraw = true;
+    mManager.Draw(GameEngine, decMenu, fElapsedTime);
 
 	if (mManager.GetState(eMenuStates::DRAW_NOISE_YES).bHeld) { DrawNoise(GameEngine); bFreeToDraw = false; }
 
@@ -182,7 +189,7 @@ void Minecraft::SetBlock(int32_t x, int32_t y, int32_t z) {
 	vChunk[index].SetMaskBlock(
 		x % CHUNK_SIZE, y, z % CHUNK_SIZE, true,
 		x_ ? &vChunk[MapIndex(x_ - 1, z_)] : nullptr,
-		size / nMapSize > x_ ? &vChunk[MapIndex(x_ + 1, z_)] : nullptr,
+		MapIndex(x_ + 1, z_) < size ? &vChunk[MapIndex(x_ + 1, z_)] : nullptr,
 		z_ ? &vChunk[MapIndex(x_, z_ - 1)] : nullptr,
 		MapIndex(x_, z_ + 1) < size ? &vChunk[MapIndex(x_, z_ + 1)] : nullptr
 	);

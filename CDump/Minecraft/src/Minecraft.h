@@ -92,12 +92,14 @@ public:
 	~Minecraft() {}
 
 	void Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig);
-	void Update(olc::PixelGameEngine& GameEngine, MenuManager& mManager, float& fElapsedTime);
-	void Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager);
+	void Update(olc::PixelGameEngine& GameEngine, const float& fElapsedTime);
+	void Draw(olc::PixelGameEngine& GameEngine, const float& fElapsedTime);
 
 	sBlock* const GetBlock(int32_t x, int32_t y, int32_t z);
 	void SetBlock(int32_t x, int32_t y, int32_t z);
 	void ResetBlock(int32_t x, int32_t y, int32_t z);
+
+	bool IsFinished() { return !mManager.GetState(eMenuStates::EXIT).bPressed; }
 
 private:
 	void DrawNoise(olc::PixelGameEngine& GameEngine);
@@ -135,4 +137,8 @@ private:
 
 	std::vector<sChunk> vChunk;
 	GraphicsEngine cEngine3D;
+
+    MenuManager mManager;
+    std::unique_ptr<olc::Sprite> sprMenu;
+    std::unique_ptr<olc::Decal> decMenu;
 };
