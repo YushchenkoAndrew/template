@@ -8,6 +8,9 @@ void GraphicsEngine::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig)
 	mProjection = Matrix4D::Projection((float)iHeight / (float)iWidth, 90.0f, 1000.0f, 0.1f);
 
 	lightSrc->Init(luaConfig);
+}
+
+void GraphicsEngine::LoadMap() {
 	lightSrc->LoadBlock(vpBlocks);
 }
 

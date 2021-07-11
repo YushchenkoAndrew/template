@@ -25,6 +25,7 @@ public:
 	void Update(olc::PixelGameEngine& GameEngine,MenuManager& mManager, const float& fElapsedTime);
 
 	void Draw(olc::PixelGameEngine& GameEngine, MenuManager& mManager);
+	void LoadMap();
 
 private:
 
