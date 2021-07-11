@@ -90,6 +90,7 @@ sBlock* const sChunk::GetBlock(int32_t x, int32_t y, int32_t z) {
 
 void Minecraft::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
 	nMapSize = luaConfig.GetTableValue<int32_t>(nullptr, "nMapSize");
+	nMapLoadRange = luaConfig.GetTableValue<int32_t>(nullptr, "nMapLoadRange");
 	nNoiseSize = luaConfig.GetTableValue<int32_t>(nullptr, "nNoiseSize");
 
 	// Init Menu
@@ -100,10 +101,7 @@ void Minecraft::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
 	vChunk.assign(nMapSize * nMapSize, {}); 
 	cEngine3D.Init(iHeight, iWidth, luaConfig);
 
-	InitMap(Type2Type<FractalNoise>(), mManager.GetState(eMenuStates::DRAW_OUTLINE).bHeld);
-
-	SetBlock(24, CHUNK_SIZE - 1, 0);
-	SetBlock(23, CHUNK_SIZE - 1, 0);
+	InitMap(Type2Type<FractalNoise>(), cEngine3D.cCamera.GetPos() - (float)nMapSize * CHUNK_SIZE * 0.5f);
 }
 
 void Minecraft::Update(olc::PixelGameEngine& GameEngine, const float& fElapsedTime) {

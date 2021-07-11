@@ -12,7 +12,6 @@ public:
 
 	template <class T>
 	void Init(sPoint3D vOffset, const bool& bOutline, const bool& bLastChunkX,const bool& bLastChunkZ, sChunk* pWestChunk, sChunk* pNorthChunk) {
-		vOffset *= CHUNK_SIZE;
 		vBlock.clear();
 
 		for (int32_t z = 0; z < CHUNK_SIZE; z++) {
@@ -105,12 +104,17 @@ private:
 	void DrawNoise(olc::PixelGameEngine& GameEngine);
 	inline int32_t MapIndex(int32_t x, int32_t z) { return z + x * nMapSize; }
 
+	// TODO: Use std::async
 	template <class T>
-	void InitMap(Type2Type<T>, const bool& bOutline) {
+	void InitMap(Type2Type<T>, sPoint3D vOffset) {
+		cEngine3D.vpBlocks.clear();
+		vWorldPos = vOffset;
+		bool& bOutline = mManager.GetState(eMenuStates::DRAW_OUTLINE).bHeld;
+
 		for (int32_t x = 0; x < nMapSize; x++) {
 			for (int32_t z = 0; z < nMapSize; z++) {
 				vChunk[MapIndex(x, z)].Init<T>(
-					{ (float)x, 0.0f, (float)z }, bOutline,
+					{ (float)x * CHUNK_SIZE + vOffset.x, 0.0f, (float)z * CHUNK_SIZE + vOffset.z }, bOutline,
 					x == nMapSize - 1, z == nMapSize - 1,
 					x ? &vChunk[MapIndex(x - 1, z)] : nullptr,
 					z ? &vChunk[MapIndex(x, z - 1)] : nullptr
@@ -119,11 +123,12 @@ private:
 		}
 
 		for (auto& chunk : vChunk) chunk.LoadMap(cEngine3D.vpBlocks);
+		cEngine3D.LoadMap();
 	}
 
 	template <class T>
 	void DrawCollision(olc::PixelGameEngine& GameEngine) {
-		olc::vf2d vMainBlock = { GameEngine.ScreenWidth() / 2.0f, GameEngine.ScreenHeight() / 2.0f };
+		olc::vf2d vMainBlock = { GameEngine.ScreenWidth() * 0.5f, GameEngine.ScreenHeight() * 0.5f };
 		olc::vf2d vMouse = GameEngine.GetMousePos();
 
 		GameEngine.DrawRect(vMainBlock - olc::vi2d(50, 50), { 100, 100 }, T::IsCollide(vMouse, vMainBlock, { 20.0f, 20.0f }, { 100.0f, 100.0f }) ? olc::RED : olc::YELLOW);
@@ -133,7 +138,10 @@ private:
 
 private:
 	int32_t nMapSize = 1;
+	int32_t nMapLoadRange = 1;
 	int32_t nNoiseSize = 0;
+
+	sPoint3D vWorldPos;
 
 	std::vector<sChunk> vChunk;
 	GraphicsEngine cEngine3D;

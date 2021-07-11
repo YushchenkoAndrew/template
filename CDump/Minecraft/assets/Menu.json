@@ -16,12 +16,12 @@
               "items": [
                 {
                   "name": "Yes",
-                  "enable": true,
+                  "enable": false,
                   "id": 17
                 },
                 {
                   "name": "No",
-                  "enable": false,
+                  "enable": true,
                   "id": 19
                 }
               ]
@@ -36,12 +36,12 @@
                   "items": [
                     {
                       "name": "Yes",
-                      "enable": false,
+                      "enable": true,
                       "id": 33
                     },
                     {
                       "name": "No",
-                      "enable": true,
+                      "enable": false,
                       "id": 35
                     }
                   ]
