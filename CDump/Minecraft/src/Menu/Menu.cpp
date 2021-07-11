@@ -38,9 +38,6 @@ void Menu::Build(LuaScript& luaJson) {
         luaJson.GetTableValue<bool>(nullptr, i + 1);
 
         std::string key = luaJson.GetTableValue<const char*>(nullptr, "name");
-
-        (*this)[key].SetId(luaJson.GetTableValue<int32_t>(nullptr, "id"));
-        (*this)[key].SetEnable(luaJson.GetTableValue<bool>(nullptr, "enable"));
         (*this)[key].SetScale(nSpriteScale);
         (*this)[key].SetSprites(vSprites);
 
@@ -52,6 +49,10 @@ void Menu::Build(LuaScript& luaJson) {
 			luaJson.GetTableValue<bool>(nullptr, "items");
 			(*this)[key].Build(luaJson);
 			luaJson.Pop();
+        }
+        else {
+            (*this)[key].SetId(luaJson.GetTableValue<int32_t>(nullptr, "id"));
+            (*this)[key].SetEnable(luaJson.GetTableValue<bool>(nullptr, "enable"));
         }
 
         luaJson.Pop();
@@ -67,8 +68,7 @@ void Menu::Build(LuaScript& luaJson) {
 }
 
 void Menu::InitStates(menustate_t& mMenuState) {
-    if (nId > 0)
-        mMenuState[STATE_GROUP(nId)][STATE_INDEX(nId)] = { false, false, bEnable };
+    if (nId > 0) mMenuState[STATE_GROUP(nId)][STATE_INDEX(nId)] = { false, false, bEnable };
 
     for (auto& item : items) {
         item.InitStates(mMenuState);
