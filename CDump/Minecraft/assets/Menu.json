@@ -153,6 +153,22 @@
                   "id": 163
                 }
               ]
+            },
+            {
+              "name": "Follow",
+              "size": [2, 1],
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": true,
+                  "id": 177
+                },
+                {
+                  "name": "No",
+                  "enable": false,
+                  "id": 179
+                }
+              ]
             }
           ]
         },

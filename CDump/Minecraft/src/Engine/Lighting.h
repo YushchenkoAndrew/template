@@ -7,6 +7,7 @@ class Light {
 public:
 	virtual void Init(float x, float y, float z) = 0;
 	virtual void Init(LuaScript& luaConfig) = 0;
+	virtual void Update(const sPoint3D& vPos) = 0;
 	virtual void LoadBlock(std::vector<sBlock*>& vpBlocks) = 0;
 	virtual float GetBrightness(const sPoint3D& vTriangle, const sPoint3D& normal, bool bDistribute) = 0;
 	virtual ~Light() {}
@@ -30,6 +31,11 @@ public:
 		vPos.z = luaConfig.GetTableValue<float>(nullptr, "z");
 		blLightSrc.SetPos(vPos);
 		luaConfig.Pop();
+	}
+
+	void Update(const sPoint3D& vPos) override { 
+		this->vPos.x = vPos.x; this->vPos.y = vPos.y; this->vPos.z = vPos.z;
+		//blLightSrc.SetPos(vPos);
 	}
 
 	void LoadBlock(std::vector<sBlock*>& vpBlocks) override { 

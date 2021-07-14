@@ -124,6 +124,8 @@ void GraphicsEngine::Update(olc::PixelGameEngine& GameEngine, MenuManager& mMana
 	if (mManager.InUse()) return;
 	cDraw.Update();
 	cCamera.Update(GameEngine, fElapsedTime);
+
+	if (mManager.GetState(eMenuStates::FOLLOW_CAMERA).bHeld) lightSrc->Update(cCamera.vPos);
 }
 
 void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManager) {

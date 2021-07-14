@@ -22,6 +22,7 @@ namespace eMenuStates {
 		DRAW_AXIS_COLLISION = 135,
 		DRAW_AXIS_STAT_COLLISION = 137,
 		DRAW_OUTLINE = 161,
+		FOLLOW_CAMERA = 177,
 		EXIT = 80
 	};
 }
