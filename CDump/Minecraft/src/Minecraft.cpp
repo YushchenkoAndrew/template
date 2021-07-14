@@ -101,27 +101,30 @@ void Minecraft::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
 	vChunk.assign(nMapSize * nMapSize, {}); 
 	cEngine3D.Init(iHeight, iWidth, luaConfig);
 
-	InitMap(Type2Type<FractalNoise>(), cEngine3D.cCamera.GetPos() - (float)nMapSize * CHUNK_SIZE * 0.5f);
+	vWorldStart = cEngine3D.cCamera.GetPos() - (float)nMapSize * CHUNK_SIZE * 0.5f;
+	InitMap(Type2Type<FractalNoise>());
 }
 
 void Minecraft::Update(olc::PixelGameEngine& GameEngine, const float& fElapsedTime) {
 	mManager.Update(GameEngine);
 	cEngine3D.Update(GameEngine, mManager, fElapsedTime);
 
-	//if (mManager.GetState(eMenuStates::TRUE_NOISE).bPressed) InitMap(Type2Type<TrueNoise>());
-	//if (mManager.GetState(eMenuStates::PERLIN_NOISE).bPressed) InitMap(Type2Type<PerlinNoise>());
-	//if (mManager.GetState(eMenuStates::FRACTAL_NOISE).bPressed) InitMap(Type2Type<FractalNoise>());
+	if (mManager.GetState(eMenuStates::TRUE_NOISE).bPressed) InitMap(Type2Type<TrueNoise>());
+	if (mManager.GetState(eMenuStates::PERLIN_NOISE).bPressed) InitMap(Type2Type<PerlinNoise>());
+	if (mManager.GetState(eMenuStates::FRACTAL_NOISE).bPressed) InitMap(Type2Type<FractalNoise>());
 
-	//if (mManager.GetState(eMenuStates::DRAW_OUTLINE).bPressed || mManager.GetState(eMenuStates::DRAW_OUTLINE).bRealeased) {
-	//	if (mManager.GetState(eMenuStates::TRUE_NOISE).bHeld) InitMap(Type2Type<TrueNoise>());
-	//	if (mManager.GetState(eMenuStates::PERLIN_NOISE).bHeld) InitMap(Type2Type<PerlinNoise>());
-	//	if (mManager.GetState(eMenuStates::FRACTAL_NOISE).bHeld) InitMap(Type2Type<FractalNoise>());
-	//}
+	if (mManager.GetState(eMenuStates::DRAW_OUTLINE).bPressed || mManager.GetState(eMenuStates::DRAW_OUTLINE).bRealeased) {
+		if (mManager.GetState(eMenuStates::TRUE_NOISE).bHeld) InitMap(Type2Type<TrueNoise>());
+		if (mManager.GetState(eMenuStates::PERLIN_NOISE).bHeld) InitMap(Type2Type<PerlinNoise>());
+		if (mManager.GetState(eMenuStates::FRACTAL_NOISE).bHeld) InitMap(Type2Type<FractalNoise>());
+	}
 
-	// FIXME:
-	sPoint3D vMapRange = sPoint3D::abs(cEngine3D.cCamera.GetPos() - vWorldPos);
-	if (vMapRange.z > (float)(nMapLoadRange + nMapSize * 0.5f) * CHUNK_SIZE) {
-		InitMap(Type2Type<FractalNoise>(), vWorldPos + sPoint3D{ 0.0f, 0.0f, 24.0f });
+	sPoint3D vMapRange = (cEngine3D.cCamera.GetPos() - vWorldStart - (float)nMapSize * CHUNK_SIZE * 0.5f);
+	const float fLength = (float)(nMapLoadRange - nMapSize * 0.5f) * CHUNK_SIZE;
+
+	if (vMapRange.z < fLength || vMapRange.x < fLength || vMapRange.z > -fLength || vMapRange.x > -fLength) {
+		vWorldStart = vWorldStart + sPoint3D::normalize(vMapRange) * CHUNK_SIZE;
+		InitMap(Type2Type<FractalNoise>());
 	}
 
 

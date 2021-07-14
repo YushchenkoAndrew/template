@@ -106,15 +106,14 @@ private:
 
 	// TODO: Use std::async
 	template <class T>
-	void InitMap(Type2Type<T>, sPoint3D vOffset) {
+	void InitMap(Type2Type<T>) {
 		cEngine3D.vpBlocks.clear();
-		vWorldPos = vOffset;
 		bool& bOutline = mManager.GetState(eMenuStates::DRAW_OUTLINE).bHeld;
 
 		for (int32_t x = 0; x < nMapSize; x++) {
 			for (int32_t z = 0; z < nMapSize; z++) {
 				vChunk[MapIndex(x, z)].Init<T>(
-					{ (float)x * CHUNK_SIZE + vOffset.x, 0.0f, (float)z * CHUNK_SIZE + vOffset.z }, bOutline,
+					{ (float)x * CHUNK_SIZE + vWorldStart.x, 0.0f, (float)z * CHUNK_SIZE + vWorldStart.z }, bOutline,
 					x == nMapSize - 1, z == nMapSize - 1,
 					x ? &vChunk[MapIndex(x - 1, z)] : nullptr,
 					z ? &vChunk[MapIndex(x, z - 1)] : nullptr
@@ -141,7 +140,7 @@ private:
 	int32_t nMapLoadRange = 1;
 	int32_t nNoiseSize = 0;
 
-	sPoint3D vWorldPos;
+	sPoint3D vWorldStart;
 
 	std::vector<sChunk> vChunk;
 	GraphicsEngine cEngine3D;
