@@ -237,6 +237,7 @@ struct sBlock {
 
 	template <class T>
 	bool IsCollide(sPoint3D& vPos) {
+		// TODO: At some point
 		//if (!IS_EXIST(bStatus)) return false;
 
 		//if (!IS_NORTH_N(bStatus) && T::IsCollide(sPoint2D{vPos.x, vP})) {}
