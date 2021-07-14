@@ -181,11 +181,12 @@
   "sMenuSprite": "assets/Sprite-0002.png",
   "sMenuSpriteScale": 1.0,
 
-  "nMapSize": 4,
+  "nMapSize": 6,
+  "nMapLoadRange": 2,
   "nNoiseSize": 100,
-  "vLightSource": { "x": 10.0, "y": 30.0, "z": 10.0 },
+  "vLightSource": { "x": 10.0, "y": 30.0, "z": 0.0 },
 
-  "vCamera": { "x": 2.0, "y": 25.0, "z": 2.0 },
+  "vCamera": { "x": 0.0, "y": 50.0, "z": 0.0 },
   "nCameraStep": 8.0,
   "nMouseSpeed": 0.5,
 
@@ -196,35 +197,27 @@
 {
   "name": "root",
   "size": [1, 2],
-  "id": -1,
-  "enable": false,
   "items": [
     {
       "name": "Debug",
       "size": [1, 2],
-      "id": -1,
-      "enable": false,
       "items": [
         {
           "name": "Draw",
           "size": [1, 4],
-          "id": -1,
-          "enable": false,
           "items": [
             {
               "name": "Edges",
               "size": [2, 1],
-              "id": -1,
-              "enable": false,
               "items": [
                 {
                   "name": "Yes",
-                  "enable": true,
+                  "enable": false,
                   "id": 17
                 },
                 {
                   "name": "No",
-                  "enable": false,
+                  "enable": true,
                   "id": 19
                 }
               ]
@@ -232,23 +225,19 @@
             {
               "name": "Shadow",
               "size": [1, 2],
-              "id": -1,
-              "enable": false,
               "items": [
                 {
                   "name": "Shadow",
                   "size": [2, 1],
-                  "id": -1,
-                  "enable": false,
                   "items": [
                     {
                       "name": "Yes",
-                      "enable": false,
+                      "enable": true,
                       "id": 33
                     },
                     {
                       "name": "No",
-                      "enable": true,
+                      "enable": false,
                       "id": 35
                     }
                   ]
@@ -256,8 +245,6 @@
                 {
                   "name": "Distribute",
                   "size": [2, 1],
-                  "id": -1,
-                  "enable": false,
                   "items": [
                     {
                       "name": "Yes",
@@ -276,8 +263,6 @@
             {
               "name": "Color",
               "size": [2, 1],
-              "id": -1,
-              "enable": false,
               "items": [
                 {
                   "name": "Yes",
@@ -294,8 +279,6 @@
             {
               "name": "Noise",
               "size": [2, 1],
-              "id": -1,
-              "enable": false,
               "items": [
                 {
                   "name": "Yes",
@@ -312,8 +295,6 @@
             {
               "name": "Collision",
               "size": [1, 3],
-              "id": -1,
-              "enable": false,
               "items": [
                 {
                   "name": "Rectangle",
@@ -333,8 +314,6 @@
                 {
                   "name": "Static",
                   "size": [1, 3],
-                  "id": -1,
-                  "enable": false,
                   "items": [
                     {
                       "name": "Diagonal",
@@ -354,20 +333,48 @@
                   "enable": false
                 }
               ]
+            },
+            {
+              "name": "Outline",
+              "size": [2, 1],
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": false,
+                  "id": 161
+                },
+                {
+                  "name": "No",
+                  "enable": true,
+                  "id": 163
+                }
+              ]
+            },
+            {
+              "name": "Follow",
+              "size": [2, 1],
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": true,
+                  "id": 177
+                },
+                {
+                  "name": "No",
+                  "enable": false,
+                  "id": 179
+                }
+              ]
             }
           ]
         },
         {
           "name": "Alg",
           "size": [1, 4],
-          "id": -1,
-          "enable": false,
           "items": [
             {
               "name": "Rand",
               "size": [1, 3],
-              "id": -1,
-              "enable": false,
               "items": [
                 {
                   "name": "TrueNoise",
@@ -389,8 +396,6 @@
             {
               "name": "Collision",
               "size": [1, 3],
-              "id": -1,
-              "enable": false,
               "items": [
                 {
                   "name": "Diagonal",
@@ -405,8 +410,8 @@
     },
     {
       "name": "Exit",
-      "enable": false,
-      "id": 80
+      "id": 80,
+      "enable": false
     }
   ]
 }
