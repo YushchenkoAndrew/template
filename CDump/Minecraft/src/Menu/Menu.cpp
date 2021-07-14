@@ -147,7 +147,7 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
 
         vPatchPos = { vSizeInPatch.x - 2, 0 };
         olc::vi2d vPos = vPatchPos * PATCH_SIZE * (int32_t)nSpriteScale + vOffset;
-        GameEngine.DrawPartialDecal(vPos, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0], vScale[1] });
+        GameEngine.DrawPartialDecal(vPos, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0] * nSpriteScale, vScale[1] * nSpriteScale });
     }
     
     if ((nRows - nTopLeftItem) > vTable.y) {
@@ -169,7 +169,7 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
 
         vPatchPos = { vSizeInPatch.x - 2, vSizeInPatch.y - 1 };
         olc::vi2d vPos = vPatchPos * PATCH_SIZE + vOffset;
-        GameEngine.DrawPartialDecal(vPos, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0], vScale[1] });
+        GameEngine.DrawPartialDecal(vPos, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0] * nSpriteScale, vScale[1] * nSpriteScale });
     }
 
 
@@ -188,7 +188,7 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
     vScale = luaAnimated.GetArray<float>();
     luaAnimated.Pop();
 
-    GameEngine.DrawPartialDecal(vCursor, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0], vScale[1] });
+    GameEngine.DrawPartialDecal(vCursor, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0] * nSpriteScale, vScale[1] * nSpriteScale });
 
 
 
@@ -222,7 +222,7 @@ void Menu::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& d
 
         vPatchPos.x += vItemSize.x;
         vPos = vPatchPos * PATCH_SIZE * (int32_t)nSpriteScale + vOffset;
-        GameEngine.DrawPartialDecal(vPos, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0], vScale[1] });
+        GameEngine.DrawPartialDecal(vPos, decMenu.get(), { vSource[0], vSource[1] }, { vSize[0], vSize[1] }, { vScale[0] * nSpriteScale, vScale[1] * nSpriteScale });
 
 		AnyType<int32_t>::GetValue()++;
     }
