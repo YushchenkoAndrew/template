@@ -11,7 +11,7 @@ function Animated:Init(path)
 
   -- Create Frame StateMachine (NextFrame) for each State
   for key, sprites in pairs(Animated.sprites) do
-    for name, state in pairs(sprites.states) do
+    for _, state in pairs(sprites.states) do
       state.NextFrame = {}
     end
 
@@ -22,7 +22,7 @@ end
 
 
 function Animated:AddStateMachine(sName, nId)
-  print("[lua] CREATED [" .. nId .. "] " .. sName)
+  -- print("[lua] CREATED [" .. nId .. "] " .. sName)
 
   -- Create Frame StateMachine (NextFrame) for each State
   local sprites = Animated.sprites[sName]
@@ -46,7 +46,7 @@ function Animated:NextFrame(fElapsedTime, sName, sState)
 
   -- Main Loop
   repeat
-    for key, frame in pairs(stMachine.frames) do
+    for _, frame in pairs(stMachine.frames) do
       time = 0.0
 
       while true do

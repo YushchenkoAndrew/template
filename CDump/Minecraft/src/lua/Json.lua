@@ -118,7 +118,7 @@ end
 
 function JSON:ParseKeywords()
 	local j = 1
-	for key, value in pairs(JSON.tKeywords) do
+	for _, value in pairs(JSON.tKeywords) do
 		while (#value > j and value:sub(j, j) == JSON.cCurr and JSON.cCurr ~= nil) do
 			JSON.cCurr = JSON.file:read(1)
 			j = j + 1
