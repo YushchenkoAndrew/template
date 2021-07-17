@@ -1,23 +1,17 @@
-import * as React from "react";
+import React, { useState } from "react";
 
 export interface NavItemProps {
   name: string;
 }
 
-export default class NavItem extends React.Component<NavItemProps> {
-  state = { click: 0 };
+export default function NavItem(props: NavItemProps) {
+  const [click, setClick] = useState(0);
 
-  render() {
-    return (
-      <li className="nav-item">
-        <a
-          href="#"
-          className="nav-link"
-          onClick={() => this.setState({ click: this.state.click + 1 })}
-        >
-          {this.props.name + " " + this.state.click}
-        </a>
-      </li>
-    );
-  }
+  return (
+    <li className="nav-item">
+      <a href="#" className="nav-link" onClick={() => setClick(click + 1)}>
+        {props.name + " " + click}
+      </a>
+    </li>
+  );
 }
