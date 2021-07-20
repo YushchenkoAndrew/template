@@ -1,4 +1,5 @@
 import * as React from "react";
+import styles from "./NavBar.module.css";
 
 export interface NavBarProps {
   children: React.ReactNode;
@@ -6,8 +7,8 @@ export interface NavBarProps {
 
 export default function NavBar(props: NavBarProps) {
   return (
-    <nav className="navbar">
-      <ul className="navbar-nav">{props.children}</ul>
+    <nav className={styles.navbar}>
+      <ul className={styles["navbar-container"]}>{props.children}</ul>
     </nav>
   );
 }
