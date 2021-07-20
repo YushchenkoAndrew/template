@@ -14,3 +14,8 @@ a {
 * {
   box-sizing: border-box;
 }
+
+@font-face {
+  font-family: "FourBit";
+  src: url("/fonts/4bitfont.ttf");
+}
