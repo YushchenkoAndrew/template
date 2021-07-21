@@ -1,6 +1,8 @@
 import * as React from "react";
-import NavBar from "../../components/NavBar/NavBar";
-import NavItem from "../../components/NavBar/NavItem";
+import NavBar from "../../components/NavBar";
+import NavItem from "../../components/NavItem";
+import styles from "../../styles/Projects.module.css";
+import stylesId from "../../styles/Glitch.module.css";
 
 interface HomeProps {}
 
@@ -13,7 +15,9 @@ export default function Home(props: HomeProps) {
         <NavItem name="Home2" />
         <NavItem name="Home4" />
       </NavBar>
-      <p>This is another paragraph.</p>
+      <div>
+        <p className={stylesId["glitch-rgb"]} data-glitch="This is another paragraph.">This is another paragraph.</p>
+      </div>
     </>
   );
 }
