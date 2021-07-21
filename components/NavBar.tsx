@@ -8,7 +8,9 @@ export interface NavBarProps {
 export default function NavBar(props: NavBarProps) {
   return (
     <nav className={styles.navbar}>
-      <ul className={styles["navbar-container"]}>{props.children}</ul>
+      <div className={styles["navbar-collapse"]}>
+        <ul className={styles["navbar-nav"]}>{props.children}</ul>
+      </div>
     </nav>
   );
 }
