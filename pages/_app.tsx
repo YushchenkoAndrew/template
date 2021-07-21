@@ -8,12 +8,12 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <title>My page</title>
         <link 
+          rel="preload"
           href="/fonts/4bitfont.ttf"
           as="font"
           crossOrigin=""
         />
       </Head>
-      <p>This is another paragraph.</p>
       <Component {...pageProps} />
     </>
   );
