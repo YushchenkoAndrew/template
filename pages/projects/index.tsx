@@ -11,13 +11,10 @@ export default function Home(props: HomeProps) {
     <>
       <NavBar>
         <NavItem name="Home" />
-        <NavItem name="Home1" />
-        <NavItem name="Home2" />
-        <NavItem name="Home4" />
+        <NavItem name="API" />
+        <NavItem name="Projects" />
+        <NavItem name="Info" />
       </NavBar>
-      <div>
-        <p className={stylesId["glitch-rgb"]} data-glitch="This is another paragraph.">This is another paragraph.</p>
-      </div>
     </>
   );
 }
