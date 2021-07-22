@@ -1,6 +1,6 @@
 .glitch-rgb { 
   text-decoration: none;
-  position: absolute;
+  position: relative;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -11,11 +11,14 @@
   display: block;
   content: attr(data-glitch);
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 8px;
   width: 100%;
   height: 100%;
   opacity: .8;
+}
+
+.glitch-rgb:hover {
+  color: #fff;
 }
 
 .glitch-rgb::after {
@@ -38,9 +41,11 @@
 
 @keyframes glitch-rgb {
   0%  { transform: translate(0); }
-  25% { transform: translate(-5px, 5px); }
-  40% { transform: translate(-5px, -5px); }
-  60% { transform: translate(5px, 5px); }
-  80% { transform: translate(5px, -5px); }
+  5%  { transform: translate(3px, 0px); }
+  25% { transform: translate(5px, 2px); }
+  50% { transform: translate(-4px, -3px); }
+  60% { transform: translate(2px, 5px); }
+  85% { transform: translate(4px, 0px); }
+  90% { transform: translate(2px, -3px); }
   to  { transform: translate(0); }
 }
