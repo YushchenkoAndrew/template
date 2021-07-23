@@ -1,21 +1,32 @@
-import * as React from "react";
+import Head from "next/head";
+import  React from "react";
 import NavBar from "../../components/NavBar";
 import NavItem from "../../components/NavItem";
-import styles from "../../styles/Projects.module.css";
-import stylesId from "../../styles/Glitch.module.css";
 
-interface HomeProps {}
-
-export default function Home(props: HomeProps) {
+export default function Home() {
   return (
-    <>
-      <NavBar>
-        <NavItem name="Home" />
-        <NavItem name="API" />
-        <NavItem name="Projects" />
-        <NavItem name="Info" />
-      </NavBar>
-    </>
+    <div className="container">
+      <Head>
+        <title>Mortis Home</title>
+        <meta name="author" content="Andrew Y" />
+        <meta name="description" content="Site with projects examples" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <main>
+        <NavBar>
+          <NavItem name="Home" href="/projects" active={true} />
+          <NavItem name="API" href="/api/doc" />
+          <NavItem name="Projects" href="/projects/projects" />
+          <NavItem name="Info" href="/projects/info" />
+        </NavBar>
+
+
+      </main>
+
+      <footer>
+      </footer>
+    </div>
   );
 }
 
