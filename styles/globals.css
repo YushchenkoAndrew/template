@@ -19,3 +19,8 @@ a {
   font-family: "FourBit";
   src: url("/fonts/4bitfont.ttf");
 }
+
+@font-face {
+  font-family: "ABSTRACT";
+  src: url("/fonts/ABSTRACT.TTF");
+}
