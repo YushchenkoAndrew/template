@@ -9,3 +9,6 @@
   height: 100%;
 }
 
+.nav-link-active {
+  font-size: 2.2rem;
+}

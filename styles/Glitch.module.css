@@ -1,4 +1,4 @@
-.glitch-rgb { 
+.glitch-rgb {
   color: #fff;
   text-decoration: none;
   position: relative;
@@ -8,14 +8,15 @@
   margin: 0;
 }
 
-.glitch-rgb::before, .glitch-rgb::after {
+.glitch-rgb::before,
+.glitch-rgb::after {
   display: block;
   content: attr(data-glitch);
   position: absolute;
   top: 8px;
   width: 100%;
   height: 100%;
-  opacity: .8;
+  opacity: 0.8;
 }
 
 .glitch-rgb:hover {
@@ -33,62 +34,37 @@
 }
 
 .glitch-rgb:hover::before {
-  animation: glitch-rgb .3s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  animation: glitch-rgb 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
 }
 
 .glitch-rgb:hover::after {
-  animation: glitch-rgb .3s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite reverse;
+  animation: glitch-rgb 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite
+    reverse;
 }
 
 @keyframes glitch-rgb {
-  0%  { transform: translate(0); }
-  5%  { transform: translate(3px, 0px); }
-  25% { transform: translate(5px, 2px); }
-  50% { transform: translate(-4px, -3px); }
-  60% { transform: translate(2px, 5px); }
-  85% { transform: translate(4px, 0px); }
-  90% { transform: translate(2px, -3px); }
-  to  { transform: translate(0); }
-}
-
-
-
-
-.glitch-judder {
-  color: #fff;
-  text-decoration: none;
-  position: relative;
-  display: inline-block;
-  margin: 0;
-}
-
-.glitch-judder::after, .glitch-judder::before {
-  content: attr(data-glitch);
-  position: absolute;
-  top: 8px;
-  width: 100%;
-  height: 100%;
-}
-
-.glitch-judder::before {
-  /* left: 2px; */
-  text-shadow: -2px 0 #49FC00;
-  clip: rect(24px, 550px, 90px, 0);
-  animation: glitch-judder 3s infinite linear alternate-reverse;
-  /* transform: translate(2px, 0px); */
-}
-
-.glitch-judder::after {
-  /* left: -2px; */
-  text-shadow: -2px 0 spin(#49FC00, 180);
-  clip: rect(85px, 550px, 140px, 0);
-  animation: glitch-judder 3s infinite linear alternate-reverse;
-  /* transform: translate(-2px, 0px); */
-}
-
-@keyframes glitch-judder {
-  25% { clip: rect(150px, 9999px, 300px, 0); }
-  50% { clip: rect(150px, 9999px, 300px, 0); }
-  60% { clip: rect(150px, 9999px, 300px, 0); }
-  80% { clip: rect(150px, 9999px, 300px, 0); }
+  0% {
+    transform: translate(0);
+  }
+  5% {
+    transform: translate(3px, 0px);
+  }
+  25% {
+    transform: translate(5px, 2px);
+  }
+  50% {
+    transform: translate(-4px, -3px);
+  }
+  60% {
+    transform: translate(2px, 5px);
+  }
+  85% {
+    transform: translate(4px, 0px);
+  }
+  90% {
+    transform: translate(2px, -3px);
+  }
+  to {
+    transform: translate(0);
+  }
 }
