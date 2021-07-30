@@ -17,7 +17,7 @@ export default function NavItem(props: NavItemProps) {
       setCount(count + 1);
       if (!props.active || (count > 10 && count < 20))
         return setName(props.name);
-      let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
       let i = Math.floor(Math.random() * props.name.length);
       let j = Math.floor(Math.random() * chars.length);
       setCount((count % 20) + 1);
