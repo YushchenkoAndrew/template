@@ -7,12 +7,16 @@ public:
     }
 
     bool OnUserCreate() override {
+        cCodeRain.Init(ScreenWidth(), ScreenHeight(), 6);
+
         return true;
     }
 
     bool OnUserUpdate(float fElapseTime) override {
 	    Clear(olc::BLACK);
         cCodeRain.Draw(*this, fElapseTime);
+
+        DrawString(20, 20, std::to_string(fElapseTime));
         return true; 
     }
 
