@@ -35,8 +35,7 @@ private:
     LuaScript& luaConfig;
 };
 
-int main()
-{
+int main() {
     LuaScript luaConfig;
     if (!luaConfig.Init("src/lua/Json.lua")) return 0;
     luaConfig.CallMethod("JSON", "Parse", { "assets/Config.json" }, 1);
