@@ -10,9 +10,9 @@ public:
         }
     }
 
-    void Draw(olc::PixelGameEngine& GameEngine, float fElapseTime) {
+    void Draw(olc::PixelGameEngine& GameEngine, float fElapseTime, std::unique_ptr<olc::Decal>& decFont) {
         for (auto& stream : vStrems) {
-            stream.Draw(GameEngine, fElapseTime);
+            stream.Draw(GameEngine, fElapseTime, decFont);
         }
     }
 
