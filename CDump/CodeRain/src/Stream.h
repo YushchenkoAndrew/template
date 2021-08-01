@@ -10,7 +10,7 @@ public:
     void Init(const olc::vf2d& vPos, uint8_t nStep, int32_t nHeight, uint8_t nFontSize) {
         fScale = (float)nFontSize / 8.0f;
         this->vPos = vPos;
-        this->nStep = nStep;
+        fStep = (float)nStep;
         this->nHeight = nHeight;
     }
 
@@ -19,15 +19,20 @@ public:
 
     void Update(float fElapseTime) {
         float prev = vPos.y;
-        vPos.y = vPos.y > nHeight ? 0.0f : vPos.y + (float)nStep * fElapseTime;
+        vPos.y += vPos.y > nHeight ?  -(float)nHeight : (float)fStep * fElapseTime;
 
-        if ((int32_t)prev != (int32_t)vPos.y && rand() % 20 > 17) {
+        if (floorf(prev) != floorf(vPos.y) && rand() % 20 > 17) {
             decPos = { rand() % 26 + 1, rand() % 6 + 2 };
         }
     }
 
     void Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decFont) {
+#ifdef __EMSCRIPTEN__
+        // Stupid JS with type Number witch can be int and float at the same time 
+        GameEngine.DrawPartialDecal(olc::vi2d(floorf(vPos.x), floorf(vPos.y)), decFont.get(), decPos * PATCH_SIZE, { PATCH_SIZE, PATCH_SIZE }, { fScale, fScale }, pColor);
+#else
         GameEngine.DrawPartialDecal(vPos, decFont.get(), decPos * PATCH_SIZE, { PATCH_SIZE, PATCH_SIZE }, { fScale, fScale }, pColor);
+#endif
     }
 
     // void LightEffect(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decFont) {
@@ -46,7 +51,7 @@ public:
     // }
 
 private:
-    uint8_t nStep;
+    float fStep;
     int32_t nHeight;
     float fScale;
 
@@ -75,7 +80,7 @@ public:
         vStart = vChars.back().GetPos();
         for (int32_t i = 0; i < nShadowLen; i++) {
             vChars.push_back({});
-            vChars.back().Init(vStart - olc::vf2d(0.0f, (float)i * nFontSize), nStep, nHeight, nFontSize);
+            vChars.back().Init(vStart - olc::vf2d(0.0f, (float)(i + 1) * nFontSize), nStep, nHeight, nFontSize);
             vChars.back().SetColor(GREEN((255 / nShadowLen) * (nShadowLen - i)));
         }
     }
