@@ -2,15 +2,15 @@ import React from "react";
 import DefaultNavBar from "../../components/default/DefaultNavBar";
 import DefaultHead from "../../components/default/DefaultHead";
 
-export default function Info() {
+export default function Projects() {
   return (
     <>
       <DefaultHead>
-        <title>Mortis Info</title>
+        <title>Mortis Projects</title>
       </DefaultHead>
 
       <header>
-        <DefaultNavBar info />
+        <DefaultNavBar projects />
       </header>
 
       <main></main>
