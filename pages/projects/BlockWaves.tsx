@@ -1,7 +1,6 @@
 import React from "react";
 import DefaultNavBar from "../../components/default/DefaultNavBar";
 import DefaultHead from "../../components/default/DefaultHead";
-import { Event } from "../../types/default";
 
 export default function BlockWaves() {
   return (

@@ -40,3 +40,16 @@ a {
 div.emscripten_border {
   border: none;
 }
+
+.p5Canvas {
+  padding-right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+
+  /* FIXME: */
+  position: relative;
+  left: -5px;
+  top: 85px;
+  transition: none 0s ease 0s;
+}
