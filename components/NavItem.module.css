@@ -1,6 +1,6 @@
 .nav-link {
   display: flex;
-  padding: 0.5rem 1rem;
+  padding: 0rem 1rem;
   color: #fff;
   text-decoration: none;
   font-family: "FourBit";
@@ -9,6 +9,6 @@
   height: 100%;
 }
 
-.nav-link-active {
-  font-size: 2.2rem;
+.nav-link:hover {
+  text-decoration: none;
 }

@@ -13,7 +13,7 @@
   display: block;
   content: attr(data-glitch);
   position: absolute;
-  top: 8px;
+  top: 0.04em;
   width: 100%;
   height: 100%;
   opacity: 0.8;

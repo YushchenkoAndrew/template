@@ -1,5 +1,5 @@
 import React from "react";
-import { Navbar, Container } from "react-bootstrap";
+import { Navbar, Container, Nav } from "react-bootstrap";
 
 export interface NavBarProps {
   children: React.ReactNode;
@@ -7,13 +7,13 @@ export interface NavBarProps {
 
 export default function NavBar(props: NavBarProps) {
   return (
-  <Navbar collapseOnSelect fixed="top" bg="dark" variant="dark" expand="md">
-    <Container>
-      <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-      <Navbar.Collapse id="responsive-navbar-nav">
-        {props.children}
-      </Navbar.Collapse>
-    </Container>
-  </Navbar>
+    <Navbar collapseOnSelect bg="dark" variant="dark" expand="md">
+      <Container>
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className="me-auto">{props.children}</Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 }

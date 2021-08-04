@@ -32,9 +32,7 @@ export default function NavItem(props: NavItemProps) {
     <li className="nav-item">
       <a
         href={props.href}
-        className={`${styles["nav-link"]} ${effect["glitch-rgb"]} ${
-          props.active ? styles["nav-link-active"] : ""
-        } `}
+        className={`${styles["nav-link"]} ${effect["glitch-rgb"]}`}
         data-glitch={name}
       >
         {name}
