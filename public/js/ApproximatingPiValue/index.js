@@ -2,23 +2,19 @@ let SIZE;
 let RECT_SIZE;
 
 let canvas;
-let dots = [];
+let dots = 0;
 let dotsInCircle = 0;
 
 function setup() {
-  SIZE = window.innerWidth < 700 ? window.innerWidth : 700;
+  // SIZE = window.innerWidth < 700 ? window.innerWidth : 700;
+  SIZE = window.innerWidth < 768 ? 500 : 700;
+  SIZE = window.innerWidth < 560 ? 400 : SIZE;
+  SIZE = window.innerWidth < 400 ? 300 : SIZE;
   RECT_SIZE = SIZE / 1.75;
   canvas = createCanvas(SIZE, SIZE);
   canvas.parent(document.getElementById("CanvasContainer0"));
 
   background(0);
-  translate(SIZE / 2, SIZE / 2);
-
-  noFill();
-  stroke(255);
-
-  ellipse(0, 0, RECT_SIZE, RECT_SIZE);
-  rect(-RECT_SIZE / 2, -RECT_SIZE / 2, RECT_SIZE, RECT_SIZE);
 }
 
 function addDots() {
@@ -26,7 +22,7 @@ function addDots() {
     let x = random(-RECT_SIZE / 2, RECT_SIZE / 2);
     let y = random(-RECT_SIZE / 2, RECT_SIZE / 2);
 
-    if (abs(x) != RECT_SIZE / 2 || abs(y) != RECT_SIZE / 2) dots.push([x, y]);
+    if (abs(x) != RECT_SIZE / 2 || abs(y) != RECT_SIZE / 2) dots++;
 
     noStroke();
     fill(150, 150, 150);
@@ -36,18 +32,28 @@ function addDots() {
   }
 }
 
-function resizeCanvas() {
-  SIZE = window.innerWidth < 700 ? window.innerWidth : 700;
-  RECT_SIZE = SIZE / 1.75;
-  canvas.resize(SIZE, SIZE);
-}
+window.addEventListener(
+  "resize",
+  (event) => {
+    SIZE = window.innerWidth < 768 ? 500 : 700;
+    SIZE = window.innerWidth < 560 ? 400 : SIZE;
+    SIZE = window.innerWidth < 400 ? 300 : SIZE;
+    RECT_SIZE = SIZE / 1.75;
+    canvas.resize(SIZE, SIZE);
+
+    background(0);
+  },
+  true
+);
 
 function draw() {
   translate(SIZE / 2, SIZE / 2);
 
-  noStroke();
-  fill(0);
-  rect(-SIZE / 2, RECT_SIZE / 2 + 2, SIZE, (SIZE - RECT_SIZE) / 2);
+  noFill();
+  stroke(255);
+
+  ellipse(0, 0, RECT_SIZE, RECT_SIZE);
+  rect(-RECT_SIZE / 2, -RECT_SIZE / 2, RECT_SIZE, RECT_SIZE);
 
   let { x, y } = canvas.position();
 
@@ -60,12 +66,15 @@ function draw() {
   )
     addDots();
 
+  noStroke();
+  fill(0);
+  rect(-SIZE / 2, RECT_SIZE / 2 + 2, SIZE, (SIZE - RECT_SIZE) / 2);
   textSize(32);
+
   fill(255);
-  if (dots.length != 0)
-    text(
-      ((4 * dotsInCircle) / dots.length).toFixed(6),
-      -RECT_SIZE / 6.6,
-      RECT_SIZE / 1.3
-    );
+  text(
+    dots ? ((4 * dotsInCircle) / dots).toFixed(6) : "0.000000",
+    -RECT_SIZE / 6.6,
+    RECT_SIZE / 1.3
+  );
 }
