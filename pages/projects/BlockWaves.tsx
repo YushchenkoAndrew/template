@@ -1,6 +1,7 @@
 import React from "react";
-import DefaultNavBar from "../../components/default/DefaultNavBar";
+import DefaultNavBar from "../../components/default/DefaultHeader";
 import DefaultHead from "../../components/default/DefaultHead";
+import DefaultHeader from "../../components/default/DefaultHeader";
 
 export default function BlockWaves() {
   return (
@@ -11,9 +12,7 @@ export default function BlockWaves() {
         <script src="/js/BlockWaves/index.js"></script>
       </DefaultHead>
 
-      <header>
-        <DefaultNavBar projects />
-      </header>
+      <DefaultHeader projects />
 
       <main>
         {/* FIXME: */}

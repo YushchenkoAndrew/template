@@ -1,6 +1,6 @@
 import React from "react";
-import DefaultNavBar from "../../components/default/DefaultNavBar";
 import DefaultHead from "../../components/default/DefaultHead";
+import DefaultHeader from "../../components/default/DefaultHeader";
 
 export default function Projects() {
   return (
@@ -9,9 +9,7 @@ export default function Projects() {
         <title>Mortis Projects</title>
       </DefaultHead>
 
-      <header>
-        <DefaultNavBar projects />
-      </header>
+      <DefaultHeader projects />
 
       <main></main>
 

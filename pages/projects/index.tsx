@@ -1,9 +1,6 @@
-import Head from "next/head";
 import React from "react";
 import DefaultHead from "../../components/default/DefaultHead";
-import DefaultNavBar from "../../components/default/DefaultNavBar";
-import NavBar from "../../components/NavBar";
-import NavItem from "../../components/NavItem";
+import DefaultHeader from "../../components/default/DefaultHeader";
 
 export default function Home() {
   return (
@@ -12,9 +9,7 @@ export default function Home() {
         <title>Mortis Home</title>
       </DefaultHead>
 
-      <header>
-        <DefaultNavBar home />
-      </header>
+      <DefaultHeader home />
 
       <main></main>
 

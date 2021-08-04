@@ -1,6 +1,6 @@
 import React from "react";
-import DefaultNavBar from "../../components/default/DefaultNavBar";
 import DefaultHead from "../../components/default/DefaultHead";
+import DefaultHeader from "../../components/default/DefaultHeader";
 
 export default function Info() {
   return (
@@ -9,9 +9,7 @@ export default function Info() {
         <title>Mortis Info</title>
       </DefaultHead>
 
-      <header>
-        <DefaultNavBar info />
-      </header>
+      <DefaultHeader info />
 
       <main></main>
 
