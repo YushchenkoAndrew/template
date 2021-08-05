@@ -9,8 +9,8 @@ export default function ApproximatingPiValue() {
     <>
       <DefaultHead>
         <title>Block Waves</title>
-        <script src="/js/lib/p5.min.js"></script>
-        <script src="/js/ApproximatingPiValue/index.js"></script>
+        <script defer src="/js/lib/p5.min.js"></script>
+        <script defer src="/js/ApproximatingPiValue/index.js"></script>
       </DefaultHead>
 
       <DefaultHeader projects />

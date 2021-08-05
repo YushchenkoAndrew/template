@@ -6,10 +6,10 @@ let dots = 0;
 let dotsInCircle = 0;
 
 function setup() {
-  // SIZE = window.innerWidth < 700 ? window.innerWidth : 700;
-  SIZE = window.innerWidth < 768 ? 500 : 700;
-  SIZE = window.innerWidth < 560 ? 400 : SIZE;
-  SIZE = window.innerWidth < 400 ? 300 : SIZE;
+  SIZE =
+    window.innerWidth < 900
+      ? document.getElementById("CanvasContainer0").offsetWidth / 1.2
+      : 700;
   RECT_SIZE = SIZE / 1.75;
   canvas = createCanvas(SIZE, SIZE);
   canvas.parent(document.getElementById("CanvasContainer0"));
@@ -35,9 +35,12 @@ function addDots() {
 window.addEventListener(
   "resize",
   (event) => {
-    SIZE = window.innerWidth < 768 ? 500 : 700;
-    SIZE = window.innerWidth < 560 ? 400 : SIZE;
-    SIZE = window.innerWidth < 400 ? 300 : SIZE;
+    SIZE =
+      window.innerWidth < 900
+        ? document.getElementById("CanvasContainer0").offsetWidth / 1.2
+        : 700;
+    // SIZE = window.innerWidth < 560 ? 400 : SIZE;
+    // SIZE = window.innerWidth < 400 ? 300 : SIZE;
     RECT_SIZE = SIZE / 1.75;
     canvas.resize(SIZE, SIZE);
 
@@ -55,14 +58,12 @@ function draw() {
   ellipse(0, 0, RECT_SIZE, RECT_SIZE);
   rect(-RECT_SIZE / 2, -RECT_SIZE / 2, RECT_SIZE, RECT_SIZE);
 
-  let { x, y } = canvas.position();
-
   if (
     mouseIsPressed &&
-    mouseX >= x &&
-    mouseX < x + canvas.width &&
-    mouseY >= y &&
-    mouseY < y + canvas.height
+    mouseX > 0 &&
+    mouseX < canvas.width &&
+    mouseY > 0 &&
+    mouseY < canvas.height
   )
     addDots();
 
