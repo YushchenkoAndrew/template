@@ -1,0 +1,745 @@
+{
+  "RightCursor": {
+    "size": [8, 8],
+    "scale": [1, 1],
+    "states": {
+      "idle": {
+        "mode": "LOOP",
+        "next": true,
+        "frames": [
+          {
+            "path": null,
+            "duration": 0.2,
+            "pos": { "x": 2, "y": 8 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 3, "y": 8 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 4, "y": 8 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 5, "y": 8 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 6, "y": 8 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 7, "y": 8 }
+          }
+        ]
+      }
+    }
+  },
+
+  "DownCursor": {
+    "size": [8, 8],
+    "scale": [1, 1],
+    "states": {
+      "idle": {
+        "mode": "LOOP",
+        "next": true,
+        "frames": [
+          {
+            "path": null,
+            "duration": 0.2,
+            "pos": { "x": 2, "y": 10 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 3, "y": 10 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 4, "y": 10 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 5, "y": 10 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 6, "y": 10 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 7, "y": 10 }
+          }
+        ]
+      }
+    }
+  },
+
+  "UpCursor": {
+    "size": [8, 8],
+    "scale": [1, 1],
+    "states": {
+      "idle": {
+        "mode": "LOOP",
+        "next": true,
+        "frames": [
+          {
+            "path": null,
+            "duration": 0.2,
+            "pos": { "x": 2, "y": 11 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 3, "y": 11 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 4, "y": 11 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 5, "y": 11 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 6, "y": 11 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 7, "y": 11 }
+          }
+        ]
+      }
+    }
+  },
+
+  "Cursor": {
+    "size": [8, 8],
+    "scale": [1, 1],
+    "states": {
+      "idle": {
+        "mode": "LOOP",
+        "next": true,
+        "frames": [
+          {
+            "path": null,
+            "duration": 0.2,
+            "pos": { "x": 2, "y": 12 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 3, "y": 12 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 4, "y": 12 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 5, "y": 12 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 6, "y": 12 }
+          },
+          {
+            "path": null,
+            "duration": 0.1,
+            "pos": { "x": 7, "y": 12 }
+          }
+        ]
+      }
+    }
+  }
+}
+{
+  "nScreenWidth": 255,
+  "nScreenHeight": 255,
+  "nPixel": 4,
+
+  "sMenuConfig": "assets/Menu.json",
+  "sMenuAnimated": "assets/AnimatedSprite.json",
+  "sMenuSprite": "assets/Sprite-0002.png",
+  "sMenuSpriteScale": 1.0,
+
+  "nMapSize": 6,
+  "nMapLoadRange": 2,
+  "nNoiseSize": 100,
+  "vLightSource": { "x": 10.0, "y": 30.0, "z": 0.0 },
+
+  "vCamera": { "x": 0.0, "y": 50.0, "z": 0.0 },
+  "nCameraStep": 8.0,
+  "nMouseSpeed": 0.5,
+
+  "MenuSprites": {
+    "MENU": [8, 2]
+  }
+}
+{
+  "name": "root",
+  "size": [1, 2],
+  "items": [
+    {
+      "name": "Debug",
+      "size": [1, 2],
+      "items": [
+        {
+          "name": "Draw",
+          "size": [1, 4],
+          "items": [
+            {
+              "name": "Edges",
+              "size": [2, 1],
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": false,
+                  "id": 17
+                },
+                {
+                  "name": "No",
+                  "enable": true,
+                  "id": 19
+                }
+              ]
+            },
+            {
+              "name": "Shadow",
+              "size": [1, 2],
+              "items": [
+                {
+                  "name": "Shadow",
+                  "size": [2, 1],
+                  "items": [
+                    {
+                      "name": "Yes",
+                      "enable": true,
+                      "id": 33
+                    },
+                    {
+                      "name": "No",
+                      "enable": false,
+                      "id": 35
+                    }
+                  ]
+                },
+                {
+                  "name": "Distribute",
+                  "size": [2, 1],
+                  "items": [
+                    {
+                      "name": "Yes",
+                      "enable": false,
+                      "id": 65
+                    },
+                    {
+                      "name": "No",
+                      "enable": true,
+                      "id": 67
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Color",
+              "size": [2, 1],
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": true,
+                  "id": 49
+                },
+                {
+                  "name": "No",
+                  "enable": false,
+                  "id": 51
+                }
+              ]
+            },
+            {
+              "name": "Noise",
+              "size": [2, 1],
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": false,
+                  "id": 97
+                },
+                {
+                  "name": "No",
+                  "enable": true,
+                  "id": 99
+                }
+              ]
+            },
+            {
+              "name": "Collision",
+              "size": [1, 3],
+              "items": [
+                {
+                  "name": "Rectangle",
+                  "id": 129,
+                  "enable": false
+                },
+                {
+                  "name": "Diagonal",
+                  "id": 131,
+                  "enable": false
+                },
+                {
+                  "name": "Axis",
+                  "id": 135,
+                  "enable": false
+                },
+                {
+                  "name": "Static",
+                  "size": [1, 3],
+                  "items": [
+                    {
+                      "name": "Diagonal",
+                      "id": 133,
+                      "enable": false
+                    },
+                    {
+                      "name": "Axis",
+                      "id": 137,
+                      "enable": false
+                    }
+                  ]
+                },
+                {
+                  "name": "Inaff",
+                  "id": 141,
+                  "enable": false
+                }
+              ]
+            },
+            {
+              "name": "Outline",
+              "size": [2, 1],
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": false,
+                  "id": 161
+                },
+                {
+                  "name": "No",
+                  "enable": true,
+                  "id": 163
+                }
+              ]
+            },
+            {
+              "name": "Follow",
+              "size": [2, 1],
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": true,
+                  "id": 177
+                },
+                {
+                  "name": "No",
+                  "enable": false,
+                  "id": 179
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Alg",
+          "size": [1, 4],
+          "items": [
+            {
+              "name": "Rand",
+              "size": [1, 3],
+              "items": [
+                {
+                  "name": "TrueNoise",
+                  "id": 113,
+                  "enable": false
+                },
+                {
+                  "name": "PerlinNoise",
+                  "id": 115,
+                  "enable": false
+                },
+                {
+                  "name": "FractalNoise",
+                  "id": 117,
+                  "enable": true
+                }
+              ]
+            },
+            {
+              "name": "Collision",
+              "size": [1, 3],
+              "items": [
+                {
+                  "name": "Diagonal",
+                  "id": -1,
+                  "enable": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Exit",
+      "id": 80,
+      "enable": false
+    }
+  ]
+}
+âPNG
+
+   IHDR   @   @   ™iqﬁ   sRGB ÆŒÈ  úIDATxúÌòOHQ«ø≥ÌÆ…öÉsOfB·¬u©.dá@£¬;{Ë⁄M<u∫uäÏöHRXùJ®ìÎ
+¡äπS,§Çå!∂Êﬂ}ÏM3ÎŒÏº€Ÿ‚}`aˆ˝Ê˝˛|ﬂüôy»rå‡XYI
+Ùz‰¸%“˚ÒÉ`w>nÛ0∆uJ0ø°Ωk ™`Ûµ≥µüÛ‰xü©=ºóu,Ç,«HmS-m˜>`äøΩô√‹ÃC≤Ù5≈$ƒ(’Rò)miÀ“ÊDYé*~µB®ÇMÄù≠Z⁄Ó°•òÔ#NE rå´© ¨_‘sÔ1% ü˛3ÚÕg:Iæø^Øo\#ù/_HÃX|e$àÙ‘c¶ÿî∆ÿ]¸ÃÓ¢Ωkÿ±A 8w˘> Û¥ÖÍòÇ”æWo?)∏jÍELVm}TFÇ»$ôcS2…A]ßòÊY0–¨ÿı≠©1Ω∞å˛T vÙΩÏZ&9`/s≤ôöˆÄÃÃê…∆æ∆Â`W|>^äwÎ√$ÄWı·¥xø`üÎåÿ?è {á˛∫ VîCÒÄOîKÒÄºΩﬁ^6≈>0Ω∞åöz±‘a-)π ˝©îPN"¯≤îìæ=®~„õ Ä˝;B©UÄr¿Ù*|·VØ~=˝|Ñ…ë±Ô|bÕcZ•√4æ•≥˙è∑}WVí˝lnÌËaéõı19ﬁÁËd(Ho¶–OSV≤kªz`∑,¶7–⁄—ÉŸ7œ\ıoÌË¡bzÉ©èI!„∑ycKì£Ã‹ Œïœá∆Ö8≠B‡˚˛¯Â”:v∂sL9Xû	jKõÃ	x·˜R µMQÏlª>Î°ËÅ¿’73‡0ÚpW0~ôë’U› ù=Â¯0CUU“‹‹Ï˚3›ÅÓDBO\ê$íÑ„[ôOrTUµ5UUâ{1ˇ^ ÄQ)zSâyWoinä0∂YıßÌvv∑"Î;Mw"!x)û¢iö≠≈Ï≥≥≥ÑÂ>¨"õ∂⁄+O_v≈øªsì<àF-ECCCVÊÇˆ——Qà¢à\.Q111a≤744òÏëH§†ﬂB◊NÌéã«…X<N
+â†™*—4ç(äRPM”lÌä¢X⁄E!Fª’=v1äŸãBã∑°òc´ƒÛÔÒjwìC—µnuÄi‹/E!ˇ‰cê√·p8á√·p8á√·p8á√·p8Œˇœ/å %œá/Î    IENDÆB`ÇâPNG
+
+   IHDR   X   «   ù•î¢   sRGB ÆŒÈ  
+≥IDATxúÌùMh…«ﬂ$÷‚å?§5s∞&$÷d!!H a∞Y¥âÏ›†¯‚,"q`&áÖÕ!Ë≤ìCˆÃ`àÃ∆9$bw-Ç}–∆ãJñ&Y†èC∆óAÿ1“:Ï•sê´ß‘Sﬂ]Ø¶{Ù~ 4›Uı˙’øﬂºÓÆÓÆ P)`o‡‘¿@ƒ/omnTÎ∂67&mEm¯˙≤Ì¯Èï9á¯Ö§CiŸ⁄‹,àÑê	™≥•ÚU$<ﬂñ≠Û›GùØáTÖY!ÈL$¶H¿dd„y⁄æ˝6ÅEï\ëuÜ∑œÑJñÈ÷…lÎRfkw^»ØQ∑!”ÓKùqÁ‡@##Ã¡:ÜK„N)dµπdtÄ¡∂_ôv≤ø∏rÀ˙ i%0ÎxuÊäÌvˆ®A "i‰¸#≥+;Fˆ´#”Qqt&fÌ¸~I±6Ì.ØY	m,pi<‚Ö5Ì<ceaßµcj%EH⁄ol4°±—4∂_Æîîˆ´#”—•ì±/.ÏÌòAÄ∑!2ŸH`æÛçç&Ï.Ø¡ÍúΩÉ≈—°ñú"˚∂¨.ØIÌ'≈uŸFqt ˆÎ“çIcë≠Rs¨ßØﬂ 9∆ÓÚ4`/⁄Tˆ¿zœ?í⁄g‚‚ˆÙı√Û«èåˇ3€ {"Gá VÙ~iÊ£+ç∏ {¢Ì.ØpQ– πÆ‚≤6Là§˝âô¡6q˘Ìò˛ÁEûòÑ≠ÖÒ∂Tî$3ßi,ﬂ¶›Åº-Àπ|‰ÄıfÉ∑©#€0”⁄tç`óùü	ÅC„¡|$õr ¶FÜ"ä`d(Çë°FÜ"ä`d\ª∫⁄<êÃF¿\¢Ñ¡⁄ FÎíı2¡´Õ•¬bÌ& Ï˚•Ä.÷n¬js©ê¥œÍπÿÊm»ÏÛ∂]"7i_Áó’xpπRÇÄ”Ä8sN]º}ë;m_Ñë¿´Õ•‘ ™Œ\Ÿ€@•‰tÀàë‹˚"˚6∑ã ˆß˚>˝Wa¡ÃIÄΩró˚™äúK⁄/[à¿|±±Ô€V)"6¸“Q[té%Ì/÷pÌ€b#,√Èπó$˚<ô9MÎVH`dH`dH`d§9zFÿBÅ≥¯A^ií"7úAA·y:Ÿt™ó∑}LQ {7Ÿƒ?=óc=ÿsj` J˛±ı ˙+’›™)
+TÌEÎL˝ı≈'Vw4Lˆ∫IÑâ∞ù¢¿ï§}—NˆŸN√ï™Ωn≥L€¶±©€9ò—kM7OwÄ’7pGÜFÜF∆Èπ∫ñnb"õˆ™rŸ9nß¶¯Ú¡Ægl
+0◊rˇBﬁu¡i19zõ\<òúñÈl¯$s9Xa¢K`ìv&ÂXxè`Y©ÊJ’”ÂP_~e
+∫–∞'s)¢€ ÅëI-üæ˝}ÌW*D◊2lR¸ œ¥Q«µ/)ÇDñ„-øÚ≈3∏{·Zq∞Î∏ña·M‡„'è¬ø~π„u\À∞"ÒìG·≥µ"ÃÆœKØîB‘q-√$µ¿$ÆGDW;◊/hsZà:ÆeåL\•⁄:176&≠áQñ¶NÓ.ïÛ$.&(ì∏-º¸∑…≥“`î˘Æ„Ô∂VÑ„'è+Û]«7ﬁû]ü/»:ÇQÊªéoPr0âÏàÌ©∆y+÷95÷iö’ïˇÙ#ªg∆ï£'O‚∫Ωgæôè´ßóà˙ÊÉ‘7=ßÍıπ–€  ΩßÀèF0ª>_ËÙËÙˆΩ‹UÊEÊ≈MñaÏ ]˚©˙ºr˚i˚Æ√€m˚©zΩpˇÚ≈H‰8Ê0Pµ}lºûEúª}ß s|™^/»:7UØ«À"qXY°∑
+ΩΩ–7˛≠}—≠jo≤˝ÃÄ=‚tˇÚ≈Hv076ÕççE™:™2πMÛMu`ı-3ˇôpÓˆùl~µ–É'»‰J`ÃÅE¶÷‰û<l¿wøSê^
+gqÿU@˛\XU'ã;¿´¿äÓ@®Í§Ÿ§Ïa®Æîí"…Æ‘duT>ô¥Wmﬂ§oi"0¶Äi1›~fG”‰_·2\É—T]"`Ωûv”Fó—ùÿæ¢´ùá˜iÛYà:ÆeåÃ>ÒjˇmB‘q-√∆ÀYâ,«€i⁄´˝/`˚ÅznÙu\À∞&pœ7√íÊ∏¢ékY&∂@Ùt˜pÙÒ-ydÑ®„Z¶Í[pDNËU«µåëYÅuéá™„Z∆»¨¿›BfœÉ	5Œó ›≈8	LÛîõc-T∑G.AAAA!%’»ëÎ/∞$?'€Àlãf—∂ıA¥-L¨®Ñ}ñ˝:ãJ@’Pg≤√¢ü›Iñâ÷Î|–ÌDôÆl⁄!Y{›ÔŸπ-∂/ÚYÂ+ˆØ¿ 8‹—PEá®èÕ§Ã™	ùUì‡'øY™õô∫â˚ÉBwî›†ª »†ºà8\œdîØ6óÚ=I˛pi<:q¢ónL˙4Îç?ø]â∂∑7Ç
+ÌM‡·“xtı√w`eaVv†±—Ùe⁄ÂJ	Üß™0r~Æˇ¢P"{ò∑±—Ñˇ5>áÁè˘0Ìçı∆ÁïÚ◊  ‡ÍáÔŸ['≈ÌÈÎ˜e⁄{;ºÅ∑õZ`>zyqﬂ¸‡l\Á£∑>u≤Ì√£ßØ?*•`QÏÂ4mea †M‹èﬁ˙4ï0|{^lWZ"∑|∆Ì<8mƒaŸ
+˙Ñ˜Óæ´,üx˝}l:
+ä¿¢àK+d^£ò.ïë…Ñ¿˜Óæ€ñJDÎÚH∞IëDb±¥1Ò˙˚±†Ï3_ûgÇ	¨ãŸ§~^»Dä Ä6aª!=  Eõúm;ÍÀ•Ñd êŸÃË)¬‰´.™C)BÉèK[[°Aò?H#ﬂ>èÈ¿CäXm.†QuÊ
+Gá`wyz˙˙Ω‚[‘ÁèAqt  k7É‹ŸöÉÀï4 `wyÕßYoGá†\)›¶Å˘(.WJ ïåú?‚√¥7¯·…P—‡1Çô»  ’ô+¡∆[mX¨›Ä∞wóΩ¶àÿÒZÿyqL…˝m{F':íUúÓ∆«ß∞∞∏„…ÂÎ…A±…<AAA‰Ç`W..Ø›™⁄¶Yó∂/6†›Ù<50±?~ΩÏµ[Sª¨ÆËU^ŸÎΩ…u2ﬂ0@ÆTΩí™{„REöËSΩ[ç’®Oˆ»"XˆŒ≥Æmö®„€Üä^4Ú⁄m(3ÛlZ∑B#ìßMu˘*w| =O√pi<˛º⁄\ÇÍ»tºº∏r^´Œ∆Àü,^ÍõJ»ê¿yDs
+˛π∂3≤Í4≠#9¯‘¿@¸yks  û˛˜iºÓÿWè	€˝'øé?ˇıèøÇô˜~/◊ﬁ˚\_öãóØéO¡ı“Z˛˙kÈwÄR2$p°‹¢9ÿ˘‰ˇ7ø¯]¸˘óø˝9¸˝∑„ÂÔ˝Ù2Ï<¯Kº|‰Ãè·˘≥ˇƒÀ=áèªn6î"ê!ÅÛR~£åÕµ¡ÒÁŸıyòãóßÍu∏˘bº|ÓˆÄˆPä@ÜŒ#îÉ[‰*|´ı˘çiÄá˜ZÓüûx€ZÂ'Œ <›=/+>·bî"ê!Åë…UäxczˇÚÈâ˚ñOúŸ_ﬁ©¥¿ì'Å;~NÎ•d–#8ÀO˜Ñ U`z±1ØÂ%r)rŒˇ+"ûôı†    IENDÆB`Çrequire("src/lua/Json")
+
+-- Init Object
+Animated = {
+  sprites = {},
+}
+
+function Animated:Init(path)
+  Animated.sprites = JSON:Parse(path)
+  -- JSON:Stringify(Animated.sprites, 0)
+
+  -- Create Frame StateMachine (NextFrame) for each State
+  for key, sprites in pairs(Animated.sprites) do
+    for name, state in pairs(sprites.states) do
+      state.NextFrame = {}
+    end
+
+    sprites.NextState = {}
+    Animated:AddStateMachine(key, 1)
+  end
+end
+
+
+function Animated:AddStateMachine(sName, nId)
+  print("[lua] CREATED [" .. nId .. "] " .. sName)
+
+  -- Create Frame StateMachine (NextFrame) for each State
+  local sprites = Animated.sprites[sName]
+  for name, state in pairs(sprites.states) do
+    state.NextFrame[nId] = coroutine.create(Animated.NextFrame)
+    coroutine.resume(state.NextFrame[nId], Animated, 0.0, sName, name)
+  end
+
+  sprites.NextState[nId] = coroutine.create(Animated.NextState)
+  coroutine.resume(sprites.NextState[nId], Animated, 0.0, sName, nId)
+end
+
+
+function Animated:NextFrame(fElapsedTime, sName, sState)
+
+  -- Init StateMachine
+  local class = nil
+  local stMachine = Animated.sprites[sName]["states"][sState]
+  local time = 0.0
+  class, fElapsedTime = coroutine.yield()
+
+  -- Main Loop
+  repeat
+    for key, frame in pairs(stMachine.frames) do
+      time = 0.0
+
+      while true do
+        class, fElapsedTime = coroutine.yield(frame.pos)
+
+        time = time + fElapsedTime
+        if time >= frame.duration then break end
+      end
+    end
+  until stMachine.mode ~= "LOOP"
+
+  return nil
+end
+
+
+function Animated:NextState(fElapsedTime, sName, nId)
+
+  -- Init StateMachine
+  -- local sprite =
+  local stMachine = Animated.sprites[sName]
+  local status = nil
+  local frame = nil
+  local class = nil
+  class, fElapsedTime = coroutine.yield()
+
+  repeat
+    for key, state in pairs(stMachine.states) do
+      if coroutine.status(state.NextFrame[nId]) ~= "dead" then
+        status, frame = coroutine.resume(state.NextFrame[nId], Animated, fElapsedTime, sName, key)
+      elseif state.next then
+        -- Create and init value of coroutine
+        state.NextFrame[nId] = coroutine.create(Animated.NextFrame)
+        coroutine.resume(state.NextFrame[nId], Animated, fElapsedTime, sName, key)
+
+        -- Get new values
+        status, frame = coroutine.resume(state.NextFrame[nId], Animated, fElapsedTime, sName, key)
+      else status = true; break end
+
+      if frame ~= nil then
+        class, fElapsedTime = coroutine.yield(
+          {
+            size = stMachine.size,
+            scale = stMachine.scale,
+            offset = { frame["x"] * 8, frame["y"] * 8 }
+          }
+        )
+      end
+
+      status = true
+      if frame == nil and not state.next then break end
+      status = false
+    end
+  until status
+
+  return nil
+end
+
+
+function Animated:GetFrame(fElapsedTime, sName, nId)
+  -- if nId > #Animated.sprites[sName].NextState then Animated:AddStateMachine(sName, nId) end
+  if Animated.sprites[sName].NextState[nId] == nil then Animated:AddStateMachine(sName, nId) end
+
+  local stMachine = Animated.sprites[sName].NextState[nId]
+  if (coroutine.status(stMachine) == "dead") then return nil end
+
+  local status, frame = coroutine.resume(stMachine, Animated, fElapsedTime, sName)
+  return frame
+end
+
+
+-- TODO: this method on demand
+function Animated:GetFrameByState()
+
+end
+
+-- Test
+-- Animated:Init("assets/AnimatedSprite.json")
+-- JSON:Stringify(Animated:GetFrame(0.0, "MenuCursor"), 0)
+-- print(Animated:GetFrame(1.0, "MenuCursor"))
+-- print(Animated:GetFrame(2.0, "MenuCursor"))
+-- print(Animated:GetFrame(3.0, "MenuCursor"))
+
+-- Init Object
+JSON = {
+	file = nil,
+	cCurr = "",
+	error = false,
+	tKeywords = { "true", "false", "null" },
+	tKeywordsValue = { ["true"] = true, ["false"] = false, ["null"] = nil }
+}
+
+
+-- Skip Functions
+function JSON:SkipComma()
+	if (JSON.cCurr ~= ",") then JSON.error = true; return false end
+		JSON.cCurr = JSON.file:read(1)
+	return true
+end
+
+function JSON:SkipColon()
+	if (JSON.cCurr ~= ":") then JSON.error = true; return false end
+		JSON.cCurr = JSON.file:read(1)
+	return true
+end
+
+
+function JSON:SkipBlanks()
+	while (JSON.cCurr == " " or JSON.cCurr == "\n" or JSON.cCurr == "\t" or JSON.cCurr == "\r") do
+		JSON.cCurr = JSON.file:read(1)
+	end
+end
+
+
+-- Basic Parsers
+function JSON:ParseString()
+	if (JSON.cCurr ~= "\"") then return nil end
+	JSON.cCurr = JSON.file:read(1)
+	local str = ""
+	while (JSON.cCurr ~= "\"" and JSON.cCurr ~= nil) do
+		if (JSON.cCurr == "\\") then JSON.cCurr = JSON.file:read(1) end
+		str = str .. JSON.cCurr
+		JSON.cCurr = JSON.file:read(1)
+	end
+
+	if (JSON.cCurr ~= "\"") then JSON.error = true; return nil end
+	JSON.cCurr = JSON.file:read(1)
+	return str
+end
+
+function JSON:ParseNumber()
+	local sign = JSON.cCurr
+	local num = 0
+	if (JSON.cCurr == "-") then JSON.cCurr = JSON.file:read(1) end
+
+	while (JSON.cCurr >= "0" and JSON.cCurr <= "9") do
+		num = num * 10 + JSON.cCurr
+		JSON.cCurr = JSON.file:read(1)
+	end
+
+	if (JSON.cCurr == ".") then
+		JSON.cCurr = JSON.file:read(1)
+		local fPos = 0.1
+		while (JSON.cCurr >= "0" and JSON.cCurr <= "9") do
+			num = num + JSON.cCurr * fPos
+			fPos = fPos * 0.1
+			JSON.cCurr = JSON.file:read(1)
+		end
+	end
+
+	if (num == 0 and sign ~= "0") then return nil end
+
+	if (sign == "-") then num = num * -1 end
+	return num
+end
+
+function JSON:ParseObject()
+	if (JSON.cCurr ~= "{") then return nil end
+	JSON.cCurr = JSON.file:read(1)
+	JSON:SkipBlanks()
+
+	local json = {}
+	local first = true
+	while (JSON.cCurr ~= "}" and JSON.cCurr ~= nil) do
+		if (not first and (not JSON:SkipComma() or JSON:SkipBlanks())) then
+			return nil
+		end
+
+		local key = JSON:ParseString()
+		if (not key or JSON:SkipBlanks() or not JSON:SkipColon()) then return nil end
+
+		json[key] = JSON:ParseValue()
+		first = false
+	end
+
+	if (JSON.cCurr ~= "}") then JSON.error = true; return nil end
+	JSON.cCurr = JSON.file:read(1)
+	return json
+end
+
+function JSON:ParseList()
+	if (JSON.cCurr ~= "[") then return nil end
+	JSON.cCurr = JSON.file:read(1)
+	JSON:SkipBlanks()
+
+	local list = {}
+	local first = true
+	while (JSON.cCurr ~= "]" and JSON.cCurr ~= nil) do
+		if (not first and not JSON:SkipComma()) then return nil end
+
+		list[#list + 1] = JSON:ParseValue()
+		if (not list[#list]) then return nil end
+		first = false
+	end
+
+	if (JSON.cCurr ~= "]") then JSON.error = true; return nil end
+	JSON.cCurr = JSON.file:read(1)
+	return list
+end
+
+function JSON:ParseKeywords()
+	local j = 1
+	for key, value in pairs(JSON.tKeywords) do
+		while (#value > j and value:sub(j, j) == JSON.cCurr and JSON.cCurr ~= nil) do
+			JSON.cCurr = JSON.file:read(1)
+			j = j + 1
+		end
+
+		if (#value == j) then
+			JSON.cCurr = JSON.file:read(1)
+			return JSON.tKeywordsValue[value]
+		end
+	end
+
+	return nil
+end
+
+function JSON:ParseValue()
+	JSON:SkipBlanks()
+
+	local value = JSON:ParseString() or JSON:ParseNumber() or JSON:ParseObject() or JSON:ParseList() or JSON:ParseKeywords()
+
+	JSON:SkipBlanks()
+	return value
+end
+
+
+function JSON:Parse(path)
+	JSON.file = io.open(path, "r")
+	if not JSON.file then
+		print("Unable to open file")
+		return nil
+	end
+
+	JSON.cCurr = JSON.file:read(1)
+
+	return JSON.ParseValue()
+end
+
+
+function JSON:RepeatStr(str, n)
+	local result = ""
+	for i = 1, n, 1 do result = result .. str end
+	return result
+end
+
+function JSON:Stringify(json, i)
+	if (json == nil) then return end
+
+	for key, value in pairs(json) do
+		if (type(value) == "table") then
+			print(JSON:RepeatStr("  ", i) .. key .. " => ")
+			JSON:Stringify(value, i + 1)
+		else
+			print(JSON:RepeatStr("  ", i) ..  key .. " => " .. tostring(value))
+		end
+	end
+end
+
+
+-- Test
+-- JSON:Stringify(JSON:Parse("../../assets/Menu.json"), 0)
