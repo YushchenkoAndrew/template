@@ -7,7 +7,7 @@ export interface DefaultP5ContainerProps {
 export default function DefaultP5Container(props: DefaultP5ContainerProps) {
   return (
     <main role="main">
-      <div className="jumbotron bg-white" id="CanvasContainer0"></div>
+      <div className="jumbotron mx-auto bg-white" id="CanvasContainer0"></div>
       {props.children}
     </main>
   );
