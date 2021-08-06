@@ -1,9 +1,10 @@
 class HammingCode {
-  constructor(size = 8) {
+  constructor(textSize, size = 8) {
     this.size = size;
     this.step = 40;
     this.shift = { x: 40, y: 200 };
 
+    this.textSize = { head: 35, desc: 24 };
     this.data = [];
     this.createRand();
 
@@ -16,7 +17,7 @@ class HammingCode {
 
   printText({
     text = "",
-    size = textSize,
+    size = textSize["desc"],
     pos = { x: 0, y: 0 },
     color = "#FFF",
   }) {
@@ -24,7 +25,7 @@ class HammingCode {
     hammingCanvas.font = `${size}px ${textStyle}`;
     hammingCanvas.fillStyle = color;
     hammingCanvas.fillText(text, pos.x, pos.y);
-    hammingCanvas.font = `${textSize}px ${textStyle}`;
+    // hammingCanvas.font = `${textSize}px ${textStyle}`;
   }
 
   createRand() {
@@ -32,39 +33,45 @@ class HammingCode {
       this.data.push(Math.round(Math.random()));
   }
 
-  changeData({ x, y }) {
+  changeData({ x, y }, ratio = 1) {
     // Save x and y value
 
     let rect = hammingCode.getBoundingClientRect();
 
     let pos = { x: x, y: y };
 
-    x = Math.floor((x - this.shift.x - rect.x) / this.step);
-    y = Math.floor((y - this.shift.y - rect.y) / this.step);
+    x = Math.floor((x - ratio * this.shift.x - rect.x) / this.step);
+    y = Math.floor((y - ratio * this.shift.y - rect.y) / this.step);
 
     if (y >= 0 && x >= 0 && y - this.size < 0 && x - this.size < 0) {
-      console.log(`Mouse Clicked!!! x = ${x}, y = ${y}`);
+      // console.log(`Mouse Clicked!!! x = ${x}, y = ${y}`);
 
       this.data[y * this.size + x] ^= true;
       this.draw();
       return;
     }
 
+    // FIXME: Fix bug with getting correct 'x' value
     // Second table
-    x = Math.floor(
-      (pos.x - (hammingCode.width - this.shift.x - this.size * this.step)) /
-        this.step
-    );
-
-    if (y >= 0 && x >= 0 && y - this.size < 0 && x - this.size < 0) {
-      // console.log(`Mouse Clicked2!!! x = ${x}, y = ${y}`);
-
-      // User click on correct data, then save corrected data + change by index
-      this.data[this.detectError()] ^= true;
-      this.data[y * this.size + x] ^= true;
-      this.draw();
-      return;
-    }
+    //     x =
+    //       Math.floor(
+    //         (pos.x - (hammingCode.width - ratio * this.shift.x)) /
+    //           // let x = hammingCode.width - ratio * this.shift.x - this.size * this.step;
+    //           this.step
+    //       ) + 1;
+    //
+    //     console.log(pos.x, hammingCode.width - this.shift.x);
+    //     console.log({ x, y });
+    //
+    //     if (y >= 0 && x >= 0 && y - this.size < 0 && x - this.size < 0) {
+    //       console.log(`Mouse Clicked2!!! x = ${x}, y = ${y}`);
+    //
+    //       // User click on correct data, then save corrected data + change by index
+    //       // this.data[this.detectError()] ^= true;
+    //       this.data[y * this.size + x] ^= true;
+    //       this.draw();
+    //       return;
+    //     }
   }
 
   drawTable({ x, y }) {
@@ -98,8 +105,8 @@ class HammingCode {
       drawLine(x, pos + y, x + border, pos + y);
       drawLine(pos + x, y, pos + x, y + border);
 
-      let x_ = x + this.step / 2 - textSize / 4;
-      let y_ = y + this.step / 2 + pos + textSize / 4;
+      let x_ = x + this.step / 2 - this.textSize["desc"] / 4;
+      let y_ = y + this.step / 2 + pos + this.textSize["desc"] / 4;
 
       for (let j = 0; j < this.size; j++) {
         let index = i * this.size + j;
@@ -136,7 +143,7 @@ class HammingCode {
     }
   }
 
-  draw() {
+  draw(ratio = 1) {
     // Reset Canvas
     hammingCanvas.fillStyle = "#000000";
     hammingCanvas.fillRect(0, 0, hammingCode.width, hammingCode.height);
@@ -144,29 +151,35 @@ class HammingCode {
     let text = "Hamming Code";
     this.printText({
       text: text,
-      size: 35,
-      pos: { x: hammingCode.width / 2 - (text.length * 35) / 4, y: 100 },
+      size: this.textSize["head"],
+      pos: {
+        x: hammingCode.width / 2 - (ratio * (text.length * 35)) / 4,
+        y: ratio * 100,
+      },
     });
 
     this.printText({
       text: "Data with Error",
-      size: 24,
-      pos: { x: this.shift.x + 70, y: this.shift.y - 20 },
+      size: this.textSize["desc"],
+      pos: { x: ratio * (this.shift.x + 70), y: ratio * (this.shift.y - 20) },
       color: "#74e384",
     });
-    this.drawTable(this.shift);
+    this.drawTable({ x: ratio * this.shift.x, y: ratio * this.shift.y });
 
     let errIndex = this.detectError();
     this.data[errIndex] ^= true;
 
-    let x = hammingCode.width - this.shift.x - this.size * this.step;
+    let x = hammingCode.width - ratio * this.shift.x - this.size * this.step;
     this.printText({
       text: "Correct Data",
-      size: 24,
-      pos: { x: x + this.shift.x + 50, y: this.shift.y - 20 },
+      size: this.textSize["desc"],
+      pos: {
+        x: x + ratio * (this.shift.x + 50),
+        y: ratio * (this.shift.y - 20),
+      },
       color: "#74e384",
     });
-    this.drawTable({ x: x, y: this.shift.y });
+    this.drawTable({ x: x, y: ratio * this.shift.y });
 
     // Return to the previous data state
     this.data[errIndex] ^= true;
