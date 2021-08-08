@@ -14,7 +14,7 @@ export interface CardProps {
 
 export default function Card(props: CardProps) {
   return (
-    <div className="card card-has-bg click-col">
+    <div className="card">
       <Image
         className="card-img"
         src={props.img}
