@@ -1,0 +1,29 @@
+.card-title {
+  display: flex;
+  line-height: 2em;
+  text-decoration: none;
+  font-family: "Abstract";
+  align-items: center;
+  text-align: center;
+  height: 100%;
+}
+
+.card-title:hover {
+  text-decoration: none;
+}
+
+.title-sm {
+  font-size: 0.5rem;
+}
+
+.title-md {
+  font-size: 0.8rem;
+}
+
+.title-lg {
+  font-size: 0.8rem;
+}
+
+.title-xl {
+  font-size: 0.8rem;
+}
