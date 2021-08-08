@@ -10,7 +10,7 @@ export interface DefaultEmscContainerProps {
 export default function DefaultEmscContainer(props: DefaultEmscContainerProps) {
   return (
     <main role="main">
-      <div className="jumbotron  mx-auto bg-white" id="CanvasContainer0">
+      <div className="jumbotron mx-auto bg-white" id="CanvasContainer0">
         <canvas
           className={"emscripten " + (props.canvas ?? "")}
           id="canvas"
