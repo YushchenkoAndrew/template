@@ -42,6 +42,7 @@ function resizeCanvas() {
   hammingCanvas.font = `${ratio * textSize}px ${textStyle}`;
   for (let key in code.textSize) code.textSize[key] = ratio * textSize[key];
 
+  prevRatio = ratio;
   code.draw(ratio);
 }
 
