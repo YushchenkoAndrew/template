@@ -1,15 +1,33 @@
 // TODO: Remake for curr project
-var MatrixCanvas = document.getElementById("canvas");
-MatrixCanvas.width = 1200;
-MatrixCanvas.height = 800;
+var matrixCode = document.getElementById("canvas");
+matrixCode.width = 1200;
+matrixCode.height = 800;
 
-var rainCanvas = MatrixCanvas.getContext("2d");
-const fontSize = Math.floor(MatrixCanvas.width / 60);
-var codeRain = new CodeRain(
-  "I'm the creeper, catch me if you can!",
-  fontSize,
-  "Arial"
-);
-codeRain.startMatrix();
+// Consts
+var fontSize = Math.floor(matrixCode.width / 60);
+let prevRatio = 0;
 
-var rain = setInterval(() => codeRain.show(), 20);
+var matrixCanvas = matrixCode.getContext("2d");
+matrixCanvas.font = `${fontSize}px Arial`;
+
+let code = new CodeRain("I'm the creeper, catch me if you can!");
+let codeRain = setInterval(() => code.draw(), 20);
+
+function resizeCanvas() {
+  let width =
+    window.innerWidth < 1250
+      ? document.getElementById("CanvasContainer0").offsetWidth / 1.2
+      : 1200;
+  let ratio = width / 1200;
+
+  if (ratio == prevRatio) return;
+  matrixCode.width = width;
+  matrixCode.height = ratio * 700;
+
+  prevRatio = ratio;
+  code.draw(ratio);
+}
+
+window.onload = () => resizeCanvas();
+window.onbeforeunload = () => clearInterval(codeRain);
+window.addEventListener("resize", () => resizeCanvas(), true);

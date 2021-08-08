@@ -1,37 +1,49 @@
 class Char {
-  constructor(point, vel, value = undefined) {
-    this.pos = point;
-    this.value;
-    this.store = value;
+  constructor(pos, vel, color = "#64FF14") {
+    this.vel = vel;
+    this.pos = pos;
+
+    this.char = {
+      curr: undefined,
+      final: undefined,
+      color: color,
+    };
+
+    this.changeChar = setInterval(
+      () => this.setRandomChar(),
+      Math.round(Math.random() * 150 + 100)
+    );
 
     this.setRandomChar();
-
-    this.color = "#64FF14";
-
-    this.vel = vel;
-    this.switchInterval = Math.round(Math.random() * 150 + 100);
-
-    this.changeChar = setInterval(() => this.setRandomChar(), this.switchInterval);
   }
 
   setRandomChar() {
-    let code = Math.random() > 0.5 ? 48 + Math.round(Math.random() * 78) : 0x30a0 + Math.random() * 96;
+    let code =
+      Math.random() > 0.5
+        ? 48 + Math.round(Math.random() * 78)
+        : 0x30a0 + Math.random() * 96;
 
-    this.value = String.fromCharCode(code);
+    this.char.curr = String.fromCharCode(code);
+  }
+
+  isEnd() {
+    return this.pos.y >= matrixCode.height;
   }
 
   move() {
-    this.pos.y = this.pos.y >= window.innerHeight ? 0 : this.pos.y + this.vel;
+    this.pos.y = this.isEnd()
+      ? matrixCode.height - this.pos.y
+      : this.pos.y + this.vel;
   }
 
-  show(stopFlag) {
-    rainCanvas.fillStyle = this.color;
-    rainCanvas.fillText(this.value, this.pos.x, this.pos.y);
+  draw(stopFlag) {
+    matrixCanvas.fillStyle = this.char.color;
+    matrixCanvas.fillText(this.char.curr, this.pos.x, this.pos.y);
 
-    if (stopFlag && this.store) {
-      this.value = this.store;
-      this.color = "#FAFFDC";
-      this.pos.y = window.innerHeight / 2;
+    if (stopFlag && this.char.final) {
+      this.char.curr = this.char.final;
+      this.char.color = "#FAFFDC";
+      this.pos.y = matrixCode.height / 2;
 
       clearInterval(this.changeChar);
       return;
