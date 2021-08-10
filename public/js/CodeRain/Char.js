@@ -40,7 +40,7 @@ class Char {
     matrixCanvas.fillStyle = this.char.color;
     matrixCanvas.fillText(this.char.curr, this.pos.x, this.pos.y);
 
-    if (stopFlag && this.char.final) {
+    if (stopFlag && this.char.final && this.pos.y >= matrixCode.height / 2) {
       this.char.curr = this.char.final;
       this.char.color = "#FAFFDC";
       this.pos.y = matrixCode.height / 2;

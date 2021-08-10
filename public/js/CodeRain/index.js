@@ -1,10 +1,9 @@
-// TODO: Remake for curr project
 var matrixCode = document.getElementById("canvas");
 matrixCode.width = 1200;
 matrixCode.height = 800;
 
 // Consts
-var fontSize = Math.floor(matrixCode.width / 60);
+var fontSize = 12;
 let prevRatio = 0;
 
 var matrixCanvas = matrixCode.getContext("2d");
@@ -25,6 +24,7 @@ function resizeCanvas() {
   matrixCode.height = ratio * 700;
 
   prevRatio = ratio;
+  code.resize(ratio);
   code.draw(ratio);
 }
 
