@@ -11,7 +11,11 @@ public:
     
     cEdgeDetection.Init(sprImage);
     cEdgeDetection.Grayscale();
-    cEdgeDetection.GaussFilter();
+    cEdgeDetection.GaussFilter(5, 1.5f);
+    cEdgeDetection.IntensityGradient();
+    cEdgeDetection.NonMaximumSuppression();
+    cEdgeDetection.DoubleThreshold(0.09f, 0.01f);
+    cEdgeDetection.EdgeTrack(3);
 
     return true;
   } 
