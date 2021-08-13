@@ -1,0 +1,162 @@
+{
+  "name": "root",
+  "size": [1, 7],
+  "items": [
+    {
+      "name": "Next",
+      "id": 1,
+      "enable": false
+    },
+    {
+      "name": "Blur",
+      "size": [1, 3],
+      "items": [
+        {
+          "name": "Enable",
+          "size": [2, 1],
+          "items": [
+            {
+              "name": "Yes",
+              "id": -1,
+              "enable": false
+            },
+            {
+              "name": "No",
+              "id": -1,
+              "enable": false
+            }
+          ]
+        },
+        {
+          "name": "Size",
+          "id": -1,
+          "enable": false
+        },
+        {
+          "name": "Sigma",
+          "id": -1,
+          "enable": false
+        }
+      ]
+    },
+    {
+      "name": "Gradient",
+      "size": [1, 2],
+      "items": [
+        {
+          "name": "Enable",
+          "size": [2, 1],
+          "items": [
+            {
+              "name": "Yes",
+              "id": -1,
+              "enable": false
+            },
+            {
+              "name": "No",
+              "id": -1,
+              "enable": false
+            }
+          ]
+        },
+        {
+          "name": "Inverse",
+          "id": -1,
+          "enable": false
+        }
+      ]
+    },
+    {
+      "name": "Suppression",
+      "size": [1, 1],
+      "items": [
+        {
+          "name": "Enable",
+          "size": [2, 1],
+          "items": [
+            {
+              "name": "Yes",
+              "id": -1,
+              "enable": false
+            },
+            {
+              "name": "No",
+              "id": -1,
+              "enable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Threshold",
+      "size": [1, 2],
+      "items": [
+        {
+          "name": "Enable",
+          "size": [2, 1],
+          "items": [
+            {
+              "name": "Yes",
+              "id": -1,
+              "enable": false
+            },
+            {
+              "name": "No",
+              "id": -1,
+              "enable": false
+            }
+          ]
+        },
+        {
+          "name": "Ratio",
+          "size": [2, 1],
+          "items": [
+            {
+              "name": "High",
+              "id": -1,
+              "enable": false
+            },
+            {
+              "name": "Low",
+              "id": -1,
+              "enable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Edge Track",
+      "size": [1, 2],
+      "items": [
+        {
+          "name": "Enable",
+          "size": [2, 1],
+          "items": [
+            {
+              "name": "Yes",
+              "id": -1,
+              "enable": false
+            },
+            {
+              "name": "No",
+              "id": -1,
+              "enable": false
+            }
+          ]
+        },
+        {
+          "name": "Size",
+          "id": -1,
+          "enable": false
+        }
+      ]
+    },
+    {
+      "name": "Exit",
+      "id": 80,
+      "enable": false
+    }
+  ]
+}

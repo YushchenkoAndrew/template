@@ -1,0 +1,17 @@
+{
+  "nScreenWidth": 600,
+  "nScreenHeight": 600,
+  "nPixel": 1,
+
+  "sMenuConfig": "assets/Menu.json",
+  "sMenuAnimated": "assets/AnimatedSprite.json",
+  "sMenuSprite": "assets/Sprite-0002.png",
+  "sMenuSpriteScale": 3.0,
+
+  "sImage" : "assets/test.png",
+  "nImageOffset" : 300,
+
+  "MenuSprites": {
+    "MENU": [8, 2]
+  }
+}
