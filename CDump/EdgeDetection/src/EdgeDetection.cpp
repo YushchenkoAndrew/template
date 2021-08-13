@@ -169,7 +169,7 @@ void EdgeDetection::EdgeTrack(int32_t nStep) {
 void EdgeDetection::Draw(olc::PixelGameEngine& GameEngine) {
   for (int32_t y = OFFSET; y < nHeight - OFFSET; y++) {
     for (int32_t x = OFFSET; x < nWidth - OFFSET; x++) {
-      GameEngine.Draw(x - OFFSET, y - OFFSET, vPixels[INDEX(x, y, nWidth)]);
+      GameEngine.Draw(x + nWidth - OFFSET, y - OFFSET, vPixels[INDEX(x, y, nWidth)]);
     }
   }
 }
