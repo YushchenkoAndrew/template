@@ -29,7 +29,6 @@ all:
 
 debug:
 	if [ ! -d "./build" ]; then mkdir $(OUTPUT_GCC); fi
-	export LD_LIBRARY_PATH='$(shell pwd)'
 	$(GCC) $(TARGET) $(INCLUDE) $(LIB) $(CFLAGS_GCC) -O0 -ggdb $(EM_LDFALGS_GCC) -o $(OUTPUT_GCC)/$(OUT_NAME_GCC)
 
 dev:
@@ -37,4 +36,4 @@ dev:
 	$(EM_CC) $(TARGET) $(COMPILED_TARGET) $(INCLUDE) $(LIB) $(CFLAGS_EM) $(LDFALGS_EM) -o $(OUTPUT_EM)/$(OUT_NAME_EM).html
 
 run:
-	./$(OUTPUT_GCC)/$(OUT_NAME_GCC)
+	LD_LIBRARY_PATH='$(shell pwd)' ./$(OUTPUT_GCC)/$(OUT_NAME_GCC)
