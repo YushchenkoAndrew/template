@@ -5,6 +5,7 @@ import effect from "../styles/Glitch.module.css";
 export interface NavItemProps {
   name: string;
   href: string;
+  style?: string;
   active?: boolean;
 }
 
@@ -32,7 +33,9 @@ export default function NavItem(props: NavItemProps) {
     <li className="nav-item">
       <a
         href={props.href}
-        className={`${styles["nav-link"]} ${effect["glitch-rgb"]}`}
+        className={`${styles["nav-link"]} ${effect["glitch-rgb"]} ${
+          props.style ?? ""
+        }`}
         data-glitch={name}
       >
         {name}

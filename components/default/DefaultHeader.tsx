@@ -22,8 +22,8 @@ export default function DefaultHeader(props: DefaultHeaderProps) {
           active={props.projects}
         />
         <NavItem name="Info" href="/projects/info" active={props.info} />
+        {props.children}
       </NavBar>
-      {props.children}
     </header>
   );
 }
