@@ -23,7 +23,7 @@ export default function Card(props: CardProps) {
       <a
         className={`card-img-overlay d-flex flex-column ${
           props.color ?? "text-white"
-        }`}
+        } text-decoration-none`}
         href={props.href}
       >
         <div className="card-body">
@@ -34,14 +34,14 @@ export default function Card(props: CardProps) {
           >
             {props.title}
           </h4>
-          <small>{props.description}</small>
+          <p className={styles["card-text"]}>{props.description}</p>
         </div>
+        {/* TODO: Maybe add footer info such as github or other stuff 
         <div className="card-footer">
           <div className="media">
-            {/* TODO: Maybe add footer info such as github or other stuff */}
             {props.children}
           </div>
-        </div>
+        </div> */}
       </a>
     </div>
   );

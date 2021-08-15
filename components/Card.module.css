@@ -5,11 +5,50 @@
   font-family: "Abstract";
   align-items: center;
   text-align: center;
-  height: 100%;
+  justify-content: center;
+
+  height: 60%;
+  width: 100%;
 }
 
 .card-title:hover {
   text-decoration: none;
+}
+
+.card-text {
+  font-family: "Roboto-Thin";
+  color: #fff;
+  align-items: center;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 34em) {
+  .title-sm {
+    font-size: 1.1vw;
+  }
+
+  .title-md {
+    font-size: 2.1vw !important;
+  }
+
+  .title-lg {
+    font-size: 3.1vw !important;
+  }
+
+  .title-xl {
+    font-size: 4.1vw !important;
+  }
+
+  .card-text {
+    font-size: 3.1vw !important;
+  }
+}
+
+@media (max-width: 170px) {
+  .card-title {
+    height: 10%;
+  }
 }
 
 .title-sm {
@@ -21,9 +60,9 @@
 }
 
 .title-lg {
-  font-size: 0.8rem;
+  font-size: 1.2rem;
 }
 
 .title-xl {
-  font-size: 0.8rem;
+  font-size: 1.4rem;
 }
