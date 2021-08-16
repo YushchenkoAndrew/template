@@ -15,7 +15,10 @@ export default function ApproximatingPiValue() {
 
       <DefaultHeader projects />
       <DefaultP5Container />
-      <DefaultFooter />
+      <DefaultFooter name="Approximating Pi Value">
+        {/* TODO:  */}
+        <p>Description:</p>
+      </DefaultFooter>
     </>
   );
 }

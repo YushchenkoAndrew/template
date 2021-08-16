@@ -4,6 +4,7 @@ import CardColumns from "../../components/CardColumns";
 import DefaultFooter from "../../components/default/DefaultFooter";
 import DefaultHead from "../../components/default/DefaultHead";
 import DefaultHeader from "../../components/default/DefaultHeader";
+import NavItem from "../../components/NavItem";
 
 export default function Projects() {
   const baseURL = process.env.BASE_URL ?? "";
@@ -113,7 +114,17 @@ export default function Projects() {
           />
         </CardColumns>
       </main>
-      <DefaultFooter />
+      <DefaultFooter name="Menu">
+        <ul className="list-unstyled">
+          {/* TODO: Maybe can use NavItem (structure of it almost the same) */}
+          {/* <NavItem name="Home" href="/projects" />
+          <NavItem name="API" href="/api/doc" /> */}
+          <li>Home</li>
+          <li>About</li>
+          <li>Blog</li>
+          <li>Portfolio</li>
+        </ul>
+      </DefaultFooter>
     </>
   );
 }
