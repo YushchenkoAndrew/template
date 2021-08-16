@@ -6,6 +6,7 @@ export interface NavItemProps {
   name: string;
   href: string;
   style?: string;
+  target?: React.HTMLAttributeAnchorTarget;
   active?: boolean;
 }
 
@@ -33,9 +34,10 @@ export default function NavItem(props: NavItemProps) {
     <li className="nav-item">
       <a
         href={props.href}
-        className={`${styles["nav-link"]} ${effect["glitch-rgb"]} ${
-          props.style ?? ""
-        }`}
+        className={
+          props.style ?? `${styles["nav-link"]} ${effect["glitch-rgb"]}`
+        }
+        target={props.target ?? "_self"}
         data-glitch={name}
       >
         {name}
