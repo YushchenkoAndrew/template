@@ -25,19 +25,25 @@ export default function DefaultFooter(props: DefaultFooterProps) {
             </FooterTop>
             <FooterBottom email="AndrewYushchenko@gmail.com">
               <a
-                className="text-muted mx-1"
+                className="text-muted mx-3"
                 href="https://github.com/YushchenkoAndrew"
+                target="_blank"
               >
-                <FontAwesomeIcon icon={faGithub} />
-              </a>
-              <a className="text-muted mx-1" href="/">
-                <FontAwesomeIcon icon={faTwitter} />
+                <FontAwesomeIcon icon={faGithub} size="lg" />
               </a>
               <a
-                className="text-muted mx-1"
+                className="text-muted mx-3"
                 href="https://www.linkedin.com/in/andrew-yushchenko-7447771a2/"
+                target="_blank"
               >
-                <FontAwesomeIcon icon={faLinkedinIn} />
+                <FontAwesomeIcon icon={faTwitter} size="lg" />
+              </a>
+              <a
+                className="text-muted mx-3"
+                href="https://www.linkedin.com/in/andrew-yushchenko-7447771a2/"
+                target="_blank"
+              >
+                <FontAwesomeIcon icon={faLinkedinIn} size="lg" />
               </a>
             </FooterBottom>
           </div>
