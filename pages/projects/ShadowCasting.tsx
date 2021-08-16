@@ -3,6 +3,7 @@ import DefaultHead from "../../components/default/DefaultHead";
 import DefaultHeader from "../../components/default/DefaultHeader";
 import DefaultFooter from "../../components/default/DefaultFooter";
 import DefaultEmscContainer from "../../components/default/DefaultEmscContainer";
+import DefaultProjectInfo from "../../components/default/DefaultProjectInfo";
 
 // FIXME: Fix src code in C++ to change position of canvas has issue with small sizes !!!
 export default function ShadowCasting() {
@@ -20,7 +21,13 @@ export default function ShadowCasting() {
 
       <DefaultHeader projects />
       <DefaultEmscContainer canvas="limit-xxl" />
-      <DefaultFooter />
+      <DefaultFooter name="Approximating Pi Value">
+        <DefaultProjectInfo
+          //  TODO: Finish description part!!!
+          href="https://github.com/YushchenkoAndrew/template/tree/master/CDump/ShadowCasting"
+          description=""
+        />
+      </DefaultFooter>
     </>
   );
 }

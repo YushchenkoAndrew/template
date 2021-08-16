@@ -17,6 +17,7 @@ hammingCanvas.font = `${textSize["desc"]}px ${textStyle}`;
 hammingCanvas.lineWidth = lineWidth;
 
 let code = new HammingCode();
+code.draw();
 
 hammingCode.addEventListener(
   "mousedown",

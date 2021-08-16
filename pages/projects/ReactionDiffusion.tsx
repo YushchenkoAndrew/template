@@ -3,6 +3,7 @@ import DefaultHead from "../../components/default/DefaultHead";
 import DefaultHeader from "../../components/default/DefaultHeader";
 import DefaultFooter from "../../components/default/DefaultFooter";
 import DefaultEmscContainer from "../../components/default/DefaultEmscContainer";
+import DefaultProjectInfo from "../../components/default/DefaultProjectInfo";
 
 export default function ReactionDiffusion() {
   return (
@@ -19,7 +20,13 @@ export default function ReactionDiffusion() {
 
       <DefaultHeader projects />
       <DefaultEmscContainer canvas="limit-md" />
-      <DefaultFooter />
+      <DefaultFooter name="Reac">
+        <DefaultProjectInfo
+          href="https://github.com/YushchenkoAndrew/template/tree/master/CDump/ReactionDiffusion"
+          description="A simulation of chemical reaction, which is based on some certain rules. It's using a Gray-Scott model.
+          Just click on the canvas!!"
+        />
+      </DefaultFooter>
     </>
   );
 }
