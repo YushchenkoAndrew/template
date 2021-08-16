@@ -14,6 +14,12 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           as="font"
           crossOrigin=""
         />
+        <link
+          rel="preload"
+          href="/fonts/3Dventure.ttf"
+          as="font"
+          crossOrigin=""
+        />
       </Head>
       <Component {...pageProps} />
     </>
