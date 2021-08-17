@@ -27,9 +27,10 @@ export default function ShadowCasting() {
       <DefaultEmscContainer canvas="limit-xxl" />
       <DefaultFooter name="Approximating Pi Value">
         <DefaultProjectInfo
-          //  TODO: Finish description part!!!
           href="https://github.com/YushchenkoAndrew/template/tree/master/CDump/ShadowCasting"
-          description=""
+          description="This project is improved version of Ray Casting 2D. Instead of emitting 
+          lots of rays in each directions, this algorith detect edges and will draw a segment for it, thus
+          a lot of performance is saved and we can use sprite for represent light source"
         />
       </DefaultFooter>
     </>

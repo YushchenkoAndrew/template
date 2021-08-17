@@ -25,21 +25,21 @@ export default function DefaultFooter(props: DefaultFooterProps) {
             </FooterTop>
             <FooterBottom email="AndrewYushchenko@gmail.com">
               <a
-                className="text-muted mx-3"
+                className="text-muted mx-2 mx-md-3"
                 href="https://github.com/YushchenkoAndrew"
                 target="_blank"
               >
                 <FontAwesomeIcon icon={faGithub} size="lg" />
               </a>
               <a
-                className="text-muted mx-3"
-                href="https://www.linkedin.com/in/andrew-yushchenko-7447771a2/"
+                className="text-muted mx-2 mx-md-3"
+                href="https://twitter.com/AndrewY69942173"
                 target="_blank"
               >
                 <FontAwesomeIcon icon={faTwitter} size="lg" />
               </a>
               <a
-                className="text-muted mx-3"
+                className="text-muted mx-2 mx-md-3"
                 href="https://www.linkedin.com/in/andrew-yushchenko-7447771a2/"
                 target="_blank"
               >
