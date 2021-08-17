@@ -10,13 +10,13 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <link
           rel="preload"
-          href="/fonts/4bitfont.ttf"
+          href="/projects/fonts/4bitfont.ttf"
           as="font"
           crossOrigin=""
         />
         <link
           rel="preload"
-          href="/fonts/3Dventure.ttf"
+          href="/projects/fonts/3Dventure.ttf"
           as="font"
           crossOrigin=""
         />

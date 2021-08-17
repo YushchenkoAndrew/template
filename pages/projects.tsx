@@ -1,26 +1,25 @@
 import React from "react";
-import Card from "../../components/Card";
-import CardColumns from "../../components/CardColumns";
-import DefaultFooter from "../../components/default/DefaultFooter";
-import DefaultHead from "../../components/default/DefaultHead";
-import DefaultHeader from "../../components/default/DefaultHeader";
-import DefaultNav from "../../components/default/DefaultNav";
+import Card from "../components/Card";
+import CardColumns from "../components/CardColumns";
+import DefaultFooter from "../components/default/DefaultFooter";
+import DefaultHead from "../components/default/DefaultHead";
+import DefaultHeader from "../components/default/DefaultHeader";
+import DefaultNav from "../components/default/DefaultNav";
 
 export default function Projects() {
-  const baseURL = process.env.BASE_URL ?? "";
   return (
     <>
       <DefaultHead>
         <title>Mortis Projects</title>
         <link
           rel="preload"
-          href="/fonts/ABSTRACT.ttf"
+          href="/projects/fonts/ABSTRACT.ttf"
           as="font"
           crossOrigin=""
         />
         <link
           rel="preload"
-          href="/fonts/Roboto-Thin.ttf"
+          href="/projects/fonts/Roboto-Thin.ttf"
           as="font"
           crossOrigin=""
         />
@@ -30,47 +29,47 @@ export default function Projects() {
       <main role="main">
         <CardColumns>
           <Card
-            img="/img/ApproximatingPiValue.webp"
+            img="/projects/img/ApproximatingPiValue.webp"
             title="Find Pi with RNG"
-            href={`${baseURL}/ApproximatingPiValue`}
+            href={`/projects/ApproximatingPiValue`}
             description="Plz RNG Gods, I need to gacha the Pi value"
           />
           <Card
-            img="/img/CodeRain.webp"
+            img="/projects/img/CodeRain.webp"
             title="Code Rain"
             size="title-lg"
-            href={`${baseURL}/CodeRain`}
+            href={`/projects/CodeRain`}
             description="Take the blue pill and the site will close, or take the red pill and I show how deep the rabbit hole goes"
           />
           <Card
-            img="/img/HammingCode.webp"
+            img="/projects/img/HammingCode.webp"
             title="Hamming Code"
-            href={`${baseURL}/HammingCode`}
+            href={`/projects/HammingCode`}
             description="The first algorithm for Error correction"
           />
           <Card
-            img="/img/Minecraft.webp"
+            img="/projects/img/Minecraft.webp"
             title="3D Engine"
             size="title-lg"
-            href={`${baseURL}/Minecraft`}
+            href={`/projects/Minecraft`}
             description="Yet another Minecraft clone"
           />
           <Card
-            img="/img/ReactionDiffusion.webp"
+            img="/projects/img/ReactionDiffusion.webp"
             title="Reaction Diffusion"
-            href={`${baseURL}/ReactionDiffusion`}
+            href={`/projects/ReactionDiffusion`}
             description="Haha, chemical elements go brrrrr "
           />
           <Card
-            img="/img/ShadowCasting.webp"
+            img="/projects/img/ShadowCasting.webp"
             title="Shadow Casting"
-            href={`${baseURL}/ShadowCasting`}
+            href={`/projects/ShadowCasting`}
             description="Same as Ray Casting, but better"
           />
 
           {/* WARNING: Temp file */}
           <Card
-            img="/img/Black.webp"
+            img="/projects/img/Black.webp"
             title="Some text"
             href="#"
             size="title-lg"

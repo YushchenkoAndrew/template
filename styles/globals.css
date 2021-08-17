@@ -22,22 +22,22 @@ a {
 
 @font-face {
   font-family: "FourBit";
-  src: url("/fonts/4bitfont.ttf");
+  src: url("/projects/fonts/4bitfont.ttf");
 }
 
 @font-face {
   font-family: "Abstract";
-  src: url("/fonts/ABSTRACT.ttf");
+  src: url("/projects/fonts/ABSTRACT.ttf");
 }
 
 @font-face {
   font-family: "3Dventure";
-  src: url("/fonts/3Dventure.ttf");
+  src: url("/projects/fonts/3Dventure.ttf");
 }
 
 @font-face {
   font-family: "Roboto-Thin";
-  src: url("/fonts/Roboto-Thin.ttf");
+  src: url("/projects/fonts/Roboto-Thin.ttf");
 }
 
 .emscripten {

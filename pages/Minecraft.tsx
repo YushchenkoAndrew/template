@@ -1,20 +1,24 @@
 import React from "react";
-import DefaultHead from "../../components/default/DefaultHead";
-import DefaultHeader from "../../components/default/DefaultHeader";
-import DefaultFooter from "../../components/default/DefaultFooter";
-import DefaultEmscContainer from "../../components/default/DefaultEmscContainer";
-import DefaultProjectInfo from "../../components/default/DefaultProjectInfo";
+import DefaultHead from "../components/default/DefaultHead";
+import DefaultHeader from "../components/default/DefaultHeader";
+import DefaultFooter from "../components/default/DefaultFooter";
+import DefaultEmscContainer from "../components/default/DefaultEmscContainer";
+import DefaultProjectInfo from "../components/default/DefaultProjectInfo";
 
 export default function ReactionDiffusion() {
   return (
     <>
       <DefaultHead>
         <title>Reaction Diffusion</title>
-        <script defer type="text/javascript" src="/js/index.js"></script>
+        <script
+          defer
+          type="text/javascript"
+          src="/projects/js/index.js"
+        ></script>
         <script
           async
           type="text/javascript"
-          src="/js/Minecraft/index.js"
+          src="/projects/js/Minecraft/index.js"
         ></script>
       </DefaultHead>
 
