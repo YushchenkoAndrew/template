@@ -20,6 +20,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           as="font"
           crossOrigin=""
         />
+        <link rel="icon" href="/projects/favicon.ico" />
       </Head>
       <Component {...pageProps} />
     </>
