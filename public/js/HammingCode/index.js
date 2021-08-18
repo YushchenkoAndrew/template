@@ -25,6 +25,7 @@ hammingCode.addEventListener(
   false
 );
 
+// FIXME: Fix bug with resizing click
 function resizeCanvas() {
   let width =
     window.innerWidth < 950
