@@ -1,70 +1,95 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Card from "../components/info/Card";
+import CardStat from "../components/info/CardStat";
+import Calendar from "react-calendar";
+import DefaultNav from "../components/default/DefaultNav";
 import DefaultHead from "../components/default/DefaultHead";
 import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultFooter from "../components/default/DefaultFooter";
-import DefaultNav from "../components/default/DefaultNav";
-import CardStat from "../components/info/CardStat";
-import { faEye, faGlobe, faUserPlus } from "@fortawesome/free-solid-svg-icons";
-import Card from "../components/info/Card";
-import Calendar from "react-calendar";
+import { WorldMap } from "../components/WorldMap/WorldMap";
 import { Doughnut, Line } from "react-chartjs-2";
+import { faEye, faGlobe, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { Data as StatisticData, StatInfo, Country } from "./api/info/statistic";
+import { Data as AnalyticsData, Analytics } from "./api/info/analytics";
 
 export default function Info() {
-  const [value, onChange] = useState(new Date());
+  const [date, onDateChange] = useState(new Date());
+  const [mapData, onMapLoad] = useState([] as Country[]);
+  const [lineData, onLineLoad] = useState([] as Number[]);
+  const [labels, onLabelsLoad] = useState([] as string[]);
+  const [doughnutData, onDoughnutLoad] = useState([] as Number[]);
+  const [infoData, onInfoLoad] = useState({
+    users: { value: 0, gain: 0 },
+    views: { value: 0, gain: 0 },
+    countries: 0,
+  } as StatInfo);
+  const [chartSize, setChartSize] = useState({
+    height: 310,
+    width: 800,
+    size: "xl",
+  });
 
-  // TODO: Send to API date for receive data
-  // console.log(value);
+  useEffect(() => {
+    function handleChartResize() {
+      if (window.innerWidth <= 1200 && window.innerWidth > 992)
+        return setChartSize({ height: 300, width: 800, size: "lg" });
 
-  const mapData = [
-    { country: "cn", value: 1389618778 },
-    { country: "in", value: 1311559204 },
-    { country: "us", value: 331883986 },
-    { country: "id", value: 264935824 },
-    { country: "pk", value: 210797836 },
-    { country: "br", value: 210301591 },
-    { country: "ng", value: 208679114 },
-    { country: "bd", value: 161062905 },
-    { country: "ru", value: 141944641 },
-    { country: "mx", value: 127318112 },
-  ];
+      if (window.innerWidth <= 992 && window.innerWidth > 767)
+        return setChartSize({ height: 400, width: 400, size: "xl" });
 
-  let doughnutData = {
-    labels: ["Red", "Green", "Yellow"],
-    datasets: [
-      {
-        data: [300, 50, 100],
-        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-        hoverBackgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-      },
-    ],
-  };
+      if (window.innerWidth <= 767)
+        return setChartSize({ height: 400, width: 400, size: "lg" });
 
-  let lineData = {
-    labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-    datasets: [
-      {
-        label: "# of Votes",
-        data: [12, 19, 3, 5, 2, 3],
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(255, 206, 86, 0.2)",
-          "rgba(75, 192, 192, 0.2)",
-          "rgba(153, 102, 255, 0.2)",
-          "rgba(255, 159, 64, 0.2)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
+      return setChartSize({ height: 310, width: 800, size: "xl" });
+    }
+
+    window.addEventListener("resize", handleChartResize);
+    handleChartResize();
+
+    return () => window.removeEventListener("resize", handleChartResize);
+  }, []);
+
+  useEffect(() => {
+    loadStaticData(date);
+    loadAnalyticsData(date);
+  }, []);
+
+  function loadStaticData(date: Date) {
+    fetch(
+      `/projects/api/info/statistic?date=${new Date(
+        date.getTime() - date.getTimezoneOffset() * 60000
+      )
+        .toISOString()
+        .slice(0, 10)}`
+    )
+      .then((res) => res.json())
+      .then((data: StatisticData) => {
+        if (data.stat !== "OK") return;
+        onMapLoad(data.map);
+        onInfoLoad(data.info);
+      });
+  }
+
+  function loadAnalyticsData(date: Date) {
+    fetch(
+      `/projects/api/info/analytics?date=${new Date(
+        date.getTime() - date.getTimezoneOffset() * 60000
+      )
+        .toISOString()
+        .slice(0, 10)}`
+    )
+      .then((res) => res.json())
+      .then((data: AnalyticsData) => {
+        if (data.stat !== "OK") return;
+        onLineLoad(data.line);
+        onLabelsLoad(data.days);
+        onDoughnutLoad([
+          data.doughnut.ctr,
+          data.doughnut.cr_media,
+          data.doughnut.cr_projects,
+        ]);
+      });
+  }
 
   return (
     <>
@@ -76,33 +101,88 @@ export default function Info() {
 
       <div className="container">
         <div className="card-group mt-2 mb-4">
-          <CardStat title="New users" value={55} gain={-64} icon={faUserPlus} />
-          <CardStat title="Views" value={55} gain={64} icon={faEye} />
-          <CardStat title="Countries" value={55} icon={faGlobe} />
+          <CardStat
+            title="New users"
+            value={infoData.users.value}
+            gain={infoData.users.gain}
+            icon={faUserPlus}
+          />
+          <CardStat
+            title="Views"
+            value={infoData.views.value}
+            gain={infoData.views.gain}
+            icon={faEye}
+          />
+          <CardStat
+            title="Countries"
+            value={infoData.countries}
+            icon={faGlobe}
+          />
         </div>
 
         <div className="row">
           <div className="col-lg-4 col-md-12 mb-4">
             <Card title="Calendar">
-              <Calendar onChange={onChange} value={value} />
+              <Calendar
+                onChange={(date: Date) => {
+                  loadStaticData(date);
+                  loadAnalyticsData(date);
+                  onDateChange(date);
+                }}
+                value={date}
+              />
             </Card>
           </div>
-          <div className="col-lg-4 col-md-12 mb-4">
+          <div className="col col-lg-8 col-md-12 mb-4">
             <Card title="Visited Country">
-              {/* <WorldMap color="#2a65db" size="lg" data={mapData} /> */}
-              {/* <WorldMap color="red" size="lg" data={mapData} /> */}
+              <div className="d-flex justify-content-center">
+                <WorldMap
+                  color="#2a65db"
+                  size={chartSize.size}
+                  data={mapData}
+                />
+              </div>
             </Card>
           </div>
         </div>
         <div className="row">
-          <div className="col-lg-4 col-md-12 mb-4">
-            <Card title="Sample text">
-              <Line data={lineData} height={400} width={400} />
+          <div className="col-lg-8 col-md-12 mb-4">
+            <Card title="Weekdays Statistics">
+              <Line
+                height={chartSize.height}
+                width={chartSize.width}
+                options={{ maintainAspectRatio: false }}
+                data={{
+                  labels,
+                  datasets: [
+                    {
+                      label: "Visitors",
+                      data: lineData,
+                      backgroundColor: ["rgba(255, 99, 132, 0.2)"],
+                      borderColor: ["rgba(255, 99, 132, 1)"],
+                      borderWidth: 1,
+                    },
+                  ],
+                }}
+              />
             </Card>
           </div>
           <div className="col-lg-4 col-md-12 mb-4">
-            <Card title="Sample text">
-              <Doughnut data={doughnutData} height={400} width={400} />
+            <Card title="Analytics">
+              <Doughnut
+                height={100}
+                width={100}
+                data={{
+                  labels: ["CTR", "CR(media)", "CR(projects)"],
+                  datasets: [
+                    {
+                      data: doughnutData,
+                      backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
+                      hoverBackgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
+                    },
+                  ],
+                }}
+              />
             </Card>
           </div>
         </div>
