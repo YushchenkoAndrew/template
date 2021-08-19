@@ -12,7 +12,7 @@ export interface CardStatProps {
 
 export default function CardStat(props: CardStatProps) {
   return (
-    <div className={`card border-right  ${styles["card-shadow"]} mb-4`}>
+    <div className={`card border-right ${styles["card-shadow"]} mb-4`}>
       <div className="card-body text-center">
         <div className="d-flex d-lg-flex d-md-block align-items-center">
           <div>
