@@ -24,6 +24,7 @@ export default function Card(props: CardProps) {
         className={`card-img-overlay d-flex flex-column ${
           props.color ?? "text-white"
         } text-decoration-none`}
+        onClick={() => fetch("/projects/api/view/click", { method: "PATCH" })}
         href={props.href}
       >
         <div className="card-body">

@@ -3,8 +3,12 @@ import Head from "next/head";
 
 import "../styles/globals.css";
 import "../styles/bootstrap.min.css";
+import { useEffect } from "react";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
+  useEffect(() => {
+    fetch("/projects/api/view/page", { method: "PATCH" });
+  }, []);
   return (
     <>
       <Head>

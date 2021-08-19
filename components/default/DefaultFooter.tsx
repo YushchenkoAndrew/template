@@ -27,6 +27,9 @@ export default function DefaultFooter(props: DefaultFooterProps) {
               <a
                 className="text-muted mx-2 mx-md-3"
                 href="https://github.com/YushchenkoAndrew"
+                onClick={() =>
+                  fetch("/projects/api/view/media", { method: "PATCH" })
+                }
                 target="_blank"
               >
                 <FontAwesomeIcon icon={faGithub} size="lg" />
@@ -34,6 +37,9 @@ export default function DefaultFooter(props: DefaultFooterProps) {
               <a
                 className="text-muted mx-2 mx-md-3"
                 href="https://twitter.com/AndrewY69942173"
+                onClick={() =>
+                  fetch("/projects/api/view/media", { method: "PATCH" })
+                }
                 target="_blank"
               >
                 <FontAwesomeIcon icon={faTwitter} size="lg" />
@@ -41,6 +47,9 @@ export default function DefaultFooter(props: DefaultFooterProps) {
               <a
                 className="text-muted mx-2 mx-md-3"
                 href="https://www.linkedin.com/in/andrew-yushchenko-7447771a2/"
+                onClick={() =>
+                  fetch("/projects/api/view/media", { method: "PATCH" })
+                }
                 target="_blank"
               >
                 <FontAwesomeIcon icon={faLinkedinIn} size="lg" />

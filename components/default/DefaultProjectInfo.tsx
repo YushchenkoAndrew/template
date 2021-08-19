@@ -1,5 +1,4 @@
 import React from "react";
-import NavItem from "../NavItem";
 
 export interface GithubLink {
   href: string;
@@ -21,7 +20,12 @@ export default function DefaultProjectInfo(props: DefaultProjectInfoProps) {
       </p>
       <p className="text-dark">
         {"Source: "}
-        <a className="font-weight-bold" href={props.href} target="_blank">
+        <a
+          className="font-weight-bold"
+          href={props.href}
+          onClick={() => fetch("/projects/api/view/media", { method: "PATCH" })}
+          target="_blank"
+        >
           Github{props.lang ? ` (${props.lang})` : ""}
         </a>
         {props.links
@@ -31,6 +35,9 @@ export default function DefaultProjectInfo(props: DefaultProjectInfoProps) {
                 <a
                   className="font-weight-bold"
                   href={item.href}
+                  onClick={() =>
+                    fetch("/projects/api/view/media", { method: "PATCH" })
+                  }
                   target="_blank"
                 >
                   Github{item.lang ? ` (${item.lang})` : ""}

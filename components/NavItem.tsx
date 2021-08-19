@@ -37,6 +37,7 @@ export default function NavItem(props: NavItemProps) {
         className={
           props.style ?? `${styles["nav-link"]} ${effect["glitch-rgb"]}`
         }
+        onClick={() => fetch("/projects/api/view/click", { method: "PATCH" })}
         target={props.target ?? "_self"}
         data-glitch={name}
       >
