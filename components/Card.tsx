@@ -14,6 +14,7 @@ export interface CardProps {
 
 export default function Card(props: CardProps) {
   let [offset, setOffset] = useState({ top: -1, left: -1 } as DOMRect);
+  let [opacityStyle, setOpacity] = useState("");
   let [animation, setAnimation] = useState("");
   let [transitionStyle, setStyle] = useState({
     top: 0,
@@ -26,7 +27,18 @@ export default function Card(props: CardProps) {
     );
   }, []);
 
-  // TODO: Think about mobile !!! Change OnMouseEvent for them!!
+  function showElement(x: number, y: number) {
+    setStyle({ top: y, left: x });
+    setOpacity(styles["dim"]);
+    setAnimation(styles["explode-animation"]);
+  }
+
+  function hideElement(x: number, y: number) {
+    setStyle({ top: y, left: x });
+    setOpacity(styles["appear"]);
+    setAnimation(styles["displode-animation"]);
+  }
+
   return (
     <div
       className="card overflow-hidden"
@@ -35,20 +47,20 @@ export default function Card(props: CardProps) {
           ? setOffset(el?.getBoundingClientRect())
           : null
       }
-      onMouseEnter={(e) => {
-        setStyle({
-          top: e.pageY - offset.top - window.scrollY,
-          left: e.pageX - offset.left - window.scrollX,
-        });
-        setAnimation(styles["explode-animation"]);
-      }}
-      onMouseLeave={(e) => {
-        setStyle({
-          top: e.pageY - offset.top - window.scrollY,
-          left: e.pageX - offset.left - window.scrollX,
-        });
-        setAnimation(styles["displode-animation"]);
-      }}
+      onMouseEnter={(e) =>
+        showElement(
+          e.pageX - offset.left - window.scrollX,
+          e.pageY - offset.top - window.scrollY
+        )
+      }
+      onMouseLeave={(e) =>
+        hideElement(
+          e.pageX - offset.left - window.scrollX,
+          e.pageY - offset.top - window.scrollY
+        )
+      }
+      onTouchStart={(e) => showElement(0, 0)}
+      onTouchEnd={(e) => hideElement(0, 0)}
     >
       <span className={`${styles["card-middleware"]}`} />
       <span
@@ -68,7 +80,7 @@ export default function Card(props: CardProps) {
         onClick={() => fetch("/projects/api/view/click", { method: "PATCH" })}
         href={props.href}
       >
-        <div className="card-body">
+        <div className={`card-body ${opacityStyle}`}>
           <h4
             className={`${styles["card-title"]} ${
               styles[props.size ?? "title-md"]

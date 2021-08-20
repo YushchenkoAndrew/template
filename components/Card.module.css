@@ -67,7 +67,6 @@
   font-size: 1.4rem;
 }
 
-
 .card-hover {
   background-color: white;
   border-radius: 1000px;
@@ -75,14 +74,15 @@
   top: 0;
   left: 0;
   width: 0px;
-  height: 0px; 
+  height: 0px;
   margin-top: 0px;
   margin-left: 0px;
   pointer-events: none;
 }
 
 .card-middleware {
-  background-color: #1f2225;
+  background-color: #2d3135;
+  /* background-color: #343a40; */
   position: absolute;
   top: 0;
   left: 0;
@@ -91,14 +91,12 @@
   pointer-events: none;
 }
 
-
 .explode-animation {
-   animation: explode 0.9s forwards;
-
+  animation: explode 0.9s forwards;
 }
 
 .displode-animation {
-   animation: displode 0.5s forwards;
+  animation: displode 0.5s forwards;
 }
 
 @keyframes explode {
@@ -128,5 +126,31 @@
     height: 0px;
     margin-left: 0px;
     margin-top: 0px;
+  }
+}
+
+.dim {
+  animation: dim 0.5s forwards;
+}
+
+.appear {
+  animation: appear 0.8s forwards;
+}
+
+@keyframes dim {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
