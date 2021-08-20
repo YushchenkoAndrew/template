@@ -7,10 +7,12 @@ import DefaultHead from "../components/default/DefaultHead";
 import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultFooter from "../components/default/DefaultFooter";
 import { WorldMap } from "../components/WorldMap/WorldMap";
+import { useSpring } from "react-spring";
 import { Doughnut, Line } from "react-chartjs-2";
 import { faEye, faGlobe, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { Data as StatisticData, StatInfo, Country } from "./api/info/statistic";
 import { Data as AnalyticsData, Analytics } from "./api/info/analytics";
+import { config } from "@fortawesome/fontawesome-svg-core";
 
 export default function Info() {
   const [date, onDateChange] = useState(new Date());
@@ -53,6 +55,35 @@ export default function Info() {
     loadStaticData(date);
     loadAnalyticsData(date);
   }, []);
+
+  const infoUsers = useSpring({
+    reset: false,
+    from: {
+      value: 0,
+      gain: 0,
+    },
+    to: infoData.users,
+    delay: 200,
+  });
+
+  const infoViews = useSpring({
+    reset: false,
+    from: {
+      value: 0,
+      gain: 0,
+    },
+    to: infoData.views,
+    delay: 200,
+  });
+
+  const infoCountries = useSpring({
+    reset: false,
+    from: {
+      value: 0,
+    },
+    to: { value: infoData.countries },
+    delay: 200,
+  });
 
   function loadStaticData(date: Date) {
     fetch(
@@ -103,20 +134,23 @@ export default function Info() {
         <div className="card-group mt-2 mb-4">
           <CardStat
             title="New users"
-            value={infoData.users.value}
-            gain={infoData.users.gain}
+            value={infoUsers.value}
+            gain={infoUsers.gain}
+            goal={infoData.users.gain}
             icon={faUserPlus}
           />
           <CardStat
             title="Views"
-            value={infoData.views.value}
-            gain={infoData.views.gain}
+            value={infoViews.value}
+            gain={infoViews.gain}
+            goal={infoData.views.gain}
             icon={faEye}
           />
           <CardStat
             title="Countries"
-            value={infoData.countries}
+            value={infoCountries.value}
             icon={faGlobe}
+            goal={0}
           />
         </div>
 

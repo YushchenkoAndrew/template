@@ -34,8 +34,8 @@ export default function handler(
   res.status(200).json({
     stat: "OK",
     info: {
-      users: { value: 55, gain: -64 },
-      views: { value: 55, gain: 64 },
+      users: { value: 25, gain: -64 },
+      views: { value: 155, gain: 64 },
       countries: 55,
     },
     map: [
