@@ -2,10 +2,12 @@ import React from "react";
 import styles from "./CardStat.module.css";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { animated, SpringValue } from "react-spring";
 
 export interface CardStatProps {
-  value: number;
-  gain?: number;
+  value: SpringValue<number>;
+  gain?: SpringValue<number>;
+  goal: number;
   title: string;
   icon: IconProp;
 }
@@ -17,19 +19,23 @@ export default function CardStat(props: CardStatProps) {
         <div className="d-flex d-lg-flex d-md-block align-items-center">
           <div>
             <div className="d-inline-flex align-items-center">
-              <h2 className="text-dark mb-1 font-weight-medium">
-                {props.value}
-              </h2>
+              <animated.h2 className="text-dark mb-1 font-weight-medium">
+                {props.value.to((n) => n.toFixed(0))}
+              </animated.h2>
               {props.gain ? (
-                <span
+                <animated.span
                   className={`badge ${
-                    props.gain > 0 ? "bg-primary" : "bg-danger"
+                    props.goal > 0
+                      ? "bg-primary"
+                      : props.goal < 0
+                      ? "bg-danger"
+                      : 0
                   } font-12 text-white font-weight-medium badge-pill ml-2 d-lg-block d-md-none`}
                 >
-                  {props.gain > 0
-                    ? `+${props.gain.toFixed(2)}%`
-                    : `${props.gain.toFixed(2)}%`}
-                </span>
+                  {props.gain.to((n) =>
+                    n > 0 ? `+${n.toFixed(2)}%` : `${n.toFixed(2)}%`
+                  )}
+                </animated.span>
               ) : null}
             </div>
 
