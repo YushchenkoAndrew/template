@@ -27,7 +27,7 @@ export default function ReactionDiffusion() {
       <DefaultFooter name="Reaction Diffusion">
         <DefaultProjectInfo
           href="https://github.com/YushchenkoAndrew/template/tree/master/CDump/ReactionDiffusion"
-          description="A simulation of chemical reaction, which is based on some certain rules. It's using a Gray-Scott model.
+          description="A simulation of chemical reaction, which is based on Cellular automaton rules. It's using a Gray-Scott model.
           Just click on the canvas!!"
         />
       </DefaultFooter>
