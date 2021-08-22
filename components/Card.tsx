@@ -25,6 +25,9 @@ export default function Card(props: CardProps) {
     document.addEventListener("scroll", () =>
       setOffset({ top: -1, left: -1 } as DOMRect)
     );
+
+    // FIXME: Kinda strange bug with resize window
+    window.onresize = () => setOffset({ top: -1, left: -1 } as DOMRect);
   }, []);
 
   function showElement(x: number, y: number) {
@@ -44,7 +47,7 @@ export default function Card(props: CardProps) {
       className="card overflow-hidden"
       ref={(el) =>
         el && offset.top == -1 && offset.left == -1
-          ? setOffset(el?.getBoundingClientRect())
+          ? setOffset(el.getBoundingClientRect())
           : null
       }
       onMouseEnter={(e) =>

@@ -10,7 +10,7 @@ export default function DefaultHead(props: DefaultHeadProps) {
     <Head>
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-      <link rel="icon" href="/favicon.ico" />
+      <link rel="icon" href="/projects/favicon.ico" />
       <meta charSet="utf-8" />
 
       <meta name="description" content="Site with projects examples" />
