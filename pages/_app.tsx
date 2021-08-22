@@ -24,7 +24,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           as="font"
           crossOrigin=""
         />
-        <link rel="icon" href="/projects/favicon.ico" />
+        <script defer src="/projects/js/lib/md5.js"></script>
+        <script defer src="/projects/js/lib/ip.min.js"></script>
       </Head>
       <Component {...pageProps} />
     </>
