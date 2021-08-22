@@ -171,7 +171,7 @@ export default function Info() {
             <Card title="Visited Country">
               <div className="d-flex justify-content-center">
                 <WorldMap
-                  color="#2a65db"
+                  color="#007bff"
                   size={chartSize.size}
                   data={mapData}
                 />
@@ -211,8 +211,8 @@ export default function Info() {
                   datasets: [
                     {
                       data: doughnutData,
-                      backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-                      hoverBackgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
+                      backgroundColor: ["#ff6384", "#007bff", "#ffce56"],
+                      hoverBackgroundColor: ["#ff6384", "#007bff", "#ffce56"],
                     },
                   ],
                 }}

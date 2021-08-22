@@ -3,3 +3,7 @@
   -webkit-box-shadow: 0 3px 9px 0 rgb(169 184 200 / 15%);
   -moz-box-shadow: 0 3px 9px 0 rgba(169, 184, 200, 0.15);
 }
+
+.bg-primary {
+  background-color: #000;
+}
