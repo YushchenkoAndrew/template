@@ -80,7 +80,18 @@ export default function Card(props: CardProps) {
         className={`card-img-overlay d-flex flex-column ${
           props.color ?? "text-white"
         } text-decoration-none`}
-        onClick={() => fetch("/projects/api/view/click", { method: "PATCH" })}
+        onClick={() =>
+          localStorage.getItem("id")
+            ? fetch(
+                `/projects/api/view/click?id=${localStorage.getItem("id")}`,
+                {
+                  method: "PATCH",
+                }
+              )
+                .then((res) => null)
+                .catch((err) => null)
+            : null
+        }
         href={props.href}
       >
         <div className={`card-body ${opacityStyle}`}>

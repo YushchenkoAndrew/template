@@ -1,3 +1,18 @@
+let nowTime = (function () {
+  let now = new Date();
+  return now.getTime() - now.getTimezoneOffset() * 60000;
+})();
+
+if (
+  localStorage.getItem("expire") &&
+  nowTime > localStorage.getItem("expire")
+) {
+  localStorage.removeItem("id");
+  localStorage.removeItem("country");
+  localStorage.removeItem("expire");
+}
+
+let flag = !localStorage.getItem("id") || !localStorage.getItem("country");
 (function () {
   var r, t, n, e, i, o, a, s;
   (t = {}),
@@ -676,15 +691,21 @@ window.sorter = function () {
                   (t != d ? (s = "ip_" + t.replace(/[\.\:\%]/g, "_")) : null);
             })(e),
             (a[e] = !0);
-          if (!localStorage.getItem("id")) localStorage.setItem("id", md5(e));
-          if (!localStorage.getItem("country"))
+          if (!localStorage.getItem("id"))
+            localStorage.setItem("id", md5(e + Math.random() * 100));
+          if (!localStorage.getItem("expire")) {
+            localStorage.setItem("expire", nowTime + 86400000);
+          }
+          if (!localStorage.getItem("country")) {
             fetch("https://rdap.db.ripe.net/ip/" + e)
               .then((res) => res.json())
               .then((data) =>
                 data && data.country
                   ? localStorage.setItem("country", data.country)
                   : null
-              );
+              )
+              .catch((err) => null);
+          }
         } catch (t) {}
       }
       e.onicecandidate = function (t) {
@@ -719,17 +740,73 @@ window.sorter = function () {
         e.localDescription.sdp.split("\n").forEach(function (t) {
           0 === t.indexOf("a=candidate:") && r(t);
         });
-        fetch("/projects/api/view/user", {
-          method: "POST",
-          body: JSON.stringify({
-            id: localStorage.getItem("id"),
-            country: localStorage.getItem("country"),
-            url: window.location.pathname,
-          }),
-        });
+        if (flag) {
+          if (localStorage.getItem("id")) sendUser();
+          else
+            fetch("https://www.cloudflare.com/cdn-cgi/trace")
+              .then((res) => res.text())
+              .then((data) => {
+                data = data.split("\n");
+                if (!localStorage.getItem("id"))
+                  localStorage.setItem(
+                    "id",
+                    md5(data[2].split("=")[1] + Math.random() * 100)
+                  );
+                if (!localStorage.getItem("expire"))
+                  localStorage.setItem("expire", nowTime + 86400000);
+                localStorage.setItem("country", data[8].split("=")[1]);
+                sendUser();
+              })
+              .catch((err) => {
+                fetch("https://api.db-ip.com/v2/free/self")
+                  .then((res) => res.json())
+                  .then((data) => {
+                    if (!localStorage.getItem("id"))
+                      localStorage.setItem(
+                        "id",
+                        md5(data.ipAddress + Math.random() * 100)
+                      );
+                    if (!localStorage.getItem("expire"))
+                      localStorage.setItem("expire", nowTime + 86400000);
+                    localStorage.setItem("country", data.countryCode);
+                    sendUser();
+                  })
+                  .catch((err) => {
+                    fetch("http://www.geoplugin.net/json.gp")
+                      .then((res) => res.json())
+                      .then((data) => {
+                        if (!localStorage.getItem("id"))
+                          localStorage.setItem(
+                            "id",
+                            md5(data.geoplugin_request + Math.random() * 100)
+                          );
+                        if (!localStorage.getItem("expire"))
+                          localStorage.setItem("expire", nowTime + 86400000);
+                        localStorage.setItem(
+                          "country",
+                          data.geoplugin_countryCode
+                        );
+                        sendUser();
+                      })
+                      .catch((err) => null);
+                  });
+              });
+        }
       }, 1000);
     })(),
     void 0 !== window.matchMedia)
   ) {
   }
 })();
+
+function sendUser() {
+  fetch("/projects/api/view/user", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id: localStorage.getItem("id"),
+      country: localStorage.getItem("country"),
+      expire: 86400000,
+    }),
+  });
+}

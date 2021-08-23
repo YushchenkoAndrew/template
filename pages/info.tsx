@@ -12,7 +12,6 @@ import { Doughnut, Line } from "react-chartjs-2";
 import { faEye, faGlobe, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { Data as StatisticData, StatInfo, Country } from "./api/info/statistic";
 import { Data as AnalyticsData, Analytics } from "./api/info/analytics";
-import { config } from "@fortawesome/fontawesome-svg-core";
 
 export default function Info() {
   const [date, onDateChange] = useState(new Date());
@@ -54,7 +53,7 @@ export default function Info() {
   useEffect(() => {
     loadStaticData(date);
     loadAnalyticsData(date);
-  }, []);
+  }, [date]);
 
   const infoUsers = useSpring({
     reset: false,
@@ -91,14 +90,15 @@ export default function Info() {
         date.getTime() - date.getTimezoneOffset() * 60000
       )
         .toISOString()
-        .slice(0, 10)}`
+        .slice(0, 10)}&id=${localStorage.getItem("id")}`
     )
       .then((res) => res.json())
       .then((data: StatisticData) => {
         if (data.stat !== "OK") return;
         onMapLoad(data.map);
         onInfoLoad(data.info);
-      });
+      })
+      .catch((err) => null);
   }
 
   function loadAnalyticsData(date: Date) {
@@ -107,7 +107,7 @@ export default function Info() {
         date.getTime() - date.getTimezoneOffset() * 60000
       )
         .toISOString()
-        .slice(0, 10)}`
+        .slice(0, 10)}&id=${localStorage.getItem("id")}`
     )
       .then((res) => res.json())
       .then((data: AnalyticsData) => {
@@ -119,7 +119,8 @@ export default function Info() {
           data.doughnut.cr_media,
           data.doughnut.cr_projects,
         ]);
-      });
+      })
+      .catch((err) => null);
   }
 
   return (

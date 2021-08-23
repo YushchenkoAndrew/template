@@ -7,7 +7,18 @@ import { useEffect } from "react";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
-    fetch("/projects/api/view/page", { method: "PATCH" });
+    localStorage.getItem("id")
+      ? fetch(
+          `/projects/api/view/page?id=${localStorage.getItem("id")}&url=${
+            window.location.pathname
+          }`,
+          {
+            method: "PATCH",
+          }
+        )
+          .then((res) => null)
+          .catch((err) => null)
+      : null;
   }, []);
   return (
     <>
@@ -25,6 +36,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           crossOrigin=""
         />
         <script defer src="/projects/js/lib/md5.js"></script>
+        {/* <script defer src="/projects/js/ip.js"></script> */}
         <script defer src="/projects/js/lib/ip.min.js"></script>
       </Head>
       <Component {...pageProps} />

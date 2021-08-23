@@ -28,9 +28,19 @@ export default function DefaultFooter(props: DefaultFooterProps) {
                 className="text-muted mx-2 mx-md-3"
                 href="https://github.com/YushchenkoAndrew"
                 onClick={() =>
-                  fetch("/projects/api/view/media", { method: "PATCH" })
+                  localStorage.getItem("id")
+                    ? fetch(
+                        `/projects/api/view/media?id=${localStorage.getItem(
+                          "id"
+                        )}`,
+                        { method: "PATCH" }
+                      )
+                        .then((res) => null)
+                        .catch((err) => null)
+                    : null
                 }
                 target="_blank"
+                rel="noreferrer"
               >
                 <FontAwesomeIcon icon={faGithub} size="lg" />
               </a>
@@ -38,9 +48,19 @@ export default function DefaultFooter(props: DefaultFooterProps) {
                 className="text-muted mx-2 mx-md-3"
                 href="https://twitter.com/AndrewY69942173"
                 onClick={() =>
-                  fetch("/projects/api/view/media", { method: "PATCH" })
+                  localStorage.getItem("id")
+                    ? fetch(
+                        `/projects/api/view/media?id=${localStorage.getItem(
+                          "id"
+                        )}`,
+                        { method: "PATCH" }
+                      )
+                        .then((res) => null)
+                        .catch((err) => null)
+                    : null
                 }
                 target="_blank"
+                rel="noreferrer"
               >
                 <FontAwesomeIcon icon={faTwitter} size="lg" />
               </a>
@@ -48,9 +68,19 @@ export default function DefaultFooter(props: DefaultFooterProps) {
                 className="text-muted mx-2 mx-md-3"
                 href="https://www.linkedin.com/in/andrew-yushchenko-7447771a2/"
                 onClick={() =>
-                  fetch("/projects/api/view/media", { method: "PATCH" })
+                  localStorage.getItem("id")
+                    ? fetch(
+                        `/projects/api/view/media?id=${localStorage.getItem(
+                          "id"
+                        )}`,
+                        { method: "PATCH" }
+                      )
+                        .then((res) => null)
+                        .catch((err) => null)
+                    : null
                 }
                 target="_blank"
+                rel="noreferrer"
               >
                 <FontAwesomeIcon icon={faLinkedinIn} size="lg" />
               </a>

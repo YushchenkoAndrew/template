@@ -23,26 +23,44 @@ export default function DefaultProjectInfo(props: DefaultProjectInfoProps) {
         <a
           className="font-weight-bold"
           href={props.href}
-          onClick={() => fetch("/projects/api/view/media", { method: "PATCH" })}
+          onClick={() =>
+            localStorage.getItem("id")
+              ? fetch(
+                  `/projects/api/view/media?id=${localStorage.getItem("id")}`,
+                  { method: "PATCH" }
+                )
+                  .then((res) => null)
+                  .catch((err) => null)
+              : null
+          }
           target="_blank"
+          rel="noreferrer"
         >
           Github{props.lang ? ` (${props.lang})` : ""}
         </a>
         {props.links
-          ? props.links.map((item) => (
-              <>
-                {" "}
-                <a
-                  className="font-weight-bold"
-                  href={item.href}
-                  onClick={() =>
-                    fetch("/projects/api/view/media", { method: "PATCH" })
-                  }
-                  target="_blank"
-                >
-                  Github{item.lang ? ` (${item.lang})` : ""}
-                </a>
-              </>
+          ? props.links.map((item, key) => (
+              <a
+                className="font-weight-bold ml-1"
+                href={item.href}
+                key={key}
+                onClick={() =>
+                  localStorage.getItem("id")
+                    ? fetch(
+                        `/projects/api/view/media?id=${localStorage.getItem(
+                          "id"
+                        )}`,
+                        { method: "PATCH" }
+                      )
+                        .then((res) => null)
+                        .catch((err) => null)
+                    : null
+                }
+                target="_blank"
+                rel="noreferrer"
+              >
+                Github{item.lang ? ` (${item.lang})` : ""}
+              </a>
             ))
           : null}
       </p>

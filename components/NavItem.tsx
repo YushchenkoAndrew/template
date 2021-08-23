@@ -37,7 +37,18 @@ export default function NavItem(props: NavItemProps) {
         className={
           props.style ?? `${styles["nav-link"]} ${effect["glitch-rgb"]}`
         }
-        onClick={() => fetch("/projects/api/view/click", { method: "PATCH" })}
+        onClick={() =>
+          localStorage.getItem("id")
+            ? fetch(
+                `/projects/api/view/click?id=${localStorage.getItem("id")}`,
+                {
+                  method: "PATCH",
+                }
+              )
+                .then((res) => null)
+                .catch((err) => null)
+            : null
+        }
         target={props.target ?? "_self"}
         data-glitch={name}
       >
