@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { DefaultRes, Stat as StatMessage } from "../ping";
 
+type QueryParams = { date: string };
+
 export type Country = { country: string; value: number };
 export type Stat = { value: number; gain: number };
 export type StatInfo = { users: Stat; views: Stat; countries: number };
@@ -21,11 +23,11 @@ export default function handler(
       .json({ stat: "ERR", message: "Request handler not found" });
   }
 
-  let { date } = req.query;
+  let { date } = req.query as QueryParams;
   if (!date) {
     return res
       .status(400)
-      .json({ stat: "ERR", message: "Date is not declared!" });
+      .json({ stat: "ERR", message: "Not all Query params are declared!" });
   }
 
   // TODO: Get data from API

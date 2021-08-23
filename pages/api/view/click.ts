@@ -1,5 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { DefaultRes } from "../ping";
+import redis from "../../../config/redis";
+
+type QueryParams = { id: string };
 
 export default function handler(
   req: NextApiRequest,
@@ -11,10 +14,22 @@ export default function handler(
       .json({ stat: "ERR", message: "Request handler not found" });
   }
 
-  // TODO: Send to API
-  console.log("click++");
+  if (!req.query["id"]) {
+    return res
+      .status(400)
+      .json({ stat: "ERR", message: "Incorrect query params" });
+  }
+
   res.status(200).json({
     stat: "OK",
     message: "Success",
+  });
+
+  let { id } = req.query as QueryParams;
+  redis.get(id, (err, reply) => {
+    if (err || !reply) return;
+
+    // TODO: Send to API
+    console.log(`id=${id} country=${reply} click++`);
   });
 }
