@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import GeoJSON from "geojson";
 import { geoMercator, geoPath } from "d3-geo";
 import { PathTooltip } from "react-path-tooltip";
@@ -68,19 +68,15 @@ const CHeightRatio = 3 / 4;
 
 export const WorldMap: React.FC<IProps> = (props: IProps) => {
   // calculate window width
-  const updateWindowWidth = () => {
-    const [width, setWidth] = React.useState(0);
-    React.useEffect(() => {
-      const updateWidth = () => {
-        setWidth(window.innerWidth);
-      };
-      window.addEventListener("resize", updateWidth);
-      updateWidth();
-      return () => window.removeEventListener("resize", updateWidth);
-    }, []);
-    return width;
-  };
-  const windowWidth = updateWindowWidth();
+  const [windowWidth, setWidth] = useState(0);
+  useEffect(() => {
+    const updateWidth = () => {
+      setWidth(window.innerWidth);
+    };
+    window.addEventListener("resize", updateWidth);
+    updateWidth();
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
 
   // get input size
   const size = typeof props.size !== "undefined" ? props.size : "sm";

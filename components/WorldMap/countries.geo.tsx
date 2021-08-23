@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-export default {
+const countries = {
   features: [
     {
       N: "Fiji",
@@ -12166,4 +12166,5 @@ export default {
     },
   ],
 };
+export default countries;
 /* eslint-disable max-len */
