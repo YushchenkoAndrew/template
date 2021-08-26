@@ -31,5 +31,6 @@ export default function handler(
 
     // TODO: Send to API
     console.log(`id=${id} url=${url} country=${reply} page++`);
+    redis.hincrby("Info:Sum", "Views", 1);
   });
 }

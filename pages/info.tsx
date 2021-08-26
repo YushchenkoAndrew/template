@@ -114,6 +114,8 @@ export default function Info() {
         if (data.stat !== "OK") return;
         onLineLoad(data.line);
         onLabelsLoad(data.days);
+
+        // TODO: Maybe sort value for showing specific colors more
         onDoughnutLoad([
           data.doughnut.ctr,
           data.doughnut.cr_media,

@@ -31,5 +31,6 @@ export default function handler(
 
     // TODO: Send to API
     console.log(`id=${id} country=${reply} media++`);
+    redis.hincrby("Info:Sum", "Media", 1);
   });
 }

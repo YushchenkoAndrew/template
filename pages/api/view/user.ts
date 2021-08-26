@@ -26,6 +26,7 @@ export default function handler(
 
   redis.set(id, country);
   redis.expire(id, expire);
+  redis.hincrby("Info:Sum", "Visitors", 1);
 
   res.status(200).json({
     stat: "OK",
