@@ -30,6 +30,9 @@ export default function handler(
   Promise.all([
     new Promise((resolve, reject) => {
       redis.hgetall("Info:Stat", (err, reply) => {
+        // FIXME: Change this!!!
+        // FIXME: Save curr data + prev data!!!
+
         if (!err && reply) {
           return resolve({
             users: { value: +reply.userValue, gain: +reply.userGain },

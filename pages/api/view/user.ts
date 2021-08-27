@@ -10,6 +10,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!id || !country || !expire) return res.status(400);
   res.status(204);
 
+  // TODO: Save countries
   console.log("user ");
   console.log(req.body as User);
 
