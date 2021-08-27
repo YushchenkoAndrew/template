@@ -1,10 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-
-export type Stat = "OK" | "ERR";
-export type DefaultRes = {
-  stat: Stat;
-  message: string;
-};
+import { DefaultRes } from "../../types/request";
 
 export default function handler(
   req: NextApiRequest,

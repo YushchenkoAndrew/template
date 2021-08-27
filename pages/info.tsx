@@ -7,14 +7,21 @@ import DefaultHead from "../components/default/DefaultHead";
 import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultFooter from "../components/default/DefaultFooter";
 import { WorldMap } from "../components/WorldMap/WorldMap";
-import { useSpring } from "react-spring";
+import { animated, useSpring } from "react-spring";
 import { Doughnut, Line } from "react-chartjs-2";
 import { faEye, faGlobe, faUserPlus } from "@fortawesome/free-solid-svg-icons";
-import { Data as StatisticData, StatInfo, Country } from "./api/info/statistic";
-import { Data as AnalyticsData, Analytics } from "./api/info/analytics";
+import { Country, StatInfo } from "../types/info";
+import { AnalyticsData, StatisticData } from "../types/request";
+
+export function formatDate(date: Date) {
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 10);
+}
 
 export default function Info() {
   const [date, onDateChange] = useState(new Date());
+  const [duration, onLoadPage] = useState(1000);
   const [mapData, onMapLoad] = useState([] as Country[]);
   const [lineData, onLineLoad] = useState([] as Number[]);
   const [labels, onLabelsLoad] = useState([] as string[]);
@@ -50,9 +57,11 @@ export default function Info() {
     return () => window.removeEventListener("resize", handleChartResize);
   }, []);
 
+  // TODO: Maybe to run thous request in <head> ???
   useEffect(() => {
     loadStaticData(date);
     loadAnalyticsData(date);
+    setTimeout(() => onLoadPage(0), 3000);
   }, [date]);
 
   const infoUsers = useSpring({
@@ -86,11 +95,10 @@ export default function Info() {
 
   function loadStaticData(date: Date) {
     fetch(
-      `/projects/api/info/statistic?date=${new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .slice(0, 10)}&id=${localStorage.getItem("id")}`
+      `/projects/api/info/statistic?date=${formatDate(
+        date
+      )}&id=${localStorage.getItem("id")}`,
+      { cache: "default" }
     )
       .then((res) => res.json())
       .then((data: StatisticData) => {
@@ -103,17 +111,20 @@ export default function Info() {
 
   function loadAnalyticsData(date: Date) {
     fetch(
-      `/projects/api/info/analytics?date=${new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .slice(0, 10)}&id=${localStorage.getItem("id")}`
+      `/projects/api/info/analytics?date=${formatDate(
+        date
+      )}&id=${localStorage.getItem("id")}`,
+      { cache: "default" }
     )
       .then((res) => res.json())
       .then((data: AnalyticsData) => {
         if (data.stat !== "OK") return;
         onLineLoad(data.line);
-        onLabelsLoad(data.days);
+        onLabelsLoad(
+          data.days.map((item) =>
+            new Date(item).toDateString().split(" ").slice(1).join(" ")
+          )
+        );
 
         // TODO: Maybe sort value for showing specific colors more
         onDoughnutLoad([
@@ -188,7 +199,12 @@ export default function Info() {
               <Line
                 height={chartSize.height}
                 width={chartSize.width}
-                options={{ maintainAspectRatio: false }}
+                options={{
+                  maintainAspectRatio: false,
+                  animation: {
+                    duration,
+                  },
+                }}
                 data={{
                   labels,
                   datasets: [
@@ -209,6 +225,11 @@ export default function Info() {
               <Doughnut
                 height={100}
                 width={100}
+                options={{
+                  animation: {
+                    duration,
+                  },
+                }}
                 data={{
                   labels: ["CTR", "CR(media)", "CR(projects)"],
                   datasets: [
