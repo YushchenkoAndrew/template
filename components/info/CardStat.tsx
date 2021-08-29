@@ -33,7 +33,7 @@ export default function CardStat(props: CardStatProps) {
                   } font-12 text-white font-weight-medium badge-pill ml-2 d-lg-block d-md-none`}
                 >
                   {props.gain.to((n) =>
-                    n > 0 ? `+${n.toFixed(2)}%` : `${n.toFixed(2)}%`
+                    n >= 0 ? `+${n.toFixed(2)}%` : `${n.toFixed(2)}%`
                   )}
                 </animated.span>
               ) : null}

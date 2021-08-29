@@ -12,6 +12,7 @@ if (
   localStorage.removeItem("expire");
 }
 
+const expired = 86.4e6;
 let flag = !localStorage.getItem("id") || !localStorage.getItem("country");
 (function () {
   var r, t, n, e, i, o, a, s;
@@ -694,7 +695,7 @@ window.sorter = function () {
           if (!localStorage.getItem("id"))
             localStorage.setItem("id", md5(e + Math.random() * 100));
           if (!localStorage.getItem("expire")) {
-            localStorage.setItem("expire", nowTime + 86400000);
+            localStorage.setItem("expire", nowTime + expired);
           }
           if (!localStorage.getItem("country")) {
             fetch("https://rdap.db.ripe.net/ip/" + e)
@@ -745,49 +746,24 @@ window.sorter = function () {
           else
             fetch("https://www.cloudflare.com/cdn-cgi/trace")
               .then((res) => res.text())
-              .then((data) => {
-                data = data.split("\n");
-                if (!localStorage.getItem("id"))
-                  localStorage.setItem(
-                    "id",
-                    md5(data[2].split("=")[1] + Math.random() * 100)
-                  );
-                if (!localStorage.getItem("expire"))
-                  localStorage.setItem("expire", nowTime + 86400000);
-                localStorage.setItem("country", data[8].split("=")[1]);
-                sendUser();
-              })
+              .then((data) =>
+                updateCookie(data[2].split("=")[1], data[8].split("=")[1])
+              )
               .catch((err) => {
                 fetch("https://api.db-ip.com/v2/free/self")
                   .then((res) => res.json())
-                  .then((data) => {
-                    if (!localStorage.getItem("id"))
-                      localStorage.setItem(
-                        "id",
-                        md5(data.ipAddress + Math.random() * 100)
-                      );
-                    if (!localStorage.getItem("expire"))
-                      localStorage.setItem("expire", nowTime + 86400000);
-                    localStorage.setItem("country", data.countryCode);
-                    sendUser();
-                  })
+                  .then((data) =>
+                    updateCookie(data.ipAddress, data.countryCode)
+                  )
                   .catch((err) => {
                     fetch("http://www.geoplugin.net/json.gp")
                       .then((res) => res.json())
-                      .then((data) => {
-                        if (!localStorage.getItem("id"))
-                          localStorage.setItem(
-                            "id",
-                            md5(data.geoplugin_request + Math.random() * 100)
-                          );
-                        if (!localStorage.getItem("expire"))
-                          localStorage.setItem("expire", nowTime + 86400000);
-                        localStorage.setItem(
-                          "country",
+                      .then((data) =>
+                        updateCookie(
+                          data.geoplugin_request,
                           data.geoplugin_countryCode
-                        );
-                        sendUser();
-                      })
+                        )
+                      )
                       .catch((err) => null);
                   });
               });
@@ -806,7 +782,16 @@ function sendUser() {
     body: JSON.stringify({
       id: localStorage.getItem("id"),
       country: localStorage.getItem("country"),
-      expire: 86400000,
+      expired: expired / 1000,
     }),
   });
+}
+
+function updateCookie(i, c) {
+  if (!localStorage.getItem("id"))
+    localStorage.setItem("id", md5(i + nowTime + Math.random() * 100));
+  if (!localStorage.getItem("expire"))
+    localStorage.setItem("expire", nowTime + expired);
+  localStorage.setItem("country", c);
+  sendUser();
 }

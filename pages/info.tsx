@@ -106,7 +106,7 @@ export default function Info() {
         onMapLoad(data.map);
         onInfoLoad(data.info);
       })
-      .catch((err) => null);
+      .catch((err) => {});
   }
 
   function loadAnalyticsData(date: Date) {
@@ -133,7 +133,7 @@ export default function Info() {
           data.doughnut.cr_projects,
         ]);
       })
-      .catch((err) => null);
+      .catch((err) => {});
   }
 
   return (
