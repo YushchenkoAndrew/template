@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../../config/redis";
-import { ApiReq, WorldData } from "../../../types/api";
-import { Country, StatInfo } from "../../../types/info";
+import { ApiReq, InfoData, WorldData } from "../../../types/api";
+import { Country, DayStat, StatInfo } from "../../../types/info";
 import { DefaultRes, StatisticData } from "../../../types/request";
+import { formatDate } from "../../info";
 
 const apiURL =
   process.env.NODE_ENV == "production"
@@ -27,42 +28,80 @@ export default function handler(
       .json({ stat: "ERR", message: "Not all Query params are declared!" });
   }
 
+  let prev = new Date(date);
+  prev.setDate(prev.getDate() - 7);
+
+  const now = formatDate(new Date());
   Promise.all([
     new Promise((resolve, reject) => {
-      redis.hgetall("Info:Stat", (err, reply) => {
-        // FIXME: Change this!!!
-        // FIXME: Save curr data + prev data!!!
-
-        if (!err && reply) {
+      redis.hgetall("Info:Now", (err, reply) => {
+        if (!err && reply && date == now) {
           return resolve({
-            users: { value: +reply.userValue, gain: +reply.userGain },
-            views: { value: +reply.viewsValue, gain: +reply.viewsGain },
-            countries: +reply.countries,
+            Visitors: +reply.Visitors,
+            Views: +reply.Views,
           });
         }
 
-        fetch(`http://${apiURL}/api/info/sum`)
+        fetch(`http://${apiURL}/api/info?created_at=${date}`)
           .then((res) => res.json())
           .then((res: ApiReq) => {
-            const result = res.result.pop();
-            if (!res.items || !result || res.status == "ERR")
-              return reject("Idk some thing wrong with back-end");
+            if (res.status == "ERR") {
+              return reject("Idk something wrong happened at the backend");
+            }
+            const result = res.result.pop() as InfoData | undefined;
 
-            // TODO:
-            // redis.hmset("Info:Sum", {
-            //   Clicks: result.Clicks.toString(),
-            //   Media: result.Media.toString(),
-            //   Views: result.Views.toString(),
-            //   Visitors: result.Visitors.toString(),
-            // });
+            // Check if the date if current one, if so load the data
+            if (date == now) {
+              redis.hmset("Info:Now", {
+                Visitors: result?.Visitors ?? 0,
+                Views: result?.Views ?? 0,
+                Clicks: result?.Clicks ?? 0,
+                Media: result?.Media ?? 0,
+              });
 
-            // TODO: Cron job to send update to back
+              // Save countries that visited today
+              if (result) {
+                result.Countries.split(",").map((item) =>
+                  redis.lpush("Info:Countries", item)
+                );
+              }
+            }
 
-            // FIXME:
             return resolve({
-              users: { value: 25, gain: -64 },
-              views: { value: 155, gain: 64 },
-              countries: 55,
+              Visitors: result?.Visitors ?? 0,
+              Views: result?.Views ?? 0,
+            });
+          })
+          .catch((err) => reject(err));
+      });
+    }),
+    new Promise((resolve, reject) => {
+      redis.hgetall("Info:Prev", (err, reply) => {
+        if (!err && reply && date == now) {
+          return resolve({
+            Visitors: +reply.Visitors,
+            Views: +reply.Views,
+          });
+        }
+
+        fetch(`http://${apiURL}/api/info?created_at=${formatDate(prev)}`)
+          .then((res) => res.json())
+          .then((res: ApiReq) => {
+            if (res.status == "ERR") {
+              return reject("Idk something wrong happened at the backend");
+            }
+            const result = res.result.pop() as InfoData | undefined;
+
+            if (date == now) {
+              redis.hmset("Info:Prev", {
+                Visitors: result?.Visitors ?? 0,
+                Views: result?.Views ?? 0,
+              });
+            }
+
+            return resolve({
+              Visitors: result?.Visitors ?? 0,
+              Views: result?.Views ?? 0,
             });
           })
           .catch((err) => reject(err));
@@ -72,23 +111,20 @@ export default function handler(
       redis.get("Info:Country", (err, reply) => {
         if (!err && reply) return resolve(JSON.parse(reply));
 
-        let prev = new Date(date);
-        prev.setDate(prev.getDate() - 7);
-
-        fetch(`http://${apiURL}/api/world`)
+        fetch(`http://${apiURL}/api/world?page=-1`)
           .then((res) => res.json())
           .then((res: ApiReq) => {
-            console.log(res);
             if (!res.items || res.status == "ERR")
-              return reject("Idk some thing wrong with back-end");
+              return reject("Idk something wrong happened at then backend");
 
-            let result = (res.result as WorldData[]).map((item) => ({
-              country: item.Country,
-              value: item.Visitors,
-            }));
+            // Need this just to decrease space usage in RAM
+            let result = {} as { [country: string]: number };
+            (res.result as WorldData[]).forEach(
+              (item) => (result[item.Country] = item.Visitors)
+            );
 
-            // redis.set("Info:Days", JSON.stringify(result));
-            // redis.expire("Info:Days", 2 * 60 * 60);
+            redis.set("Info:World", JSON.stringify(result));
+            redis.expire("Info:World", 2 * 60 * 60);
             return resolve(result);
           })
           .catch((err) => reject(err));
@@ -96,35 +132,32 @@ export default function handler(
     }),
   ])
     .then((results) => {
-      res.status(200).json({
+      const now = results[0] as DayStat;
+      const prev = results[1] as DayStat;
+      const map = Object.entries(
+        results[2] as { [country: string]: number }
+      ).reduce((acc, [key, value]) => {
+        acc.push({ country: key, value } as Country);
+        return acc;
+      }, [] as Country[]);
+
+      return res.status(200).json({
         stat: "OK",
-        info: results[0] as StatInfo,
-        map: results[1] as Country[],
+        info: {
+          users: {
+            value: now.Visitors,
+            gain: (now.Visitors - prev.Visitors) / 100,
+          },
+          views: { value: now.Views, gain: (now.Views - prev.Views) / 100 },
+          countries: map.length,
+        },
+        map,
       });
     })
-    .catch((err) => console.log(err));
-
-  // TODO: Get data from API
-  console.log(date);
-
-  // res.status(200).json({
-  //   stat: "OK",
-  //   info: {
-  //     users: { value: 25, gain: -64 },
-  //     views: { value: 155, gain: 64 },
-  //     countries: 55,
-  //   },
-  //   map: [
-  //     { country: "cn", value: 1389618778 },
-  //     { country: "in", value: 1311559204 },
-  //     { country: "us", value: 331883986 },
-  //     { country: "id", value: 264935824 },
-  //     { country: "pk", value: 210797836 },
-  //     { country: "br", value: 210301591 },
-  //     { country: "ng", value: 208679114 },
-  //     { country: "bd", value: 161062905 },
-  //     { country: "RU", value: 141944641 },
-  //     { country: "mx", value: 127318112 },
-  //   ],
-  // });
+    .catch((err) =>
+      res.status(200).json({
+        stat: "ERR",
+        message: err,
+      })
+    );
 }

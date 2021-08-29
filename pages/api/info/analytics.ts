@@ -41,101 +41,91 @@ export default function handler(
   }
 
   const now = formatDate(new Date());
+  Promise.all([
+    new Promise((resolve, reject) => {
+      redis.get("Info:Stat", (err, reply) => {
+        if (!err && reply) return resolve(JSON.parse(reply));
 
-  redis.get("Info:Day", (err, prevDate) => {
-    Promise.all([
-      new Promise((resolve, reject) => {
-        redis.hgetall("Info:Sum", (err, reply) => {
-          if (!err && reply) {
-            return resolve({
-              ctr: +reply.Views ? +reply.Clicks / +reply.Views : 1,
-              cr_media: +reply.Visitors ? +reply.Media / +reply.Visitors : 1,
-              cr_projects: +reply.Visitors
-                ? +reply.Clicks / +reply.Visitors
+        fetch(`http://${apiURL}/api/info/sum`)
+          .then((res) => res.json())
+          .then((res: ApiReq) => {
+            console.log(res);
+
+            const result = res.result.pop() as InfoData;
+            if (!res.items || !result || res.status == "ERR")
+              return reject("Idk something wrong happened at the backend");
+
+            const stat = {
+              ctr: result.Views ? result.Clicks / result.Views : 1,
+              cr_media: result.Visitors ? result.Media / result.Visitors : 1,
+              cr_projects: result.Visitors
+                ? result.Clicks / result.Visitors
                 : 1,
-            });
-          }
+            };
 
-          fetch(`http://${apiURL}/api/info/sum`)
-            .then((res) => res.json())
-            .then((res: ApiReq) => {
-              const result = res.result.pop() as InfoData;
-              if (!res.items || !result || res.status == "ERR")
-                return reject("Idk some thing wrong with back-end");
+            redis.set("Info:Stat", JSON.stringify(stat));
+            redis.expire("Info:Stat", 2 * 60 * 60);
+            return resolve(stat);
+          })
+          .catch((err) => reject(err));
+      });
+    }),
+    new Promise((resolve, reject) => {
+      redis.get("Info:Days", (err, reply) => {
+        redis.set("Info:Day", date);
+        if (!err && reply && now == date) return resolve(JSON.parse(reply));
 
-              redis.hmset("Info:Sum", {
-                Clicks: result.Clicks.toString(),
-                Media: result.Media.toString(),
-                Views: result.Views.toString(),
-                Visitors: result.Visitors.toString(),
-              });
+        let prev = new Date(date);
+        prev.setDate(prev.getDate() - 7);
 
-              // TODO: Cron job to send update to back
+        fetch(
+          `http://${apiURL}/api/info/range?end=${date}&start=${formatDate(
+            prev
+          )}&orderBy=CreatedAt`
+        )
+          .then((res) => res.json())
+          .then((res: ApiReq) => {
+            if (!res.items || res.status == "ERR")
+              return reject("Idk something wrong happened at the backend");
 
-              return resolve({
-                ctr: result.Views ? result.Clicks / result.Views : 1,
-                cr_media: result.Visitors ? result.Media / result.Visitors : 1,
-                cr_projects: result.Visitors
-                  ? result.Media / result.Visitors
-                  : 1,
-              });
-            })
-            .catch((err) => reject(err));
-        });
-      }),
-      new Promise((resolve, reject) => {
-        redis.get("Info:Days", (err, reply) => {
-          redis.set("Info:Day", date);
-          if (!err && reply && prevDate == date)
-            return resolve(JSON.parse(reply));
+            // Need this just to decrease space usage in RAM
+            let result = {} as { [time: string]: number };
+            (res.result as InfoData[]).forEach(
+              (item) => (result[item.CreatedAt.split("T")[0]] = item.Visitors)
+            );
 
-          let prev = new Date(date);
-          prev.setDate(prev.getDate() - 7);
-
-          fetch(
-            `http://${apiURL}/api/info/range?end=${date}&start=${formatDate(
-              prev
-            )}&orderBy=CreatedAt`
-          )
-            .then((res) => res.json())
-            .then((res: ApiReq) => {
-              if (!res.items || res.status == "ERR")
-                return reject("Idk some thing wrong with back-end");
-
-              let result = (res.result as InfoData[]).map((item) => ({
-                time: item.CreatedAt.split("T")[0],
-                value: item.Visitors,
-              }));
-
-              redis.set("Info:Days", JSON.stringify(result));
-              redis.expire("Info:Days", 2 * 60 * 60);
+            redis.set("Info:Days", JSON.stringify(result));
+            if (
+              new Date(prev) > new Date(now) ||
+              new Date(date) < new Date(now)
+            ) {
               return resolve(result);
-            })
-            .catch((err) => reject(err));
-        });
-      }),
-    ])
-      .then((results) => {
-        if (now != date) {
-          return res
-            .status(200)
-            .json(FormData(results[0] as Analytics, results[1] as TimeLine[]));
-        }
+            }
 
-        redis.hgetall("Info:Sum", (err, reply) => {
-          if (!err && reply) {
-            (results[1] as TimeLine[]).pop();
-            (results[1] as TimeLine[]).push({
-              time: now,
-              value: +reply.Visitors,
+            // Add now values from another place in Cache
+            redis.hget("Info:Now", "Visitors", (err, reply) => {
+              if (!err && reply) result[now] = +reply;
+              resolve(result);
             });
-          }
+          })
+          .catch((err) => reject(err));
+      });
+    }),
+  ])
+    .then((results) => {
+      let timeline = Object.entries(
+        results[1] as { [time: string]: number }
+      ).reduce((acc, [key, value]) => {
+        acc.push({ time: key, value } as TimeLine);
+        return acc;
+      }, [] as TimeLine[]);
 
-          res
-            .status(200)
-            .json(FormData(results[0] as Analytics, results[1] as TimeLine[]));
-        });
+      res.status(200).json(FormData(results[0] as Analytics, timeline));
+    })
+    .catch((err) =>
+      res.status(200).json({
+        stat: "ERR",
+        message: err,
       })
-      .catch((err) => console.log(err));
-  });
+    );
 }
