@@ -15,7 +15,8 @@ OUT_NAME_GCC=project.o
 OUTPUT_EM=web
 OUT_NAME_EM=index
 
-CFLAGS_GCC=-lX11 -lGL -lpthread -lpng -lstdc++fs -std=c++17 -llua54
+LUA_FLAG=-llua54
+CFLAGS_GCC=-lX11 -lGL -lpthread -lpng -lstdc++fs -std=c++17
 LDFALGS_GCC=
 
 CFLAGS_EM=-std=c++17 -O3 --preload-file assets/
@@ -24,12 +25,12 @@ LDFALGS_EM=-s ALLOW_MEMORY_GROWTH=1 -s MAX_WEBGL_VERSION=2 -s MIN_WEBGL_VERSION=
 all:
 	if [ ! -d "./web" ]; then mkdir $(OUTPUT_EM); fi
 	if [ ! -d "./build" ]; then mkdir $(OUTPUT_GCC); fi
-	$(GCC) $(TARGET) $(INCLUDE) $(LIB) $(CFLAGS_GCC) -O3 $(EM_LDFALGS_GCC) -o $(OUTPUT_GCC)/$(OUT_NAME_GCC)
+	$(GCC) $(TARGET) $(INCLUDE) $(LIB) $(CFLAGS_GCC) $(LUA_FLAG) -O3 $(EM_LDFALGS_GCC) -o $(OUTPUT_GCC)/$(OUT_NAME_GCC)
 	$(EM_CC) $(TARGET) $(COMPILED_TARGET) $(INCLUDE) $(LIB) $(CFLAGS_EM) $(LDFALGS_EM) -o $(OUTPUT_EM)/$(OUT_NAME_EM).js
 
 debug:
 	if [ ! -d "./build" ]; then mkdir $(OUTPUT_GCC); fi
-	$(GCC) $(TARGET) $(INCLUDE) $(LIB) $(CFLAGS_GCC) -O0 -ggdb $(EM_LDFALGS_GCC) -o $(OUTPUT_GCC)/$(OUT_NAME_GCC)
+	$(GCC) $(TARGET) $(INCLUDE) $(LIB) $(CFLAGS_GCC) $(LUA_FLAG) -O0 -ggdb $(EM_LDFALGS_GCC) -o $(OUTPUT_GCC)/$(OUT_NAME_GCC)
 
 dev:
 	if [ ! -d "./web" ]; then mkdir $(OUTPUT_EM); fi
