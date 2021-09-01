@@ -1,3 +1,5 @@
+#define STEP 3.0f
+
 struct sPoint2D {
 	float x = 0.0f;
 	float y = 0.0f;
@@ -11,7 +13,7 @@ struct sPoint2D {
 struct sStick {
   sPoint2D &vStart;
   sPoint2D &vEnd;
-  float len = 10.0f;
+  float len = STEP;
 
   void Update() {
     float dx = vEnd.x - vStart.x;
@@ -32,7 +34,5 @@ struct sStick {
 
   void Draw(olc::PixelGameEngine& GameEngine) {
     GameEngine.DrawLine(vStart.x, vStart.y, vEnd.x, vEnd.y);
-
-    // GameEngine.DrawCircle(vStart.x, vStart.y, RADIUS);
   }
 };

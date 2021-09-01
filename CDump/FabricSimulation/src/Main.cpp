@@ -12,7 +12,14 @@ public:
   }
 
   bool OnUserUpdate(float fElapsedTime) override {
-    cFabric.Update(fElapsedTime);
+	  if (GetKey(olc::R).bPressed) cFabric.Reset(35, 10);
+	  if (GetKey(olc::SPACE).bPressed) bFreeze ^= true;
+
+    olc::vi2d vMouse = { -1, -1 };
+    if (GetMouse(0).bHeld) vMouse = GetMousePos();
+    // if (GetMouse(1).bHeld)  /
+
+    if (!bFreeze) cFabric.Update(fElapsedTime, vMouse);
 
     Clear(olc::BLACK);
     cFabric.Draw(*this);
@@ -22,6 +29,7 @@ public:
 private:
   Fabric cFabric;
 
+  bool bFreeze = false;
 };
 
 int main() {
