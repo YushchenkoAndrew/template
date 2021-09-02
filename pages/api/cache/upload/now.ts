@@ -1,25 +1,159 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../../../config/redis";
 import md5 from "../../../../lib/md5";
+import { ApiTokens, ApiError } from "../../../../types/api";
 import { DefaultRes } from "../../../../types/request";
+import { formatDate } from "../../../info";
+
+const apiHost =
+  process.env.NODE_ENV == "production"
+    ? `${process.env.API_HOST}:${process.env.API_PORT}`
+    : "localhost:31337";
 
 type QueryParams = { id: string };
+
+function UpdateTokens(data: ApiTokens) {
+  console.log(data);
+
+  redis.set("API:Access", data.access_token);
+  redis.set("API:Refresh", data.refresh_token);
+
+  redis.expire("API:Access", 15 * 60);
+  redis.expire("API:Refresh", 7 * 24 * 60 * 60);
+}
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<DefaultRes>
 ) {
-  if (req.method !== "POST")
+  if (req.method !== "POST") {
     return res.status(404).json({
       stat: "ERR",
       message: "Method not supported",
     });
+  }
 
-  // TODO: Add JWT or HASH authentication
+  const now = formatDate(new Date());
+  new Promise((resolve, reject) => {
+    redis.get("API:Access", (err, reply) => {
+      if (!err && reply) return resolve(reply);
 
-  console.log(md5(process.env.API_PEPPER + "54" + process.env.API_PASS));
-  res.status(200).json({
-    stat: "OK",
-    message: "",
-  });
+      // If Access token expired, then refresh token
+      redis.get("API:Refresh", (err, reply) => {
+        if (!err && reply) {
+          return fetch(`http://${apiHost}/api/refresh`, {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify({
+              refresh_token: reply,
+            }),
+          })
+            .then((res) => res.json())
+            .then((data: ApiTokens | ApiError) => {
+              if (data.stat == "ERR")
+                return reject("Incorrect refresh token value");
+
+              UpdateTokens(data as ApiTokens);
+              resolve((data as ApiTokens).access_token);
+            })
+            .catch((err) => reject(err));
+        }
+
+        // If Refresh token expired, then relogin
+        let salt = Math.round(Math.random() * 10000).toString();
+        fetch(`http://${apiHost}/api/login`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            user: process.env.API_USER ?? "",
+            pass:
+              salt +
+              "$" +
+              md5(
+                (process.env.API_PEPPER ?? "") +
+                  salt +
+                  (process.env.API_PASS ?? "")
+              ),
+          }),
+        })
+          .then((res) => res.json())
+          .then((data: ApiTokens | ApiError) => {
+            if (data.stat == "ERR") return reject("Incorrect user or pass");
+
+            UpdateTokens(data as ApiTokens);
+            resolve((data as ApiTokens).access_token);
+          })
+          .catch((err) => reject(err));
+      });
+    });
+  })
+    .then((access) => {
+      console.log(access);
+
+      redis.hgetall("Info:Now", (err, reply) => {
+        if (err || !reply) return;
+
+        redis.lrange("Info:Countries", 0, -1, (err, countries) => {
+          if (err || !countries) return;
+
+          console.log(reply);
+          console.log(countries);
+
+          // Visitor Stat Update
+          fetch(`http://${apiHost}/api/info/${now}`, {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+              Authorization: `Bear ${access}`,
+            },
+            body: JSON.stringify({
+              Countries: countries
+                .reduce(
+                  (acc, curr) => (!acc.includes(curr) ? [...acc, curr] : acc),
+                  [] as string[]
+                )
+                .join(","),
+              Views: +(reply.Views ?? 0),
+              Clicks: +(reply.Clicks ?? 0),
+              Media: +(reply.Media ?? 0),
+              Visitors: +(reply.Visitors ?? 0),
+            }),
+          })
+            .then((res) => res.json())
+            .then((data) => console.log(data))
+            .catch((err) => console.log(err));
+
+          // Visited Countries Update
+          fetch(`http://${apiHost}/api/world/${now}`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bear ${access}`,
+              "content-type": "application/json",
+            },
+            body: JSON.stringify({
+              Country: countries.join(","),
+              Visitors: +(reply.Visitors ?? 0),
+            }),
+          })
+            .then((res) => res.json())
+            .then((data) => console.log(data))
+            .catch((err) => console.log(err));
+        });
+      });
+
+      res.status(200).json({
+        stat: "OK",
+        message: "",
+      });
+    })
+    .catch((err) =>
+      res.status(200).json({
+        stat: "ERR",
+        message: err,
+      })
+    );
 }

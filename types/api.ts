@@ -1,5 +1,17 @@
 import { Stat } from "./request";
 
+export type ApiError = {
+  stat: Stat;
+  result: string[];
+  message: string;
+};
+
+export type ApiTokens = {
+  stat: Stat;
+  access_token: string;
+  refresh_token: string;
+};
+
 export type ApiReq = {
   items: number;
   result: (InfoSum | InfoData | WorldData)[];

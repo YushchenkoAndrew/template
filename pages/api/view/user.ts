@@ -21,6 +21,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     redis.expire(id, expired);
 
     redis.hincrby("Info:Now", "Visitors", 1);
+    redis.hincrby("Info:Now", "Views", 1);
     redis.lpush("Info:Countries", country);
   }, 0);
 }
