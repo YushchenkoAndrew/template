@@ -5,7 +5,7 @@ import { ApiReq, InfoData } from "../../../types/api";
 import { AnalyticsData, DefaultRes, Stat } from "../../../types/request";
 import { Analytics } from "../../../types/info";
 
-const apiURL =
+const apiHost =
   process.env.NODE_ENV == "production"
     ? `${process.env.API_HOST}:${process.env.API_PORT}`
     : "localhost:31337";
@@ -46,7 +46,7 @@ export default function handler(
       redis.get("Info:Stat", (err, reply) => {
         if (!err && reply) return resolve(JSON.parse(reply));
 
-        fetch(`http://${apiURL}/api/info/sum`)
+        fetch(`http://${apiHost}/api/info/sum`)
           .then((res) => res.json())
           .then((res: ApiReq) => {
             console.log(res);
@@ -79,7 +79,7 @@ export default function handler(
         prev.setDate(prev.getDate() - 7);
 
         fetch(
-          `http://${apiURL}/api/info/range?end=${date}&start=${formatDate(
+          `http://${apiHost}/api/info/range?end=${date}&start=${formatDate(
             prev
           )}&orderBy=CreatedAt`
         )

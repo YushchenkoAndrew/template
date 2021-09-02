@@ -5,7 +5,7 @@ import { Country, DayStat, StatInfo } from "../../../types/info";
 import { DefaultRes, StatisticData } from "../../../types/request";
 import { formatDate } from "../../info";
 
-const apiURL =
+const apiHost =
   process.env.NODE_ENV == "production"
     ? `${process.env.API_HOST}:${process.env.API_PORT}`
     : "localhost:31337";
@@ -42,7 +42,7 @@ export default function handler(
           });
         }
 
-        fetch(`http://${apiURL}/api/info?created_at=${date}`)
+        fetch(`http://${apiHost}/api/info?created_at=${date}`)
           .then((res) => res.json())
           .then((res: ApiReq) => {
             if (res.status == "ERR") {
@@ -84,7 +84,7 @@ export default function handler(
           });
         }
 
-        fetch(`http://${apiURL}/api/info?created_at=${formatDate(prev)}`)
+        fetch(`http://${apiHost}/api/info?created_at=${formatDate(prev)}`)
           .then((res) => res.json())
           .then((res: ApiReq) => {
             if (res.status == "ERR") {
@@ -111,7 +111,7 @@ export default function handler(
       redis.get("Info:Country", (err, reply) => {
         if (!err && reply) return resolve(JSON.parse(reply));
 
-        fetch(`http://${apiURL}/api/world?page=-1`)
+        fetch(`http://${apiHost}/api/world?page=-1`)
           .then((res) => res.json())
           .then((res: ApiReq) => {
             if (!res.items || res.status == "ERR")
@@ -122,6 +122,8 @@ export default function handler(
             (res.result as WorldData[]).forEach(
               (item) => (result[item.Country] = item.Visitors)
             );
+
+            // TODO: Update world record by local data
 
             redis.set("Info:World", JSON.stringify(result));
             redis.expire("Info:World", 2 * 60 * 60);
