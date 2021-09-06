@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import redis from "../../../../config/redis";
-import md5 from "../../../../lib/md5";
-import { ApiTokens, ApiError } from "../../../../types/api";
-import { DefaultRes } from "../../../../types/request";
-import { formatDate } from "../../../info";
+import redis from "../../../config/redis";
+import md5 from "../../../lib/md5";
+import { ApiTokens, ApiError } from "../../../types/api";
+import { DefaultRes } from "../../../types/request";
+import { formatDate } from "../../info";
+import { PassValidate } from "../../../lib/auth";
 
 const apiHost =
   process.env.NODE_ENV == "production"
@@ -22,15 +23,14 @@ function UpdateTokens(data: ApiTokens) {
   redis.expire("API:Refresh", 7 * 24 * 60 * 60);
 }
 
-export default function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<DefaultRes>
-) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
-    return res.status(404).json({
-      stat: "ERR",
-      message: "Method not supported",
-    });
+    return res.status(404).send("");
+  }
+
+  let key = (req.query.key ?? "") as string;
+  if (!PassValidate(key, process.env.ACCESS_KEY ?? "")) {
+    return res.status(401).send("");
   }
 
   const now = formatDate(new Date());
@@ -144,16 +144,8 @@ export default function handler(
             .catch((err) => console.log(err));
         });
       });
-
-      res.status(200).json({
-        stat: "OK",
-        message: "",
-      });
     })
-    .catch((err) =>
-      res.status(200).json({
-        stat: "ERR",
-        message: err,
-      })
-    );
+    .catch((err) => console.log(err));
+
+  res.status(204).send("");
 }
