@@ -126,7 +126,9 @@ export default function handler(
             // TODO: Update world record by local data
 
             redis.set("Info:World", JSON.stringify(result));
-            redis.expire("Info:World", 2 * 60 * 60);
+
+            // TODO: Not sure about expiring the variable
+            // redis.expire("Info:World", 2 * 60 * 60);
             return resolve(result);
           })
           .catch((err) => reject(err));
