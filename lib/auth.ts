@@ -4,9 +4,9 @@ export function PassValidate(pass: string, pass2: string) {
   for (let i = 0; i < max; i++) {
     equal =
       equal &&
-      pass2.length < i &&
-      pass.length < i &&
-      pass2.charAt(i) === pass.charAt(i);
+      i < pass2.length &&
+      i < pass.length &&
+      pass2.charAt(i) == pass.charAt(i);
   }
   return equal;
 }
