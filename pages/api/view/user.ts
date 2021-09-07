@@ -1,8 +1,35 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getValue, setValue } from "../../../lib/mutex";
 import redis from "../../../config/redis";
+import { apiHost } from "../../../config";
+import { ApiReq, WorldData } from "../../../types/api";
 
 type User = { id: string; country: string; expired: number };
+
+function finalValue(key: string) {
+  return new Promise<string>((resolve, reject) => {
+    redis.get(key, (err, reply) => {
+      // replay always will have value in this step
+      if (reply && !err) return resolve(reply ?? "");
+
+      fetch(`http://${apiHost}/api/world?page=-1`)
+        .then((res) => res.json())
+        .then((res: ApiReq) => {
+          if (!res.items || res.status == "ERR")
+            return reject("Idk something wrong happened at then backend");
+
+          // Need this just to decrease space usage in RAM
+          let result = {} as { [country: string]: number };
+          (res.result as WorldData[]).forEach(
+            (item) => (result[item.Country] = item.Visitors)
+          );
+
+          resolve(JSON.stringify(result));
+        })
+        .catch((err) => reject(err));
+    });
+  });
+}
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(404).send("");
@@ -24,8 +51,11 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     redis.hincrby("Info:Now", "Visitors", 1);
     redis.hincrby("Info:Now", "Views", 1);
 
+    // Need this for detect curr day countries
+    redis.lpush("Info:Countries", country);
+
     // Use simple mutex handler for changing variables with kubernetes & docker
-    getValue("Info:World")
+    getValue("Info:World", finalValue("Info:World"))
       .then((str: string) => {
         let data = JSON.parse(str);
         data[country] = data[country] ? data[country] + 1 : 1;

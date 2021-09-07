@@ -11,12 +11,12 @@ function finalGet(key: string) {
   });
 }
 
-export function getValue(key: string) {
+export function getValue(key: string, handler?: Promise<string>) {
   return new Promise<string>((resolve, reject) => {
     redis.get("Mutex", (err, reply) => {
       if (!reply || err) {
         redis.set("Mutex", "0");
-        finalGet(key)
+        (handler ?? finalGet(key))
           .then((res) => resolve(res))
           .catch((err) => reject(err))
           .finally(() => redis.incr("Mutex"));
@@ -28,7 +28,7 @@ export function getValue(key: string) {
             if (Number(reply) % 2 != 0) {
               // Mark that data in use
               redis.incr("Mutex");
-              finalGet(key)
+              (handler ?? finalGet(key))
                 .then((res) => resolve(res))
                 .catch((err) => reject(err))
                 .finally(() => redis.incr("Mutex"));
@@ -37,7 +37,7 @@ export function getValue(key: string) {
         }, Number(process.env.MUTEX_WAIT ?? 10));
       } else {
         redis.incr("Mutex");
-        finalGet(key)
+        (handler ?? finalGet(key))
           .then((res) => resolve(res))
           .catch((err) => reject(err))
           .finally(() => redis.incr("Mutex"));
