@@ -104,9 +104,10 @@ export default function handler(
       });
     }),
     new Promise((resolve, reject) => {
-      redis.get("Info:Country", (err, reply) => {
+      redis.get("Info:World", (err, reply) => {
         if (!err && reply) return resolve(JSON.parse(reply));
 
+        // NOTE: This will run only in the case where none of users were identified
         fetch(`http://${apiHost}/api/world?page=-1`)
           .then((res) => res.json())
           .then((res: ApiReq) => {
@@ -119,12 +120,9 @@ export default function handler(
               (item) => (result[item.Country] = item.Visitors)
             );
 
-            // TODO: Update world record by local data
-
-            redis.set("Info:World", JSON.stringify(result));
-
             // TODO: Not sure about expiring the variable
             // redis.expire("Info:World", 2 * 60 * 60);
+            redis.set("Info:World", JSON.stringify(result));
             return resolve(result);
           })
           .catch((err) => reject(err));
