@@ -3,12 +3,8 @@ import redis from "../../../config/redis";
 import { ApiReq, InfoData, WorldData } from "../../../types/api";
 import { Country, DayStat, StatInfo } from "../../../types/info";
 import { DefaultRes, StatisticData } from "../../../types/request";
+import { apiHost } from "../../../config";
 import { formatDate } from "../../info";
-
-const apiHost =
-  process.env.NODE_ENV == "production"
-    ? `${process.env.API_HOST}:${process.env.API_PORT}`
-    : "localhost:31337";
 
 type QueryParams = { date: string };
 export default function handler(

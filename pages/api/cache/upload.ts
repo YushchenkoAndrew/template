@@ -3,13 +3,9 @@ import redis from "../../../config/redis";
 import md5 from "../../../lib/md5";
 import { ApiTokens, ApiError } from "../../../types/api";
 import { DefaultRes } from "../../../types/request";
+import { apiHost } from "../../../config";
 import { formatDate } from "../../info";
 import { PassValidate } from "../../../lib/auth";
-
-const apiHost =
-  process.env.NODE_ENV == "production"
-    ? `${process.env.API_HOST}:${process.env.API_PORT}`
-    : "localhost:31337";
 
 type QueryParams = { id: string };
 
