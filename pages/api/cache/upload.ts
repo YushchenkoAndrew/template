@@ -6,6 +6,7 @@ import { DefaultRes } from "../../../types/request";
 import { apiHost } from "../../../config";
 import { formatDate } from "../../info";
 import { PassValidate } from "../../../lib/auth";
+import { getValue } from "../../../lib/mutex";
 
 type QueryParams = { id: string };
 
@@ -122,24 +123,33 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             .then((res) => res.json())
             .then((data) => console.log(data))
             .catch((err) => console.log(err));
+        });
+      });
 
-          // Visited Countries Update
-          fetch(`http://${apiHost}/api/world/${now}`, {
+      // Update World Table
+      getValue("Info:World")
+        .then((str: string) => {
+          const data = JSON.parse(str);
+          console.log(data);
+
+          fetch(`http://${apiHost}/api/world/list`, {
             method: "POST",
             headers: {
               Authorization: `Bear ${access}`,
               "content-type": "application/json",
             },
-            body: JSON.stringify({
-              Country: countries.join(","),
-              Visitors: +(reply.Visitors ?? 0),
-            }),
+            body: JSON.stringify(
+              Object.entries(data).map(([Country, Visitors]) => ({
+                Country,
+                Visitors,
+              }))
+            ),
           })
             .then((res) => res.json())
             .then((data) => console.log(data))
             .catch((err) => console.log(err));
-        });
-      });
+        })
+        .catch((err) => console.log(err));
     })
     .catch((err) => console.log(err));
 
