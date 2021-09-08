@@ -12,23 +12,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(401).send("");
   }
 
-  redis.get("Mutex", function getMutex(err, reply) {
-    // Init values
-    if (err || !reply || Number(reply) % 2 != 0) {
-      redis.set("Mutex", "1");
-      redis.set("Info:World", "{}");
-      return;
-    }
-
-    setTimeout(getMutex, Number(process.env.MUTEX_WAIT ?? 10));
-  });
-
-  redis.hmset("Info:Now", "Views", 0, "Visitors", 0, "Clicks", 0, "Media", 0);
-
-  // The best way just delete those vars
+  redis.del("Mutex");
+  redis.del("Info:Now");
   redis.del("Info:Prev");
   redis.del("Info:Stat");
   redis.del("Info:Days");
+  redis.del("Info:World");
   redis.del("Info:Countries");
 
   redis.del("API:Access");

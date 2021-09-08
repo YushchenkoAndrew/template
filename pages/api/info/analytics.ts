@@ -68,7 +68,6 @@ export default function handler(
     }),
     new Promise((resolve, reject) => {
       redis.get("Info:Days", (err, reply) => {
-        redis.set("Info:Day", date);
         if (!err && reply && now == date) return resolve(JSON.parse(reply));
 
         let prev = new Date(date);

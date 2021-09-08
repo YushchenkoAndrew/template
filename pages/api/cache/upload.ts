@@ -11,8 +11,6 @@ import { getValue } from "../../../lib/mutex";
 type QueryParams = { id: string };
 
 function UpdateTokens(data: ApiTokens) {
-  console.log(data);
-
   redis.set("API:Access", data.access_token);
   redis.set("API:Refresh", data.refresh_token);
 
@@ -89,18 +87,14 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     });
   })
     .then((access) => {
-      console.log(access);
-
       redis.hgetall("Info:Now", (err, reply) => {
         if (err || !reply) return;
 
         redis.lrange("Info:Countries", 0, -1, (err, countries) => {
           if (err || !countries) return;
 
-          console.log(reply);
-          console.log(countries);
-
           // Visitor Stat Update
+          if (countries.length == 0) return;
           fetch(`http://${apiHost}/api/info/${now}`, {
             method: "POST",
             headers: {
@@ -121,7 +115,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             }),
           })
             .then((res) => res.json())
-            .then((data) => console.log(data))
+            // .then((data) => console.log(data))
             .catch((err) => console.log(err));
         });
       });
@@ -130,8 +124,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       getValue("Info:World")
         .then((str: string) => {
           const data = JSON.parse(str);
-          console.log(data);
 
+          if (Object.keys(data).length == 0) return;
           fetch(`http://${apiHost}/api/world/list`, {
             method: "POST",
             headers: {
@@ -146,7 +140,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             ),
           })
             .then((res) => res.json())
-            .then((data) => console.log(data))
+            // .then((data) => console.log(data))
             .catch((err) => console.log(err));
         })
         .catch((err) => console.log(err));
