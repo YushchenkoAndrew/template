@@ -1,9 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getValue, setValue } from "../../../lib/mutex";
 import redis from "../../../config/redis";
-import { apiHost, botHost } from "../../../config";
+import { apiHost } from "../../../config";
 import { ApiReq, WorldData } from "../../../types/api";
-import { LogMessage } from "../../../types/bot";
 import { sendLogs } from "../../../lib/bot";
 
 type User = { id: string; country: string; expired: number };

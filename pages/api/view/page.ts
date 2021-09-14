@@ -1,8 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { botHost } from "../../../config";
 import redis from "../../../config/redis";
 import { sendLogs } from "../../../lib/bot";
-import { LogMessage } from "../../../types/bot";
 
 type QueryParams = { id: string; url: string };
 

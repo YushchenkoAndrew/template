@@ -3,9 +3,8 @@ import redis from "../../../config/redis";
 import { ApiReq, InfoData, WorldData } from "../../../types/api";
 import { Country, DayStat, StatInfo } from "../../../types/info";
 import { DefaultRes, StatisticData } from "../../../types/request";
-import { apiHost, botHost } from "../../../config";
+import { apiHost } from "../../../config";
 import { formatDate } from "../../info";
-import { LogMessage } from "../../../types/bot";
 import { sendLogs } from "../../../lib/bot";
 
 type QueryParams = { date: string };

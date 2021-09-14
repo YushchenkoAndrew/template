@@ -1,7 +1,5 @@
 import redis from "redis";
-import { botHost } from ".";
 import { sendLogs } from "../lib/bot";
-import { LogMessage } from "../types/bot";
 
 const PORT = process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379;
 const HOST = process.env.REDIS_HOST ?? "127.0.0.1";

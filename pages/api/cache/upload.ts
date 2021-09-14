@@ -26,17 +26,11 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   let key = (req.query.key ?? "") as string;
   if (!PassValidate(key, process.env.ACCESS_KEY ?? "")) {
-    fetch(`http://${botHost}/bot/logs/info?key=${process.env.BOT_KEY ?? ""}`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        stat: "OK",
-        name: "WEB",
-        file: "/api/cache/upload.ts",
-        message: "Someone tried to reach this handler. You'll will no pass!!",
-      } as LogMessage),
+    sendLogs({
+      stat: "OK",
+      name: "WEB",
+      file: "/api/cache/upload.ts",
+      message: "Someone tried to reach this handler. You'll will no pass!!",
     });
     return res.status(401).send("");
   }
