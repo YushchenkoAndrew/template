@@ -2,11 +2,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../../config/redis";
 import md5 from "../../../lib/md5";
 import { ApiTokens, ApiError } from "../../../types/api";
-import { DefaultRes } from "../../../types/request";
-import { apiHost } from "../../../config";
+import { apiHost, botHost } from "../../../config";
 import { formatDate } from "../../info";
 import { PassValidate } from "../../../lib/auth";
 import { getValue } from "../../../lib/mutex";
+import { LogMessage } from "../../../types/bot";
+import { sendLogs } from "../../../lib/bot";
 
 type QueryParams = { id: string };
 
@@ -25,6 +26,18 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   let key = (req.query.key ?? "") as string;
   if (!PassValidate(key, process.env.ACCESS_KEY ?? "")) {
+    fetch(`http://${botHost}/bot/logs/info?key=${process.env.BOT_KEY ?? ""}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        stat: "OK",
+        name: "WEB",
+        file: "/api/cache/upload.ts",
+        message: "Someone tried to reach this handler. You'll will no pass!!",
+      } as LogMessage),
+    });
     return res.status(401).send("");
   }
 
@@ -115,8 +128,16 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             }),
           })
             .then((res) => res.json())
-            // .then((data) => console.log(data))
-            .catch((err) => console.log(err));
+            .catch((err) =>
+              sendLogs({
+                stat: "ERR",
+                name: "WEB",
+                url: `http://${apiHost}/api/info/${now}`,
+                file: "/api/cache/upload.ts",
+                message: "Something went wrong with API request;",
+                desc: err,
+              })
+            );
         });
       });
 
@@ -140,12 +161,36 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             ),
           })
             .then((res) => res.json())
-            // .then((data) => console.log(data))
-            .catch((err) => console.log(err));
+            .catch((err) =>
+              sendLogs({
+                stat: "ERR",
+                name: "WEB",
+                url: `http://${apiHost}/api/world/list`,
+                file: "/api/cache/upload.ts",
+                message: "Something went wrong with API request",
+                desc: err,
+              })
+            );
         })
-        .catch((err) => console.log(err));
+        .catch((err) =>
+          sendLogs({
+            stat: "ERR",
+            name: "WEB",
+            file: "/api/cache/upload.ts",
+            message: "Something went wrong with Cache",
+            desc: err,
+          })
+        );
     })
-    .catch((err) => console.log(err));
+    .catch((err) =>
+      sendLogs({
+        stat: "ERR",
+        name: "WEB",
+        file: "/api/cache/upload.ts",
+        message: "Bruhh, something is broken and it's not me!!!",
+        desc: err,
+      })
+    );
 
   res.status(204).send("");
 }

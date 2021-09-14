@@ -1,8 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getValue, setValue } from "../../../lib/mutex";
 import redis from "../../../config/redis";
-import { apiHost } from "../../../config";
+import { apiHost, botHost } from "../../../config";
 import { ApiReq, WorldData } from "../../../types/api";
+import { LogMessage } from "../../../types/bot";
+import { sendLogs } from "../../../lib/bot";
 
 type User = { id: string; country: string; expired: number };
 
@@ -61,6 +63,14 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         data[country] = data[country] ? data[country] + 1 : 1;
         setValue("Info:World", JSON.stringify(data));
       })
-      .catch((err) => console.log(err));
+      .catch((err) =>
+        sendLogs({
+          stat: "ERR",
+          name: "WEB",
+          file: "/api/view/user.ts",
+          message: "Ohhh noooo, Cache is broken!!!",
+          desc: err,
+        })
+      );
   }, 0);
 }

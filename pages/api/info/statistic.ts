@@ -3,8 +3,10 @@ import redis from "../../../config/redis";
 import { ApiReq, InfoData, WorldData } from "../../../types/api";
 import { Country, DayStat, StatInfo } from "../../../types/info";
 import { DefaultRes, StatisticData } from "../../../types/request";
-import { apiHost } from "../../../config";
+import { apiHost, botHost } from "../../../config";
 import { formatDate } from "../../info";
+import { LogMessage } from "../../../types/bot";
+import { sendLogs } from "../../../lib/bot";
 
 type QueryParams = { date: string };
 export default function handler(
@@ -152,10 +154,18 @@ export default function handler(
         map,
       });
     })
-    .catch((err) =>
+    .catch((err) => {
       res.status(200).json({
         stat: "ERR",
         message: err,
-      })
-    );
+      });
+
+      sendLogs({
+        stat: "ERR",
+        name: "WEB",
+        file: "/api/info/statistic.ts",
+        message: "Couldn't reach statistic data",
+        desc: err,
+      });
+    });
 }

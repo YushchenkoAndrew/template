@@ -1,5 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { botHost } from "../../../config";
 import redis from "../../../config/redis";
+import { sendLogs } from "../../../lib/bot";
+import { LogMessage } from "../../../types/bot";
 
 type QueryParams = { id: string };
 
@@ -12,11 +15,18 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   setTimeout(() => {
     let { id } = req.query as QueryParams;
     redis.get(id, (err, reply) => {
-      if (err || !reply) return;
+      if (!err && reply) {
+        // console.log(`id=${id} country=${reply} click++`);
+        return redis.hincrby("Info:Now", "Clicks", 1);
+      }
 
-      // TODO: Send to API
-      console.log(`id=${id} country=${reply} click++`);
-      redis.hincrby("Info:Now", "Clicks", 1);
+      sendLogs({
+        stat: "ERR",
+        name: "WEB",
+        file: "/api/view/click.ts",
+        message: "Ohhh noooo, Cache is broken!!!",
+        desc: err,
+      });
     });
   }, 0);
 }

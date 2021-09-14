@@ -11,22 +11,29 @@ export interface NavItemProps {
 }
 
 export default function NavItem(props: NavItemProps) {
-  const [name, setName] = useState(props.name);
+  const [nameProp, setNameProp] = useState(
+    props.name.split("").map((item) => ({ char: item, color: "#fff" }))
+  );
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCount(count + 1);
       if (!props.active || (count > 10 && count < 20))
-        return setName(props.name);
+        // return setName(props.name);
+        return setNameProp(
+          props.name.split("").map((item) => ({ char: item, color: "#fff" }))
+        );
       let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
       let i = Math.floor(Math.random() * props.name.length);
       let j = Math.floor(Math.random() * chars.length);
       setCount((count % 20) + 1);
-      setName(
-        props.name.substr(0, i) + chars.charAt(j) + props.name.substr(i + 1)
+      setNameProp(
+        (props.name.substr(0, i) + chars.charAt(j) + props.name.substr(i + 1))
+          .split("")
+          .map((item, k) => ({ char: item, color: i !== k ? "#fff" : "#999" }))
       );
-    }, 100);
+    }, 150);
     return () => clearInterval(interval);
   });
 
@@ -50,9 +57,11 @@ export default function NavItem(props: NavItemProps) {
             : null
         }
         target={props.target ?? "_self"}
-        data-glitch={name}
+        data-glitch={nameProp.map(({ char }) => char).join("")}
       >
-        {name}
+        {nameProp.map(({ char, color }) => (
+          <div style={{ color }}>{char}</div>
+        ))}
       </a>
     </li>
   );

@@ -3,8 +3,10 @@ import redis from "../../../config/redis";
 import { formatDate } from "../../info";
 import { ApiReq, InfoData } from "../../../types/api";
 import { AnalyticsData, DefaultRes, Stat } from "../../../types/request";
-import { apiHost } from "../../../config";
+import { apiHost, botHost } from "../../../config";
 import { Analytics } from "../../../types/info";
+import { LogMessage } from "../../../types/bot";
+import { sendLogs } from "../../../lib/bot";
 
 type QueryParams = { date: string };
 
@@ -117,10 +119,18 @@ export default function handler(
 
       res.status(200).json(FormData(results[0] as Analytics, timeline));
     })
-    .catch((err) =>
+    .catch((err) => {
       res.status(200).json({
         stat: "ERR",
         message: err,
-      })
-    );
+      });
+
+      sendLogs({
+        stat: "ERR",
+        name: "WEB",
+        file: "/api/info/analytics.ts",
+        message: "Couldn't reach analytics data",
+        desc: err,
+      });
+    });
 }
