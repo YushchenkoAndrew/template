@@ -59,9 +59,15 @@ export default function NavItem(props: NavItemProps) {
         target={props.target ?? "_self"}
         data-glitch={nameProp.map(({ char }) => char).join("")}
       >
-        {nameProp.map(({ char, color }) => (
-          <div style={{ color }}>{char}</div>
-        ))}
+        {nameProp.map(({ char, color }, key) =>
+          props.style ? (
+            char
+          ) : (
+            <div key={key} style={{ color }}>
+              {char}
+            </div>
+          )
+        )}
       </a>
     </li>
   );

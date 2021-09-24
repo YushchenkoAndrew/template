@@ -21,7 +21,7 @@ export default function DefaultNav(props: DefaultNavProps) {
       />
       <NavItem
         name="API"
-        href="/api/doc"
+        href="/api/swagger/index.html"
         style={props.style}
         target="_blank"
         active={props.api}
