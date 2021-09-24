@@ -27,7 +27,7 @@ export default function handler(
 ) {
   if (req.method !== "GET") {
     return res
-      .status(404)
+      .status(405)
       .json({ stat: "ERR", message: "Request handler not found" });
   }
 

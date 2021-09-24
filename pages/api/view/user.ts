@@ -33,7 +33,7 @@ function finalValue(key: string) {
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") return res.status(404).send("");
+  if (req.method !== "POST") return res.status(405).send("");
 
   let { id, country, expired } = req.body as User;
   if (!id || !country || !expired || isNaN(+expired))

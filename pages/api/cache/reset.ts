@@ -7,7 +7,7 @@ import { LogMessage } from "../../../types/bot";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
-    return res.status(404).send("");
+    return res.status(405).send("");
   }
 
   let key = (req.query.key ?? "") as string;
