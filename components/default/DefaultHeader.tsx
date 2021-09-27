@@ -1,7 +1,8 @@
 import React from "react";
-import NavBar from "../NavBar";
-import NavItem from "../NavItem";
+import NavBar from "../NavBar/NavBar";
+import NavContainer from "../NavBar/NavContainer";
 import DefaultNav from "./DefaultNav";
+import styles from "./Default.module.css";
 
 export interface DefaultHeaderProps {
   home?: boolean;
@@ -15,12 +16,14 @@ export default function DefaultHeader(props: DefaultHeaderProps) {
   return (
     <header className="masthead">
       <NavBar>
-        <DefaultNav
-          home={props.home}
-          api={props.api}
-          projects={props.projects}
-          info={props.info}
-        ></DefaultNav>
+        <NavContainer>
+          <DefaultNav
+            home={props.home}
+            api={props.api}
+            projects={props.projects}
+            info={props.info}
+          ></DefaultNav>
+        </NavContainer>
       </NavBar>
       {props.children}
     </header>

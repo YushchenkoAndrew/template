@@ -1,5 +1,5 @@
 import React from "react";
-import NavItem from "../NavItem";
+import NavItem from "../NavBar/NavItem";
 
 export interface DefaultNavProps {
   home?: boolean;
