@@ -1,3 +1,4 @@
+import { withIronSession } from "next-iron-session";
 import React from "react";
 import DefaultHeader from "../../components/admin/default/DefaultHeader";
 import DefaultHead from "../../components/default/DefaultHead";
@@ -7,7 +8,7 @@ export default function AdminHome() {
   return (
     <>
       <DefaultHead>
-        <title>Admin</title>
+        <title>Settings</title>
       </DefaultHead>
       <DefaultHeader />
     </>

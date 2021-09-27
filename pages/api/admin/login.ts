@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { Session, withIronSession } from "next-iron-session";
 import redis from "../../../config/redis";
 import { PassValidate } from "../../../lib/auth";
+import { sendLogs } from "../../../lib/bot";
 import md5 from "../../../lib/md5";
 import { LoginRequest } from "../../../types/admin";
 import { DefaultRes } from "../../../types/request";
@@ -30,6 +32,14 @@ function checkUserInfo(id: string, salt: number, user: string, pass: string) {
         } else redis.incr(`LOGIN:${id}`);
 
         if (Number(tries) >= 5) {
+          sendLogs({
+            stat: "ERR",
+            name: "WEB",
+            file: "/pages/api/admin/logs",
+            message: "You can't go EVEN FURTHER BEYOND",
+            desc: `User ${id} surpass limit of password tries`,
+          });
+
           return resolve({
             status: 429,
             send: {
@@ -61,6 +71,7 @@ function checkUserInfo(id: string, salt: number, user: string, pass: string) {
           });
         }
 
+        redis.set(`LOGIN:${id}`, "0");
         return resolve({
           status: 200,
           send: {
@@ -73,22 +84,36 @@ function checkUserInfo(id: string, salt: number, user: string, pass: string) {
   });
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<DefaultRes>
-) {
-  if (req.method !== "POST") {
-    return res.status(405).send({ stat: "ERR", message: "Unknown method" });
-  }
+export default withIronSession(
+  async function (
+    req: NextApiRequest & { session: Session },
+    res: NextApiResponse<DefaultRes>
+  ) {
+    if (req.method !== "POST") {
+      return res.status(405).send({ stat: "ERR", message: "Unknown method" });
+    }
 
-  let id = req.query["id"] as string;
-  let { salt, user, pass } = req.body as LoginRequest;
-  if (!salt || !user || !pass || !id) {
-    return res
-      .status(400)
-      .send({ stat: "ERR", message: "This request is too bad to bee true" });
-  }
+    let id = req.query["id"] as string;
+    let { salt, user, pass } = req.body as LoginRequest;
+    if (!salt || !user || !pass || !id) {
+      return res
+        .status(400)
+        .send({ stat: "ERR", message: "This request is too bad to bee true" });
+    }
 
-  let response = await checkUserInfo(id, salt, user, pass);
-  res.status(response.status).send(response.send);
-}
+    let response = await checkUserInfo(id, salt, user, pass);
+    if (response.status == 200) {
+      req.session.set("user", md5(Math.random().toString() + id));
+      await req.session.save();
+    }
+
+    res.status(response.status).send(response.send);
+  },
+  {
+    cookieName: "SESSION_ID",
+    cookieOptions: {
+      secure: process.env.NODE_ENV === "production",
+    },
+    password: process.env.APPLICATION_SECRET ?? "",
+  }
+);

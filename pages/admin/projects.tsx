@@ -7,7 +7,7 @@ export default function AdminHome() {
   return (
     <>
       <DefaultHead>
-        <title>Admin</title>
+        <title>Projects</title>
       </DefaultHead>
       <DefaultHeader />
     </>

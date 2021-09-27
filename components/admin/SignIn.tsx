@@ -68,6 +68,7 @@ export default function SignIn(props: SignInProps) {
         ></input>
         <input
           name="pass"
+          type="password"
           className="form-control my-3"
           placeholder="Password"
         ></input>

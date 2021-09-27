@@ -1,42 +1,39 @@
 import { withIronSession } from "next-iron-session";
 import React from "react";
-import SignIn from "../../components/admin/SignIn";
+import DefaultHeader from "../../components/admin/default/DefaultHeader";
 import DefaultHead from "../../components/default/DefaultHead";
 import { NextSessionArgs } from "../../types/session";
 
-export default function Login() {
+export default function Logout() {
   return (
     <>
       <DefaultHead>
-        <title>Login</title>
+        <title>Logout</title>
       </DefaultHead>
-
-      <div className="container text-center">
-        {/* <div className="row align-items-center h-100">
-          <div className="col-6 mx-auto"> */}
-        <div className="h-100 justify-content-center">
-          <SignIn title="Welcome back" desc="Sign in to go further" />
-        </div>
-        {/* </div>
-        </div> */}
-      </div>
     </>
   );
 }
 
 export const getServerSideProps = withIronSession(
   async function ({ req, res }: NextSessionArgs) {
-    if (req.session.get("user")) {
+    if (!req.session.get("user")) {
       return {
         redirect: {
           basePath: false,
-          destination: "/projects/admin",
+          destination: "/projects/admin/login",
           permanent: false,
         },
       };
     }
 
-    return { props: {} };
+    await req.session.destroy();
+    return {
+      redirect: {
+        basePath: false,
+        destination: "/projects/",
+        permanent: false,
+      },
+    };
   },
   {
     cookieName: "SESSION_ID",
