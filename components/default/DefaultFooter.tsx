@@ -1,7 +1,6 @@
 import React from "react";
 import FooterTop from "../Footer/Top";
 import FooterBottom from "../Footer/Bottom";
-import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGithub,
@@ -26,7 +25,7 @@ export default function DefaultFooter(props: DefaultFooterProps) {
             <FooterBottom email="AndrewYushchenko@gmail.com">
               <a
                 className="text-muted mx-2 mx-md-3"
-                href="https://github.com/YushchenkoAndrew"
+                href={process.env.GITHUB}
                 onClick={() =>
                   localStorage.getItem("id")
                     ? fetch(
@@ -46,7 +45,7 @@ export default function DefaultFooter(props: DefaultFooterProps) {
               </a>
               <a
                 className="text-muted mx-2 mx-md-3"
-                href="https://twitter.com/AndrewY69942173"
+                href={process.env.TWITTER}
                 onClick={() =>
                   localStorage.getItem("id")
                     ? fetch(
@@ -66,7 +65,7 @@ export default function DefaultFooter(props: DefaultFooterProps) {
               </a>
               <a
                 className="text-muted mx-2 mx-md-3"
-                href="https://www.linkedin.com/in/andrew-yushchenko-7447771a2/"
+                href={process.env.LINKEDIN}
                 onClick={() =>
                   localStorage.getItem("id")
                     ? fetch(
