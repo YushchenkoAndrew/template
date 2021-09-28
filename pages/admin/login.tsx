@@ -2,6 +2,7 @@ import { withIronSession } from "next-iron-session";
 import React from "react";
 import SignIn from "../../components/admin/SignIn";
 import DefaultHead from "../../components/default/DefaultHead";
+import sessionConfig from "../../config/session";
 import { NextSessionArgs } from "../../types/session";
 
 export default function Login() {
@@ -24,25 +25,20 @@ export default function Login() {
   );
 }
 
-export const getServerSideProps = withIronSession(
-  async function ({ req, res }: NextSessionArgs) {
-    if (req.session.get("user")) {
-      return {
-        redirect: {
-          basePath: false,
-          destination: "/projects/admin",
-          permanent: false,
-        },
-      };
-    }
-
-    return { props: {} };
-  },
-  {
-    cookieName: "SESSION_ID",
-    cookieOptions: {
-      secure: process.env.NODE_ENV === "production",
-    },
-    password: process.env.APPLICATION_SECRET ?? "",
+export const getServerSideProps = withIronSession(async function ({
+  req,
+  res,
+}: NextSessionArgs) {
+  if (req.session.get("user")) {
+    return {
+      redirect: {
+        basePath: false,
+        destination: "/projects/admin",
+        permanent: false,
+      },
+    };
   }
-);
+
+  return { props: {} };
+},
+sessionConfig);
