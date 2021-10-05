@@ -73,7 +73,7 @@ export default function SignIn(props: SignInProps) {
           placeholder="Password"
         ></input>
 
-        <button className="btn btn-lg btn-primary btn-block" type="submit">
+        <button className="btn btn-lg btn-dark btn-block" type="submit">
           Sign in
         </button>
 

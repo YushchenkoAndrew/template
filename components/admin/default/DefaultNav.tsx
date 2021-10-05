@@ -22,7 +22,6 @@ export default function DefaultNav(props: DefaultNavProps) {
         name="Projects"
         href="/projects/admin/projects"
         style={props.style}
-        target="_blank"
         active={props.projects}
       />
       <NavItem
