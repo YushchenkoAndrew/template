@@ -4,6 +4,7 @@ import redis from "../../../config/redis";
 import { apiHost } from "../../../config";
 import { ApiReq, WorldData } from "../../../types/api";
 import { sendLogs } from "../../../lib/bot";
+import md5 from "../../../lib/md5";
 
 type User = { id: string; country: string; expired: number };
 
@@ -38,6 +39,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   let { id, country, expired } = req.body as User;
   if (!id || !country || !expired || isNaN(+expired))
     return res.status(400).send("");
+
   res.status(204).send("");
 
   // Run in background
@@ -46,30 +48,40 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     console.log("user ");
     console.log(req.body as User);
 
-    redis.set(id, country);
-    redis.expire(id, expired);
+    const now = new Date().getTime();
+    const prev = Number(req.headers["x-custom-header"]);
+    if (isNaN(prev) || now < prev || now - prev >= 2000) return;
 
-    redis.hincrby("Info:Now", "Visitors", 1);
-    redis.hincrby("Info:Now", "Views", 1);
+    const hash = md5(prev.toString());
+    redis.get(`RAND:${hash}`, (err, ok) => {
+      if (err || !ok) return;
+      redis.del(`RAND:${hash}`);
 
-    // Need this for detect curr day countries
-    redis.lpush("Info:Countries", country);
+      redis.set(id, country);
+      redis.expire(id, expired);
 
-    // Use simple mutex handler for changing variables with kubernetes & docker
-    getValue("Info:World", finalValue("Info:World"))
-      .then((str: string) => {
-        let data = JSON.parse(str);
-        data[country] = data[country] ? data[country] + 1 : 1;
-        setValue("Info:World", JSON.stringify(data));
-      })
-      .catch((err) =>
-        sendLogs({
-          stat: "ERR",
-          name: "WEB",
-          file: "/api/view/user.ts",
-          message: "Ohhh noooo, Cache is broken!!!",
-          desc: err,
+      redis.hincrby("Info:Now", "Visitors", 1);
+      redis.hincrby("Info:Now", "Views", 1);
+
+      // Need this for detect curr day countries
+      redis.lpush("Info:Countries", country);
+
+      // Use simple mutex handler for changing variables with kubernetes & docker
+      getValue("Info:World", finalValue("Info:World"))
+        .then((str: string) => {
+          let data = JSON.parse(str);
+          data[country] = data[country] ? data[country] + 1 : 1;
+          setValue("Info:World", JSON.stringify(data));
         })
-      );
+        .catch((err) =>
+          sendLogs({
+            stat: "ERR",
+            name: "WEB",
+            file: "/api/view/user.ts",
+            message: "Ohhh noooo, Cache is broken!!!",
+            desc: err,
+          })
+        );
+    });
   }, 0);
 }

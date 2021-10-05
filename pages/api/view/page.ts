@@ -13,18 +13,17 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   setTimeout(() => {
     let { id, url } = req.query as QueryParams;
     redis.get(id, (err, reply) => {
-      if (!err && reply) {
-        // console.log(`id=${id} url=${url} country=${reply} page++`);
-        return redis.hincrby("Info:Now", "Views", 1);
+      if (err) {
+        return sendLogs({
+          stat: "ERR",
+          name: "WEB",
+          file: "/api/view/page.ts",
+          message: "Ohhh noooo, Cache is broken!!!",
+          desc: err,
+        });
       }
 
-      sendLogs({
-        stat: "ERR",
-        name: "WEB",
-        file: "/api/view/page.ts",
-        message: "Ohhh noooo, Cache is broken!!!",
-        desc: err,
-      });
+      if (reply) return redis.hincrby("Info:Now", "Views", 1);
     });
   }, 0);
 }

@@ -1,19 +1,33 @@
+let flag = !localStorage.getItem("id") || !localStorage.getItem("country");
 let nowTime = (function () {
   let now = new Date();
   return now.getTime() - now.getTimezoneOffset() * 60000;
 })();
 
-if (
-  localStorage.getItem("expire") &&
-  nowTime > localStorage.getItem("expire")
-) {
+function clearLocalStorage() {
+  flag = true;
   localStorage.removeItem("id");
   localStorage.removeItem("country");
   localStorage.removeItem("expire");
 }
 
+if (
+  localStorage.getItem("expire") &&
+  nowTime > localStorage.getItem("expire")
+) {
+  clearLocalStorage();
+} else {
+  fetch("/projects/api/view/ping", {
+    method: "HEAD",
+    headers: {
+      "X-Custom-Header": localStorage.getItem("id"),
+    },
+  })
+    .catch((err) => clearLocalStorage())
+    .then((res) => (res.status !== 204 ? clearLocalStorage() : null));
+}
+
 const expired = 86.4e6;
-let flag = !localStorage.getItem("id") || !localStorage.getItem("country");
 (function () {
   var r, t, n, e, i, o, a, s;
   (t = {}),
@@ -776,15 +790,24 @@ window.sorter = function () {
 })();
 
 function sendUser() {
-  fetch("/projects/api/view/user", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      id: localStorage.getItem("id"),
-      country: localStorage.getItem("country"),
-      expired: expired / 1000,
-    }),
-  });
+  fetch("/projects/api/view/rand", {
+    method: "HEAD",
+  })
+    .catch((err) => null)
+    .then((res) => {
+      fetch("/projects/api/view/user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Custom-Header": res.headers.get("X-Custom-Header"),
+        },
+        body: JSON.stringify({
+          id: localStorage.getItem("id"),
+          country: localStorage.getItem("country"),
+          expired: expired / 1000,
+        }),
+      });
+    });
 }
 
 function updateCookie(i, c) {
