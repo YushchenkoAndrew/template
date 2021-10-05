@@ -103,7 +103,12 @@ export default withIronSession(
 
     let response = await checkUserInfo(id, salt, user, pass);
     if (response.status == 200) {
-      req.session.set("user", md5(Math.random().toString() + id));
+      const sessionID = md5(Math.random().toString() + id);
+      redis.set(`SESSION:${sessionID}`, id);
+      redis.expire(id, Number(process.env.SESSION_TTL ?? 3600));
+
+      req.session.set("user", sessionID);
+
       await req.session.save();
     }
 
@@ -113,6 +118,7 @@ export default withIronSession(
     cookieName: "SESSION_ID",
     cookieOptions: {
       secure: process.env.NODE_ENV === "production",
+      maxAge: Number(process.env.SESSION_TTL ?? 3600),
     },
     password: process.env.APPLICATION_SECRET ?? "",
   }

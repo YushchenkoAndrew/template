@@ -4,6 +4,7 @@ import SignIn from "../../components/admin/SignIn";
 import DefaultHead from "../../components/default/DefaultHead";
 import sessionConfig from "../../config/session";
 import { NextSessionArgs } from "../../types/session";
+import { checkIfUserExist } from "../../lib/session";
 
 export default function Login() {
   return (
@@ -29,7 +30,10 @@ export const getServerSideProps = withIronSession(async function ({
   req,
   res,
 }: NextSessionArgs) {
-  if (req.session.get("user")) {
+  const sessionID = req.session.get("user");
+  const isOk = await checkIfUserExist(sessionID);
+
+  if (sessionID && isOk) {
     return {
       redirect: {
         basePath: false,

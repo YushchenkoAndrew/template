@@ -4,6 +4,8 @@ import DefaultHeader from "../../components/admin/default/DefaultHeader";
 import DefaultHead from "../../components/default/DefaultHead";
 import sessionConfig from "../../config/session";
 import { NextSessionArgs } from "../../types/session";
+import { checkIfUserExist } from "../../lib/session";
+import redis from "../../config/redis";
 
 export default function Logout() {
   return (
@@ -19,7 +21,10 @@ export const getServerSideProps = withIronSession(async function ({
   req,
   res,
 }: NextSessionArgs) {
-  if (!req.session.get("user")) {
+  const sessionID = req.session.get("user");
+  const isOk = await checkIfUserExist(sessionID);
+
+  if (!sessionID || !isOk) {
     return {
       redirect: {
         basePath: false,
@@ -29,7 +34,9 @@ export const getServerSideProps = withIronSession(async function ({
     };
   }
 
+  redis.del(`SESSION:${sessionID}`);
   await req.session.destroy();
+
   return {
     redirect: {
       basePath: false,
