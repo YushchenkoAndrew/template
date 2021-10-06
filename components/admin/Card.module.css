@@ -1,11 +1,10 @@
-.flag span {
-  background-color: #fffbec;
-  width: 60px;
-  height: 25px;
-  padding-bottom: 3px;
-  border-radius: 5px;
+.flag {
+  width: 15px;
+  height: 15px;
+  border-radius: 13px;
   display: flex;
-  color: #fed85d;
-  justify-content: center;
-  align-items: center;
+}
+
+.shadow {
+  box-shadow: rgba(100, 100, 111, 0.2) 4px 9px 20px 0px;
 }
