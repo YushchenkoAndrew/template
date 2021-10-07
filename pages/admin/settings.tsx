@@ -4,7 +4,7 @@ import DefaultHeader from "../../components/admin/default/DefaultHeader";
 import DefaultHead from "../../components/default/DefaultHead";
 import defaultServerSideHandler from "../../lib/session";
 
-export default function AdminHome() {
+export default function AdminSettings() {
   return (
     <>
       <DefaultHead>

@@ -12,21 +12,24 @@ const DynamicCardStack = dynamic(
   () => import("../../components/admin/CardStack")
 );
 
-export default function AdminHome() {
-  let [projects, onScrollLoad] = useState([] as JSX.Element[]);
+export default function AdminProjects() {
+  // TODO: So Im a bit lazy right now, os future me all hopes on YOU !!!
+  // Please create lazyloading by using SSR (I guess)
 
-  useEffect(() => {
-    document.addEventListener("click", () => {
-      // if (
-      //   window.innerHeight + document.documentElement.scrollTop ===
-      //   document?.scrollingElement?.scrollHeight
-      // ) {
-      // onLoad(true);
-      console.log("HERE");
-      onScrollLoad([...projects, <DynamicCardStack id={projects.length} />]);
-      // }
-    });
-  }, []);
+  // let [projects, onScrollLoad] = useState([] as JSX.Element[]);
+
+  // useEffect(() => {
+  //   document.addEventListener("click", () => {
+  //     // if (
+  //     //   window.innerHeight + document.documentElement.scrollTop ===
+  //     //   document?.scrollingElement?.scrollHeight
+  //     // ) {
+  //     // onLoad(true);
+  //     console.log("HERE");
+  //     onScrollLoad([...projects, <DynamicCardStack id={projects.length} />]);
+  //     // }
+  //   });
+  // }, []);
 
   return (
     <>
@@ -38,8 +41,9 @@ export default function AdminHome() {
       <div className="container mt-4">
         <div className="row">
           <AddCard />
-          <CardStack id={80} />
-          {projects}
+          <CardStack id={0} />
+          <CardStack id={10} />
+          {/* {projects} */}
         </div>
       </div>
 
