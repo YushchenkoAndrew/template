@@ -1,0 +1,32 @@
+.add-card {
+  border-radius: 30px;
+  background-color: var(--light);
+  transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.add-card:hover svg {
+  color: var(--light) !important;
+  transform: rotate(90deg);
+  transition-duration: 500ms;
+}
+
+.add-card:hover .add-title {
+  color: var(--light) !important;
+}
+
+.add-card:hover {
+  transform: scale(1.02);
+  background-color: rgba(23, 162, 184, 0.7);
+  box-shadow: 5.1px 10.2px 10.2px rgba(0, 123, 255, 0.26);
+}
+
+.add-title {
+  font-family: "3Dventure";
+  font-size: 3.5rem;
+}
+
+@media (min-width: 991.98px) and (max-width: 1199.98px) {
+  .add-title {
+    font-size: 3rem !important;
+  }
+}

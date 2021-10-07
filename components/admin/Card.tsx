@@ -1,4 +1,4 @@
-import React, { CSSProperties, useEffect, useState } from "react";
+import React from "react";
 import Image from "react-bootstrap/Image";
 import { FlagType } from "../../types/flag";
 import styles from "./Card.module.css";
@@ -41,12 +41,12 @@ export default function Card(props: CardProps) {
               ? desc.join(" ")
               : desc.slice(0, 15).join(" ") + "..."}
           </p>
-          <div className="d-flex justify-content-between mt-3">
+          <div className="d-flex justify-content-between mt-3 mb-2">
             <span />
             <div className="row mr-2 mb-2">
               <a
                 href={`/projects/admin/projects/info/${props.id}`}
-                className="btn btn-sm btn-outline-primary mr-2"
+                className="btn btn-sm btn-outline-info mr-2"
               >
                 Statistics
               </a>

@@ -6,5 +6,9 @@
 }
 
 .shadow {
-  box-shadow: rgba(100, 100, 111, 0.2) 4px 9px 20px 0px;
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  transition: none !important;
+  box-shadow: 5.1px 10.2px 10.2px rgba(0, 123, 255, 0.26);
 }
