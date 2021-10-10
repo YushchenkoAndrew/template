@@ -48,13 +48,13 @@ export default function Card(props: CardProps) {
                 href={`/projects/admin/projects/info/${props.id}`}
                 className="btn btn-sm btn-outline-info mr-2"
               >
-                Statistics
+                Modify
               </a>
               <a
                 href={`/projects/admin/projects/edit/${props.id}`}
-                className="btn btn-sm btn-outline-dark"
+                className="btn btn-sm btn-outline-danger"
               >
-                Modify
+                Delete
               </a>
             </div>
           </div>
