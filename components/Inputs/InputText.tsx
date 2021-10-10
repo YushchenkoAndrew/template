@@ -1,4 +1,5 @@
 import React from "react";
+import { ProjectElement } from "../../types/projects";
 
 export interface InputTextProps {
   name: string;
@@ -7,7 +8,9 @@ export interface InputTextProps {
   placeholder?: string;
   message?: string;
   onChange: (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event:
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      | ProjectElement
   ) => void;
 }
 

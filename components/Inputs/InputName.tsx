@@ -1,4 +1,5 @@
 import React from "react";
+import { ProjectElement } from "../../types/projects";
 import InputValue from "./InputValue";
 
 export interface InputNameProps {
@@ -9,7 +10,9 @@ export interface InputNameProps {
   placeholder?: string;
   message?: string;
   onChange: (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event:
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      | ProjectElement
   ) => void;
 }
 
