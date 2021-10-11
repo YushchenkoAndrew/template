@@ -1,4 +1,5 @@
 import React from "react";
+import { Event } from "../../pages/admin/projects/add";
 import { ProjectElement } from "../../types/projects";
 import InputValue from "./InputValue";
 
@@ -6,14 +7,9 @@ export interface InputNameProps {
   char: string;
   name: string;
   type?: string;
-  required?: boolean;
+  error?: boolean;
   placeholder?: string;
-  message?: string;
-  onChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-      | ProjectElement
-  ) => void;
+  onChange: (event: Event) => void;
 }
 
 export default function InputName(props: InputNameProps) {
@@ -26,9 +22,8 @@ export default function InputName(props: InputNameProps) {
         <InputValue
           name={props.name}
           type={props.type}
-          required={props.required ?? false}
+          error={props.error}
           placeholder={props.placeholder}
-          message={props.message}
           onChange={props.onChange}
         />
       </div>

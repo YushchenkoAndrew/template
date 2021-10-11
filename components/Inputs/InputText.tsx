@@ -1,17 +1,13 @@
 import React from "react";
+import { Event } from "../../pages/admin/projects/add";
 import { ProjectElement } from "../../types/projects";
 
 export interface InputTextProps {
   name: string;
   rows?: number;
-  required?: boolean | undefined;
+  error?: boolean;
   placeholder?: string;
-  message?: string;
-  onChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-      | ProjectElement
-  ) => void;
+  onChange: (event: Event) => void;
 }
 
 export default function InputText(props: InputTextProps) {
@@ -21,12 +17,11 @@ export default function InputText(props: InputTextProps) {
         name={props.name}
         className="form-control"
         placeholder={props.placeholder ?? ""}
-        required={props.required}
         rows={props.rows ?? 3}
         onChange={props.onChange}
       />
-      {props.required ? (
-        <div className="invalid-feedback w-100">{props.message}</div>
+      {props.error ? (
+        <div className="text-danger small w-100">This field is required</div>
       ) : null}
     </>
   );

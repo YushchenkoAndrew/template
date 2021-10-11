@@ -1,18 +1,15 @@
 import React, { useRef, useState } from "react";
+import { Event } from "../../pages/admin/projects/add";
 import { ProjectElement, ProjectFile } from "../../types/projects";
 
 export interface InputFileProps {
   name: string;
   role: string;
   type?: string;
-  required?: boolean;
+  error?: boolean;
   multiple?: boolean;
   message?: string;
-  onChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-      | ProjectElement
-  ) => void;
+  onChange: (event: Event) => void;
 }
 
 export default function InputFile(props: InputFileProps) {
@@ -35,7 +32,6 @@ export default function InputFile(props: InputFileProps) {
         type="file"
         ref={fileRef}
         className="d-none"
-        required={props.required}
         multiple={props.multiple}
         accept={props.type}
         onChange={() => {
@@ -74,13 +70,13 @@ export default function InputFile(props: InputFileProps) {
         }}
       />
       <button
-        className={`btn ${file ? "btn-success" : "btn-outline-info"} ml-3`}
+        className={`btn ${file ? "btn-success" : "btn-outline-info"}`}
         onClick={() => fileRef.current?.click()}
       >
         {file && !props.multiple ? file : "Upload"}
       </button>
-      {props.required ? (
-        <div className="invalid-feedback w-100">{props.message}</div>
+      {props.error ? (
+        <div className="text-danger small w-100">Thing field is required</div>
       ) : null}
     </>
   );
