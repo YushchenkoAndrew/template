@@ -1,0 +1,19 @@
+.directory-list ul {
+  border-left: 2px dashed var(--gray);
+}
+
+.directory-list li {
+  list-style: none;
+  font-size: 17px;
+  font-style: italic;
+  font-weight: normal;
+}
+
+.directory-list a:hover {
+  cursor: pointer;
+  text-decoration: underline !important;
+}
+
+.text-orange {
+  color: var(--orange);
+}

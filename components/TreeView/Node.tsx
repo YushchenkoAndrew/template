@@ -1,15 +1,52 @@
+import {
+  faFolder,
+  faFolderOpen,
+  IconDefinition,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useRef, useState } from "react";
-
+import styles from "./TreeView.module.css";
 export interface NodeProps {
   name: string;
+  index?: string;
+  open?: boolean;
+  className?: string;
+  icon?: IconDefinition;
+  iconClass?: string;
+  url?: string;
   children?: React.ReactNode;
+  onChange?: (key: string) => void;
 }
 
-export default function Node(props: NodeProps) {
+function Node(props: NodeProps) {
   return (
     <li>
-      <span>{props.name}</span>
-      {props.children ? <ul>{props.children}</ul> : null}
+      <a
+        className={`${
+          props.className ?? ""
+        } row text-dark text-decoration-none`}
+        href={props.url}
+        onClick={() => {
+          props.onChange?.(props.index || "");
+          if (props.url) window.open(props.url, "_blank");
+        }}
+      >
+        {props.icon ? (
+          <FontAwesomeIcon
+            className={`ml-1 mr-2 ${props.iconClass ?? ""}`}
+            icon={
+              props.icon === faFolder && props.open ? faFolderOpen : props.icon
+            }
+            size="lg"
+          />
+        ) : (
+          <span />
+        )}
+        {props.name}
+      </a>
+      {props.children && props.open ? <ul>{props.children}</ul> : null}
     </li>
   );
 }
+
+export default React.memo(Node);
