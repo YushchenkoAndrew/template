@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from "react";
+import React, { useState } from "react";
 import DefaultHeader from "../../../components/admin/default/DefaultHeader";
 import InputValue from "../../../components/Inputs/InputValue";
 import DefaultFooter from "../../../components/default/DefaultFooter";
@@ -7,7 +7,6 @@ import DefaultNav from "../../../components/default/DefaultNav";
 import defaultServerSideHandler from "../../../lib/session";
 import {
   ProjectElement,
-  ProjectFields,
   ProjectFile,
   ProjectForm,
 } from "../../../types/projects";
@@ -24,6 +23,7 @@ import InputRadio from "../../../components/Inputs/InputRadio";
 const placeholder = {
   name: "CodeRain",
   title: "Code Rain",
+  flag: "js",
   img: {
     name: "CodeRain.webp",
     type: "webp",
@@ -41,80 +41,94 @@ const treePlaceholder = {
   templates: {},
 } as TreeObj;
 
-export default function AdminHome() {
-  const [formData, onFormChange] = useState(placeholder);
-  const [treeStructure, onFileAdd] = useState(treePlaceholder);
-  const [fileInfo, onFileInfoAdd] = useState({} as ProjectFile);
+export type Event =
+  | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  | ProjectElement;
 
-  function onChange(
-    event:
-      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-      | ProjectElement
-  ) {
+function formTree(
+  tree: TreeObj,
+  info: ProjectFile,
+  files?: ProjectFile[]
+): TreeObj {
+  const dirs = [
+    info.role,
+    ...(info.dir ?? "").split("/").filter((item) => item),
+  ];
+  return {
+    ...tree,
+    ...(function combine(
+      prev: TreeObj | ProjectFile | null,
+      index: number = 0
+    ): TreeObj {
+      if (index === dirs.length) {
+        if (!files) return {};
+        return files.reduce(
+          (acc, curr) => ({
+            ...acc,
+            [curr.name]: curr,
+          }),
+          {} as TreeObj
+        );
+      }
+
+      return {
+        [dirs[index]]: {
+          ...(prev && !prev.name ? (prev as TreeObj)[dirs[index]] : prev ?? {}),
+          ...combine(
+            prev && !prev.name ? (prev as TreeObj)[dirs[index]] : prev,
+            index + 1
+          ),
+        },
+      };
+    })(tree),
+  };
+}
+
+export default function AdminHome() {
+  const [err, onError] = useState({} as { [name: string]: boolean });
+  const [formData, onFormChange] = useState({ flag: "js" } as ProjectForm);
+  const [treeStructure, onFileAdd] = useState(treePlaceholder);
+  const [fileInfo, onFileInfoAdd] = useState({ role: "assets" } as ProjectFile);
+
+  function onThumbnailChange(event: Event) {
     const { name, value } = event.target;
     onFormChange({
       ...formData,
-      [name]: value ? value : placeholder[name as ProjectFields],
-
-      // FIXME: I'll think about it
-      // ...(name == "title" ? { name: value.replace(" ", "") } : {}),
+      [name]: value ? value : undefined,
     });
 
     if (!(value as ProjectFile).name) return;
-    const file = value as ProjectFile;
-
-    onFileAdd({
-      ...treeStructure,
-      [file.role]: {
-        ...(treeStructure[file.role] ?? {}),
-        [file.name]: file,
-      },
-    });
+    onFileAdd(
+      formTree(treeStructure, value as ProjectFile, [value] as ProjectFile[])
+    );
   }
 
-  function onFileChange(
-    event:
-      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-      | ProjectElement
-  ) {
-    const { name, value } = event.target;
+  function onFileInfoChange(event: Event) {
     onFileInfoAdd({
       ...fileInfo,
-      [name]: value,
+      [event.target.name]: event.target.value,
     });
   }
 
-  function onFilesUpload(
-    event:
-      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-      | ProjectElement
-  ) {
-    const { name, value } = event.target;
-    if (Array.isArray(value)) {
-      return onFileAdd(
-        (value as ProjectFile[]).reduce(
-          (acc, curr) => ({
-            ...acc,
-            [curr.role]: {
-              ...(acc[curr.role] ?? {}),
-              [curr.name]: curr,
-            },
-          }),
-          treeStructure
-        )
-      );
-    }
+  function onFilesUpload(event: Event) {
+    if (!Array.isArray(event.target.value)) return;
+    return onFileAdd(
+      formTree(treeStructure, fileInfo, event.target.value as ProjectFile[])
+    );
+  }
 
-    if (!(value as ProjectFile).name) return;
-    const file = value as ProjectFile;
+  function checkOnError(): boolean {
+    let flags = {
+      name: !formData.name,
+      title: !formData.title,
+      desc: !formData.desc,
+      img: !formData.img,
+      link: formData.flag === "link" && !formData.link,
+    };
 
-    onFileAdd({
-      ...treeStructure,
-      [file.role]: {
-        ...(treeStructure[file.role] ?? {}),
-        [file.name]: file,
-      },
-    });
+    onError(flags);
+    for (let err of Object.values(flags)) if (err) return true;
+    return false;
   }
 
   return (
@@ -128,11 +142,11 @@ export default function AdminHome() {
         <div className="row">
           <div className="col-md-5 order-md-2 mb-4">
             <Card
-              img={formData.img.url ?? ""}
-              title={formData.title}
+              img={formData.img?.url || (placeholder.img.url ?? "")}
+              title={formData.title || placeholder.title}
               size="title-lg"
               href="#"
-              description={formData.desc}
+              description={formData.desc || placeholder.desc}
             />
           </div>
           <div className="col-md-7 order-md-1">
@@ -141,74 +155,122 @@ export default function AdminHome() {
               <InputName
                 char="@"
                 name="name"
-                required
-                placeholder="CodeRain"
-                message="Please enter title"
-                onChange={onChange}
+                error={err.name}
+                placeholder={placeholder.name}
+                onChange={onThumbnailChange}
               />
             </InputTemplate>
 
             <InputTemplate label="Title">
               <InputValue
                 name="title"
-                required
+                error={err.title}
                 placeholder={placeholder.title}
-                message="Please enter title"
-                onChange={onChange}
+                onChange={onThumbnailChange}
               />
             </InputTemplate>
 
             <InputTemplate label="Description">
               <InputText
                 name="desc"
-                required
+                error={err.desc}
                 placeholder={placeholder.desc}
-                message="Please enter title"
-                onChange={onChange}
+                onChange={onThumbnailChange}
               />
             </InputTemplate>
 
-            <InputTemplate label="Image">
-              <InputFile
-                name="img"
-                role="thumbnail"
-                type="image/*"
-                onChange={onChange}
-              />
-            </InputTemplate>
+            {formData.flag === "link" ? (
+              <InputTemplate label="Link">
+                <InputName
+                  char="http://"
+                  name="link"
+                  error={err.link}
+                  placeholder="github.com/YushchenkoAndrew/template/tree/master/JS/CodeRain"
+                  onChange={onThumbnailChange}
+                />
+              </InputTemplate>
+            ) : (
+              <span />
+            )}
+
+            <div className="input-group d-flex justify-content-between">
+              <InputTemplate label="Image">
+                <InputFile
+                  name="img"
+                  role="thumbnail"
+                  type="image/*"
+                  error={err.img}
+                  onChange={onThumbnailChange}
+                />
+              </InputTemplate>
+
+              <InputTemplate label="Flag">
+                <InputRadio
+                  name="flag"
+                  options="js c++ link"
+                  label="btn-outline-secondary"
+                  onChange={onThumbnailChange}
+                />
+              </InputTemplate>
+            </div>
           </div>
         </div>
+        {formData.flag === "link" ? (
+          <span />
+        ) : (
+          <>
+            <hr />
+            <div className="row">
+              <div className="col-md-6 order-md-1 mb-4">
+                <h4 className="mb-3">Project's Files Structure</h4>
+                <TreeView
+                  name={formData.name || placeholder.name}
+                  role={fileInfo.role}
+                  dir={fileInfo.dir}
+                  projectTree={formTree(treeStructure, fileInfo)}
+                />
+              </div>
+              <div className="col-md-6 order-md-2">
+                <InputTemplate label="Role">
+                  <div className="input-group">
+                    <InputRadio
+                      name="role"
+                      options="assets src styles template"
+                      onChange={onFileInfoChange}
+                    />
+                  </div>
+                </InputTemplate>
+
+                <InputTemplate label="Directory">
+                  <InputValue
+                    name="dir"
+                    placeholder="/lua/"
+                    onChange={onFileInfoChange}
+                  />
+                </InputTemplate>
+
+                <InputTemplate label="File">
+                  <InputFile
+                    name="img"
+                    role={fileInfo.role}
+                    multiple
+                    onChange={onFilesUpload}
+                  />
+                </InputTemplate>
+              </div>
+            </div>
+          </>
+        )}
         <hr />
-        <div className="row">
-          <div className="col-md-6 order-md-1 mb-4">
-            <h4 className="mb-3">Project's Files Structure</h4>
-            <TreeView name={formData.name} projectTree={treeStructure} />
-          </div>
-          <div className="col-md-6 order-md-2">
-            <InputTemplate label="Role">
-              <InputRadio
-                name="role"
-                options="assets src styles template"
-                onChange={onFileChange}
-              />
-            </InputTemplate>
-            <InputTemplate label="Directory">
-              <InputValue
-                name="dir"
-                placeholder="/lua/"
-                message="Please enter title"
-                onChange={onFileChange}
-              />
-            </InputTemplate>
-            <InputTemplate label="File">
-              <InputFile
-                name="img"
-                role={fileInfo.role}
-                multiple
-                onChange={onFilesUpload}
-              />
-            </InputTemplate>
-          </div>
+        <div className="d-flex justify-content-center mb-3">
+          <button
+            className="btn btn-success btn-lg w-75"
+            onClick={() => {
+              if (checkOnError()) return;
+            }}
+          >
+            Submit
+          </button>
         </div>
       </div>
 
