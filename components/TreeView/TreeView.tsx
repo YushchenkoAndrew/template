@@ -97,7 +97,6 @@ export default function TreeView(props: TreeViewProps) {
     return Object.entries(obj).map(([name, value], i) => {
       const key = md5(name + index.toString());
       const { icon, color } = getIcons(value.type);
-      console.log(value);
 
       return (
         <Node
@@ -105,7 +104,6 @@ export default function TreeView(props: TreeViewProps) {
           open={name === props.role || forced || showNode[key]}
           key={key}
           index={key}
-          url={value.url}
           icon={icon}
           iconClass={color}
           onChange={onStateChange}

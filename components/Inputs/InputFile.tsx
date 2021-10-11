@@ -18,6 +18,7 @@ export default function InputFile(props: InputFileProps) {
 
   function createFile(file: File, arg?: Object): ProjectFile {
     return {
+      file,
       name: file.name,
       type: file.type,
       role: props.role,
@@ -70,7 +71,9 @@ export default function InputFile(props: InputFileProps) {
         }}
       />
       <button
-        className={`btn ${file ? "btn-success" : "btn-outline-info"}`}
+        className={`btn ${
+          file && !props.multiple ? "btn-success" : "btn-outline-info"
+        }`}
         onClick={() => fileRef.current?.click()}
       >
         {file && !props.multiple ? file : "Upload"}

@@ -3,6 +3,7 @@ import Projects from "../pages/projects";
 export type ProjectFields = "name" | "title" | "desc" | "img";
 
 export type ProjectFile = {
+  file: File;
   name: string;
   dir?: string;
   url?: string;

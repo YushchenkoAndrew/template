@@ -9,7 +9,7 @@
   font-weight: normal;
 }
 
-.directory-list a:hover {
+.directory-list span:hover {
   cursor: pointer;
   text-decoration: underline !important;
 }

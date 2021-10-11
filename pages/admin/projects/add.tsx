@@ -117,7 +117,7 @@ export default function AdminHome() {
     );
   }
 
-  function checkOnError(): boolean {
+  function checkOnError(update: boolean = true): boolean {
     let flags = {
       name: !formData.name,
       title: !formData.title,
@@ -126,7 +126,7 @@ export default function AdminHome() {
       link: formData.flag === "link" && !formData.link,
     };
 
-    onError(flags);
+    if (update) onError(flags);
     for (let err of Object.values(flags)) if (err) return true;
     return false;
   }
@@ -264,7 +264,9 @@ export default function AdminHome() {
         <hr />
         <div className="d-flex justify-content-center mb-3">
           <button
-            className="btn btn-success btn-lg w-75"
+            className={`btn btn-lg w-75 ${
+              checkOnError(false) ? "btn-outline-success" : "btn-success"
+            }`}
             onClick={() => {
               if (checkOnError()) return;
             }}

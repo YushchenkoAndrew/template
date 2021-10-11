@@ -13,7 +13,6 @@ export interface NodeProps {
   className?: string;
   icon?: IconDefinition;
   iconClass?: string;
-  url?: string;
   children?: React.ReactNode;
   onChange?: (key: string) => void;
 }
@@ -21,15 +20,11 @@ export interface NodeProps {
 function Node(props: NodeProps) {
   return (
     <li>
-      <a
+      <span
         className={`${
           props.className ?? ""
         } row text-dark text-decoration-none`}
-        href={props.url}
-        onClick={() => {
-          props.onChange?.(props.index || "");
-          if (props.url) window.open(props.url, "_blank");
-        }}
+        onClick={() => props.onChange?.(props.index || "")}
       >
         {props.icon ? (
           <FontAwesomeIcon
@@ -43,7 +38,7 @@ function Node(props: NodeProps) {
           <span />
         )}
         {props.name}
-      </a>
+      </span>
       {props.children && props.open ? <ul>{props.children}</ul> : null}
     </li>
   );
