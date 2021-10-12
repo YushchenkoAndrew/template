@@ -12,6 +12,7 @@ import { Doughnut, Line } from "react-chartjs-2";
 import { faEye, faGlobe, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { Country, StatInfo } from "../types/info";
 import { AnalyticsData, StatisticData } from "../types/request";
+import { useRouter } from "next/dist/client/router";
 
 export function formatDate(date: Date) {
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
@@ -20,6 +21,9 @@ export function formatDate(date: Date) {
 }
 
 export default function Info() {
+  const router = useRouter();
+  const basePath = router.basePath;
+
   const [date, onDateChange] = useState(new Date());
   const [duration, onLoadPage] = useState(1000);
   const [mapData, onMapLoad] = useState([] as Country[]);
@@ -95,7 +99,7 @@ export default function Info() {
 
   function loadStaticData(date: Date) {
     fetch(
-      `/projects/api/info/statistic?date=${formatDate(
+      `${basePath}/api/info/statistic?date=${formatDate(
         date
       )}&id=${localStorage.getItem("id")}`,
       { cache: "default" }
@@ -111,7 +115,7 @@ export default function Info() {
 
   function loadAnalyticsData(date: Date) {
     fetch(
-      `/projects/api/info/analytics?date=${formatDate(
+      `${basePath}/api/info/analytics?date=${formatDate(
         date
       )}&id=${localStorage.getItem("id")}`,
       { cache: "default" }

@@ -5,8 +5,13 @@ import DefaultHead from "../../components/default/DefaultHead";
 import sessionConfig from "../../config/session";
 import { NextSessionArgs } from "../../types/session";
 import { checkIfUserExist } from "../../lib/session";
+import { basePath } from "../../config";
+import { useRouter } from "next/dist/client/router";
 
 export default function Login() {
+  const router = useRouter();
+  const basePath = router.basePath;
+
   return (
     <>
       <DefaultHead>
@@ -37,7 +42,7 @@ export const getServerSideProps = withIronSession(async function ({
     return {
       redirect: {
         basePath: false,
-        destination: "/projects/admin",
+        destination: `${basePath}/admin`,
         permanent: false,
       },
     };

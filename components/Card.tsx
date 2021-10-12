@@ -1,3 +1,4 @@
+import { useRouter } from "next/dist/client/router";
 import React, { CSSProperties, useEffect, useState } from "react";
 import Image from "react-bootstrap/Image";
 import styles from "./Card.module.css";
@@ -13,6 +14,9 @@ export interface CardProps {
 }
 
 export default function Card(props: CardProps) {
+  const router = useRouter();
+  const basePath = router.basePath;
+
   let [offset, setOffset] = useState({ top: -1, left: -1 } as DOMRect);
   let [opacityStyle, setOpacity] = useState("");
   let [animation, setAnimation] = useState("");
@@ -83,7 +87,7 @@ export default function Card(props: CardProps) {
         onClick={() =>
           localStorage.getItem("id")
             ? fetch(
-                `/projects/api/view/click?id=${localStorage.getItem("id")}`,
+                `${basePath}/api/view/click?id=${localStorage.getItem("id")}`,
                 {
                   method: "PATCH",
                 }

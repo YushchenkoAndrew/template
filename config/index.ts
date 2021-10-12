@@ -1,3 +1,5 @@
+import { useRouter } from "next/dist/client/router";
+
 const apiHost =
   process.env.NODE_ENV == "production"
     ? `${process.env.API_HOST}:${process.env.API_PORT}`
@@ -8,4 +10,6 @@ const botHost =
     ? process.env.BOT_URL ?? ""
     : "localhost:3000";
 
-export { apiHost, botHost };
+const basePath = "/projects";
+
+export { apiHost, botHost, basePath };

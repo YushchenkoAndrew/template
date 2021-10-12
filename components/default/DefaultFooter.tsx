@@ -7,6 +7,7 @@ import {
   faLinkedinIn,
   faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
+import { useRouter } from "next/dist/client/router";
 
 export interface DefaultFooterProps {
   name: string;
@@ -14,6 +15,8 @@ export interface DefaultFooterProps {
 }
 
 export default function DefaultFooter(props: DefaultFooterProps) {
+  const router = useRouter();
+  const basePath = router.basePath;
   return (
     <div className="container">
       <footer className="pt-4 my-md-5 pt-md-5 border-top py-2">
@@ -29,7 +32,7 @@ export default function DefaultFooter(props: DefaultFooterProps) {
                 onClick={() =>
                   localStorage.getItem("id")
                     ? fetch(
-                        `/projects/api/view/media?id=${localStorage.getItem(
+                        `${basePath}/api/view/media?id=${localStorage.getItem(
                           "id"
                         )}`,
                         { method: "PATCH" }
@@ -49,7 +52,7 @@ export default function DefaultFooter(props: DefaultFooterProps) {
                 onClick={() =>
                   localStorage.getItem("id")
                     ? fetch(
-                        `/projects/api/view/media?id=${localStorage.getItem(
+                        `${basePath}/api/view/media?id=${localStorage.getItem(
                           "id"
                         )}`,
                         { method: "PATCH" }
@@ -69,7 +72,7 @@ export default function DefaultFooter(props: DefaultFooterProps) {
                 onClick={() =>
                   localStorage.getItem("id")
                     ? fetch(
-                        `/projects/api/view/media?id=${localStorage.getItem(
+                        `${basePath}/api/view/media?id=${localStorage.getItem(
                           "id"
                         )}`,
                         { method: "PATCH" }

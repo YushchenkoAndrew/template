@@ -1,3 +1,4 @@
+import { useRouter } from "next/dist/client/router";
 import React from "react";
 
 export interface GithubLink {
@@ -13,6 +14,8 @@ export interface DefaultProjectInfoProps {
 }
 
 export default function DefaultProjectInfo(props: DefaultProjectInfoProps) {
+  const router = useRouter();
+  const basePath = router.basePath;
   return (
     <>
       <p className="text-dark">
@@ -26,7 +29,7 @@ export default function DefaultProjectInfo(props: DefaultProjectInfoProps) {
           onClick={() =>
             localStorage.getItem("id")
               ? fetch(
-                  `/projects/api/view/media?id=${localStorage.getItem("id")}`,
+                  `${basePath}/api/view/media?id=${localStorage.getItem("id")}`,
                   { method: "PATCH" }
                 )
                   .then((res) => null)
@@ -47,7 +50,7 @@ export default function DefaultProjectInfo(props: DefaultProjectInfoProps) {
                 onClick={() =>
                   localStorage.getItem("id")
                     ? fetch(
-                        `/projects/api/view/media?id=${localStorage.getItem(
+                        `${basePath}/api/view/media?id=${localStorage.getItem(
                           "id"
                         )}`,
                         { method: "PATCH" }

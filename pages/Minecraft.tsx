@@ -4,8 +4,11 @@ import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultFooter from "../components/default/DefaultFooter";
 import DefaultEmscContainer from "../components/default/DefaultEmscContainer";
 import DefaultProjectInfo from "../components/default/DefaultProjectInfo";
+import { useRouter } from "next/dist/client/router";
 
 export default function ReactionDiffusion() {
+  const router = useRouter();
+  const basePath = router.basePath;
   return (
     <>
       <DefaultHead>
@@ -13,12 +16,12 @@ export default function ReactionDiffusion() {
         <script
           defer
           type="text/javascript"
-          src="/projects/js/index.js"
+          src={`${basePath}/js/index.js`}
         ></script>
         <script
           async
           type="text/javascript"
-          src="/projects/js/Minecraft/index.js"
+          src={`${basePath}/js/Minecraft/index.js`}
         ></script>
       </DefaultHead>
 

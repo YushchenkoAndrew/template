@@ -2,6 +2,7 @@ import { withIronSession } from "next-iron-session";
 import sessionConfig from "../config/session";
 import { NextSessionArgs } from "../types/session";
 import redis from "../config/redis";
+import { basePath } from "../config";
 
 export function checkIfUserExist(sessionID: string) {
   return new Promise<boolean>((resolve, reject) => {
@@ -23,7 +24,7 @@ export default withIronSession(async function ({ req, res }: NextSessionArgs) {
     return {
       redirect: {
         basePath: false,
-        destination: "/projects/admin/login",
+        destination: `${basePath}/admin/login`,
         permanent: false,
       },
     };

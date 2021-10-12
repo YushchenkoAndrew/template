@@ -1,3 +1,4 @@
+import { useRouter } from "next/dist/client/router";
 import React from "react";
 import Image from "react-bootstrap/Image";
 import { FlagType } from "../../types/flag";
@@ -14,6 +15,8 @@ export interface CardProps {
 
 export default function Card(props: CardProps) {
   const desc = (props.desc ?? "").split(" ");
+  const router = useRouter();
+  const basePath = router.basePath;
 
   return (
     <div className="col-lg-4 col-md-6 col-sm-11 mt-4">
@@ -45,13 +48,13 @@ export default function Card(props: CardProps) {
             <span />
             <div className="row mr-2 mb-2">
               <a
-                href={`/projects/admin/projects/info/${props.id}`}
+                href={`${basePath}/admin/projects/info/${props.id}`}
                 className="btn btn-sm btn-outline-info mr-2"
               >
                 Modify
               </a>
               <a
-                href={`/projects/admin/projects/edit/${props.id}`}
+                href={`${basePath}/admin/projects/edit/${props.id}`}
                 className="btn btn-sm btn-outline-danger"
               >
                 Delete

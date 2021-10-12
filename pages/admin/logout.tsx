@@ -6,8 +6,13 @@ import sessionConfig from "../../config/session";
 import { NextSessionArgs } from "../../types/session";
 import { checkIfUserExist } from "../../lib/session";
 import redis from "../../config/redis";
+import { basePath } from "../../config";
+import { useRouter } from "next/dist/client/router";
 
 export default function Logout() {
+  const router = useRouter();
+  const basePath = router.basePath;
+
   return (
     <>
       <DefaultHead>
@@ -28,7 +33,7 @@ export const getServerSideProps = withIronSession(async function ({
     return {
       redirect: {
         basePath: false,
-        destination: "/projects/admin/login",
+        destination: `${basePath}/admin/login`,
         permanent: false,
       },
     };
@@ -40,7 +45,7 @@ export const getServerSideProps = withIronSession(async function ({
   return {
     redirect: {
       basePath: false,
-      destination: "/projects/",
+      destination: basePath,
       permanent: false,
     },
   };

@@ -4,14 +4,20 @@ import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultP5Container from "../components/default/DefaultP5Container";
 import DefaultFooter from "../components/default/DefaultFooter";
 import DefaultProjectInfo from "../components/default/DefaultProjectInfo";
+import { useRouter } from "next/dist/client/router";
 
 export default function ApproximatingPiValue() {
+  const router = useRouter();
+  const basePath = router.basePath;
   return (
     <>
       <DefaultHead>
         <title>Approximating Pi Value</title>
-        <script defer src="/projects/js/lib/p5.min.js"></script>
-        <script defer src="/projects/js/ApproximatingPiValue/index.js"></script>
+        <script defer src={`${basePath}/js/lib/p5.min.js`}></script>
+        <script
+          defer
+          src={`${basePath}/js/ApproximatingPiValue/index.js`}
+        ></script>
       </DefaultHead>
 
       <DefaultHeader projects />

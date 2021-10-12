@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "./NavItem.module.css";
 import effect from "../../styles/Glitch.module.css";
+import { useRouter } from "next/dist/client/router";
 
 export interface NavItemProps {
   name: string;
@@ -11,6 +12,8 @@ export interface NavItemProps {
 }
 
 export default function NavItem(props: NavItemProps) {
+  const router = useRouter();
+  const basePath = router.basePath;
   const [nameProp, setNameProp] = useState(
     props.name.split("").map((item) => ({ char: item, color: "#fff" }))
   );
@@ -47,7 +50,7 @@ export default function NavItem(props: NavItemProps) {
         onClick={() =>
           localStorage.getItem("id")
             ? fetch(
-                `/projects/api/view/click?id=${localStorage.getItem("id")}`,
+                `${basePath}/api/view/click?id=${localStorage.getItem("id")}`,
                 {
                   method: "PATCH",
                 }

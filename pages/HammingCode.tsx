@@ -4,14 +4,20 @@ import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultFooter from "../components/default/DefaultFooter";
 import DefaultEmscContainer from "../components/default/DefaultEmscContainer";
 import DefaultProjectInfo from "../components/default/DefaultProjectInfo";
+import { useRouter } from "next/dist/client/router";
 
 export default function HammingCode() {
+  const router = useRouter();
+  const basePath = router.basePath;
   return (
     <>
       <DefaultHead>
         <title>Hamming Code</title>
-        <script defer src="/projects/js/HammingCode/HammingCode.js"></script>
-        <script defer src="/projects/js/HammingCode/index.js"></script>
+        <script
+          defer
+          src={`${basePath}/js/HammingCode/HammingCode.js`}
+        ></script>
+        <script defer src={`${basePath}/js/HammingCode/index.js`}></script>
       </DefaultHead>
 
       <DefaultHeader projects />

@@ -4,16 +4,19 @@ import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultFooter from "../components/default/DefaultFooter";
 import DefaultEmscContainer from "../components/default/DefaultEmscContainer";
 import DefaultProjectInfo from "../components/default/DefaultProjectInfo";
+import { useRouter } from "next/dist/client/router";
 
 export default function CodeRain() {
+  const router = useRouter();
+  const basePath = router.basePath;
   return (
     <>
       <DefaultHead>
         <title>Code Rain</title>
-        <script defer src="/projects/js/CodeRain/Char.js"></script>
-        <script defer src="/projects/js/CodeRain/Stream.js"></script>
-        <script defer src="/projects/js/CodeRain/CodeRain.js"></script>
-        <script defer src="/projects/js/CodeRain/index.js"></script>
+        <script defer src={`${basePath}/js/CodeRain/Char.js`}></script>
+        <script defer src={`${basePath}/js/CodeRain/Stream.js`}></script>
+        <script defer src={`${basePath}/js/CodeRain/CodeRain.js`}></script>
+        <script defer src={`${basePath}/js/CodeRain/index.js`}></script>
       </DefaultHead>
 
       <DefaultHeader projects />

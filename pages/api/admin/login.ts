@@ -98,7 +98,10 @@ export default withIronSession(
     if (!salt || !user || !pass || !id) {
       return res
         .status(400)
-        .send({ stat: "ERR", message: "This request is too bad to bee true" });
+        .send({
+          stat: "ERR",
+          message: "This request is too bad to be a true one",
+        });
     }
 
     let response = await checkUserInfo(id, salt, user, pass);

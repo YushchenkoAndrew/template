@@ -1,3 +1,4 @@
+import { useRouter } from "next/dist/client/router";
 import React, { useEffect, useState } from "react";
 import md5 from "../../lib/md5";
 import { DefaultRes } from "../../types/request";
@@ -9,6 +10,9 @@ export interface SignInProps {
 }
 
 export default function SignIn(props: SignInProps) {
+  const router = useRouter();
+  const basePath = router.basePath;
+
   const [errMessage, onErrHappen] = useState("");
 
   useEffect(() => {
@@ -33,7 +37,7 @@ export default function SignIn(props: SignInProps) {
     }
 
     const salt = Math.round(Math.random() * 10000);
-    fetch(`/projects/api/admin/login?id=${localStorage.getItem("id")}`, {
+    fetch(`${basePath}/api/admin/login?id=${localStorage.getItem("id")}`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -50,7 +54,7 @@ export default function SignIn(props: SignInProps) {
           return onErrHappen(
             body.message.replace("[LOGIN]", target.user.value)
           );
-        window.location.href = "/projects/admin";
+        window.location.href = `${basePath}/admin`;
       })
       .catch((err) => {});
   }

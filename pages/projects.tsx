@@ -1,3 +1,4 @@
+import { useRouter } from "next/dist/client/router";
 import React from "react";
 import Card from "../components/Card";
 import CardColumns from "../components/CardColumns";
@@ -7,19 +8,21 @@ import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultNav from "../components/default/DefaultNav";
 
 export default function Projects() {
+  const router = useRouter();
+  const basePath = router.basePath;
   return (
     <>
       <DefaultHead>
         <title>Mortis Projects</title>
         <link
           rel="preload"
-          href="/projects/fonts/ABSTRACT.ttf"
+          href={`${basePath}/fonts/ABSTRACT.ttf`}
           as="font"
           crossOrigin=""
         />
         <link
           rel="preload"
-          href="/projects/fonts/Roboto-Thin.ttf"
+          href={`${basePath}/fonts/Roboto-Thin.ttf`}
           as="font"
           crossOrigin=""
         />
@@ -29,41 +32,41 @@ export default function Projects() {
       <main role="main">
         <CardColumns>
           <Card
-            img="/projects/img/ApproximatingPiValue.webp"
+            img={`${basePath}/img/ApproximatingPiValue.webp`}
             title="Find Pi with RNG"
-            href={`/projects/ApproximatingPiValue`}
+            href={`${basePath}/ApproximatingPiValue`}
             description="Plz RNG Gods, I need to gacha the Pi value"
           />
           <Card
-            img="/projects/img/CodeRain.webp"
+            img={`${basePath}/img/CodeRain.webp`}
             title="Code Rain"
             size="title-lg"
-            href={`/projects/CodeRain`}
+            href={`${basePath}/CodeRain`}
             description="Take the blue pill and the site will close, or take the red pill and I show how deep the rabbit hole goes"
           />
           <Card
-            img="/projects/img/HammingCode.webp"
+            img={`${basePath}/img/HammingCode.webp`}
             title="Hamming Code"
-            href={`/projects/HammingCode`}
+            href={`${basePath}/HammingCode`}
             description="The first algorithm for Error correction"
           />
           <Card
-            img="/projects/img/Minecraft.webp"
+            img={`${basePath}/img/Minecraft.webp`}
             title="3D Engine"
             size="title-lg"
-            href={`/projects/Minecraft`}
+            href={`${basePath}/Minecraft`}
             description="Yet another Minecraft clone"
           />
           <Card
-            img="/projects/img/ReactionDiffusion.webp"
+            img={`${basePath}/img/ReactionDiffusion.webp`}
             title="Reaction Diffusion"
-            href={`/projects/ReactionDiffusion`}
+            href={`${basePath}/ReactionDiffusion`}
             description="Haha, chemical elements go brrrrr "
           />
           <Card
-            img="/projects/img/ShadowCasting.webp"
+            img={`${basePath}/img/ShadowCasting.webp`}
             title="Shadow Casting"
-            href={`/projects/ShadowCasting`}
+            href={`${basePath}/ShadowCasting`}
             description="Caveman discover shadow. Ugh, Uugh pretty shade"
           />
 

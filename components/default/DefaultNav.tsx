@@ -1,3 +1,4 @@
+import { useRouter } from "next/dist/client/router";
 import React from "react";
 import NavItem from "../NavBar/NavItem";
 
@@ -11,11 +12,13 @@ export interface DefaultNavProps {
 }
 
 export default function DefaultNav(props: DefaultNavProps) {
+  const router = useRouter();
+  const basePath = router.basePath;
   return (
     <>
       <NavItem
         name="Home"
-        href="/projects"
+        href={basePath}
         style={props.style}
         active={props.home}
       />
@@ -28,13 +31,13 @@ export default function DefaultNav(props: DefaultNavProps) {
       />
       <NavItem
         name="Projects"
-        href="/projects/projects"
+        href={`${basePath}/projects`}
         style={props.style}
         active={props.projects}
       />
       <NavItem
         name="Info"
-        href="/projects/info"
+        href={`${basePath}/info`}
         style={props.style}
         active={props.info}
       />

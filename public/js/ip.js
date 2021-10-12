@@ -4,6 +4,13 @@ let nowTime = (function () {
   return now.getTime() - now.getTimezoneOffset() * 60000;
 })();
 
+if (!localStorage.getItem("salt")) {
+  localStorage.setItem(
+    "salt",
+    md5(Math.random().toString() + new Date().toString())
+  );
+}
+
 function clearLocalStorage() {
   flag = true;
   localStorage.removeItem("id");
