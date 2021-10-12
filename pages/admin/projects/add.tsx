@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DefaultHeader from "../../../components/admin/default/DefaultHeader";
 import InputValue from "../../../components/Inputs/InputValue";
 import DefaultFooter from "../../../components/default/DefaultFooter";
@@ -19,6 +19,8 @@ import Card from "../../../components/Card";
 import InputFile from "../../../components/Inputs/InputFile";
 import TreeView from "../../../components/TreeView/TreeView";
 import InputRadio from "../../../components/Inputs/InputRadio";
+import md5 from "../../../lib/md5";
+import { useRouter } from "next/dist/client/router";
 
 const placeholder = {
   name: "CodeRain",
@@ -28,9 +30,17 @@ const placeholder = {
     name: "CodeRain.webp",
     type: "webp",
     role: "thumbnail",
-    url: "/projects/img/CodeRain.webp",
+    url: `/projects/img/CodeRain.webp`,
   },
   desc: "Take the blue pill and the site will close, or take the red pill and I show how deep the rabbit hole goes",
+} as ProjectForm;
+
+const formPlaceholder = {
+  name: "",
+  flag: "js",
+  title: "",
+  desc: "",
+  link: "",
 } as ProjectForm;
 
 const treePlaceholder = {
@@ -85,8 +95,11 @@ function formTree(
 }
 
 export default function AdminHome() {
+  const router = useRouter();
+  const basePath = router.basePath;
+
   const [err, onError] = useState({} as { [name: string]: boolean });
-  const [formData, onFormChange] = useState({ flag: "js" } as ProjectForm);
+  const [formData, onFormChange] = useState(formPlaceholder);
   const [treeStructure, onFileAdd] = useState(treePlaceholder);
   const [fileInfo, onFileInfoAdd] = useState({ role: "assets" } as ProjectFile);
 
@@ -131,6 +144,48 @@ export default function AdminHome() {
     return false;
   }
 
+  //
+  //  Cache part
+  //
+  useEffect(() => {
+    const cacheId = md5(
+      localStorage.getItem("salt") ?? "" + localStorage.getItem("id") ?? ""
+    );
+    fetch(`${basePath}/api/admin/cache?id=${cacheId}`, {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((data: ProjectForm) => {
+        onFormChange({
+          ...formData,
+          name: data.name || formData.name,
+          flag: data.flag || formData.flag,
+          title: data.title || formData.title,
+          desc: data.desc || formData.desc,
+          link: data.link || formData.link,
+        });
+      })
+      .catch((err) => null);
+  }, []);
+
+  function onDataCache(event: Event) {
+    const cacheId = md5(
+      localStorage.getItem("salt") ?? "" + localStorage.getItem("id") ?? ""
+    );
+    fetch(`${basePath}/api/admin/cache?id=${cacheId}`, {
+      method: "POST",
+      body: JSON.stringify({
+        name: formData.name,
+        flag: formData.flag,
+        title: formData.title,
+        desc: formData.desc,
+        link: formData.link ?? "",
+      }),
+    })
+      .then((res) => console.log(res.status))
+      .catch((err) => null);
+  }
+
   return (
     <>
       <DefaultHead>
@@ -155,27 +210,33 @@ export default function AdminHome() {
               <InputName
                 char="@"
                 name="name"
+                value={formData.name}
                 error={err.name}
                 placeholder={placeholder.name}
                 onChange={onThumbnailChange}
+                onBlur={onDataCache}
               />
             </InputTemplate>
 
             <InputTemplate label="Title">
               <InputValue
                 name="title"
+                value={formData.title}
                 error={err.title}
                 placeholder={placeholder.title}
                 onChange={onThumbnailChange}
+                onBlur={onDataCache}
               />
             </InputTemplate>
 
             <InputTemplate label="Description">
               <InputText
                 name="desc"
+                value={formData.desc}
                 error={err.desc}
                 placeholder={placeholder.desc}
                 onChange={onThumbnailChange}
+                onBlur={onDataCache}
               />
             </InputTemplate>
 
@@ -184,9 +245,11 @@ export default function AdminHome() {
                 <InputName
                   char="http://"
                   name="link"
+                  value={formData.link ?? ""}
                   error={err.link}
                   placeholder="github.com/YushchenkoAndrew/template/tree/master/JS/CodeRain"
                   onChange={onThumbnailChange}
+                  onBlur={onDataCache}
                 />
               </InputTemplate>
             ) : (
@@ -244,6 +307,7 @@ export default function AdminHome() {
                 <InputTemplate label="Directory">
                   <InputValue
                     name="dir"
+                    value={fileInfo.dir ?? ""}
                     placeholder="/lua/"
                     onChange={onFileInfoChange}
                   />
@@ -269,6 +333,52 @@ export default function AdminHome() {
             }`}
             onClick={() => {
               if (checkOnError()) return;
+
+              fetch(`${basePath}/api/admin/projects`, {
+                method: "POST",
+                body: JSON.stringify({
+                  thumbnail: {
+                    name: formData.name,
+                    flag: formData.flag,
+                    title: formData.title,
+                    desc: formData.desc,
+                    link: formData.link ?? "",
+                  },
+                }),
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  const id = data.id ?? null;
+                  if (!id) return;
+
+                  (function parseTree(
+                    tree: TreeObj | ProjectFile | null,
+                    path: string = ""
+                  ) {
+                    if (!tree) return;
+                    if (tree.name) {
+                      const data = new FormData();
+                      data.append(
+                        (tree as ProjectFile).name,
+                        (tree as ProjectFile).file
+                      );
+                      return fetch(
+                        `${basePath}/api/admin/file?id=${id}&path=${path}`,
+                        {
+                          method: "POST",
+                          body: data,
+                        }
+                      )
+                        .then((res) => console.log(res.status))
+                        .catch((err) => null);
+                    }
+
+                    Object.entries(tree).forEach(([name, value]) =>
+                      parseTree(value, value.name ? path : `${path}/${name}`)
+                    );
+                  })(treeStructure);
+                })
+                .catch((err) => null);
             }}
           >
             Submit
