@@ -34,6 +34,7 @@ export default function Card(props: CardProps) {
             // FIXME: Do not change img
             width="100"
             height="100"
+            alt="Project image"
           />
           <h4 className="d-block text-dark font-weight-bold mt-3">
             {props.title}

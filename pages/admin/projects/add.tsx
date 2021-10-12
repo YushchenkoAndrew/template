@@ -20,7 +20,7 @@ import InputFile from "../../../components/Inputs/InputFile";
 import TreeView from "../../../components/TreeView/TreeView";
 import InputRadio from "../../../components/Inputs/InputRadio";
 import md5 from "../../../lib/md5";
-import { useRouter } from "next/dist/client/router";
+import { basePath } from "../../../config";
 
 const placeholder = {
   name: "CodeRain",
@@ -30,7 +30,7 @@ const placeholder = {
     name: "CodeRain.webp",
     type: "webp",
     role: "thumbnail",
-    url: `/projects/img/CodeRain.webp`,
+    url: `${basePath}/projects/img/CodeRain.webp`,
   },
   desc: "Take the blue pill and the site will close, or take the red pill and I show how deep the rabbit hole goes",
 } as ProjectForm;
@@ -95,9 +95,6 @@ function formTree(
 }
 
 export default function AdminHome() {
-  const router = useRouter();
-  const basePath = router.basePath;
-
   const [err, onError] = useState({} as { [name: string]: boolean });
   const [formData, onFormChange] = useState(formPlaceholder);
   const [treeStructure, onFileAdd] = useState(treePlaceholder);
@@ -285,7 +282,7 @@ export default function AdminHome() {
             <hr />
             <div className="row">
               <div className="col-md-6 order-md-1 mb-4">
-                <h4 className="mb-3">Project's Files Structure</h4>
+                <h4 className="mb-3">Projects Files Structure</h4>
                 <TreeView
                   name={formData.name || placeholder.name}
                   role={fileInfo.role}

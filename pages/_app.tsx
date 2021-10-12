@@ -4,11 +4,9 @@ import Head from "next/head";
 import "../styles/globals.css";
 import "../styles/bootstrap.min.css";
 import { useEffect } from "react";
-import { useRouter } from "next/dist/client/router";
+import { basePath } from "../config";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  const router = useRouter();
-  const basePath = router.basePath;
   useEffect(() => {
     localStorage.getItem("id")
       ? fetch(
