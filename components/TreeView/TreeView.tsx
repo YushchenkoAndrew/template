@@ -78,6 +78,9 @@ export interface TreeViewProps {
   projectTree: TreeObj;
 }
 
+//
+// TODO: Add functionality to delete file/folder
+//
 export default function TreeView(props: TreeViewProps) {
   const [showNode, onNodeChange] = useState({} as { [name: string]: boolean });
 

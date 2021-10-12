@@ -17,6 +17,10 @@ export default function InputFile(props: InputFileProps) {
   const [file, onFileUpload] = useState<string | null>(null);
 
   function createFile(file: File, arg?: Object): ProjectFile {
+    const form = new FormData();
+    form.append("test", file);
+    console.log(form);
+
     return {
       file,
       name: file.name,

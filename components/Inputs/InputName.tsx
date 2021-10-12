@@ -6,10 +6,12 @@ import InputValue from "./InputValue";
 export interface InputNameProps {
   char: string;
   name: string;
+  value: string;
   type?: string;
   error?: boolean;
   placeholder?: string;
   onChange: (event: Event) => void;
+  onBlur?: (event: Event) => void;
 }
 
 export default function InputName(props: InputNameProps) {
@@ -21,10 +23,12 @@ export default function InputName(props: InputNameProps) {
         </div>
         <InputValue
           name={props.name}
+          value={props.value}
           type={props.type}
           error={props.error}
           placeholder={props.placeholder}
           onChange={props.onChange}
+          onBlur={props.onBlur}
         />
       </div>
     </>
