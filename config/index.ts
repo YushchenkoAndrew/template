@@ -10,6 +10,11 @@ const botHost =
     ? process.env.BOT_URL ?? ""
     : "localhost:3000";
 
+const fileServer =
+  process.env.NODE_ENV == "production"
+    ? process.env.FILE_SERVER_URL ?? ""
+    : "localhost:8003";
+
 const basePath = "/projects";
 
-export { apiHost, botHost, basePath };
+export { apiHost, botHost, fileServer, basePath };

@@ -5,15 +5,10 @@ import { PassValidate } from "../../../lib/auth";
 import { sendLogs } from "../../../lib/bot";
 import md5 from "../../../lib/md5";
 import { LoginRequest } from "../../../types/admin";
-import { DefaultRes } from "../../../types/request";
-
-type PromiseReturn = {
-  status: number;
-  send: DefaultRes;
-};
+import { DefaultRes, FullResponse } from "../../../types/request";
 
 function checkUserInfo(id: string, salt: number, user: string, pass: string) {
-  return new Promise<PromiseReturn>((resolve, reject) => {
+  return new Promise<FullResponse>((resolve, reject) => {
     redis.get(id, (err, reply) => {
       if (err || !reply) {
         return resolve({
@@ -96,12 +91,10 @@ export default withIronSession(
     let id = req.query["id"] as string;
     let { salt, user, pass } = req.body as LoginRequest;
     if (!salt || !user || !pass || !id) {
-      return res
-        .status(400)
-        .send({
-          stat: "ERR",
-          message: "This request is too bad to be a true one",
-        });
+      return res.status(400).send({
+        stat: "ERR",
+        message: "This request is too bad to be a true one",
+      });
     }
 
     let response = await checkUserInfo(id, salt, user, pass);

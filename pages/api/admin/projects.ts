@@ -3,11 +3,6 @@ import { Session, withIronSession } from "next-iron-session";
 import redis from "../../../config/redis";
 import sessionConfig from "../../../config/session";
 
-type PromiseReturn = {
-  code: number;
-  data: string;
-};
-
 export default withIronSession(async function (
   req: NextApiRequest & { session: Session },
   res: NextApiResponse

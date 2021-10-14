@@ -3,7 +3,7 @@ import { botHost } from "../config";
 import { LogMessage } from "../types/bot";
 
 export function sendLogs(body: LogMessage) {
-  let salt = Math.round(Math.random() * 100000);
+  let salt = Math.round(Math.random() * 100000 + 500);
   fetch(
     `http://${botHost}/bot/logs/alert?key=${md5(
       salt + (process.env.BOT_KEY ?? "")

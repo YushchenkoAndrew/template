@@ -6,6 +6,11 @@ export type DefaultRes = {
   message: string;
 };
 
+export type FullResponse = {
+  status: number;
+  send: DefaultRes;
+};
+
 export type AnalyticsData = {
   stat: Stat;
   doughnut: Analytics;
