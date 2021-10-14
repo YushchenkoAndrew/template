@@ -30,7 +30,7 @@ const placeholder = {
     name: "CodeRain.webp",
     type: "webp",
     role: "thumbnail",
-    url: `${basePath}/projects/img/CodeRain.webp`,
+    url: `${basePath}/img/CodeRain.webp`,
   },
   desc: "Take the blue pill and the site will close, or take the red pill and I show how deep the rabbit hole goes",
 } as ProjectForm;
@@ -355,23 +355,26 @@ export default function AdminHome() {
                     if (!tree) return;
                     if (tree.name) {
                       const data = new FormData();
-                      data.append(
-                        (tree as ProjectFile).name,
-                        (tree as ProjectFile).file
+                      data.append("file", (tree as ProjectFile).file);
+                      return (
+                        fetch(
+                          `${basePath}/api/admin/file?id=${id}&path=/${path}&name=${tree.name}`,
+                          {
+                            method: "POST",
+                            body: data,
+                          }
+                        )
+                          // TODO: Show something on Success !!!!
+                          .then((res) => console.log(res.status))
+                          .catch((err) => null)
                       );
-                      return fetch(
-                        `${basePath}/api/admin/file?id=${id}&path=${path}`,
-                        {
-                          method: "POST",
-                          body: data,
-                        }
-                      )
-                        .then((res) => console.log(res.status))
-                        .catch((err) => null);
                     }
 
                     Object.entries(tree).forEach(([name, value]) =>
-                      parseTree(value, value.name ? path : `${path}/${name}`)
+                      parseTree(
+                        value,
+                        value.name ? path : `${formData.name}${path}/${name}`
+                      )
                     );
                   })(treeStructure);
                 })
