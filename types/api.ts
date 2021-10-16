@@ -1,20 +1,22 @@
 import { Stat } from "./request";
 
 export type ApiError = {
-  stat: Stat;
+  status: Stat;
   result: string[];
   message: string;
 };
 
 export type ApiTokens = {
-  stat: Stat;
+  status: Stat;
   access_token: string;
   refresh_token: string;
 };
 
-export type ApiReq = {
+export type ApiResult = InfoSum | InfoData | WorldData | ProjectData | FileData;
+
+export type ApiRes = {
   items: number;
-  result: (InfoSum | InfoData | WorldData)[];
+  result: ApiResult[];
   status: Stat;
   totalItems: number;
 };
@@ -41,4 +43,25 @@ export type WorldData = {
   UpdatedAt: string;
   Country: string;
   Visitors: number;
+};
+
+export type FileData = {
+  ID: number;
+  UpdatedAt: string;
+  Name: string;
+  Path: string;
+  Type: string;
+  Role: string;
+  ProjectID: number;
+};
+
+export type ProjectData = {
+  ID: number;
+  CreatedAt: string;
+  Name: string;
+  Title: string;
+  Flag: string;
+  Desc: string;
+  Note: string;
+  Files: FileData[];
 };

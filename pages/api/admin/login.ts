@@ -14,7 +14,7 @@ function checkUserInfo(id: string, salt: number, user: string, pass: string) {
         return resolve({
           status: 403,
           send: {
-            stat: "ERR",
+            status: "ERR",
             message: "Man, who the heck are you ?",
           },
         });
@@ -38,7 +38,7 @@ function checkUserInfo(id: string, salt: number, user: string, pass: string) {
           return resolve({
             status: 429,
             send: {
-              stat: "ERR",
+              status: "ERR",
               message: "You can't go EVEN FURTHER BEYOND",
             },
           });
@@ -60,7 +60,7 @@ function checkUserInfo(id: string, salt: number, user: string, pass: string) {
           return resolve({
             status: 401,
             send: {
-              stat: "ERR",
+              status: "ERR",
               message: `So your name is Ms.[LOGIN], huh...`,
             },
           });
@@ -70,7 +70,7 @@ function checkUserInfo(id: string, salt: number, user: string, pass: string) {
         return resolve({
           status: 200,
           send: {
-            stat: "OK",
+            status: "OK",
             message: "I guess you can pass",
           },
         });
@@ -85,14 +85,14 @@ export default withIronSession(
     res: NextApiResponse<DefaultRes>
   ) {
     if (req.method !== "POST") {
-      return res.status(405).send({ stat: "ERR", message: "Unknown method" });
+      return res.status(405).send({ status: "ERR", message: "Unknown method" });
     }
 
     let id = req.query["id"] as string;
     let { salt, user, pass } = req.body as LoginRequest;
     if (!salt || !user || !pass || !id) {
       return res.status(400).send({
-        stat: "ERR",
+        status: "ERR",
         message: "This request is too bad to be a true one",
       });
     }

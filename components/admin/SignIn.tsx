@@ -50,7 +50,7 @@ export default function SignIn(props: SignInProps) {
     })
       .then((res) => res.json())
       .then((body: DefaultRes) => {
-        if (body.stat === "ERR")
+        if (body.status === "ERR")
           return onErrHappen(
             body.message.replace("[LOGIN]", target.user.value)
           );

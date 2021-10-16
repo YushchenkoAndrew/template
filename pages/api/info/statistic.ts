@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../../config/redis";
-import { ApiReq, InfoData, WorldData } from "../../../types/api";
+import { ApiRes, InfoData, WorldData } from "../../../types/api";
 import { Country, DayStat, StatInfo } from "../../../types/info";
 import { DefaultRes, StatisticData } from "../../../types/request";
 import { apiHost } from "../../../config";
@@ -15,14 +15,14 @@ export default function handler(
   if (req.method !== "GET") {
     return res
       .status(405)
-      .json({ stat: "ERR", message: "Request handler not found" });
+      .json({ status: "ERR", message: "Request handler not found" });
   }
 
   let { date } = req.query as QueryParams;
   if (!date) {
     return res
       .status(400)
-      .json({ stat: "ERR", message: "Not all Query params are declared!" });
+      .json({ status: "ERR", message: "Not all Query params are declared!" });
   }
 
   let prev = new Date(date);
@@ -41,7 +41,7 @@ export default function handler(
 
         fetch(`http://${apiHost}/api/info?created_at=${date}`)
           .then((res) => res.json())
-          .then((res: ApiReq) => {
+          .then((res: ApiRes) => {
             if (res.status == "ERR") {
               return reject("Idk something wrong happened at the backend");
             }
@@ -83,7 +83,7 @@ export default function handler(
 
         fetch(`http://${apiHost}/api/info?created_at=${formatDate(prev)}`)
           .then((res) => res.json())
-          .then((res: ApiReq) => {
+          .then((res: ApiRes) => {
             if (res.status == "ERR") {
               return reject("Idk something wrong happened at the backend");
             }
@@ -111,7 +111,7 @@ export default function handler(
         // NOTE: This will run only in the case where none of users were identified
         fetch(`http://${apiHost}/api/world?page=-1`)
           .then((res) => res.json())
-          .then((res: ApiReq) => {
+          .then((res: ApiRes) => {
             if (!res.items || res.status == "ERR")
               return reject("Idk something wrong happened at then backend");
 
@@ -155,7 +155,7 @@ export default function handler(
     })
     .catch((err) => {
       res.status(200).json({
-        stat: "ERR",
+        status: "ERR",
         message: err,
       });
 

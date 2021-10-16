@@ -6,5 +6,5 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<DefaultRes>
 ) {
-  res.status(200).json({ stat: "OK", message: "pong" });
+  res.status(200).json({ status: "OK", message: "pong" });
 }

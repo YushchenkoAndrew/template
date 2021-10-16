@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getValue, setValue } from "../../../lib/mutex";
 import redis from "../../../config/redis";
 import { apiHost } from "../../../config";
-import { ApiReq, WorldData } from "../../../types/api";
+import { ApiRes, WorldData } from "../../../types/api";
 import { sendLogs } from "../../../lib/bot";
 import md5 from "../../../lib/md5";
 
@@ -16,7 +16,7 @@ function finalValue(key: string) {
 
       fetch(`http://${apiHost}/api/world?page=-1`)
         .then((res) => res.json())
-        .then((res: ApiReq) => {
+        .then((res: ApiRes) => {
           if (!res.items || res.status == "ERR")
             return reject("Idk something wrong happened at then backend");
 

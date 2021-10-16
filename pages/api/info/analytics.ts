@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../../config/redis";
 import { formatDate } from "../../info";
-import { ApiReq, InfoData } from "../../../types/api";
+import { ApiRes, InfoData } from "../../../types/api";
 import { AnalyticsData, DefaultRes, Stat } from "../../../types/request";
 import { apiHost, botHost } from "../../../config";
 import { Analytics } from "../../../types/info";
@@ -28,14 +28,14 @@ export default function handler(
   if (req.method !== "GET") {
     return res
       .status(405)
-      .json({ stat: "ERR", message: "Request handler not found" });
+      .json({ status: "ERR", message: "Request handler not found" });
   }
 
   let { date } = req.query as QueryParams;
   if (!date) {
     return res
       .status(400)
-      .json({ stat: "ERR", message: "Not all Query params are declared!" });
+      .json({ status: "ERR", message: "Not all Query params are declared!" });
   }
 
   const now = formatDate(new Date());
@@ -46,11 +46,12 @@ export default function handler(
 
         fetch(`http://${apiHost}/api/info/sum`)
           .then((res) => res.json())
-          .then((res: ApiReq) => {
-            console.log(res);
+          .then((res: ApiRes) => {
+            if (res.status == "ERR")
+              return reject("Idk something wrong happened at the backend");
 
             const result = res.result.pop() as InfoData;
-            if (!res.items || !result || res.status == "ERR")
+            if (!res.items || !result)
               return reject("Idk something wrong happened at the backend");
 
             const stat = {
@@ -81,7 +82,7 @@ export default function handler(
           )}&orderBy=CreatedAt`
         )
           .then((res) => res.json())
-          .then((res: ApiReq) => {
+          .then((res: ApiRes) => {
             if (!res.items || res.status == "ERR")
               return reject("Idk something wrong happened at the backend");
 
@@ -121,7 +122,7 @@ export default function handler(
     })
     .catch((err) => {
       res.status(200).json({
-        stat: "ERR",
+        status: "ERR",
         message: err,
       });
 

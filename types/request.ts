@@ -2,8 +2,9 @@ import { Analytics, Country, StatInfo } from "./info";
 
 export type Stat = "OK" | "ERR";
 export type DefaultRes = {
-  stat: Stat;
+  status: Stat;
   message: string;
+  result?: any;
 };
 
 export type FullResponse = {
