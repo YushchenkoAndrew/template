@@ -7,6 +7,7 @@ import DefaultNav from "../../../components/default/DefaultNav";
 import defaultServerSideHandler from "../../../lib/session";
 import {
   ProjectElement,
+  ProjectFields,
   ProjectFile,
   ProjectForm,
 } from "../../../types/projects";
@@ -21,6 +22,8 @@ import TreeView from "../../../components/TreeView/TreeView";
 import InputRadio from "../../../components/Inputs/InputRadio";
 import md5 from "../../../lib/md5";
 import { basePath } from "../../../config";
+import { DefaultRes } from "../../../types/request";
+import { ProjectData } from "../../../types/api";
 
 const placeholder = {
   name: "CodeRain",
@@ -94,6 +97,7 @@ function formTree(
   };
 }
 
+// TODO: Add another description for the footer !!!
 export default function AdminHome() {
   const [err, onError] = useState({} as { [name: string]: boolean });
   const [formData, onFormChange] = useState(formPlaceholder);
@@ -333,32 +337,44 @@ export default function AdminHome() {
 
               fetch(`${basePath}/api/admin/projects`, {
                 method: "POST",
+                headers: {
+                  "content-type": "application/json",
+                },
                 body: JSON.stringify({
-                  thumbnail: {
-                    name: formData.name,
-                    flag: formData.flag,
-                    title: formData.title,
-                    desc: formData.desc,
-                    link: formData.link ?? "",
-                  },
+                  name: formData.name,
+                  flag: formData.flag,
+                  title: formData.title,
+                  desc: formData.desc,
+                  link: formData.link ?? "",
                 }),
               })
                 .then((res) => res.json())
-                .then((data) => {
-                  const id = data.id ?? null;
-                  if (!id) return;
+                .then((data: DefaultRes) => {
+                  if (
+                    data.status !== "OK" ||
+                    !(data.result as ProjectData[]).length ||
+                    !(data.result as ProjectData[])[0]
+                  )
+                    return;
 
-                  (function parseTree(
-                    tree: TreeObj | ProjectFile | null,
-                    path: string = ""
-                  ) {
+                  const { ID } = (data.result as ProjectData[])[0];
+                  (function parseTree(tree: TreeObj | ProjectFile | null) {
                     if (!tree) return;
                     if (tree.name) {
                       const data = new FormData();
                       data.append("file", (tree as ProjectFile).file);
                       return (
                         fetch(
-                          `${basePath}/api/admin/file?id=${id}&path=/${path}&name=${tree.name}`,
+                          `${basePath}/api/admin/file?id=${ID}&project=${
+                            formData.name
+                          }&role=${tree.role}${
+                            tree.dir
+                              ? "&dir=" +
+                                ((tree as ProjectFile).dir?.[0] !== "/"
+                                  ? "/" + tree.dir
+                                  : tree.dir)
+                              : ""
+                          }`,
                           {
                             method: "POST",
                             body: data,
@@ -371,10 +387,7 @@ export default function AdminHome() {
                     }
 
                     Object.entries(tree).forEach(([name, value]) =>
-                      parseTree(
-                        value,
-                        value.name ? path : `${formData.name}${path}/${name}`
-                      )
+                      parseTree(value)
                     );
                   })(treeStructure);
                 })
