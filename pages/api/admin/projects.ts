@@ -62,8 +62,9 @@ export default withIronSession(async function (
     return res.status(405).send({ stat: "ERR", message: "Unknown method" });
   }
 
+  let id = req.query["id"] as string;
   let { name, flag, title, desc, link } = req.body as ProjectForm;
-  if (!name || !flag || !title || !desc) {
+  if (!id || !name || !flag || !title || !desc) {
     return res
       .status(400)
       .send({ stat: "ERR", message: "Not all required fields are setted" });
@@ -72,6 +73,8 @@ export default withIronSession(async function (
   const { status, send } = await AddProject(
     JSON.stringify({ name, flag, title, desc, link })
   );
+
+  if (send.status === "OK") redis.del(`CACHE:${id}`);
   res.status(status).send(send);
 },
 sessionConfig);

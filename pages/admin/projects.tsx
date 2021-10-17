@@ -42,7 +42,7 @@ export default function AdminProjects() {
         <div className="row">
           <AddCard />
           <CardStack id={0} />
-          <CardStack id={10} />
+          {/* <CardStack id={10} /> */}
           {/* {projects} */}
         </div>
       </div>
