@@ -28,7 +28,7 @@ export default function DefaultFooter(props: DefaultFooterProps) {
             <FooterBottom email="AndrewYushchenko@gmail.com">
               <a
                 className="text-muted mx-2 mx-md-3"
-                href={process.env.GITHUB}
+                href="https://github.com/YushchenkoAndrew"
                 onClick={() =>
                   localStorage.getItem("id")
                     ? fetch(
@@ -48,7 +48,7 @@ export default function DefaultFooter(props: DefaultFooterProps) {
               </a>
               <a
                 className="text-muted mx-2 mx-md-3"
-                href={process.env.TWITTER}
+                href="https://twitter.com/AndrewY69942173"
                 onClick={() =>
                   localStorage.getItem("id")
                     ? fetch(
@@ -68,7 +68,7 @@ export default function DefaultFooter(props: DefaultFooterProps) {
               </a>
               <a
                 className="text-muted mx-2 mx-md-3"
-                href={process.env.LINKEDIN}
+                href="https://www.linkedin.com/in/andrew-yushchenko-7447771a2/"
                 onClick={() =>
                   localStorage.getItem("id")
                     ? fetch(
