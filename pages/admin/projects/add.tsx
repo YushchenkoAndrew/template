@@ -24,6 +24,7 @@ import md5 from "../../../lib/md5";
 import { basePath } from "../../../config";
 import { DefaultRes } from "../../../types/request";
 import { ProjectData } from "../../../types/api";
+import Alert, { AlertProps } from "../../../components/Alert";
 
 const placeholder = {
   name: "CodeRain",
@@ -103,6 +104,7 @@ export default function AdminHome() {
   const [formData, onFormChange] = useState(formPlaceholder);
   const [treeStructure, onFileAdd] = useState(treePlaceholder);
   const [fileInfo, onFileInfoAdd] = useState({ role: "assets" } as ProjectFile);
+  const [alert, onAlert] = useState({ state: "alert-success" } as AlertProps);
 
   function onThumbnailChange(event: Event) {
     const { name, value } = event.target;
@@ -152,18 +154,19 @@ export default function AdminHome() {
     const cacheId = md5(
       localStorage.getItem("salt") ?? "" + localStorage.getItem("id") ?? ""
     );
-    fetch(`${basePath}/api/admin/cache?id=${cacheId}`, {
+    fetch(`${basePath}/api/admin/projects/cache?id=${cacheId}`, {
       method: "GET",
     })
       .then((res) => res.json())
-      .then((data: ProjectForm) => {
+      .then((data: DefaultRes) => {
+        if (data.status === "ERR") return;
         onFormChange({
           ...formData,
-          name: data.name || formData.name,
-          flag: data.flag || formData.flag,
-          title: data.title || formData.title,
-          desc: data.desc || formData.desc,
-          link: data.link || formData.link,
+          name: data.result.name || formData.name,
+          flag: data.result.flag || formData.flag,
+          title: data.result.title || formData.title,
+          desc: data.result.desc || formData.desc,
+          link: data.result.link || formData.link,
         });
       })
       .catch((err) => null);
@@ -173,7 +176,7 @@ export default function AdminHome() {
     const cacheId = md5(
       localStorage.getItem("salt") ?? "" + localStorage.getItem("id") ?? ""
     );
-    fetch(`${basePath}/api/admin/cache?id=${cacheId}`, {
+    fetch(`${basePath}/api/admin/projects/cache?id=${cacheId}`, {
       method: "POST",
       body: JSON.stringify({
         name: formData.name,
@@ -193,6 +196,7 @@ export default function AdminHome() {
         <title>Admin</title>
       </DefaultHead>
       <DefaultHeader />
+      <Alert state={alert.state} title={alert.title} note={alert.note} />
 
       <div className="container mt-4">
         <div className="row">
@@ -335,7 +339,12 @@ export default function AdminHome() {
             onClick={() => {
               if (checkOnError()) return;
 
-              fetch(`${basePath}/api/admin/projects`, {
+              const cacheId = md5(
+                localStorage.getItem("salt") ??
+                  "" + localStorage.getItem("id") ??
+                  ""
+              );
+              fetch(`${basePath}/api/admin/projects?id=${cacheId}`, {
                 method: "POST",
                 headers: {
                   "content-type": "application/json",
@@ -354,8 +363,14 @@ export default function AdminHome() {
                     data.status !== "OK" ||
                     !(data.result as ProjectData[]).length ||
                     !(data.result as ProjectData[])[0]
-                  )
+                  ) {
+                    onAlert({
+                      state: "alert-danger",
+                      title: "Error",
+                      note: data.message ?? "Backend error",
+                    });
                     return;
+                  }
 
                   const { ID } = (data.result as ProjectData[])[0];
                   (function parseTree(tree: TreeObj | ProjectFile | null) {
@@ -381,8 +396,24 @@ export default function AdminHome() {
                           }
                         )
                           // TODO: Show something on Success !!!!
-                          .then((res) => console.log(res.status))
-                          .catch((err) => null)
+                          .then((res) => res.json())
+                          .then((data: DefaultRes) => {
+                            onAlert({
+                              state:
+                                data.status === "OK"
+                                  ? "alert-success"
+                                  : "alert-danger",
+                              title: data.status === "OK" ? "Success" : "Error",
+                              note: data.message ?? "Backend error",
+                            });
+                          })
+                          .catch((err) => {
+                            onAlert({
+                              state: "alert-danger",
+                              title: "Backend error",
+                              note: "Something wrong happened on backend side. You should check server logs",
+                            });
+                          })
                       );
                     }
 
@@ -391,7 +422,13 @@ export default function AdminHome() {
                     );
                   })(treeStructure);
                 })
-                .catch((err) => null);
+                .catch((err) => {
+                  onAlert({
+                    state: "alert-danger",
+                    title: "Backend error",
+                    note: "Something wrong happened on backend side. You should check server logs",
+                  });
+                });
             }}
           >
             Submit
