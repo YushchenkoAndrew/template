@@ -25,6 +25,7 @@ import { basePath } from "../../../config";
 import { DefaultRes } from "../../../types/request";
 import { ProjectData } from "../../../types/api";
 import Alert, { AlertProps } from "../../../components/Alert";
+import DefaultProjectInfo from "../../../components/default/DefaultProjectInfo";
 
 const placeholder = {
   name: "CodeRain",
@@ -37,6 +38,8 @@ const placeholder = {
     url: `${basePath}/img/CodeRain.webp`,
   },
   desc: "Take the blue pill and the site will close, or take the red pill and I show how deep the rabbit hole goes",
+  note: "Creating a 'Code Rain' effect from Matrix. As funny joke you can put any text to display at the end.",
+  link: "github.com/YushchenkoAndrew/template/tree/master/JS/CodeRain",
 } as ProjectForm;
 
 const formPlaceholder = {
@@ -44,6 +47,7 @@ const formPlaceholder = {
   flag: "js",
   title: "",
   desc: "",
+  note: "",
   link: "",
 } as ProjectForm;
 
@@ -110,7 +114,11 @@ export default function AdminHome() {
     const { name, value } = event.target;
     onFormChange({
       ...formData,
-      [name]: value ? value : undefined,
+      [name]: value
+        ? name === "name"
+          ? (value as string).replace(" ", "")
+          : value
+        : undefined,
     });
 
     if (!(value as ProjectFile).name) return;
@@ -138,8 +146,9 @@ export default function AdminHome() {
       name: !formData.name,
       title: !formData.title,
       desc: !formData.desc,
+      note: !formData.desc,
       img: !formData.img,
-      link: formData.flag === "link" && !formData.link,
+      link: !formData.link,
     };
 
     if (update) onError(flags);
@@ -166,6 +175,7 @@ export default function AdminHome() {
           flag: data.result.flag || formData.flag,
           title: data.result.title || formData.title,
           desc: data.result.desc || formData.desc,
+          note: data.result.note || formData.note,
           link: data.result.link || formData.link,
         });
       })
@@ -183,7 +193,8 @@ export default function AdminHome() {
         flag: formData.flag,
         title: formData.title,
         desc: formData.desc,
-        link: formData.link ?? "",
+        note: formData.note,
+        link: formData.link,
       }),
     })
       .then((res) => console.log(res.status))
@@ -210,7 +221,7 @@ export default function AdminHome() {
             />
           </div>
           <div className="col-md-7 order-md-1">
-            {/* <h4 className="mb-3">Thumbnail</h4> */}
+            <h4 className="font-weight-bold mb-3">Thumbnail</h4>
             <InputTemplate label="Name">
               <InputName
                 char="@"
@@ -245,22 +256,6 @@ export default function AdminHome() {
               />
             </InputTemplate>
 
-            {formData.flag === "link" ? (
-              <InputTemplate label="Link">
-                <InputName
-                  char="http://"
-                  name="link"
-                  value={formData.link ?? ""}
-                  error={err.link}
-                  placeholder="github.com/YushchenkoAndrew/template/tree/master/JS/CodeRain"
-                  onChange={onThumbnailChange}
-                  onBlur={onDataCache}
-                />
-              </InputTemplate>
-            ) : (
-              <span />
-            )}
-
             <div className="input-group d-flex justify-content-between">
               <InputTemplate label="Image">
                 <InputFile
@@ -290,7 +285,9 @@ export default function AdminHome() {
             <hr />
             <div className="row">
               <div className="col-md-6 order-md-1 mb-4">
-                <h4 className="mb-3">Projects Files Structure</h4>
+                <h4 className="font-weight-bold mb-3">
+                  Projects Files Structure
+                </h4>
                 <TreeView
                   name={formData.name || placeholder.name}
                   role={fileInfo.role}
@@ -332,6 +329,49 @@ export default function AdminHome() {
         )}
         <hr />
         <div className="d-flex justify-content-center mb-3">
+          <div className="col-md-11 ">
+            <h4 className="font-weight-bold mb-3">Footer</h4>
+            <InputTemplate label="Note">
+              <InputText
+                name="note"
+                value={formData.note}
+                error={err.note}
+                placeholder={placeholder.note}
+                onChange={onThumbnailChange}
+                onBlur={onDataCache}
+              />
+            </InputTemplate>
+
+            {/* TODO: Use List element instead !!! */}
+            <InputTemplate label="Link">
+              <InputName
+                char="http://"
+                name="link"
+                value={formData.link}
+                error={err.link}
+                placeholder={placeholder.link}
+                onChange={onThumbnailChange}
+                onBlur={onDataCache}
+              />
+            </InputTemplate>
+
+            <DefaultFooter name={formData.name}>
+              <DefaultProjectInfo
+                href={formData.link || "#"}
+                links={[
+                  {
+                    href: "https://github.com/YushchenkoAndrew/template/tree/master/CDump/CodeRain",
+                    lang: "C++",
+                  },
+                ]}
+                description={formData.note || placeholder.note}
+              />
+            </DefaultFooter>
+          </div>
+        </div>
+
+        {/* <hr /> */}
+        <div className="d-flex justify-content-center mb-3">
           <button
             className={`btn btn-lg w-75 ${
               checkOnError(false) ? "btn-outline-success" : "btn-success"
@@ -354,7 +394,8 @@ export default function AdminHome() {
                   flag: formData.flag,
                   title: formData.title,
                   desc: formData.desc,
-                  link: formData.link ?? "",
+                  note: formData.note,
+                  link: formData.link,
                 }),
               })
                 .then((res) => res.json())

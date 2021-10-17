@@ -23,6 +23,7 @@ export type ProjectForm = {
   flag: string;
   title: string;
   desc: string;
-  link?: string;
+  note: string;
+  link: string;
   img: ProjectFile;
 };
