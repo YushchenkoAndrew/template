@@ -65,15 +65,20 @@ function UploadFile(file: File, args: ArgsType) {
       file.name ?? md5(Math.random().toString())
     );
 
-    fetch(`http://${fileServer}/files?path=/${args.project}${args.dir}`, {
-      method: "POST",
-      headers: {
-        Authorization:
-          "Basic " +
-          Buffer.from(process.env.FILE_SERVER_AUTH ?? "").toString("base64"),
-      },
-      body: formData as any,
-    })
+    fetch(
+      `http://${fileServer}/files?path=/${args.project}/${
+        args.role + args.dir
+      }`,
+      {
+        method: "POST",
+        headers: {
+          Authorization:
+            "Basic " +
+            Buffer.from(process.env.FILE_SERVER_AUTH ?? "").toString("base64"),
+        },
+        body: formData as any,
+      }
+    )
       .then((res) => res.json())
       .then((data) =>
         resolve({
