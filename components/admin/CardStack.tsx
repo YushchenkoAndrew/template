@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { basePath } from "../../config";
+import React, { useEffect, useState } from "react";
+import { basePath, fileServer } from "../../config";
+import { formPath } from "../../lib/files";
 import md5 from "../../lib/md5";
 import { ApiError, ApiRes, ProjectData } from "../../types/api";
 import { FlagType } from "../../types/flag";
@@ -8,14 +9,14 @@ import Card from "./Card";
 // TODO: Add image showing
 function LoadProjects() {
   return new Promise<ProjectData[]>((resolve, reject) => {
-    fetch(`${basePath}/api/admin/projects/load`)
+    fetch(`${basePath}/api/projects/load?page=0&role=thumbnail`)
       .then((res) => res.json())
       .then((data: ApiRes | ApiError) => {
-        console.log(data);
+        if (data.status === "OK") {
+          return resolve((data as ApiRes).result as ProjectData[]);
+        }
 
-        data.status === "OK"
-          ? resolve((data as ApiRes).result as ProjectData[])
-          : reject();
+        reject();
       })
       .catch((err) => reject());
   });
@@ -27,12 +28,11 @@ export interface CardStackProps {
 export default function CardStack(props: CardStackProps) {
   let [projects, onProjectLoad] = useState([] as ProjectData[]);
 
-  // FIXME: Maybe change to something else ...
-  if (!projects.length) {
+  useEffect(() => {
     LoadProjects()
       .then((data) => onProjectLoad(data))
       .catch((err) => null);
-  }
+  }, []);
 
   return (
     <>
@@ -42,7 +42,9 @@ export default function CardStack(props: CardStackProps) {
             key={md5(Math.random().toString())}
             id={item.ID}
             title={item.Title}
-            img="https://images.unsplash.com/photo-1457976326363-73a4b5fb9e79?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=900&ixid=MnwxfDB8MXxyYW5kb218MHx8dGVjaCxzdHJlZXR8fHx8fHwxNjI4NDI3MzEy&ixlib=rb-1.2.1&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=600"
+            img={`http://${fileServer}/files/${item.Name}${formPath(
+              item.Files[0]
+            )}`}
             flag={item.Flag as FlagType}
             desc={item.Desc}
           />

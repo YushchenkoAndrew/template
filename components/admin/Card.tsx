@@ -49,11 +49,12 @@ export default function Card(props: CardProps) {
             <span />
             <div className="row mr-2 mb-2">
               <a
-                href={`${basePath}/admin/projects/info/${props.id}`}
+                href={`${basePath}/admin/projects/edit?id=${props.id}`}
                 className="btn btn-sm btn-outline-info mr-2"
               >
                 Modify
               </a>
+              {/* TODO: Change this to fetch request !!!! */}
               <a
                 href={`${basePath}/admin/projects/edit/${props.id}`}
                 className="btn btn-sm btn-outline-danger"

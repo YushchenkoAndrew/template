@@ -1,7 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Session } from "next-iron-session";
 
+export type NextApiSessionRequest = NextApiRequest & { session: Session };
+
 export type NextSessionArgs = {
-  req: NextApiRequest & { session: Session };
+  req: NextApiSessionRequest;
   res: NextApiResponse;
 };
