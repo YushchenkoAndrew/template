@@ -1,5 +1,5 @@
 import React from "react";
-import { Event } from "../../pages/admin/projects/add";
+import { Event } from "../../pages/admin/projects/[operation]";
 import { ProjectElement } from "../../types/projects";
 
 export interface InputTextProps {

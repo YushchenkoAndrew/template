@@ -4,14 +4,12 @@ import InputValue from "../../../components/Inputs/InputValue";
 import DefaultFooter from "../../../components/default/DefaultFooter";
 import DefaultHead from "../../../components/default/DefaultHead";
 import DefaultNav from "../../../components/default/DefaultNav";
-import defaultServerSideHandler from "../../../lib/session";
+import { checkIfUserExist } from "../../../lib/session";
 import {
   ProjectElement,
-  ProjectFields,
   ProjectFile,
   ProjectForm,
 } from "../../../types/projects";
-
 import { TreeObj } from "../../../types/tree";
 import InputTemplate from "../../../components/Inputs/InputTemplate";
 import InputName from "../../../components/Inputs/InputName";
@@ -26,38 +24,11 @@ import { DefaultRes } from "../../../types/request";
 import { ProjectData } from "../../../types/api";
 import Alert, { AlertProps } from "../../../components/Alert";
 import DefaultProjectInfo from "../../../components/default/DefaultProjectInfo";
-
-const placeholder = {
-  name: "CodeRain",
-  title: "Code Rain",
-  flag: "js",
-  img: {
-    name: "CodeRain.webp",
-    type: "webp",
-    role: "thumbnail",
-    url: `${basePath}/img/CodeRain.webp`,
-  },
-  desc: "Take the blue pill and the site will close, or take the red pill and I show how deep the rabbit hole goes",
-  note: "Creating a 'Code Rain' effect from Matrix. As funny joke you can put any text to display at the end.",
-  link: "github.com/YushchenkoAndrew/template/tree/master/JS/CodeRain",
-} as ProjectForm;
-
-const formPlaceholder = {
-  name: "",
-  flag: "js",
-  title: "",
-  desc: "",
-  note: "",
-  link: "",
-} as ProjectForm;
-
-const treePlaceholder = {
-  assets: {},
-  src: {},
-  thumbnail: {},
-  styles: {},
-  templates: {},
-} as TreeObj;
+import { withIronSession } from "next-iron-session";
+import { NextSessionArgs } from "../../../types/session";
+import sessionConfig from "../../../config/session";
+import { ProjectInfo } from "../../../config/placeholder";
+import InputList from "../../../components/Inputs/InputDoubleList";
 
 export type Event =
   | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -102,11 +73,15 @@ function formTree(
   };
 }
 
-// TODO: Add another description for the footer !!!
-export default function AdminHome() {
+export interface ProjectOperationProps {
+  formData: ProjectForm;
+  treeStructure: TreeObj;
+}
+
+export default function ProjectOperation(props: ProjectOperationProps) {
   const [err, onError] = useState({} as { [name: string]: boolean });
-  const [formData, onFormChange] = useState(formPlaceholder);
-  const [treeStructure, onFileAdd] = useState(treePlaceholder);
+  const [formData, onFormChange] = useState(props.formData);
+  const [treeStructure, onFileAdd] = useState(props.treeStructure);
   const [fileInfo, onFileInfoAdd] = useState({ role: "assets" } as ProjectFile);
   const [alert, onAlert] = useState({ state: "alert-success" } as AlertProps);
 
@@ -171,12 +146,7 @@ export default function AdminHome() {
         if (data.status === "ERR") return;
         onFormChange({
           ...formData,
-          name: data.result.name || formData.name,
-          flag: data.result.flag || formData.flag,
-          title: data.result.title || formData.title,
-          desc: data.result.desc || formData.desc,
-          note: data.result.note || formData.note,
-          link: data.result.link || formData.link,
+          ...data.result,
         });
       })
       .catch((err) => null);
@@ -188,17 +158,21 @@ export default function AdminHome() {
     );
     fetch(`${basePath}/api/admin/projects/cache?id=${cacheId}`, {
       method: "POST",
-      body: JSON.stringify({
-        name: formData.name,
-        flag: formData.flag,
-        title: formData.title,
-        desc: formData.desc,
-        note: formData.note,
-        link: formData.link,
-      }),
+      body: JSON.stringify(getData()),
     })
       .then((res) => console.log(res.status))
       .catch((err) => null);
+  }
+
+  function getData() {
+    return {
+      name: formData.name,
+      flag: formData.flag,
+      title: formData.title,
+      desc: formData.desc,
+      note: formData.note,
+      link: formData.link,
+    };
   }
 
   return (
@@ -213,11 +187,11 @@ export default function AdminHome() {
         <div className="row">
           <div className="col-md-5 order-md-2 mb-4">
             <Card
-              img={formData.img?.url || (placeholder.img.url ?? "")}
-              title={formData.title || placeholder.title}
+              img={formData.img?.url || (ProjectInfo.img.url ?? "")}
+              title={formData.title || ProjectInfo.title}
               size="title-lg"
               href="#"
-              description={formData.desc || placeholder.desc}
+              description={formData.desc || ProjectInfo.desc}
             />
           </div>
           <div className="col-md-7 order-md-1">
@@ -228,7 +202,7 @@ export default function AdminHome() {
                 name="name"
                 value={formData.name}
                 error={err.name}
-                placeholder={placeholder.name}
+                placeholder={ProjectInfo.name}
                 onChange={onThumbnailChange}
                 onBlur={onDataCache}
               />
@@ -239,7 +213,7 @@ export default function AdminHome() {
                 name="title"
                 value={formData.title}
                 error={err.title}
-                placeholder={placeholder.title}
+                placeholder={ProjectInfo.title}
                 onChange={onThumbnailChange}
                 onBlur={onDataCache}
               />
@@ -250,7 +224,7 @@ export default function AdminHome() {
                 name="desc"
                 value={formData.desc}
                 error={err.desc}
-                placeholder={placeholder.desc}
+                placeholder={ProjectInfo.desc}
                 onChange={onThumbnailChange}
                 onBlur={onDataCache}
               />
@@ -289,7 +263,7 @@ export default function AdminHome() {
                   Projects Files Structure
                 </h4>
                 <TreeView
-                  name={formData.name || placeholder.name}
+                  name={formData.name || ProjectInfo.name}
                   role={fileInfo.role}
                   dir={fileInfo.dir}
                   projectTree={formTree(treeStructure, fileInfo)}
@@ -336,20 +310,32 @@ export default function AdminHome() {
                 name="note"
                 value={formData.note}
                 error={err.note}
-                placeholder={placeholder.note}
+                placeholder={ProjectInfo.note}
                 onChange={onThumbnailChange}
                 onBlur={onDataCache}
               />
             </InputTemplate>
 
-            {/* TODO: Use List element instead !!! */}
             <InputTemplate label="Link">
               <InputName
                 char="http://"
                 name="link"
                 value={formData.link}
                 error={err.link}
-                placeholder={placeholder.link}
+                placeholder={ProjectInfo.link}
+                onChange={onThumbnailChange}
+                onBlur={onDataCache}
+              />
+            </InputTemplate>
+
+            {/* TODO: Use List element instead !!! */}
+            <InputTemplate label="Links List">
+              <InputList
+                char="http://"
+                name="link"
+                value={formData.link}
+                error={err.link}
+                placeholder={ProjectInfo.link}
                 onChange={onThumbnailChange}
                 onBlur={onDataCache}
               />
@@ -364,7 +350,7 @@ export default function AdminHome() {
                     lang: "C++",
                   },
                 ]}
-                description={formData.note || placeholder.note}
+                description={formData.note || ProjectInfo.note}
               />
             </DefaultFooter>
           </div>
@@ -389,14 +375,7 @@ export default function AdminHome() {
                 headers: {
                   "content-type": "application/json",
                 },
-                body: JSON.stringify({
-                  name: formData.name,
-                  flag: formData.flag,
-                  title: formData.title,
-                  desc: formData.desc,
-                  note: formData.note,
-                  link: formData.link,
-                }),
+                body: JSON.stringify(getData()),
               })
                 .then((res) => res.json())
                 .then((data: DefaultRes) => {
@@ -486,4 +465,89 @@ export default function AdminHome() {
   );
 }
 
-export const getServerSideProps = defaultServerSideHandler;
+export const getServerSideProps = withIronSession(async function ({
+  req,
+  res,
+}: NextSessionArgs) {
+  const sessionID = req.session.get("user");
+  const isOk = await checkIfUserExist(sessionID);
+
+  if (!sessionID || !isOk) {
+    return {
+      redirect: {
+        basePath: false,
+        destination: `${basePath}/admin/login`,
+        permanent: false,
+      },
+    };
+  }
+
+  let url =
+    "/" +
+    (req.url ?? "")
+      .split("?")[0]
+      .split("/")
+      .filter((item) => item)
+      .join("/");
+
+  switch (url) {
+    case "/admin/projects/add": {
+      return {
+        props: {
+          formData: {
+            name: "",
+            flag: "js",
+            title: "",
+            desc: "",
+            note: "",
+            link: "",
+          } as ProjectForm,
+
+          treeStructure: {
+            assets: {},
+            src: {},
+            thumbnail: {},
+            styles: {},
+            templates: {},
+          } as TreeObj,
+        } as ProjectOperationProps,
+      };
+    }
+
+    // TODO:
+    case "/admin/projects/edit": {
+      const res = await fetch(
+        `http://127.0.0.1:8000/${basePath}/api/projects/load?id=8`
+      );
+      const data = await res.json();
+      console.log(req.query);
+      console.log(data);
+
+      return {
+        props: {
+          formData: {
+            name: "",
+            flag: "js",
+            title: "",
+            desc: "",
+            note: "",
+            link: "",
+          } as ProjectForm,
+
+          treeStructure: {
+            assets: {},
+            src: {},
+            thumbnail: {},
+            styles: {},
+            templates: {},
+          } as TreeObj,
+        },
+      };
+    }
+  }
+
+  return {
+    notFound: true,
+  };
+},
+sessionConfig);
