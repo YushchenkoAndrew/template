@@ -31,7 +31,7 @@ function AddFile(file: File, args: ArgsType) {
           } as FileData),
         })
           .then((res) => res.json())
-          .then((data: ApiRes | ApiError) => {
+          .then((data: ApiRes<FileData> | ApiError) => {
             resolve({
               status: data.status ? 500 : 200,
               send: {
@@ -164,7 +164,8 @@ export default withIronSession(async function (
   req: NextApiRequest & { session: Session },
   res: NextApiResponse
 ) {
-  if (req.method !== "POST" && req.method !== "GET") {
+  // TODO: Create PUT request handler
+  if (req.method !== "POST" && req.method !== "PUT" && req.method !== "GET") {
     return res.status(405).send({ stat: "ERR", message: "Unknown method" });
   }
 

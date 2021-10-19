@@ -16,15 +16,13 @@ function finalValue(key: string) {
 
       fetch(`http://${apiHost}/api/world?page=-1`)
         .then((res) => res.json())
-        .then((res: ApiRes) => {
+        .then((res: ApiRes<WorldData>) => {
           if (!res.items || res.status == "ERR")
             return reject("Idk something wrong happened at then backend");
 
           // Need this just to decrease space usage in RAM
           let result = {} as { [country: string]: number };
-          (res.result as WorldData[]).forEach(
-            (item) => (result[item.Country] = item.Visitors)
-          );
+          res.result.forEach((item) => (result[item.Country] = item.Visitors));
 
           resolve(JSON.stringify(result));
         })

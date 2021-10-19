@@ -5,7 +5,7 @@ import redis from "../../../config/redis";
 import sessionConfig from "../../../config/session";
 import { ApiAuth } from "../../../lib/auth";
 import { sendLogs } from "../../../lib/bot";
-import { ApiRes, ApiError } from "../../../types/api";
+import { ApiRes, ApiError, ProjectData } from "../../../types/api";
 import { ProjectForm } from "../../../types/projects";
 import { FullResponse } from "../../../types/request";
 
@@ -22,7 +22,7 @@ function AddProject(body: string) {
           body,
         })
           .then((res) => res.json())
-          .then((data: ApiRes | ApiError) => {
+          .then((data: ApiRes<ProjectData> | ApiError) => {
             resolve({
               status: 200,
               send: {
@@ -58,7 +58,12 @@ export default withIronSession(async function (
   req: NextApiRequest & { session: Session },
   res: NextApiResponse
 ) {
-  if (req.method !== "POST") {
+  // TODO: Create PUT & DELETE request handler
+  if (
+    req.method !== "POST" &&
+    req.method !== "PUT" &&
+    req.method !== "DELETE"
+  ) {
     return res.status(405).send({ stat: "ERR", message: "Unknown method" });
   }
 

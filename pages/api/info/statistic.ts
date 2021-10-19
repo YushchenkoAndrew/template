@@ -41,11 +41,11 @@ export default function handler(
 
         fetch(`http://${apiHost}/api/info?created_at=${date}`)
           .then((res) => res.json())
-          .then((res: ApiRes) => {
+          .then((res: ApiRes<InfoData>) => {
             if (res.status == "ERR") {
               return reject("Idk something wrong happened at the backend");
             }
-            const result = res.result.pop() as InfoData | undefined;
+            const result = res.result.pop();
 
             // Check if the date if current one, if so load the data
             if (date == now) {
@@ -83,12 +83,12 @@ export default function handler(
 
         fetch(`http://${apiHost}/api/info?created_at=${formatDate(prev)}`)
           .then((res) => res.json())
-          .then((res: ApiRes) => {
+          .then((res: ApiRes<InfoData>) => {
             if (res.status == "ERR") {
               return reject("Idk something wrong happened at the backend");
             }
-            const result = res.result.pop() as InfoData | undefined;
 
+            const result = res.result.pop();
             if (date == now) {
               redis.hmset("Info:Prev", {
                 Visitors: result?.Visitors ?? 0,
@@ -111,13 +111,13 @@ export default function handler(
         // NOTE: This will run only in the case where none of users were identified
         fetch(`http://${apiHost}/api/world?page=-1`)
           .then((res) => res.json())
-          .then((res: ApiRes) => {
+          .then((res: ApiRes<WorldData>) => {
             if (!res.items || res.status == "ERR")
               return reject("Idk something wrong happened at then backend");
 
             // Need this just to decrease space usage in RAM
             let result = {} as { [country: string]: number };
-            (res.result as WorldData[]).forEach(
+            res.result.forEach(
               (item) => (result[item.Country] = item.Visitors)
             );
 

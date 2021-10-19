@@ -11,9 +11,9 @@ function LoadProjects() {
   return new Promise<ProjectData[]>((resolve, reject) => {
     fetch(`${basePath}/api/projects/load?page=0&role=thumbnail`)
       .then((res) => res.json())
-      .then((data: ApiRes | ApiError) => {
+      .then((data: ApiRes<ProjectData> | ApiError) => {
         if (data.status === "OK") {
-          return resolve((data as ApiRes).result as ProjectData[]);
+          return resolve((data as ApiRes<ProjectData>).result);
         }
 
         reject();

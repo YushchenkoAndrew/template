@@ -14,9 +14,9 @@ export type ApiTokens = {
 
 export type ApiResult = InfoSum | InfoData | WorldData | ProjectData | FileData;
 
-export type ApiRes = {
+export type ApiRes<Type> = {
   items: number;
-  result: ApiResult[];
+  result: Type[];
   status: Stat;
   totalItems: number;
 };

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../../config/redis";
 import { formatDate } from "../../info";
-import { ApiRes, InfoData } from "../../../types/api";
+import { ApiRes, InfoData, InfoSum } from "../../../types/api";
 import { AnalyticsData, DefaultRes, Stat } from "../../../types/request";
 import { apiHost, botHost } from "../../../config";
 import { Analytics } from "../../../types/info";
@@ -46,11 +46,11 @@ export default function handler(
 
         fetch(`http://${apiHost}/api/info/sum`)
           .then((res) => res.json())
-          .then((res: ApiRes) => {
+          .then((res: ApiRes<InfoData>) => {
             if (res.status == "ERR")
               return reject("Idk something wrong happened at the backend");
 
-            const result = res.result.pop() as InfoData;
+            const result = res.result.pop();
             if (!res.items || !result)
               return reject("Idk something wrong happened at the backend");
 
@@ -82,13 +82,13 @@ export default function handler(
           )}&orderBy=CreatedAt`
         )
           .then((res) => res.json())
-          .then((res: ApiRes) => {
+          .then((res: ApiRes<InfoData>) => {
             if (!res.items || res.status == "ERR")
               return reject("Idk something wrong happened at the backend");
 
             // Need this just to decrease space usage in RAM
             let result = {} as { [time: string]: number };
-            (res.result as InfoData[]).forEach(
+            res.result.forEach(
               (item) => (result[item.CreatedAt.split("T")[0]] = item.Visitors)
             );
 
