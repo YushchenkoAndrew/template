@@ -48,6 +48,7 @@ export default function Card(props: CardProps) {
           <div className="d-flex justify-content-between mt-3 mb-2">
             <span />
             <div className="row mr-2 mb-2">
+              {/* FIXME: Make on option in props to choose which href or onClick  */}
               <a
                 href={`${basePath}/admin/projects/edit?id=${props.id}`}
                 className="btn btn-sm btn-outline-info mr-2"

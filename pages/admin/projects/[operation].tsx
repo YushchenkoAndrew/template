@@ -21,7 +21,7 @@ import InputRadio from "../../../components/Inputs/InputRadio";
 import md5 from "../../../lib/md5";
 import { basePath } from "../../../config";
 import { DefaultRes } from "../../../types/request";
-import { ProjectData } from "../../../types/api";
+import { ApiError, ApiRes, ProjectData } from "../../../types/api";
 import Alert, { AlertProps } from "../../../components/Alert";
 import DefaultProjectInfo from "../../../components/default/DefaultProjectInfo";
 import { withIronSession } from "next-iron-session";
@@ -29,6 +29,7 @@ import { NextSessionArgs } from "../../../types/session";
 import sessionConfig from "../../../config/session";
 import { ProjectInfo } from "../../../config/placeholder";
 import InputList from "../../../components/Inputs/InputDoubleList";
+import { useRouter } from "next/dist/client/router";
 
 export type Event =
   | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -79,6 +80,7 @@ export interface ProjectOperationProps {
 }
 
 export default function ProjectOperation(props: ProjectOperationProps) {
+  const router = useRouter();
   const [err, onError] = useState({} as { [name: string]: boolean });
   const [formData, onFormChange] = useState(props.formData);
   const [treeStructure, onFileAdd] = useState(props.treeStructure);
@@ -138,16 +140,37 @@ export default function ProjectOperation(props: ProjectOperationProps) {
     const cacheId = md5(
       localStorage.getItem("salt") ?? "" + localStorage.getItem("id") ?? ""
     );
+
     fetch(`${basePath}/api/admin/projects/cache?id=${cacheId}`, {
       method: "GET",
     })
       .then((res) => res.json())
       .then((data: DefaultRes) => {
-        if (data.status === "ERR") return;
-        onFormChange({
-          ...formData,
-          ...data.result,
-        });
+        if (data.status === "OK") {
+          return onFormChange({
+            ...formData,
+            ...data.result,
+          });
+        }
+
+        if (router.query.operation !== "edit" || !router.query.id) return;
+        fetch(`${basePath}/api/projects/load?id=${router.query.id}`)
+          .then((res) => res.json())
+          .then((data: ApiRes<ProjectData>) => {
+            if (data.status !== "OK" || !data.result.length) return;
+            console.log(data);
+
+            return onFormChange({
+              ...formData,
+              name: data.result[0].Name,
+              title: data.result[0].Title,
+              flag: data.result[0].Flag,
+              desc: data.result[0].Desc,
+              note: data.result[0].Note,
+            });
+            // return resolve((data as ApiRes).result as ProjectData[]);
+          })
+          .catch((err) => null);
       })
       .catch((err) => null);
   }, []);
@@ -371,7 +394,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
                   ""
               );
               fetch(`${basePath}/api/admin/projects?id=${cacheId}`, {
-                method: "POST",
+                method: router.query.operation === "add" ? "POST" : "PUT",
                 headers: {
                   "content-type": "application/json",
                 },
@@ -398,43 +421,40 @@ export default function ProjectOperation(props: ProjectOperationProps) {
                     if (tree.name) {
                       const data = new FormData();
                       data.append("file", (tree as ProjectFile).file);
-                      return (
-                        fetch(
-                          `${basePath}/api/admin/file?id=${ID}&project=${
-                            formData.name
-                          }&role=${tree.role}${
-                            tree.dir
-                              ? "&dir=" +
-                                ((tree as ProjectFile).dir?.[0] !== "/"
-                                  ? "/" + tree.dir
-                                  : tree.dir)
-                              : ""
-                          }`,
-                          {
-                            method: "POST",
-                            body: data,
-                          }
-                        )
-                          // TODO: Show something on Success !!!!
-                          .then((res) => res.json())
-                          .then((data: DefaultRes) => {
-                            onAlert({
-                              state:
-                                data.status === "OK"
-                                  ? "alert-success"
-                                  : "alert-danger",
-                              title: data.status === "OK" ? "Success" : "Error",
-                              note: data.message ?? "Backend error",
-                            });
-                          })
-                          .catch((err) => {
-                            onAlert({
-                              state: "alert-danger",
-                              title: "Backend error",
-                              note: "Something wrong happened on backend side. You should check server logs",
-                            });
-                          })
-                      );
+                      return fetch(
+                        `${basePath}/api/admin/file?id=${ID}&project=${
+                          formData.name
+                        }&role=${tree.role}${
+                          tree.dir
+                            ? "&dir=" +
+                              ((tree as ProjectFile).dir?.[0] !== "/"
+                                ? "/" + tree.dir
+                                : tree.dir)
+                            : ""
+                        }`,
+                        {
+                          method: "POST",
+                          body: data,
+                        }
+                      )
+                        .then((res) => res.json())
+                        .then((data: DefaultRes) => {
+                          onAlert({
+                            state:
+                              data.status === "OK"
+                                ? "alert-success"
+                                : "alert-danger",
+                            title: data.status === "OK" ? "Success" : "Error",
+                            note: data.message ?? "Backend error",
+                          });
+                        })
+                        .catch((err) => {
+                          onAlert({
+                            state: "alert-danger",
+                            title: "Backend error",
+                            note: "Something wrong happened on backend side. You should check server logs",
+                          });
+                        });
                     }
 
                     Object.entries(tree).forEach(([name, value]) =>
@@ -491,6 +511,7 @@ export const getServerSideProps = withIronSession(async function ({
       .join("/");
 
   switch (url) {
+    case "/admin/projects/edit":
     case "/admin/projects/add": {
       return {
         props: {
@@ -511,37 +532,6 @@ export const getServerSideProps = withIronSession(async function ({
             templates: {},
           } as TreeObj,
         } as ProjectOperationProps,
-      };
-    }
-
-    // TODO:
-    case "/admin/projects/edit": {
-      const res = await fetch(
-        `http://127.0.0.1:8000/${basePath}/api/projects/load?id=8`
-      );
-      const data = await res.json();
-      console.log(req.query);
-      console.log(data);
-
-      return {
-        props: {
-          formData: {
-            name: "",
-            flag: "js",
-            title: "",
-            desc: "",
-            note: "",
-            link: "",
-          } as ProjectForm,
-
-          treeStructure: {
-            assets: {},
-            src: {},
-            thumbnail: {},
-            styles: {},
-            templates: {},
-          } as TreeObj,
-        },
       };
     }
   }
