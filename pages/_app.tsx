@@ -9,14 +9,9 @@ import { basePath } from "../config";
 export default function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     localStorage.getItem("id")
-      ? fetch(
-          `${basePath}/api/view/page?id=${localStorage.getItem("id")}&url=${
-            window.location.pathname
-          }`,
-          {
-            method: "PATCH",
-          }
-        )
+      ? fetch(`${basePath}/api/view/page?id=${localStorage.getItem("id")}`, {
+          method: "PATCH",
+        })
           .then((res) => null)
           .catch((err) => null)
       : null;

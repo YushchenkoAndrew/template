@@ -6,17 +6,9 @@ import { createQuery } from "../../../lib/query";
 import { ApiError, ApiRes, ProjectData } from "../../../types/api";
 import { FullResponse } from "../../../types/request";
 
-type ArgsType = {
-  id?: number;
-  page?: number;
-  role?: string;
-};
-
-function LoadProjects(args: ArgsType) {
+export function LoadProjects(args: { [key: string]: number | string }) {
   return new Promise<FullResponse>((resolve, reject) => {
     const query = createQuery(args);
-    console.log(query);
-
     redis.get(`Project:${query}`, (err, result) => {
       if (!err && result) {
         console.log("HERE " + query);

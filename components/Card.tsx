@@ -48,7 +48,7 @@ export default function Card(props: CardProps) {
 
   return (
     <div
-      className="card overflow-hidden my-3"
+      className="card overflow-hidden mb-3"
       ref={(el) =>
         el && offset.top == -1 && offset.left == -1
           ? setOffset(el.getBoundingClientRect())

@@ -1,4 +1,4 @@
-import { basePath } from "../config";
+import { apiHost, basePath } from "../config";
 import { ApiError, ApiRes, ProjectData } from "../types/api";
 
 export function loadProjectsThumbnail(page: number) {

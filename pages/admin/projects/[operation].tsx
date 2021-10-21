@@ -510,9 +510,6 @@ export const getServerSideProps = withIronSession(async function ({
       .join("/");
 
   switch (url) {
-    // TODO: Maybe change edit route !!!
-    // Just load here data from api and that's it
-    case "/admin/projects/edit":
     case "/admin/projects/add": {
       return {
         props: {
@@ -534,6 +531,12 @@ export const getServerSideProps = withIronSession(async function ({
           } as TreeObj,
         } as ProjectOperationProps,
       };
+    }
+
+    // FIXME: Maybe change edit route !!!
+    // Just load here data from api and that's it
+    case "/admin/projects/edit": {
+      return { props: {} };
     }
   }
 
