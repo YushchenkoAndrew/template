@@ -5,31 +5,25 @@ import DefaultFooter from "../../components/default/DefaultFooter";
 import DefaultHead from "../../components/default/DefaultHead";
 import DefaultNav from "../../components/default/DefaultNav";
 import defaultServerSideHandler from "../../lib/session";
-import dynamic from "next/dynamic";
-import CardStack from "../../components/admin/CardStack";
+import { ProjectData } from "../../types/api";
+import { fileServer } from "../../config";
+import { FlagType } from "../../types/flag";
+import Card from "../../components/admin/Card";
+import { formPath } from "../../lib/files";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { loadProjectsThumbnail } from "../../lib/projects";
 
-const DynamicCardStack = dynamic(
-  () => import("../../components/admin/CardStack")
-);
+let page = 0;
 
 export default function AdminProjects() {
-  // TODO: So Im a bit lazy right now, os future me all hopes on YOU !!!
-  // Please create lazyloading by using SSR (I guess)
+  const [hasMore, onReachEnd] = useState(true);
+  const [projects, onScrollLoad] = useState([] as ProjectData[]);
 
-  // let [projects, onScrollLoad] = useState([] as JSX.Element[]);
-
-  // useEffect(() => {
-  //   document.addEventListener("click", () => {
-  //     // if (
-  //     //   window.innerHeight + document.documentElement.scrollTop ===
-  //     //   document?.scrollingElement?.scrollHeight
-  //     // ) {
-  //     // onLoad(true);
-  //     console.log("HERE");
-  //     onScrollLoad([...projects, <DynamicCardStack id={projects.length} />]);
-  //     // }
-  //   });
-  // }, []);
+  useEffect(() => {
+    loadProjectsThumbnail(page++)
+      .then((data) => onScrollLoad([...projects, ...data]))
+      .catch((err) => onReachEnd(false));
+  }, []);
 
   return (
     <>
@@ -39,12 +33,39 @@ export default function AdminProjects() {
       <DefaultHeader />
 
       <div className="container mt-4">
-        <div className="row">
+        <InfiniteScroll
+          className="row"
+          dataLength={projects.length}
+          next={() =>
+            loadProjectsThumbnail(page++)
+              .then((data) => onScrollLoad([...projects, ...data]))
+              .catch((err) => onReachEnd(false))
+          }
+          hasMore={hasMore}
+          loader={
+            <div className="d-flex justify-content-center">
+              <div className="spinner-border" role="status">
+                <span className="sr-only">Loading...</span>
+              </div>
+            </div>
+          }
+        >
           <AddCard />
-          <CardStack id={0} />
-          {/* <CardStack id={10} /> */}
-          {/* {projects} */}
-        </div>
+          {projects.map((item, i) => {
+            return (
+              <Card
+                key={i}
+                id={item.ID}
+                title={item.Title}
+                img={`http://${fileServer}/files/${item.Name}${formPath(
+                  item.Files[0]
+                )}`}
+                flag={item.Flag as FlagType}
+                desc={item.Desc}
+              />
+            );
+          })}
+        </InfiniteScroll>
       </div>
 
       <DefaultFooter name="Menu">

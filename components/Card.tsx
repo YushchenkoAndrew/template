@@ -48,7 +48,7 @@ export default function Card(props: CardProps) {
 
   return (
     <div
-      className="card overflow-hidden"
+      className="card overflow-hidden my-3"
       ref={(el) =>
         el && offset.top == -1 && offset.left == -1
           ? setOffset(el.getBoundingClientRect())
@@ -108,12 +108,6 @@ export default function Card(props: CardProps) {
           </h4>
           <p className={styles["card-text"]}>{props.description}</p>
         </div>
-        {/* TODO: Maybe add footer info such as github or other stuff 
-        <div className="card-footer">
-          <div className="media">
-            {props.children}
-          </div>
-        </div> */}
       </a>
     </div>
   );
