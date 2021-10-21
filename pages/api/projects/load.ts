@@ -1,8 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Session, withIronSession } from "next-iron-session";
+import { Session } from "next-iron-session";
 import { apiHost } from "../../../config";
 import redis from "../../../config/redis";
-import sessionConfig from "../../../config/session";
 import { createQuery } from "../../../lib/query";
 import { ApiError, ApiRes, ProjectData } from "../../../types/api";
 import { FullResponse } from "../../../types/request";
@@ -16,8 +15,12 @@ type ArgsType = {
 function LoadProjects(args: ArgsType) {
   return new Promise<FullResponse>((resolve, reject) => {
     const query = createQuery(args);
+    console.log(query);
+
     redis.get(`Project:${query}`, (err, result) => {
       if (!err && result) {
+        console.log("HERE " + query);
+
         return resolve({
           status: 200,
           send: {
@@ -33,10 +36,10 @@ function LoadProjects(args: ArgsType) {
         .then((data: ApiRes<ProjectData> | ApiError) => {
           if (data.status !== "OK" || !data.result.length) {
             return resolve({
-              status: 500,
+              status: data.status === "ERR" ? 500 : 416,
               send: {
                 status: "ERR",
-                message: "Error",
+                message: (data as ApiError).message || "Empty result",
               },
             });
           }

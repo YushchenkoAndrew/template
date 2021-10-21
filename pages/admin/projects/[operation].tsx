@@ -168,7 +168,6 @@ export default function ProjectOperation(props: ProjectOperationProps) {
               desc: data.result[0].Desc,
               note: data.result[0].Note,
             });
-            // return resolve((data as ApiRes).result as ProjectData[]);
           })
           .catch((err) => null);
       })
@@ -351,7 +350,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
               />
             </InputTemplate>
 
-            {/* TODO: Use List element instead !!! */}
+            {/* TODO: FINISH THIIIISSSSSS !!!! */}
             <InputTemplate label="Links List">
               <InputList
                 char="http://"
@@ -511,6 +510,8 @@ export const getServerSideProps = withIronSession(async function ({
       .join("/");
 
   switch (url) {
+    // TODO: Maybe change edit route !!!
+    // Just load here data from api and that's it
     case "/admin/projects/edit":
     case "/admin/projects/add": {
       return {

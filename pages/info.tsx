@@ -108,6 +108,7 @@ export default function Info() {
       .then((data: StatisticData) => {
         if (data.stat !== "OK") return;
         onMapLoad(data.map);
+
         onInfoLoad(data.info);
       })
       .catch((err) => {});
@@ -191,7 +192,12 @@ export default function Info() {
                 <WorldMap
                   color="#007bff"
                   size={chartSize.size}
-                  data={mapData}
+                  data={[
+                    // NOTE:  Need such hack for WorldMap Component to work properly
+                    // with one country only
+                    { country: "ua", value: 0 },
+                    ...mapData,
+                  ]}
                 />
               </div>
             </Card>

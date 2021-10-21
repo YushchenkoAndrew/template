@@ -19,7 +19,7 @@ export default function Card(props: CardProps) {
   const basePath = router.basePath;
 
   return (
-    <div className="col-lg-4 col-md-6 col-sm-11 mt-4">
+    <div className="col-lg-4 col-md-6 col-sm-11 my-3">
       <div className={`card p-2 h-100 ${styles["shadow"]}`}>
         <div className="text-right">
           <div className="d-flex justify-content-between">

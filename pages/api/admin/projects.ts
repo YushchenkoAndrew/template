@@ -59,6 +59,7 @@ export default withIronSession(async function (
   res: NextApiResponse
 ) {
   // TODO: Create PUT & DELETE request handler
+  // TODO: Clear Cache on Add new project !!!
   if (
     req.method !== "POST" &&
     req.method !== "PUT" &&
