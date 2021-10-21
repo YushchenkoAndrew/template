@@ -1,3 +1,4 @@
+import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/dist/client/router";
 import React, { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -10,17 +11,20 @@ import { fileServer } from "../config";
 import { formPath } from "../lib/files";
 import { loadProjectsThumbnail } from "../lib/projects";
 import { ProjectData } from "../types/api";
+import { LoadProjects } from "./api/projects/load";
 
-let page = 0;
+let page = 1;
+export interface ProjectsListPageProps {
+  hasMore: boolean;
+  projects: ProjectData[][];
+}
 
-export default function Projects() {
+export default function ProjectsListPage(props: ProjectsListPageProps) {
   const router = useRouter();
   const basePath = router.basePath;
 
-  const [hasMore, onReachEnd] = useState(true);
-  const [projects, onScrollLoad] = useState([[], [], []] as ProjectData[][]);
-
-  useEffect(() => loadProjects(), []);
+  const [hasMore, onReachEnd] = useState(props.hasMore);
+  const [projects, onScrollLoad] = useState(props.projects);
 
   function loadProjects() {
     loadProjectsThumbnail(page++)
@@ -123,8 +127,7 @@ export default function Projects() {
           >
             {projects.map((chunk, i) => {
               return (
-                // TODO: Add show order on md & sm
-                <div key={i} className="col px-0 mx-2">
+                <div key={i} className="col-12 col-lg-4 col-md-6 px-2">
                   {chunk.map((item, j) => {
                     return (
                       <Card
@@ -153,3 +156,27 @@ export default function Projects() {
     </>
   );
 }
+
+export const getServerSideProps = async () => {
+  const { send } = await LoadProjects({ page: 0, role: "thumbnail" });
+  if (send.status === "ERR" || !send.result?.length) {
+    return {
+      props: {
+        hasMore: false,
+        projects: [[], [], []],
+      } as ProjectsListPageProps,
+    };
+  }
+
+  const chunk = send.result.length / 3;
+  return {
+    props: {
+      hasMore: true,
+      projects: [
+        send.result.slice(0, chunk),
+        send.result.slice(chunk, 2 * chunk),
+        send.result.slice(2 * chunk),
+      ],
+    } as ProjectsListPageProps,
+  };
+};
