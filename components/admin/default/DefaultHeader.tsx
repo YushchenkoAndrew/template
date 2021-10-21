@@ -2,7 +2,7 @@ import React from "react";
 import DefaultNav from "./DefaultNav";
 import NavBar from "../../NavBar/NavBar";
 import NavContainer from "../../NavBar/NavContainer";
-import styles from "./Default.module.css";
+import RunningLine from "../../RunningLine";
 
 export interface DefaultHeaderProps {
   home?: boolean;
@@ -23,9 +23,7 @@ export default function DefaultHeader(props: DefaultHeaderProps) {
           ></DefaultNav>
         </NavContainer>
 
-        <h3 className={`text-white ${styles["admin-name"]}`}>
-          {process.env.ADMIN_USER ?? "admin"}
-        </h3>
+        <RunningLine text={process.env.ADMIN_USER ?? "admin"} size={7} />
       </NavBar>
       {props.children}
     </header>
