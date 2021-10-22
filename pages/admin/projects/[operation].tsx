@@ -30,6 +30,7 @@ import sessionConfig from "../../../config/session";
 import { ProjectInfo } from "../../../config/placeholder";
 import InputList from "../../../components/Inputs/InputDoubleList";
 import { useRouter } from "next/dist/client/router";
+import { LoadProjects } from "../../api/projects/load";
 
 export type Event =
   | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -486,7 +487,6 @@ export default function ProjectOperation(props: ProjectOperationProps) {
 
 export const getServerSideProps = withIronSession(async function ({
   req,
-  res,
 }: NextSessionArgs) {
   const sessionID = req.session.get("user");
   const isOk = await checkIfUserExist(sessionID);
@@ -501,13 +501,21 @@ export const getServerSideProps = withIronSession(async function ({
     };
   }
 
-  let url =
+  const url =
     "/" +
     (req.url ?? "")
       .split("?")[0]
       .split("/")
       .filter((item) => item)
       .join("/");
+
+  let treeStructure = {
+    assets: {},
+    src: {},
+    thumbnail: {},
+    styles: {},
+    templates: {},
+  } as TreeObj;
 
   switch (url) {
     case "/admin/projects/add": {
@@ -522,26 +530,52 @@ export const getServerSideProps = withIronSession(async function ({
             link: "",
           } as ProjectForm,
 
-          treeStructure: {
-            assets: {},
-            src: {},
-            thumbnail: {},
-            styles: {},
-            templates: {},
-          } as TreeObj,
+          treeStructure,
         } as ProjectOperationProps,
       };
     }
 
-    // FIXME: Maybe change edit route !!!
-    // Just load here data from api and that's it
     case "/admin/projects/edit": {
-      return { props: {} };
+      const params = new URLSearchParams((req.url ?? "").split("?")[1] ?? "");
+      if (!params.get("name")) return { notFound: true };
+
+      const { send } = await LoadProjects({ name: params.get("name") ?? "" });
+      if (send.status === "ERR" || !send.result?.length) {
+        return { notFound: true };
+      }
+
+      const project = send.result[0] as ProjectData;
+
+      for (let i in project.Files) {
+        const file = {
+          name: project.Files[i].Name,
+          dir: project.Files[i].Path,
+          type: project.Files[i].Type,
+          role: project.Files[i].Role,
+        } as ProjectFile;
+        treeStructure = formTree(treeStructure, file, [file]);
+      }
+      console.log(treeStructure);
+
+      return {
+        props: {
+          formData: {
+            name: project.Name,
+            flag: project.Flag,
+            title: project.Title,
+            desc: project.Desc,
+            note: project.Note,
+
+            // FIXME:
+            link: "",
+          },
+
+          treeStructure,
+        } as ProjectOperationProps,
+      };
     }
   }
 
-  return {
-    notFound: true,
-  };
+  return { notFound: true };
 },
 sessionConfig);
