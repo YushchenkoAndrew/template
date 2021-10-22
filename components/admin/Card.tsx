@@ -2,15 +2,27 @@ import { useRouter } from "next/dist/client/router";
 import React from "react";
 import Image from "react-bootstrap/Image";
 import { FlagType } from "../../types/flag";
+import SimpleButton from "../SimpleButton";
 import styles from "./Card.module.css";
 import Flag from "./Flag";
 
+export type EventLinks = {
+  modify: {
+    href?: string;
+    onClick?: () => void;
+  };
+  delete: {
+    href?: string;
+    onClick?: () => void;
+  };
+};
 export interface CardProps {
   id: number;
   img: string;
   title: string;
   flag: FlagType;
   desc?: string;
+  event: EventLinks;
 }
 
 export default function Card(props: CardProps) {
@@ -48,20 +60,18 @@ export default function Card(props: CardProps) {
           <div className="d-flex justify-content-between mt-3 mb-2">
             <span />
             <div className="row mr-2 mb-2">
-              {/* FIXME: Make on option in props to choose which href or onClick  */}
-              <a
-                href={`${basePath}/admin/projects/edit?id=${props.id}`}
+              <SimpleButton
                 className="btn btn-sm btn-outline-info mr-2"
+                event={props.event.modify}
               >
                 Modify
-              </a>
-              {/* TODO: Change this to fetch request !!!! */}
-              <a
-                href={`${basePath}/admin/projects/edit/${props.id}`}
-                className="btn btn-sm btn-outline-danger"
+              </SimpleButton>
+              <SimpleButton
+                className="btn btn-sm btn-outline-danger a.href"
+                event={props.event.delete}
               >
                 Delete
-              </a>
+              </SimpleButton>
             </div>
           </div>
         </div>
