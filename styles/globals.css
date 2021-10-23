@@ -36,6 +36,11 @@ a {
 }
 
 @font-face {
+  font-family: "BitAdvanced";
+  src: url("/projects/fonts/pixel-bit-advanced.ttf");
+}
+
+@font-face {
   font-family: "Roboto-Thin";
   src: url("/projects/fonts/Roboto-Thin.ttf");
 }

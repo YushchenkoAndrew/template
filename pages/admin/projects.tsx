@@ -32,6 +32,12 @@ export default function AdminProjects(props: AdminProjectsProps) {
     <>
       <DefaultHead>
         <title>Projects</title>
+        <link
+          rel="preload"
+          href={`${basePath}/fonts/pixel-bit-advanced.ttf`}
+          as="font"
+          crossOrigin=""
+        />
       </DefaultHead>
       <DefaultHeader />
 
