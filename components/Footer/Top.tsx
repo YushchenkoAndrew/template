@@ -10,12 +10,12 @@ export interface FooterTopProps {
 export default function FooterTop(props: FooterTopProps) {
   return (
     <div className="row">
-      <div className="col-xl-8 col-md-4 col-sm-4 col-12 my-auto mx-auto a">
+      <div className="col col-md-5 col-sm-7 mx-sm-auto">
         <h3 className={`text-dark mb-md-0 mb-5 ${styles["author"]}`}>
           {props.author}
         </h3>
       </div>
-      <div className="col-xl-3 col-md-5 col-sm-5 col-12">
+      <div className="col-9 col-md-4 col-sm-5">
         <h6 className="mb-3 mb-lg-4 bold-text ">
           <b>{props.name}</b>
         </h6>
