@@ -26,8 +26,8 @@ export default function CodeRain() {
           href="https://github.com/YushchenkoAndrew/template/tree/master/JS/CodeRain"
           links={[
             {
-              href: "https://github.com/YushchenkoAndrew/template/tree/master/CDump/CodeRain",
-              lang: "C++",
+              link: "https://github.com/YushchenkoAndrew/template/tree/master/CDump/CodeRain",
+              name: "C++",
             },
           ]}
           description="Creating a 'Code Rain' effect from Matrix. As funny joke you can put any text to

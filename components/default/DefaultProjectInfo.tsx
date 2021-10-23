@@ -1,15 +1,10 @@
 import { useRouter } from "next/dist/client/router";
 import React from "react";
-
-export interface GithubLink {
-  href: string;
-  lang?: string;
-}
-
+import { ProjectLink } from "../../types/projects";
 export interface DefaultProjectInfoProps {
   href: string;
   lang?: string;
-  links?: Array<GithubLink>;
+  links?: ProjectLink[];
   description: string;
 }
 
@@ -45,7 +40,7 @@ export default function DefaultProjectInfo(props: DefaultProjectInfoProps) {
           ? props.links.map((item, key) => (
               <a
                 className="font-weight-bold ml-1"
-                href={item.href}
+                href={item.link}
                 key={key}
                 onClick={() =>
                   localStorage.getItem("id")
@@ -62,7 +57,7 @@ export default function DefaultProjectInfo(props: DefaultProjectInfoProps) {
                 target="_blank"
                 rel="noreferrer"
               >
-                Github{item.lang ? ` (${item.lang})` : ""}
+                {item.name}
               </a>
             ))
           : null}

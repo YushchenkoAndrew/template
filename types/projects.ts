@@ -27,3 +27,8 @@ export type ProjectForm = {
   link: string;
   img: ProjectFile;
 };
+
+export type ProjectLink = {
+  name: string;
+  link: string;
+};

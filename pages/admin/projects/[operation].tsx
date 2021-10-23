@@ -9,6 +9,7 @@ import {
   ProjectElement,
   ProjectFile,
   ProjectForm,
+  ProjectLink,
 } from "../../../types/projects";
 import { TreeObj } from "../../../types/tree";
 import InputTemplate from "../../../components/Inputs/InputTemplate";
@@ -19,9 +20,9 @@ import InputFile from "../../../components/Inputs/InputFile";
 import TreeView from "../../../components/TreeView/TreeView";
 import InputRadio from "../../../components/Inputs/InputRadio";
 import md5 from "../../../lib/md5";
-import { basePath } from "../../../config";
+import { basePath, fileServer } from "../../../config";
 import { DefaultRes } from "../../../types/request";
-import { ApiError, ApiRes, ProjectData } from "../../../types/api";
+import { ApiError, ApiRes, FileData, ProjectData } from "../../../types/api";
 import Alert, { AlertProps } from "../../../components/Alert";
 import DefaultProjectInfo from "../../../components/default/DefaultProjectInfo";
 import { withIronSession } from "next-iron-session";
@@ -31,6 +32,8 @@ import { ProjectInfo } from "../../../config/placeholder";
 import InputList from "../../../components/Inputs/InputDoubleList";
 import { useRouter } from "next/dist/client/router";
 import { LoadProjects } from "../../api/projects/load";
+import ListEntity from "../../../components/Inputs/ListEntity";
+import { formPath } from "../../../lib/files";
 
 export type Event =
   | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -87,6 +90,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   const [treeStructure, onFileAdd] = useState(props.treeStructure);
   const [fileInfo, onFileInfoAdd] = useState({ role: "assets" } as ProjectFile);
   const [alert, onAlert] = useState({ state: "alert-success" } as AlertProps);
+  const [links, onLinksChange] = useState([] as ProjectLink[]);
 
   function onThumbnailChange(event: Event) {
     const { name, value } = event.target;
@@ -132,6 +136,13 @@ export default function ProjectOperation(props: ProjectOperationProps) {
     if (update) onError(flags);
     for (let err of Object.values(flags)) if (err) return true;
     return false;
+  }
+
+  function onNewLinkAdd(data: { [name: string]: string }): boolean {
+    // TODO: Show error on Error !!
+    if (!data["name"] || !data["link"]) return false;
+    onLinksChange([...links, data as ProjectLink]);
+    return true;
   }
 
   //
@@ -351,28 +362,39 @@ export default function ProjectOperation(props: ProjectOperationProps) {
               />
             </InputTemplate>
 
-            {/* TODO: FINISH THIIIISSSSSS !!!! */}
-            <InputTemplate label="Links List">
+            <InputTemplate label="Additional Links">
               <InputList
-                char="http://"
-                name="link"
-                value={formData.link}
-                error={err.link}
-                placeholder={ProjectInfo.link}
-                onChange={onThumbnailChange}
-                onBlur={onDataCache}
+                char={["http://", "@"]}
+                name={["link", "name"]}
+                // error={err.link}
+                placeholder={[ProjectInfo.link, ProjectInfo.name]}
+                onChange={onNewLinkAdd}
               />
+              <ul className="list-group">
+                {links.map((item, i) => (
+                  <div key={i} className="row">
+                    <ListEntity
+                      char={["http://", "@"]}
+                      value={[item.link, item.name]}
+                      onChange={() =>
+                        onLinksChange([
+                          ...links.slice(0, i),
+                          ...links.slice(i + 1),
+                        ])
+                      }
+                    />
+                  </div>
+                ))}
+              </ul>
             </InputTemplate>
 
             <DefaultFooter name={formData.name}>
               <DefaultProjectInfo
-                href={formData.link || "#"}
-                links={[
-                  {
-                    href: "https://github.com/YushchenkoAndrew/template/tree/master/CDump/CodeRain",
-                    lang: "C++",
-                  },
-                ]}
+                href={formData.link ? `http://${formData.link}` : "#"}
+                links={links.map(({ name, link }) => ({
+                  name,
+                  link: `http://${link}`,
+                }))}
                 description={formData.note || ProjectInfo.note}
               />
             </DefaultFooter>
@@ -545,6 +567,7 @@ export const getServerSideProps = withIronSession(async function ({
       }
 
       const project = send.result[0] as ProjectData;
+      let thumbnail = {} as FileData;
 
       for (let i in project.Files) {
         const file = {
@@ -553,9 +576,10 @@ export const getServerSideProps = withIronSession(async function ({
           type: project.Files[i].Type,
           role: project.Files[i].Role,
         } as ProjectFile;
+
+        if (project.Files[i].Role === "thumbnail") thumbnail = project.Files[i];
         treeStructure = formTree(treeStructure, file, [file]);
       }
-      console.log(treeStructure);
 
       return {
         props: {
@@ -565,9 +589,17 @@ export const getServerSideProps = withIronSession(async function ({
             title: project.Title,
             desc: project.Desc,
             note: project.Note,
+            link: `${basePath}/${project.Name}`,
+            img: {
+              name: thumbnail.Name,
+              dir: thumbnail.Path,
+              type: thumbnail.Type,
+              role: thumbnail.Role,
 
-            // FIXME:
-            link: "",
+              url: `http://${fileServer}/files/${project.Name}${formPath(
+                thumbnail
+              )}`,
+            },
           },
 
           treeStructure,
