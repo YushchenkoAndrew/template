@@ -49,8 +49,11 @@ export default function Info() {
       if (window.innerWidth <= 992 && window.innerWidth > 767)
         return setChartSize({ height: 400, width: 400, size: "xl" });
 
-      if (window.innerWidth <= 767)
+      if (window.innerWidth <= 767 && window.innerWidth > 576)
         return setChartSize({ height: 400, width: 400, size: "lg" });
+
+      if (window.innerWidth <= 576)
+        return setChartSize({ height: 400, width: 400, size: "responsive" });
 
       return setChartSize({ height: 310, width: 800, size: "xl" });
     }
@@ -221,8 +224,8 @@ export default function Info() {
                     {
                       label: "Visitors",
                       data: lineData,
-                      backgroundColor: ["rgba(255, 99, 132, 0.2)"],
-                      borderColor: ["rgba(255, 99, 132, 1)"],
+                      backgroundColor: "rgba(255, 99, 132, 0.2)",
+                      borderColor: "rgba(255, 99, 132, 1)",
                       borderWidth: 1,
                     },
                   ],

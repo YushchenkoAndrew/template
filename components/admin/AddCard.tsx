@@ -11,7 +11,8 @@ export default function AddCard(props: AddCardProps) {
   const basePath = router.basePath;
 
   return (
-    <div className="col-lg-4 col-md-6 mt-4">
+    // <div className="col-lg-4 col-md-6 mt-4">
+    <div className="col col-lg-4 col-md-6 col-sm-11 my-3 text-center">
       <a
         href={`${basePath}/admin/projects/add`}
         className={`card border-info text-decoration-none p-2 h-100 ${styles["add-card"]}`}

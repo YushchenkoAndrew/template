@@ -12,3 +12,17 @@
   transition: none !important;
   box-shadow: 5.1px 10.2px 10.2px rgba(0, 123, 255, 0.26);
 }
+
+.circular {
+  display: inline-block;
+  position: relative;
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.circular img {
+  width: auto;
+  height: 80%;
+}
