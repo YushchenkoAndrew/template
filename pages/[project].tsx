@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import DefaultHead from "../components/default/DefaultHead";
 import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultFooter from "../components/default/DefaultFooter";
@@ -6,8 +6,10 @@ import DefaultProjectInfo from "../components/default/DefaultProjectInfo";
 import { GetServerSidePropsContext } from "next";
 import { LoadProjects } from "./api/projects/load";
 import { FileData, ProjectData } from "../types/api";
-import { fileServer } from "../config";
+import { basePath, fileServer } from "../config";
 import { formPath } from "../lib/files";
+import DefaultEmscContainer from "../components/default/DefaultEmscContainer";
+import DefaultP5Container from "../components/default/DefaultP5Container";
 
 export interface ProjectPageProps {
   project: string;
@@ -33,9 +35,10 @@ export default function ProjectPage(props: ProjectPageProps) {
           />
         ))}
 
+        <script defer src={`${basePath}/js/lib/p5.min.js`}></script>
         {props.jsFiles.map((file, i) => (
           <script
-            defer
+            async
             key={i}
             src={`http://${fileServer}/files/${props.project}${formPath(file)}`}
           ></script>
@@ -45,14 +48,15 @@ export default function ProjectPage(props: ProjectPageProps) {
       <DefaultHeader name={props.title} projects />
 
       {/* TODO: Finish stuff bellow */}
-      {/* <DefaultEmscContainer width={1200} height={800} /> */}
+      <DefaultEmscContainer width={1200} height={800} />
+      {/* <DefaultP5Container /> */}
       <DefaultFooter name={props.title}>
         <DefaultProjectInfo
           href="https://github.com/YushchenkoAndrew/template/tree/master/JS/CodeRain"
           links={[
             {
-              href: "https://github.com/YushchenkoAndrew/template/tree/master/CDump/CodeRain",
-              lang: "C++",
+              link: "https://github.com/YushchenkoAndrew/template/tree/master/CDump/CodeRain",
+              name: "C++",
             },
           ]}
           description={props.note}
