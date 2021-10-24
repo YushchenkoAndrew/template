@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Session, withIronSession } from "next-iron-session";
 import { apiHost } from "../../../config";
-import redis from "../../../config/redis";
+import redis, { FlushValue } from "../../../config/redis";
 import sessionConfig from "../../../config/session";
 import { ApiAuth } from "../../../lib/auth";
 import { sendLogs } from "../../../lib/bot";
@@ -80,7 +80,11 @@ export default withIronSession(async function (
     JSON.stringify({ name, flag, title, desc, link })
   );
 
-  if (send.status === "OK") redis.del(`CACHE:${id}`);
+  if (send.status === "OK") {
+    redis.del(`CACHE:${id}`);
+    FlushValue("Project");
+  }
+
   res.status(status).send(send);
 },
 sessionConfig);

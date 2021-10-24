@@ -16,6 +16,13 @@ client.on("error", function (error) {
   });
 });
 
+export function FlushValue(key: string) {
+  client.keys(`${key}:*`, function (err, keys) {
+    if (err || !keys) return;
+    keys.map((item) => client.del(item));
+  });
+}
+
 // Test connection
 client.ping();
 export default client;
