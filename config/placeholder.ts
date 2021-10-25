@@ -14,3 +14,12 @@ export const ProjectInfo = {
   note: "Creating a 'Code Rain' effect from Matrix. As funny joke you can put any text to display at the end.",
   link: "github.com/YushchenkoAndrew/template/tree/master/JS/CodeRain",
 };
+
+export const template = `<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+
+  <body>
+  </body>
+</html>`;

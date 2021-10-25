@@ -28,12 +28,17 @@ import DefaultProjectInfo from "../../../components/default/DefaultProjectInfo";
 import { withIronSession } from "next-iron-session";
 import { NextSessionArgs } from "../../../types/session";
 import sessionConfig from "../../../config/session";
-import { ProjectInfo } from "../../../config/placeholder";
+import { ProjectInfo, template } from "../../../config/placeholder";
 import InputList from "../../../components/Inputs/InputDoubleList";
 import { useRouter } from "next/dist/client/router";
 import { LoadProjects } from "../../api/projects/load";
 import ListEntity from "../../../components/Inputs/ListEntity";
 import { formPath } from "../../../lib/files";
+import Editor from "react-simple-code-editor";
+import { highlight, languages } from "prismjs";
+import "prismjs/components/prism-markup";
+import "prismjs/components/prism-css";
+import "prismjs/themes/prism-coy.css";
 
 export type Event =
   | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -85,6 +90,7 @@ export interface ProjectOperationProps {
 
 export default function ProjectOperation(props: ProjectOperationProps) {
   const router = useRouter();
+  const [code, setCode] = useState(template);
   const [err, onError] = useState({} as { [name: string]: boolean });
   const [formData, onFormChange] = useState(props.formData);
   const [treeStructure, onFileAdd] = useState(props.treeStructure);
@@ -400,101 +406,123 @@ export default function ProjectOperation(props: ProjectOperationProps) {
             </DefaultFooter>
           </div>
         </div>
-
-        {/* <hr /> */}
+        <hr />
         <div className="d-flex justify-content-center mb-3">
-          <button
-            className={`btn btn-lg w-75 ${
-              checkOnError(false) ? "btn-outline-success" : "btn-success"
-            }`}
-            onClick={() => {
-              if (checkOnError()) return;
+          <div className="col-md-9">
+            <h4 className="font-weight-bold mb-2">Template</h4>
+            <Editor
+              className="form-control"
+              value={code}
+              onValueChange={setCode}
+              highlight={(code) => highlight(code, languages.html, "html")}
+              tabSize={2}
+              padding={10}
+              style={{
+                fontFamily: '"Fira code", "Fira Mono", monospace',
+                fontSize: 18,
+                backgroundColor: "#fafafa",
+                outline: 0,
+              }}
+            />
+          </div>
+        </div>
 
-              const cacheId = md5(
-                localStorage.getItem("salt") ??
-                  "" + localStorage.getItem("id") ??
-                  ""
-              );
-              fetch(`${basePath}/api/admin/projects?id=${cacheId}`, {
-                method: router.query.operation === "add" ? "POST" : "PUT",
-                headers: {
-                  "content-type": "application/json",
-                },
-                body: JSON.stringify(getData()),
-              })
-                .then((res) => res.json())
-                .then((data: DefaultRes) => {
-                  if (
-                    data.status !== "OK" ||
-                    !(data.result as ProjectData[]).length ||
-                    !(data.result as ProjectData[])[0]
-                  ) {
-                    onAlert({
-                      state: "alert-danger",
-                      title: "Error",
-                      note: data.message ?? "Backend error",
-                    });
-                    return;
-                  }
+        <hr />
+        <div className="d-flex justify-content-center mb-3">
+          <div className="col-md-9">
+            <button
+              className={`btn btn-lg w-100 ${
+                checkOnError(false) ? "btn-outline-success" : "btn-success"
+              }`}
+              onClick={() => {
+                if (checkOnError()) return;
 
-                  const { ID } = (data.result as ProjectData[])[0];
-                  (function parseTree(tree: TreeObj | ProjectFile | null) {
-                    if (!tree) return;
-                    if (tree.name) {
-                      const data = new FormData();
-                      data.append("file", (tree as ProjectFile).file);
-                      return fetch(
-                        `${basePath}/api/admin/file?id=${ID}&project=${
-                          formData.name
-                        }&role=${tree.role}${
-                          tree.dir
-                            ? "&dir=" +
-                              ((tree as ProjectFile).dir?.[0] !== "/"
-                                ? "/" + tree.dir
-                                : tree.dir)
-                            : ""
-                        }`,
-                        {
-                          method: "POST",
-                          body: data,
-                        }
-                      )
-                        .then((res) => res.json())
-                        .then((data: DefaultRes) => {
-                          onAlert({
-                            state:
-                              data.status === "OK"
-                                ? "alert-success"
-                                : "alert-danger",
-                            title: data.status === "OK" ? "Success" : "Error",
-                            note: data.message ?? "Backend error",
-                          });
-                        })
-                        .catch((err) => {
-                          onAlert({
-                            state: "alert-danger",
-                            title: "Backend error",
-                            note: "Something wrong happened on backend side. You should check server logs",
-                          });
-                        });
+                const cacheId = md5(
+                  localStorage.getItem("salt") ??
+                    "" + localStorage.getItem("id") ??
+                    ""
+                );
+                fetch(`${basePath}/api/admin/projects?id=${cacheId}`, {
+                  method: router.query.operation === "add" ? "POST" : "PUT",
+                  headers: {
+                    "content-type": "application/json",
+                  },
+                  body: JSON.stringify(getData()),
+                })
+                  .then((res) => res.json())
+                  .then((data: DefaultRes) => {
+                    if (
+                      data.status !== "OK" ||
+                      !(data.result as ProjectData[]).length ||
+                      !(data.result as ProjectData[])[0]
+                    ) {
+                      onAlert({
+                        state: "alert-danger",
+                        title: "Error",
+                        note: data.message ?? "Backend error",
+                      });
+                      return;
                     }
 
-                    Object.entries(tree).forEach(([name, value]) =>
-                      parseTree(value)
-                    );
-                  })(treeStructure);
-                })
-                .catch((err) => {
-                  onAlert({
-                    state: "alert-danger",
-                    title: "Backend error",
-                    note: "Something wrong happened on backend side. You should check server logs",
+                    const { ID } = (data.result as ProjectData[])[0];
+                    (function parseTree(tree: TreeObj | ProjectFile | null) {
+                      if (!tree) return;
+                      if (tree.name) {
+                        const data = new FormData();
+                        data.append("file", (tree as ProjectFile).file);
+                        return fetch(
+                          `${basePath}/api/admin/file?id=${ID}&project=${
+                            formData.name
+                          }&role=${tree.role}${
+                            tree.dir
+                              ? "&dir=" +
+                                ((tree as ProjectFile).dir?.[0] !== "/"
+                                  ? "/" + tree.dir
+                                  : tree.dir)
+                              : ""
+                          }`,
+                          {
+                            method: "POST",
+                            body: data,
+                          }
+                        )
+                          .then((res) => res.json())
+                          .then((data: DefaultRes) => {
+                            onAlert({
+                              state:
+                                data.status === "OK"
+                                  ? "alert-success"
+                                  : "alert-danger",
+                              title: data.status === "OK" ? "Success" : "Error",
+                              note: data.message ?? "Backend error",
+                            });
+                          })
+                          .catch((err) => {
+                            onAlert({
+                              state: "alert-danger",
+                              title: "Backend error",
+                              note: "Something wrong happened on backend side. You should check server logs",
+                            });
+                          });
+                      }
+
+                      Object.entries(tree).forEach(([name, value]) =>
+                        parseTree(value)
+                      );
+                    })(treeStructure);
+                  })
+                  .catch((err) => {
+                    onAlert({
+                      state: "alert-danger",
+                      title: "Backend error",
+                      note: "Something wrong happened on backend side. You should check server logs",
+                    });
                   });
-                });
-            }}
-          >
-            Submit
-          </button>
+              }}
+            >
+              Submit
+            </button>
+          </div>
         </div>
       </div>
 

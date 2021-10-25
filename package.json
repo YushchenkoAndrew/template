@@ -14,6 +14,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.15",
     "@types/formidable": "^1.2.4",
+    "@types/prismjs": "^1.16.6",
     "@types/react-calendar": "^3.4.3",
     "@types/react-google-recaptcha": "^2.1.2",
     "@types/redis": "^2.8.31",
@@ -23,6 +24,7 @@
     "formidable": "^1.2.2",
     "next": "^11.1.0",
     "next-iron-session": "^4.2.0",
+    "prismjs": "^1.25.0",
     "react": "^17.0.2",
     "react-bootstrap": "^2.0.0-beta.4",
     "react-calendar": "^3.4.0",
@@ -30,6 +32,7 @@
     "react-dom": "17.0.2",
     "react-google-recaptcha": "^2.1.0",
     "react-infinite-scroll-component": "^6.1.0",
+    "react-simple-code-editor": "^0.11.0",
     "react-spring": "^9.2.4",
     "react-svg-worldmap": "^1.1.0",
     "redis": "^3.1.2"
