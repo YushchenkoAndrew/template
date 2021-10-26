@@ -1,4 +1,6 @@
 import { basePath } from ".";
+import { ProjectForm } from "../types/projects";
+import { TreeObj } from "../types/tree";
 
 export const ProjectInfo = {
   name: "CodeRain",
@@ -15,11 +17,57 @@ export const ProjectInfo = {
   link: "github.com/YushchenkoAndrew/template/tree/master/JS/CodeRain",
 };
 
-export const template = `<!DOCTYPE html>
+export const formPlaceholder = {
+  name: "",
+  flag: "js",
+  title: "",
+  desc: "",
+  note: "",
+  link: "",
+} as ProjectForm;
+
+export const treePlaceholder = {
+  assets: {},
+  src: {},
+  thumbnail: {},
+  styles: {},
+  templates: {},
+} as TreeObj;
+
+export const htmlMarkers = [
+  "<!--{{JS_FILE}}-->",
+  "<!--{{CSS_FILE}}-->",
+  "<!--{{FLAG}}-->",
+];
+
+export enum MarkerIndex {
+  JS,
+  CSS,
+  FLAG,
+}
+
+export const codeTemplate = `<!DOCTYPE html>
 <html>
   <head>
+
+  ${htmlMarkers[MarkerIndex.CSS]}
+
+  ${htmlMarkers[MarkerIndex.JS]}
+
   </head>
 
   <body>
+
+  ${htmlMarkers[MarkerIndex.FLAG]}
+
   </body>
 </html>`;
+
+export const projectFlags = ["js", "c++", "link"];
+export enum FlagIndex {
+  JS,
+  C,
+  LINK,
+}
+
+export const flagTemplate = [``, ``, ``];
