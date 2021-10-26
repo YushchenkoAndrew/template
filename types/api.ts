@@ -55,6 +55,14 @@ export type FileData = {
   ProjectID: number;
 };
 
+export type LinkData = {
+  ID: number;
+  UpdatedAt: string;
+  Name: string;
+  Link: string;
+  ProjectID: number;
+};
+
 export type ProjectData = {
   ID: number;
   CreatedAt: string;
@@ -64,4 +72,5 @@ export type ProjectData = {
   Desc: string;
   Note: string;
   Files: FileData[];
+  Links: LinkData[];
 };
