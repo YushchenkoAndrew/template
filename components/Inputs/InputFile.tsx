@@ -6,7 +6,7 @@ export interface InputFileProps {
   name: string;
   role: string;
   type?: string;
-  error?: boolean;
+  required?: boolean;
   multiple?: boolean;
   message?: string;
   onChange: (event: Event) => void;
@@ -31,12 +31,13 @@ export default function InputFile(props: InputFileProps) {
   }
 
   return (
-    <>
+    <div className="input-group">
       <input
         name={props.name}
         type="file"
         ref={fileRef}
         className="d-none"
+        required={props.required}
         multiple={props.multiple}
         accept={props.type}
         onChange={() => {
@@ -82,9 +83,9 @@ export default function InputFile(props: InputFileProps) {
       >
         {file && !props.multiple ? file : "Upload"}
       </button>
-      {props.error ? (
-        <div className="text-danger small w-100">Thing field is required</div>
+      {props.required ? (
+        <div className="invalid-tooltip">Thing field is required</div>
       ) : null}
-    </>
+    </div>
   );
 }

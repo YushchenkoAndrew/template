@@ -5,21 +5,19 @@ import { ProjectElement } from "../../types/projects";
 
 export interface InputRadioProps {
   name: string;
-  options: string;
+  options: string[];
   label?: string;
   row?: boolean;
   onChange: (event: Event) => void;
 }
 
 export default function InputRadio(props: InputRadioProps) {
-  const values = props.options.split(" ");
-  const [selected, onSelected] = useState<string | null>(values[0]);
+  const [selected, onSelected] = useState<string | null>(props.options[0]);
 
   return (
-    // <div className="input-group">
-    <>
+    <div className="input-group">
       <div className="btn-group btn-group-toggle" data-toggle="buttons">
-        {values.map((item) => (
+        {props.options.map((item) => (
           <label
             key={md5(item + Math.random().toString())}
             className={`btn ${props.label ?? "btn-outline-dark"} ${
@@ -42,6 +40,6 @@ export default function InputRadio(props: InputRadioProps) {
           </label>
         ))}
       </div>
-    </>
+    </div>
   );
 }

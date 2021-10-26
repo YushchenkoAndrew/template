@@ -5,7 +5,7 @@ export interface InputValueProps {
   name: string;
   value: string;
   type?: string;
-  error?: boolean;
+  required?: boolean;
   placeholder?: string;
   onChange: (event: Event) => void;
   onBlur?: (event: Event) => void;
@@ -20,11 +20,12 @@ export default function InputValue(props: InputValueProps) {
         type={props.type ?? "text"}
         className="form-control"
         placeholder={props.placeholder ?? ""}
+        required={props.required}
         onChange={props.onChange}
         onBlur={props.onBlur}
       />
-      {props.error ? (
-        <div className="text-danger small w-100">This field is required</div>
+      {props.required ? (
+        <div className="invalid-tooltip">This field is required</div>
       ) : null}
     </>
   );

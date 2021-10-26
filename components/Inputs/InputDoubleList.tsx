@@ -12,7 +12,7 @@ export interface InputValueProps {
   char: DoubleType<string>;
   name: DoubleType<string>;
   type?: DoubleType<string>;
-  error?: DoubleType<boolean>;
+  required?: DoubleType<boolean>;
   placeholder?: DoubleType<string>;
   onChange: (data: { [name: string]: string }) => boolean;
 }
@@ -39,7 +39,7 @@ export default function InputList(props: InputValueProps) {
           name={props.name[0]}
           value={data[props.name[0]]}
           type={props.type?.[0]}
-          error={props.error?.[0]}
+          required={props.required?.[0]}
           placeholder={props.placeholder?.[0]}
           onChange={onChange}
         />
@@ -52,7 +52,7 @@ export default function InputList(props: InputValueProps) {
           name={props.name[1]}
           value={data[props.name[1]]}
           type={props.type?.[1]}
-          error={props.error?.[1]}
+          required={props.required?.[1]}
           placeholder={props.placeholder?.[1]}
           onChange={onChange}
         />
@@ -62,6 +62,7 @@ export default function InputList(props: InputValueProps) {
             type="button"
             onClick={() => {
               if (props.onChange(data)) {
+                // Reset input on Success
                 onDataChange({ [props.name[0]]: "", [props.name[1]]: "" });
               }
             }}
