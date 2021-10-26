@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { FormEventHandler, useEffect, useState } from "react";
 import DefaultHeader from "../../../components/admin/default/DefaultHeader";
-import InputValue from "../../../components/Inputs/InputValue";
 import DefaultFooter from "../../../components/default/DefaultFooter";
 import DefaultHead from "../../../components/default/DefaultHead";
 import DefaultNav from "../../../components/default/DefaultNav";
@@ -9,42 +8,44 @@ import {
   ProjectElement,
   ProjectFile,
   ProjectForm,
-  ProjectLink,
 } from "../../../types/projects";
 import { TreeObj } from "../../../types/tree";
-import InputTemplate from "../../../components/Inputs/InputTemplate";
-import InputName from "../../../components/Inputs/InputName";
-import InputText from "../../../components/Inputs/InputText";
-import Card from "../../../components/Card";
-import InputFile from "../../../components/Inputs/InputFile";
-import TreeView from "../../../components/TreeView/TreeView";
-import InputRadio from "../../../components/Inputs/InputRadio";
 import md5 from "../../../lib/md5";
 import { basePath, fileServer } from "../../../config";
 import { DefaultRes } from "../../../types/request";
-import { ApiError, ApiRes, FileData, ProjectData } from "../../../types/api";
+import { ApiRes, FileData, ProjectData } from "../../../types/api";
 import Alert, { AlertProps } from "../../../components/Alert";
-import DefaultProjectInfo from "../../../components/default/DefaultProjectInfo";
 import { withIronSession } from "next-iron-session";
 import { NextSessionArgs } from "../../../types/session";
 import sessionConfig from "../../../config/session";
-import { ProjectInfo, template } from "../../../config/placeholder";
-import InputList from "../../../components/Inputs/InputDoubleList";
+import {
+  ProjectInfo,
+  codeTemplate,
+  formPlaceholder,
+  treePlaceholder,
+} from "../../../config/placeholder";
 import { useRouter } from "next/dist/client/router";
 import { LoadProjects } from "../../api/projects/load";
-import ListEntity from "../../../components/Inputs/ListEntity";
-import { formPath } from "../../../lib/files";
-import Editor from "react-simple-code-editor";
-import { highlight, languages } from "prismjs";
-import "prismjs/components/prism-markup";
-import "prismjs/components/prism-css";
-import "prismjs/themes/prism-coy.css";
+import {
+  formPath,
+  getDir,
+  convertProject,
+  convertFile,
+} from "../../../lib/files";
+import {
+  addCssHtml,
+  addJsHtml,
+  restoreHtmlMarkers,
+} from "../../../lib/markers";
+import DefaultThumbnailPreview from "../../../components/admin/default/DefaultThumbnailPreview";
+import DefaultFileStructure from "../../../components/admin/default/DefaultFileStructure";
+import DefaultFooterPreview from "../../../components/admin/default/DefaultFooterPreview";
 
 export type Event =
   | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   | ProjectElement;
 
-function formTree(
+export function formTree(
   tree: TreeObj,
   info: ProjectFile,
   files?: ProjectFile[]
@@ -90,15 +91,17 @@ export interface ProjectOperationProps {
 
 export default function ProjectOperation(props: ProjectOperationProps) {
   const router = useRouter();
-  const [code, setCode] = useState(template);
-  const [err, onError] = useState({} as { [name: string]: boolean });
+  const [code, setCode] = useState(codeTemplate);
+  const [validated, setValidated] = useState(false);
   const [formData, onFormChange] = useState(props.formData);
   const [treeStructure, onFileAdd] = useState(props.treeStructure);
   const [fileInfo, onFileInfoAdd] = useState({ role: "assets" } as ProjectFile);
   const [alert, onAlert] = useState({ state: "alert-success" } as AlertProps);
-  const [links, onLinksChange] = useState([] as ProjectLink[]);
+  const [links, onLinksChange] = useState({} as { [name: string]: string });
 
   function onThumbnailChange(event: Event) {
+    setValidated(false);
+
     const { name, value } = event.target;
     onFormChange({
       ...formData,
@@ -116,6 +119,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   }
 
   function onFileInfoChange(event: Event) {
+    setValidated(false);
     onFileInfoAdd({
       ...fileInfo,
       [event.target.name]: event.target.value,
@@ -124,30 +128,40 @@ export default function ProjectOperation(props: ProjectOperationProps) {
 
   function onFilesUpload(event: Event) {
     if (!Array.isArray(event.target.value)) return;
+    setValidated(false);
+
+    for (let i in event.target.value) {
+      switch (event.target.value[i].type) {
+        case "text/javascript":
+          setCode(
+            addJsHtml(
+              code,
+              formData.name || ProjectInfo.name,
+              event.target.value[i]
+            )
+          );
+          break;
+
+        case "text/css":
+          setCode(
+            addCssHtml(
+              code,
+              formData.name || ProjectInfo.name,
+              event.target.value[i]
+            )
+          );
+          break;
+      }
+    }
+
     return onFileAdd(
       formTree(treeStructure, fileInfo, event.target.value as ProjectFile[])
     );
   }
 
-  function checkOnError(update: boolean = true): boolean {
-    let flags = {
-      name: !formData.name,
-      title: !formData.title,
-      desc: !formData.desc,
-      note: !formData.desc,
-      img: !formData.img,
-      link: !formData.link,
-    };
-
-    if (update) onError(flags);
-    for (let err of Object.values(flags)) if (err) return true;
-    return false;
-  }
-
   function onNewLinkAdd(data: { [name: string]: string }): boolean {
-    // TODO: Show error on Error !!
     if (!data["name"] || !data["link"]) return false;
-    onLinksChange([...links, data as ProjectLink]);
+    onLinksChange({ ...links, [data["name"]]: data["link"] });
     return true;
   }
 
@@ -180,11 +194,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
 
             return onFormChange({
               ...formData,
-              name: data.result[0].Name,
-              title: data.result[0].Title,
-              flag: data.result[0].Flag,
-              desc: data.result[0].Desc,
-              note: data.result[0].Note,
+              ...convertProject(data.result[0]),
             });
           })
           .catch((err) => null);
@@ -204,6 +214,71 @@ export default function ProjectOperation(props: ProjectOperationProps) {
       .catch((err) => null);
   }
 
+  const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
+    event?.preventDefault();
+    if (!event?.currentTarget?.checkValidity()) {
+      setValidated(true);
+      return;
+    }
+
+    const cacheId = md5(
+      localStorage.getItem("salt") ?? "" + localStorage.getItem("id") ?? ""
+    );
+    fetch(`${basePath}/api/admin/projects?id=${cacheId}`, {
+      method: router.query.operation === "add" ? "POST" : "PUT",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(getData()),
+    })
+      .then((res) => res.json())
+      .then((data: DefaultRes) => {
+        if (
+          data.status !== "OK" ||
+          !(data.result as ProjectData[]).length ||
+          !(data.result as ProjectData[])[0]
+        ) {
+          return resHandler(data);
+        }
+
+        // TODO: To add Template file !!!
+        const { ID } = (data.result as ProjectData[])[0];
+        (function parseTree(tree: TreeObj | ProjectFile | null) {
+          if (!tree) return;
+          if (tree.name) {
+            const data = new FormData();
+            data.append("file", (tree as ProjectFile).file);
+            return fetch(
+              `${basePath}/api/admin/file?id=${ID}&project=${
+                formData.name
+              }&role=${tree.role}${getDir(tree.dir as string | undefined)}`,
+              {
+                method: "POST",
+                body: data,
+              }
+            )
+              .then((res) => res.json())
+              .then(resHandler)
+              .catch(resErrHandler);
+          }
+
+          Object.entries(tree).forEach(([name, value]) => parseTree(value));
+        })(treeStructure);
+
+        fetch(`${basePath}/api/admin/link?id=${ID}`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ ...links, main: formData.link }),
+        })
+          .then((res) => res.json())
+          .then(resHandler)
+          .catch(resErrHandler);
+      })
+      .catch(resErrHandler);
+
+    return false;
+  };
+
   function getData() {
     return {
       name: formData.name,
@@ -211,8 +286,23 @@ export default function ProjectOperation(props: ProjectOperationProps) {
       title: formData.title,
       desc: formData.desc,
       note: formData.note,
-      link: formData.link,
     };
+  }
+
+  function resHandler(data: DefaultRes) {
+    onAlert({
+      state: data.status === "OK" ? "alert-success" : "alert-danger",
+      title: data.status === "OK" ? "Success" : "Error",
+      note: data.message ?? "Backend error",
+    });
+  }
+
+  function resErrHandler() {
+    onAlert({
+      state: "alert-danger",
+      title: "Backend error",
+      note: "Something wrong happened on backend side. You should check server logs",
+    });
   }
 
   return (
@@ -222,309 +312,56 @@ export default function ProjectOperation(props: ProjectOperationProps) {
       </DefaultHead>
       <DefaultHeader />
       <Alert state={alert.state} title={alert.title} note={alert.note} />
+      <form
+        className={`container needs-validation ${
+          validated ? "was-validated" : ""
+        } mt-4`}
+        noValidate
+        onSubmit={onSubmit as FormEventHandler<HTMLFormElement>}
+      >
+        <DefaultThumbnailPreview
+          formData={formData}
+          onChange={onThumbnailChange}
+          onBlur={onDataCache}
+        />
 
-      <div className="container mt-4">
-        <div className="row">
-          <div className="col-md-5 order-md-2 mb-4">
-            <Card
-              img={formData.img?.url || (ProjectInfo.img.url ?? "")}
-              title={formData.title || ProjectInfo.title}
-              size="title-lg"
-              href="#"
-              description={formData.desc || ProjectInfo.desc}
-            />
-          </div>
-          <div className="col-md-7 order-md-1">
-            <h4 className="font-weight-bold mb-3">Thumbnail</h4>
-            <InputTemplate label="Name">
-              <InputName
-                char="@"
-                name="name"
-                value={formData.name}
-                error={err.name}
-                placeholder={ProjectInfo.name}
-                onChange={onThumbnailChange}
-                onBlur={onDataCache}
-              />
-            </InputTemplate>
-
-            <InputTemplate label="Title">
-              <InputValue
-                name="title"
-                value={formData.title}
-                error={err.title}
-                placeholder={ProjectInfo.title}
-                onChange={onThumbnailChange}
-                onBlur={onDataCache}
-              />
-            </InputTemplate>
-
-            <InputTemplate label="Description">
-              <InputText
-                name="desc"
-                value={formData.desc}
-                error={err.desc}
-                placeholder={ProjectInfo.desc}
-                onChange={onThumbnailChange}
-                onBlur={onDataCache}
-              />
-            </InputTemplate>
-
-            <div className="input-group d-flex justify-content-between">
-              <InputTemplate label="Image">
-                <InputFile
-                  name="img"
-                  role="thumbnail"
-                  type="image/*"
-                  error={err.img}
-                  onChange={onThumbnailChange}
-                />
-              </InputTemplate>
-
-              <InputTemplate label="Flag">
-                <InputRadio
-                  name="flag"
-                  options="js c++ link"
-                  label="btn-outline-secondary"
-                  onChange={onThumbnailChange}
-                />
-              </InputTemplate>
-            </div>
-          </div>
-        </div>
         {formData.flag === "link" ? (
           <span />
         ) : (
-          <>
-            <hr />
-            <div className="row">
-              <div className="col-md-6 order-md-1 mb-4">
-                <h4 className="font-weight-bold mb-3">
-                  Projects Files Structure
-                </h4>
-                <TreeView
-                  name={formData.name || ProjectInfo.name}
-                  role={fileInfo.role}
-                  dir={fileInfo.dir}
-                  projectTree={formTree(treeStructure, fileInfo)}
-                />
-              </div>
-              <div className="col-md-6 order-md-2">
-                <InputTemplate label="Role">
-                  <div className="input-group">
-                    <InputRadio
-                      name="role"
-                      options="assets src styles template"
-                      onChange={onFileInfoChange}
-                    />
-                  </div>
-                </InputTemplate>
-
-                <InputTemplate label="Directory">
-                  <InputValue
-                    name="dir"
-                    value={fileInfo.dir ?? ""}
-                    placeholder="/lua/"
-                    onChange={onFileInfoChange}
-                  />
-                </InputTemplate>
-
-                <InputTemplate label="File">
-                  <InputFile
-                    name="img"
-                    role={fileInfo.role}
-                    multiple
-                    onChange={onFilesUpload}
-                  />
-                </InputTemplate>
-              </div>
-            </div>
-          </>
+          <DefaultFileStructure
+            code={code}
+            formData={formData}
+            fileInfo={fileInfo}
+            projectTree={formTree(treeStructure, fileInfo)}
+            onChange={onFileInfoChange}
+            onCodeChange={(code: string) => setCode(restoreHtmlMarkers(code))}
+            onUpload={onFilesUpload}
+            onBlur={onDataCache}
+          />
         )}
-        <hr />
-        <div className="d-flex justify-content-center mb-3">
-          <div className="col-md-11 ">
-            <h4 className="font-weight-bold mb-3">Footer</h4>
-            <InputTemplate label="Note">
-              <InputText
-                name="note"
-                value={formData.note}
-                error={err.note}
-                placeholder={ProjectInfo.note}
-                onChange={onThumbnailChange}
-                onBlur={onDataCache}
-              />
-            </InputTemplate>
-
-            <InputTemplate label="Link">
-              <InputName
-                char="http://"
-                name="link"
-                value={formData.link}
-                error={err.link}
-                placeholder={ProjectInfo.link}
-                onChange={onThumbnailChange}
-                onBlur={onDataCache}
-              />
-            </InputTemplate>
-
-            <InputTemplate label="Additional Links">
-              <InputList
-                char={["http://", "@"]}
-                name={["link", "name"]}
-                // error={err.link}
-                placeholder={[ProjectInfo.link, ProjectInfo.name]}
-                onChange={onNewLinkAdd}
-              />
-              <ul className="list-group">
-                {links.map((item, i) => (
-                  <div key={i} className="row">
-                    <ListEntity
-                      char={["http://", "@"]}
-                      value={[item.link, item.name]}
-                      onChange={() =>
-                        onLinksChange([
-                          ...links.slice(0, i),
-                          ...links.slice(i + 1),
-                        ])
-                      }
-                    />
-                  </div>
-                ))}
-              </ul>
-            </InputTemplate>
-
-            <DefaultFooter name={formData.name}>
-              <DefaultProjectInfo
-                href={formData.link ? `http://${formData.link}` : "#"}
-                links={links.map(({ name, link }) => ({
-                  name,
-                  link: `http://${link}`,
-                }))}
-                description={formData.note || ProjectInfo.note}
-              />
-            </DefaultFooter>
-          </div>
-        </div>
-        <hr />
-        <div className="d-flex justify-content-center mb-3">
-          <div className="col-md-9">
-            <h4 className="font-weight-bold mb-2">Template</h4>
-            <Editor
-              className="form-control"
-              value={code}
-              onValueChange={setCode}
-              highlight={(code) => highlight(code, languages.html, "html")}
-              tabSize={2}
-              padding={10}
-              style={{
-                fontFamily: '"Fira code", "Fira Mono", monospace',
-                fontSize: 18,
-                backgroundColor: "#fafafa",
-                outline: 0,
-              }}
-            />
-          </div>
-        </div>
 
         <hr />
+        <DefaultFooterPreview
+          links={links}
+          formData={formData}
+          onChange={onThumbnailChange}
+          onBlur={onDataCache}
+          onLinkAdd={onNewLinkAdd}
+          onLinkChange={onLinksChange}
+        />
+
+        <hr className="mb-5" />
         <div className="d-flex justify-content-center mb-3">
           <div className="col-md-9">
             <button
-              className={`btn btn-lg w-100 ${
-                checkOnError(false) ? "btn-outline-success" : "btn-success"
-              }`}
-              onClick={() => {
-                if (checkOnError()) return;
-
-                const cacheId = md5(
-                  localStorage.getItem("salt") ??
-                    "" + localStorage.getItem("id") ??
-                    ""
-                );
-                fetch(`${basePath}/api/admin/projects?id=${cacheId}`, {
-                  method: router.query.operation === "add" ? "POST" : "PUT",
-                  headers: {
-                    "content-type": "application/json",
-                  },
-                  body: JSON.stringify(getData()),
-                })
-                  .then((res) => res.json())
-                  .then((data: DefaultRes) => {
-                    if (
-                      data.status !== "OK" ||
-                      !(data.result as ProjectData[]).length ||
-                      !(data.result as ProjectData[])[0]
-                    ) {
-                      onAlert({
-                        state: "alert-danger",
-                        title: "Error",
-                        note: data.message ?? "Backend error",
-                      });
-                      return;
-                    }
-
-                    const { ID } = (data.result as ProjectData[])[0];
-                    (function parseTree(tree: TreeObj | ProjectFile | null) {
-                      if (!tree) return;
-                      if (tree.name) {
-                        const data = new FormData();
-                        data.append("file", (tree as ProjectFile).file);
-                        return fetch(
-                          `${basePath}/api/admin/file?id=${ID}&project=${
-                            formData.name
-                          }&role=${tree.role}${
-                            tree.dir
-                              ? "&dir=" +
-                                ((tree as ProjectFile).dir?.[0] !== "/"
-                                  ? "/" + tree.dir
-                                  : tree.dir)
-                              : ""
-                          }`,
-                          {
-                            method: "POST",
-                            body: data,
-                          }
-                        )
-                          .then((res) => res.json())
-                          .then((data: DefaultRes) => {
-                            onAlert({
-                              state:
-                                data.status === "OK"
-                                  ? "alert-success"
-                                  : "alert-danger",
-                              title: data.status === "OK" ? "Success" : "Error",
-                              note: data.message ?? "Backend error",
-                            });
-                          })
-                          .catch((err) => {
-                            onAlert({
-                              state: "alert-danger",
-                              title: "Backend error",
-                              note: "Something wrong happened on backend side. You should check server logs",
-                            });
-                          });
-                      }
-
-                      Object.entries(tree).forEach(([name, value]) =>
-                        parseTree(value)
-                      );
-                    })(treeStructure);
-                  })
-                  .catch((err) => {
-                    onAlert({
-                      state: "alert-danger",
-                      title: "Backend error",
-                      note: "Something wrong happened on backend side. You should check server logs",
-                    });
-                  });
-              }}
+              type="submit"
+              className="btn btn-lg w-100 btn-outline-success"
             >
               Submit
             </button>
           </div>
         </div>
-      </div>
+      </form>
 
       <DefaultFooter name="Menu">
         <ul className="list-unstyled">
@@ -559,27 +396,13 @@ export const getServerSideProps = withIronSession(async function ({
       .filter((item) => item)
       .join("/");
 
-  let treeStructure = {
-    assets: {},
-    src: {},
-    thumbnail: {},
-    styles: {},
-    templates: {},
-  } as TreeObj;
+  let treeStructure = treePlaceholder;
 
   switch (url) {
     case "/admin/projects/add": {
       return {
         props: {
-          formData: {
-            name: "",
-            flag: "js",
-            title: "",
-            desc: "",
-            note: "",
-            link: "",
-          } as ProjectForm,
-
+          formData: formPlaceholder,
           treeStructure,
         } as ProjectOperationProps,
       };
@@ -598,13 +421,7 @@ export const getServerSideProps = withIronSession(async function ({
       let thumbnail = {} as FileData;
 
       for (let i in project.Files) {
-        const file = {
-          name: project.Files[i].Name,
-          dir: project.Files[i].Path,
-          type: project.Files[i].Type,
-          role: project.Files[i].Role,
-        } as ProjectFile;
-
+        const file = convertFile(project.Files[i]);
         if (project.Files[i].Role === "thumbnail") thumbnail = project.Files[i];
         treeStructure = formTree(treeStructure, file, [file]);
       }
@@ -612,18 +429,9 @@ export const getServerSideProps = withIronSession(async function ({
       return {
         props: {
           formData: {
-            name: project.Name,
-            flag: project.Flag,
-            title: project.Title,
-            desc: project.Desc,
-            note: project.Note,
-            link: `${basePath}/${project.Name}`,
+            ...convertProject(project),
             img: {
-              name: thumbnail.Name,
-              dir: thumbnail.Path,
-              type: thumbnail.Type,
-              role: thumbnail.Role,
-
+              ...convertFile(thumbnail),
               url: `http://${fileServer}/files/${project.Name}${formPath(
                 thumbnail
               )}`,
