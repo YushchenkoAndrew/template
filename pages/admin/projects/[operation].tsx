@@ -1,4 +1,4 @@
-import React, { FormEventHandler, useEffect, useState } from "react";
+import React, { FormEventHandler, useEffect, useRef, useState } from "react";
 import DefaultHeader from "../../../components/admin/default/DefaultHeader";
 import DefaultFooter from "../../../components/default/DefaultFooter";
 import DefaultHead from "../../../components/default/DefaultHead";
@@ -23,6 +23,8 @@ import {
   codeTemplate,
   formPlaceholder,
   treePlaceholder,
+  htmlMarkers,
+  MarkerIndex,
 } from "../../../config/placeholder";
 import { useRouter } from "next/dist/client/router";
 import { LoadProjects } from "../../api/projects/load";
@@ -32,11 +34,7 @@ import {
   convertProject,
   convertFile,
 } from "../../../lib/files";
-import {
-  addCssHtml,
-  addJsHtml,
-  restoreHtmlMarkers,
-} from "../../../lib/markers";
+import { restoreHtmlMarkers } from "../../../lib/markers";
 import DefaultThumbnailPreview from "../../../components/admin/default/DefaultThumbnailPreview";
 import DefaultFileStructure from "../../../components/admin/default/DefaultFileStructure";
 import DefaultFooterPreview from "../../../components/admin/default/DefaultFooterPreview";
@@ -92,6 +90,7 @@ export interface ProjectOperationProps {
 export default function ProjectOperation(props: ProjectOperationProps) {
   const router = useRouter();
   const [code, setCode] = useState(codeTemplate);
+  const refForm = useRef<HTMLFormElement | null>(null);
   const [validated, setValidated] = useState(false);
   const [formData, onFormChange] = useState(props.formData);
   const [treeStructure, onFileAdd] = useState(props.treeStructure);
@@ -130,30 +129,17 @@ export default function ProjectOperation(props: ProjectOperationProps) {
     if (!Array.isArray(event.target.value)) return;
     setValidated(false);
 
+    let autoCode = code;
     for (let i in event.target.value) {
-      switch (event.target.value[i].type) {
-        case "text/javascript":
-          setCode(
-            addJsHtml(
-              code,
-              formData.name || ProjectInfo.name,
-              event.target.value[i]
-            )
-          );
-          break;
-
-        case "text/css":
-          setCode(
-            addCssHtml(
-              code,
-              formData.name || ProjectInfo.name,
-              event.target.value[i]
-            )
-          );
-          break;
-      }
+      // FIXME:
+      //   autoCode = addToHtml(
+      //     autoCode,
+      //     htmlMarkers[MarkerIndex.PROJECT_NAME],
+      //     event.target.value[i]
+      //   );
     }
 
+    setCode(autoCode);
     return onFileAdd(
       formTree(treeStructure, fileInfo, event.target.value as ProjectFile[])
     );
@@ -215,6 +201,22 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   }
 
   const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
+    //  Test if file
+    const templateFile = new File(
+      [new Blob([code], { type: "text/html" })],
+      "index.html",
+      {
+        type: "text/html",
+      }
+    );
+
+    console.log(templateFile);
+
+    let reader = new FileReader();
+    reader.readAsText(templateFile);
+    reader.onload = () => console.log(reader.result);
+    reader.onerror = () => console.log(reader.error);
+
     event?.preventDefault();
     if (!event?.currentTarget?.checkValidity()) {
       setValidated(true);
@@ -242,6 +244,16 @@ export default function ProjectOperation(props: ProjectOperationProps) {
         }
 
         // TODO: To add Template file !!!
+        (
+          (treeStructure.template as TreeObj)["index.html"] as ProjectFile
+        ).file = new File(
+          [new Blob([code], { type: "text/html" })],
+          "index.html",
+          {
+            type: "text/html",
+          }
+        );
+
         const { ID } = (data.result as ProjectData[])[0];
         (function parseTree(tree: TreeObj | ProjectFile | null) {
           if (!tree) return;
@@ -290,6 +302,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   }
 
   function resHandler(data: DefaultRes) {
+    refForm.current?.scrollIntoView({ behavior: "smooth" });
     onAlert({
       state: data.status === "OK" ? "alert-success" : "alert-danger",
       title: data.status === "OK" ? "Success" : "Error",
@@ -298,6 +311,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   }
 
   function resErrHandler() {
+    refForm.current?.scrollIntoView({ behavior: "smooth" });
     onAlert({
       state: "alert-danger",
       title: "Backend error",
@@ -313,6 +327,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
       <DefaultHeader />
       <Alert state={alert.state} title={alert.title} note={alert.note} />
       <form
+        ref={refForm}
         className={`container needs-validation ${
           validated ? "was-validated" : ""
         } mt-4`}

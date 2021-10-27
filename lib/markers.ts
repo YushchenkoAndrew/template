@@ -18,36 +18,59 @@ export function restoreHtmlMarkers(code: string) {
   return code;
 }
 
-export function addJsHtml(code: string, name: string, file: ProjectFile) {
+// function includeFile(
+//   lines: string[],
+//   name: string,
+//   file: ProjectFile,
+//   tag: string
+// ) {
+//   let i = 0;
+//   for (; i < lines.length; i++) {
+//     if (lines[i].includes(htmlMarkers[MarkerIndex.JS])) break;
+//   }
+
+//   return (
+//     lines.slice(0, i).join("\n") +
+//     `\n  <${tag} defer src="${
+//       htmlMarkers[MarkerIndex.FILE_SERVER]
+//     }/files/${name}/${file.role}/${file.dir ?? ""}${file.name}"></${tag}>\n` +
+//     lines.slice(i).join("\n")
+//   );
+// }
+
+export function addToHtml(code: string, name: string, file: ProjectFile[]) {
   const lines = code.split("\n");
 
-  let i = 0;
-  for (; i < lines.length; i++) {
-    if (lines[i].includes(htmlMarkers[MarkerIndex.JS])) break;
-  }
+  // TODO:
+  // let index = { JS: -1, CSS: -1 };
+  // for (let i = 0; i < lines.length; i++) {
+  //   if (lines[i].includes(htmlMarkers[MarkerIndex.CSS])) break;
+  // }
+  // if (lines[i].includes(htmlMarkers[MarkerIndex.CSS])) break;
 
-  return (
-    lines.slice(0, i).join("\n") +
-    `\n  <script defer src="http://${fileServer}/files/${name}/${file.role}/${
-      file.dir ?? ""
-    }${file.name}" />\n` +
-    lines.slice(i).join("\n")
-  );
+  // switch (file.type) {
+  //   case "text/javascript":
+  //     includeFile(lines, name);
+  //     return;
+
+  //   case "text/css":
+  // }
+  return "";
 }
 
-export function addCssHtml(code: string, name: string, file: ProjectFile) {
-  const lines = code.split("\n");
+// export function addCssHtml(code: string, name: string, file: ProjectFile) {
+//   const lines = code.split("\n");
 
-  let i = 0;
-  for (; i < lines.length; i++) {
-    if (lines[i].includes(htmlMarkers[MarkerIndex.CSS])) break;
-  }
+//   let i = 0;
+//   for (; i < lines.length; i++) {
+//     if (lines[i].includes(htmlMarkers[MarkerIndex.CSS])) break;
+//   }
 
-  return (
-    lines.slice(0, i).join("\n") +
-    `\n  <link rel="preload" as="style" href="http://${fileServer}/files/${name}/${
-      file.role
-    }/${file.dir ?? ""}${file.name}" />\n` +
-    lines.slice(i).join("\n")
-  );
-}
+//   return (
+//     lines.slice(0, i).join("\n") +
+//     `\n  <link rel="preload" as="style" href="http://${fileServer}/files/${name}/${
+//       file.role
+//     }/${file.dir ?? ""}${file.name}" />\n` +
+//     lines.slice(i).join("\n")
+//   );
+// }

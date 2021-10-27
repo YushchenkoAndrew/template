@@ -1,5 +1,5 @@
 import { basePath } from ".";
-import { ProjectForm } from "../types/projects";
+import { ProjectFile, ProjectForm } from "../types/projects";
 import { TreeObj } from "../types/tree";
 
 export const ProjectInfo = {
@@ -31,19 +31,30 @@ export const treePlaceholder = {
   src: {},
   thumbnail: {},
   styles: {},
-  templates: {},
+  template: {
+    "index.html": {
+      name: "index.html",
+      role: "template",
+      type: "text/html",
+      // file: new Blob([""], { type: "text/html" }),
+    } as ProjectFile,
+  },
 } as TreeObj;
 
 export const htmlMarkers = [
   "<!--{{JS_FILE}}-->",
   "<!--{{CSS_FILE}}-->",
   "<!--{{FLAG}}-->",
+  "<!--{{FILE_SERVER}}-->",
+  "<!--{{PROJECT_NAME}}-->",
 ];
 
 export enum MarkerIndex {
   JS,
   CSS,
   FLAG,
+  FILE_SERVER,
+  PROJECT_NAME,
 }
 
 export const codeTemplate = `<!DOCTYPE html>

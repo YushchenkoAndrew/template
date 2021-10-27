@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Session } from "next-iron-session";
-import { apiHost } from "../../../config";
+import { apiHost, fileServer } from "../../../config";
 import redis from "../../../config/redis";
+import { formPath } from "../../../lib/files";
 import { createQuery } from "../../../lib/query";
-import { ApiError, ApiRes, ProjectData } from "../../../types/api";
+import { ApiError, ApiRes, FileData, ProjectData } from "../../../types/api";
 import { FullResponse } from "../../../types/request";
 
 export function LoadProjects(args: { [key: string]: number | string }) {
@@ -58,6 +59,30 @@ export function LoadProjects(args: { [key: string]: number | string }) {
           });
         });
     });
+  });
+}
+
+export function LoadFile(args: { [key: string]: number | string }) {
+  return new Promise((resolve, reject) => {
+    const query = createQuery(args);
+    fetch(`http://${apiHost}/api/file${query}`)
+      .then((res) => res.json())
+      .then((data: ApiRes<FileData> | ApiError) => {
+        if (data.status !== "OK" || !data.result.length) return resolve("");
+
+        fetch(
+          `http://${fileServer}/files/${args.project}${formPath(
+            data.result[0] as FileData
+          )}`
+        )
+          .then((res) => res.text())
+          .then((text) => resolve(text))
+          .catch((err) => resolve(""));
+
+        // redis.set(`Project:${query}`, JSON.stringify(data.result));
+        // redis.expire(`Project:${query}`, 2 * 60 * 60);
+      })
+      .catch((err) => resolve(""));
   });
 }
 
