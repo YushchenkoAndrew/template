@@ -1,6 +1,6 @@
 import React from "react";
 import { ProjectInfo } from "../../../config/placeholder";
-import { Event } from "../../../pages/admin/projects/[operation]";
+import { Event } from "../../../pages/admin/projects/operation";
 import { ProjectForm, ProjectLink } from "../../../types/projects";
 import DefaultFooter from "../../default/DefaultFooter";
 import DefaultProjectInfo from "../../default/DefaultProjectInfo";

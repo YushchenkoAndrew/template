@@ -1,6 +1,6 @@
 import React from "react";
-import { projectFlags, ProjectInfo } from "../../../config/placeholder";
-import { Event } from "../../../pages/admin/projects/[operation]";
+import { ProjectInfo } from "../../../config/placeholder";
+import { Event } from "../../../pages/admin/projects/operation";
 import { ProjectForm } from "../../../types/projects";
 import Card from "../../Card";
 import InputFile from "../../Inputs/InputFile";
@@ -82,7 +82,7 @@ export default function DefaultThumbnailPreview(
           <InputTemplate label="Flag">
             <InputRadio
               name="flag"
-              options={projectFlags}
+              options={["js", "c++", "link"]}
               label="btn-outline-secondary"
               onChange={props.onChange}
             />

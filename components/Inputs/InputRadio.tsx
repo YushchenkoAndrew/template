@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import md5 from "../../lib/md5";
-import { Event } from "../../pages/admin/projects/[operation]";
+import { Event } from "../../pages/admin/projects/operation";
 import { ProjectElement } from "../../types/projects";
 
 export interface InputRadioProps {

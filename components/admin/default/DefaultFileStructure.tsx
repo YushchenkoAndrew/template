@@ -1,6 +1,6 @@
 import React from "react";
 import { ProjectInfo } from "../../../config/placeholder";
-import { Event } from "../../../pages/admin/projects/[operation]";
+import { Event } from "../../../pages/admin/projects/operation";
 import { TreeObj } from "../../../types/tree";
 import { ProjectFile, ProjectForm } from "../../../types/projects";
 import InputFile from "../../Inputs/InputFile";

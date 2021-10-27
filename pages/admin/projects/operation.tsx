@@ -19,12 +19,9 @@ import { withIronSession } from "next-iron-session";
 import { NextSessionArgs } from "../../../types/session";
 import sessionConfig from "../../../config/session";
 import {
-  ProjectInfo,
   codeTemplate,
   formPlaceholder,
   treePlaceholder,
-  htmlMarkers,
-  MarkerIndex,
 } from "../../../config/placeholder";
 import { useRouter } from "next/dist/client/router";
 import { LoadProjects } from "../../api/projects/load";
@@ -34,7 +31,6 @@ import {
   convertProject,
   convertFile,
 } from "../../../lib/files";
-import { restoreHtmlMarkers } from "../../../lib/markers";
 import DefaultThumbnailPreview from "../../../components/admin/default/DefaultThumbnailPreview";
 import DefaultFileStructure from "../../../components/admin/default/DefaultFileStructure";
 import DefaultFooterPreview from "../../../components/admin/default/DefaultFooterPreview";
@@ -130,14 +126,14 @@ export default function ProjectOperation(props: ProjectOperationProps) {
     setValidated(false);
 
     let autoCode = code;
-    for (let i in event.target.value) {
-      // FIXME:
-      //   autoCode = addToHtml(
-      //     autoCode,
-      //     htmlMarkers[MarkerIndex.PROJECT_NAME],
-      //     event.target.value[i]
-      //   );
-    }
+    // FIXME:
+    // for (let i in event.target.value) {
+    //   autoCode = addToHtml(
+    //     autoCode,
+    //     htmlMarkers[MarkerIndex.PROJECT_NAME],
+    //     event.target.value[i]
+    //   );
+    // }
 
     setCode(autoCode);
     return onFileAdd(
@@ -214,6 +210,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
 
     let reader = new FileReader();
     reader.readAsText(templateFile);
+
     reader.onload = () => console.log(reader.result);
     reader.onerror = () => console.log(reader.error);
 
@@ -349,7 +346,8 @@ export default function ProjectOperation(props: ProjectOperationProps) {
             fileInfo={fileInfo}
             projectTree={formTree(treeStructure, fileInfo)}
             onChange={onFileInfoChange}
-            onCodeChange={(code: string) => setCode(restoreHtmlMarkers(code))}
+            // onCodeChange={(code: string) => setCode(restoreHtmlMarkers(code))}
+            onCodeChange={(code: string) => setCode(code)}
             onUpload={onFilesUpload}
             onBlur={onDataCache}
           />
@@ -411,54 +409,48 @@ export const getServerSideProps = withIronSession(async function ({
       .filter((item) => item)
       .join("/");
 
-  let treeStructure = treePlaceholder;
+  const params = new URLSearchParams((req.url ?? "").split("?")[1] ?? "");
 
-  switch (url) {
-    case "/admin/projects/add": {
-      return {
-        props: {
-          formData: formPlaceholder,
-          treeStructure,
-        } as ProjectOperationProps,
-      };
+  if (params.get("type") === "edit") {
+    if (!params.get("name")) return { notFound: true };
+
+    const { send } = await LoadProjects({ name: params.get("name") ?? "" });
+    if (send.status === "ERR" || !send.result?.length) {
+      return { notFound: true };
     }
 
-    case "/admin/projects/edit": {
-      const params = new URLSearchParams((req.url ?? "").split("?")[1] ?? "");
-      if (!params.get("name")) return { notFound: true };
+    let thumbnail = {} as FileData;
+    let treeStructure = treePlaceholder;
+    const project = send.result[0] as ProjectData;
 
-      const { send } = await LoadProjects({ name: params.get("name") ?? "" });
-      if (send.status === "ERR" || !send.result?.length) {
-        return { notFound: true };
-      }
+    for (let i in project.Files) {
+      const file = convertFile(project.Files[i]);
+      if (project.Files[i].Role === "thumbnail") thumbnail = project.Files[i];
+      treeStructure = formTree(treeStructure, file, [file]);
+    }
 
-      const project = send.result[0] as ProjectData;
-      let thumbnail = {} as FileData;
-
-      for (let i in project.Files) {
-        const file = convertFile(project.Files[i]);
-        if (project.Files[i].Role === "thumbnail") thumbnail = project.Files[i];
-        treeStructure = formTree(treeStructure, file, [file]);
-      }
-
-      return {
-        props: {
-          formData: {
-            ...convertProject(project),
-            img: {
-              ...convertFile(thumbnail),
-              url: `http://${fileServer}/files/${project.Name}${formPath(
-                thumbnail
-              )}`,
-            },
+    return {
+      props: {
+        formData: {
+          ...convertProject(project),
+          img: {
+            ...convertFile(thumbnail),
+            url: `http://${fileServer}/files/${project.Name}${formPath(
+              thumbnail
+            )}`,
           },
+        },
 
-          treeStructure,
-        } as ProjectOperationProps,
-      };
-    }
+        treeStructure,
+      } as ProjectOperationProps,
+    };
   }
 
-  return { notFound: true };
+  return {
+    props: {
+      formData: formPlaceholder,
+      treeStructure: treePlaceholder,
+    } as ProjectOperationProps,
+  };
 },
 sessionConfig);

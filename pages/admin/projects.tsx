@@ -59,7 +59,7 @@ export default function AdminProjects(props: AdminProjectsProps) {
             </div>
           }
         >
-          <AddCard />
+          <AddCard href={`${basePath}/admin/projects/operation?type=add`} />
           {projects.map((item, i) => {
             return (
               <Card
@@ -71,7 +71,7 @@ export default function AdminProjects(props: AdminProjectsProps) {
                 )}`}
                 event={{
                   modify: {
-                    href: `${basePath}/admin/projects/edit?name=${item.Name}`,
+                    href: `${basePath}/admin/projects/operation?type=edit&name=${item.Name}`,
                   },
                   delete: {
                     onClick: () => {

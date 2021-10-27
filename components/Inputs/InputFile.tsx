@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Event } from "../../pages/admin/projects/[operation]";
+import { Event } from "../../pages/admin/projects/operation";
 import { ProjectElement, ProjectFile } from "../../types/projects";
 
 export interface InputFileProps {

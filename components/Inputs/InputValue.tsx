@@ -1,5 +1,5 @@
 import React from "react";
-import { Event } from "../../pages/admin/projects/[operation]";
+import { Event } from "../../pages/admin/projects/operation";
 
 export interface InputValueProps {
   name: string;
