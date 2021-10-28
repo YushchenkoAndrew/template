@@ -34,6 +34,7 @@ import {
 import DefaultThumbnailPreview from "../../../components/admin/default/DefaultThumbnailPreview";
 import DefaultFileStructure from "../../../components/admin/default/DefaultFileStructure";
 import DefaultFooterPreview from "../../../components/admin/default/DefaultFooterPreview";
+import { parseHTML } from "../../../lib/markers";
 
 export type Event =
   | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -125,17 +126,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
     if (!Array.isArray(event.target.value)) return;
     setValidated(false);
 
-    let autoCode = code;
-    // FIXME:
-    // for (let i in event.target.value) {
-    //   autoCode = addToHtml(
-    //     autoCode,
-    //     htmlMarkers[MarkerIndex.PROJECT_NAME],
-    //     event.target.value[i]
-    //   );
-    // }
-
-    setCode(autoCode);
+    setCode(parseHTML(code, event.target.value));
     return onFileAdd(
       formTree(treeStructure, fileInfo, event.target.value as ProjectFile[])
     );
@@ -322,7 +313,6 @@ export default function ProjectOperation(props: ProjectOperationProps) {
         <title>Admin</title>
       </DefaultHead>
       <DefaultHeader />
-      <Alert state={alert.state} title={alert.title} note={alert.note} />
       <form
         ref={refForm}
         className={`container needs-validation ${
@@ -331,6 +321,12 @@ export default function ProjectOperation(props: ProjectOperationProps) {
         noValidate
         onSubmit={onSubmit as FormEventHandler<HTMLFormElement>}
       >
+        <Alert
+          state={alert.state}
+          title={alert.title}
+          note={alert.note}
+          onClose={() => onAlert({} as AlertProps)}
+        />
         <DefaultThumbnailPreview
           formData={formData}
           onChange={onThumbnailChange}
@@ -346,7 +342,6 @@ export default function ProjectOperation(props: ProjectOperationProps) {
             fileInfo={fileInfo}
             projectTree={formTree(treeStructure, fileInfo)}
             onChange={onFileInfoChange}
-            // onCodeChange={(code: string) => setCode(restoreHtmlMarkers(code))}
             onCodeChange={(code: string) => setCode(code)}
             onUpload={onFilesUpload}
             onBlur={onDataCache}
@@ -401,16 +396,7 @@ export const getServerSideProps = withIronSession(async function ({
     };
   }
 
-  const url =
-    "/" +
-    (req.url ?? "")
-      .split("?")[0]
-      .split("/")
-      .filter((item) => item)
-      .join("/");
-
   const params = new URLSearchParams((req.url ?? "").split("?")[1] ?? "");
-
   if (params.get("type") === "edit") {
     if (!params.get("name")) return { notFound: true };
 

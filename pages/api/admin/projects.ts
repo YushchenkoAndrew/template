@@ -69,15 +69,15 @@ export default withIronSession(async function (
   }
 
   let id = req.query["id"] as string;
-  let { name, flag, title, desc, link } = req.body as ProjectForm;
-  if (!id || !name || !flag || !title || !desc) {
+  let { name, flag, title, desc, link, note } = req.body as ProjectForm;
+  if (!id || !name || !flag || !title || !desc || !note) {
     return res
       .status(400)
       .send({ stat: "ERR", message: "Not all required fields are setted" });
   }
 
   const { status, send } = await AddProject(
-    JSON.stringify({ name, flag, title, desc, link })
+    JSON.stringify({ name, flag, title, desc, link, note })
   );
 
   if (send.status === "OK") {

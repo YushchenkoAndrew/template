@@ -36,49 +36,35 @@ export const treePlaceholder = {
       name: "index.html",
       role: "template",
       type: "text/html",
-      // file: new Blob([""], { type: "text/html" }),
     } as ProjectFile,
   },
 } as TreeObj;
 
-export const htmlMarkers = [
-  "<!--{{JS_FILE}}-->",
-  "<!--{{CSS_FILE}}-->",
-  "<!--{{FLAG}}-->",
-  "<!--{{FILE_SERVER}}-->",
-  "<!--{{PROJECT_NAME}}-->",
-];
+export const HtmlMarkers = {
+  BODY: "BODY",
+  FOOTER: "FOOTER",
 
-export enum MarkerIndex {
-  JS,
-  CSS,
-  FLAG,
-  FILE_SERVER,
-  PROJECT_NAME,
-}
+  JS: "JS_FILES",
+  CSS: "CSS_FILE",
+
+  FILE_SERVER: "{{FILE_SERVER}}",
+  PROJECT_NAME: "{{PROJECT_NAME}}",
+};
 
 export const codeTemplate = `<!DOCTYPE html>
 <html>
-  <head>
-
-  ${htmlMarkers[MarkerIndex.CSS]}
-
-  ${htmlMarkers[MarkerIndex.JS]}
-
-  </head>
-
   <body>
+    <div id="${HtmlMarkers.CSS}">
+    </div>
 
-  ${htmlMarkers[MarkerIndex.FLAG]}
+    <div id="${HtmlMarkers.JS}">
+    </div>
 
+    <div id="${HtmlMarkers.BODY}">
+      <canvas class="emscripten" id="canvas"></canvas>
+    </div>
+
+    <div id="${HtmlMarkers.FOOTER}">
+    </div>
   </body>
 </html>`;
-
-export const projectFlags = ["js", "c++", "link"];
-export enum FlagIndex {
-  JS,
-  C,
-  LINK,
-}
-
-export const flagTemplate = [``, ``, ``];

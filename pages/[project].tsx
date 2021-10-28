@@ -1,82 +1,84 @@
-import React, { useEffect } from "react";
+import React from "react";
 import DefaultHead from "../components/default/DefaultHead";
 import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultFooter from "../components/default/DefaultFooter";
 import DefaultProjectInfo from "../components/default/DefaultProjectInfo";
 import { GetServerSidePropsContext } from "next";
 import { LoadFile, LoadProjects } from "./api/projects/load";
-import { FileData, ProjectData } from "../types/api";
-import { basePath, fileServer } from "../config";
-import { formPath } from "../lib/files";
-import DefaultEmscContainer from "../components/default/DefaultEmscContainer";
-import DefaultP5Container from "../components/default/DefaultP5Container";
+import { LinkData, ProjectData } from "../types/api";
+import { fileServer } from "../config";
 import { parse } from "node-html-parser";
+import { HtmlMarkers } from "../config/placeholder";
 
 export interface ProjectPageProps {
   project: string;
   title: string;
   note: string;
   template: string;
-  cssFiles: FileData[];
+  links: {
+    main: string;
+    other: LinkData[];
+  };
 }
 
 export default function ProjectPage(props: ProjectPageProps) {
-  let doc = parse(props.template);
-
-  console.log(props.template);
-  console.log(doc.toString());
-
-  console.log(
-    doc.querySelector("head")?.childNodes?.map((item) => item.toString())
+  const doc = parse(
+    props.template
+      .replace(new RegExp(HtmlMarkers.FILE_SERVER, "g"), fileServer)
+      .replace(new RegExp(HtmlMarkers.PROJECT_NAME, "g"), props.project)
   );
-  console.log(doc.querySelector("head")?.toString());
-
   return (
     <>
       <DefaultHead>
         <title>{props.title}</title>
-        {props.cssFiles.map((file, i) => (
-          <link
-            key={i}
-            rel="preload"
-            as="style"
-            href={`http://${fileServer}/files/${props.project}${formPath(
-              file
-            )}`}
-          />
-        ))}
-
-        <div
-          dangerouslySetInnerHTML={{
-            __html: doc.querySelector("head")?.childNodes?.join("") ?? "",
-          }}
-        ></div>
       </DefaultHead>
 
       <DefaultHeader name={props.title} projects />
 
-      {/* <main role="main">
-        <div className="jumbotron mx-auto bg-white" id="CanvasContainer0">
-          <div
-            dangerouslySetInnerHTML={{
-              __html: doc.querySelector("body")?.childNodes?.join("") ?? "",
-            }}
-          ></div>
-        </div>
-      </main> */}
+      <div
+        id={HtmlMarkers.CSS}
+        dangerouslySetInnerHTML={{
+          __html:
+            doc.querySelector("#" + HtmlMarkers.CSS)?.childNodes?.join("") ??
+            "",
+        }}
+      ></div>
+      <div
+        id={HtmlMarkers.JS}
+        dangerouslySetInnerHTML={{
+          __html:
+            doc.querySelector("#" + HtmlMarkers.JS)?.childNodes?.join("") ?? "",
+        }}
+      ></div>
 
-      {/* TODO: Finish stuff bellow */}
-      <DefaultEmscContainer width={1200} height={800} />
-      {/* <DefaultP5Container /> */}
+      <main role="main">
+        <div
+          className="jumbotron mx-auto bg-white"
+          id="CanvasContainer0"
+          dangerouslySetInnerHTML={{
+            __html:
+              doc.querySelector("#" + HtmlMarkers.BODY)?.childNodes?.join("") ??
+              "",
+          }}
+        ></div>
+      </main>
+
+      <div
+        id={HtmlMarkers.FOOTER}
+        dangerouslySetInnerHTML={{
+          __html:
+            doc.querySelector("#" + HtmlMarkers.FOOTER)?.childNodes?.join("") ??
+            "",
+        }}
+      ></div>
+
       <DefaultFooter name={props.title}>
         <DefaultProjectInfo
-          href="https://github.com/YushchenkoAndrew/template/tree/master/JS/CodeRain"
-          links={[
-            {
-              link: "https://github.com/YushchenkoAndrew/template/tree/master/CDump/CodeRain",
-              name: "C++",
-            },
-          ]}
+          href={`http://${props.links.main}`}
+          links={props.links.other.map(({ Link, Name }) => ({
+            name: Name,
+            link: `http://${Link}`,
+          }))}
           description={props.note}
         />
       </DefaultFooter>
@@ -95,13 +97,22 @@ export const getServerSideProps = async (
   const project = send.result[0] as ProjectData;
   const template = await LoadFile({ project: name, role: "template" });
 
+  let links = {
+    main: "",
+    other: [] as LinkData[],
+  };
+
+  project.Links.forEach((link) =>
+    link.Name === "main" ? (links.main = link.Link) : links.other.push(link)
+  );
+
   return {
     props: {
       project: name,
       title: project.Title,
       note: project.Note,
       template: template,
-      cssFiles: project.Files.filter((file) => file.Type === "text/css"),
+      links: links,
     } as ProjectPageProps,
   };
 };
