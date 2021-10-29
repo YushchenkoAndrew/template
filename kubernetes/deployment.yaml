@@ -4,7 +4,7 @@ metadata:
   name: web-deployment
   namespace: demo
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: webserver
@@ -15,7 +15,51 @@ spec:
     spec:
       containers:
         - name: webserver
-          image: grimreapermortis/web-nextjs:demo
+          image: grimreapermortis/web-nextjs:0.0.2
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
-          imagePullPolicy: Always
+          envFrom:
+          - secretRef:
+              name: web-secrete
+          env:
+            - name: REDIS_HOST
+              value: $(FRONT_REDIS_SERVICE_SERVICE_HOST)
+            - name: API_HOST
+              value: ""
+            - name: BOT_HOST
+              value: ""
+            - name: FILE_SERVER_URL
+              value: ""
+            # FXIME: 
+            - name: NODE_ENV
+              value: test
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-redis-deployment
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front-redis
+      role: master
+  template:
+    metadata:
+      labels:
+        app: front-redis
+        role: master
+    spec:
+      containers:
+        - name: redis
+          image: redis
+          # resources:
+          #   requests:
+          #     cpu: 100m
+          #     memory: 100Mi
+          ports:
+            - containerPort: 6379
