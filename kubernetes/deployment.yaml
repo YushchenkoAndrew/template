@@ -31,9 +31,6 @@ spec:
               value: ""
             - name: FILE_SERVER_URL
               value: ""
-            # FXIME: 
-            - name: NODE_ENV
-              value: test
 
 ---
 
