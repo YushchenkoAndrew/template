@@ -1,7 +1,7 @@
 module.exports = {
   reactStrictMode: true,
   webpack5: true,
-  swcMinify: true,
+  swcMinify: false,
   basePath: "/projects",
 
   async headers() {
