@@ -1,8 +1,10 @@
 import redis from "redis";
+import getConfig from "next/config";
 import { sendLogs } from "../lib/bot";
 
-const PORT = process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379;
-const HOST = process.env.REDIS_HOST ?? "127.0.0.1";
+const { serverRuntimeConfig } = getConfig();
+const PORT = Number(serverRuntimeConfig.REDIS_PORT ?? 6379);
+const HOST = serverRuntimeConfig.REDIS_HOST ?? "127.0.0.1";
 
 const client = redis.createClient(PORT, HOST);
 

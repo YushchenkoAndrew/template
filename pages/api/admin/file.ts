@@ -10,7 +10,9 @@ import { sendLogs } from "../../../lib/bot";
 import md5 from "../../../lib/md5";
 import { ApiAuth } from "../../../lib/auth";
 import { ApiError, ApiRes, FileData } from "../../../types/api";
+import getConfig from "next/config";
 
+const { serverRuntimeConfig } = getConfig();
 type ArgsType = { id: number; project: string; dir: string; role: string };
 
 function AddFile(file: File, args: ArgsType) {
@@ -74,7 +76,9 @@ function UploadFile(file: File, args: ArgsType) {
         headers: {
           Authorization:
             "Basic " +
-            Buffer.from(process.env.FILE_SERVER_AUTH ?? "").toString("base64"),
+            Buffer.from(serverRuntimeConfig.FILE_SERVER_AUTH ?? "").toString(
+              "base64"
+            ),
         },
         body: formData as any,
       }

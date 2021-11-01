@@ -5,14 +5,16 @@ import { formatDate } from "../../info";
 import { ApiAuth, PassValidate } from "../../../lib/auth";
 import { getValue } from "../../../lib/mutex";
 import { sendLogs } from "../../../lib/bot";
+import getConfig from "next/config";
 
+const { serverRuntimeConfig } = getConfig();
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).send("");
   }
 
   let key = (req.query.key ?? "") as string;
-  if (!PassValidate(key, process.env.ACCESS_KEY ?? "")) {
+  if (!PassValidate(key, serverRuntimeConfig.ACCESS_KEY ?? "")) {
     sendLogs({
       stat: "OK",
       name: "WEB",

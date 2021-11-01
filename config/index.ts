@@ -1,20 +1,10 @@
-import { useRouter } from "next/dist/client/router";
-
-const apiHost =
-  process.env.NODE_ENV == "production"
-    ? `${process.env.API_HOST}:${process.env.API_PORT}`
-    : "localhost:31337";
-
-const botHost =
-  process.env.NODE_ENV == "production"
-    ? process.env.BOT_URL ?? ""
-    : "localhost:3000";
-
-const fileServer =
-  process.env.NODE_ENV == "production"
-    ? process.env.FILE_SERVER_URL ?? ""
-    : "localhost:8003";
+import getConfig from "next/config";
+const { serverRuntimeConfig } = getConfig();
 
 const basePath = "/projects";
+const apiHost =
+  serverRuntimeConfig.API_HOST + ":" + serverRuntimeConfig.API_PORT;
+const botHost = serverRuntimeConfig.BOT_URL;
+const fileServer = serverRuntimeConfig.FILE_SERVER_URL;
 
 export { apiHost, botHost, fileServer, basePath };

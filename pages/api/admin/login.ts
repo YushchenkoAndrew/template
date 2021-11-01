@@ -6,7 +6,9 @@ import { sendLogs } from "../../../lib/bot";
 import md5 from "../../../lib/md5";
 import { LoginRequest } from "../../../types/admin";
 import { DefaultRes, FullResponse } from "../../../types/request";
+import getConfig from "next/config";
 
+const { serverRuntimeConfig } = getConfig();
 function checkUserInfo(id: string, salt: number, user: string, pass: string) {
   return new Promise<FullResponse>((resolve, reject) => {
     redis.get(`LOGIN:${id}`, (err, tries) => {
@@ -36,11 +38,11 @@ function checkUserInfo(id: string, salt: number, user: string, pass: string) {
       // Constant time check for userName && passValidation
       let equal = {
         user: PassValidate(
-          md5(salt.toString() + (process.env.ADMIN_USER ?? "")),
+          md5(salt.toString() + (serverRuntimeConfig.ADMIN_USER ?? "")),
           user
         ),
         pass: PassValidate(
-          md5(salt.toString() + (process.env.ADMIN_PASS ?? "")),
+          md5(salt.toString() + (serverRuntimeConfig.ADMIN_PASS ?? "")),
           pass
         ),
       };
@@ -81,7 +83,7 @@ function checkCaptcha(id: string, captcha: string) {
       }
 
       fetch(
-        `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captcha}`,
+        `https://www.google.com/recaptcha/api/siteverify?secret=${serverRuntimeConfig.RECAPTCHA_SECRET_KEY}&response=${captcha}`,
         {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
@@ -154,7 +156,7 @@ export default withIronSession(
     if (send.status === "OK") {
       const sessionID = md5(Math.random().toString() + id);
       redis.set(`SESSION:${sessionID}`, id);
-      redis.expire(id, Number(process.env.SESSION_TTL ?? 3600));
+      redis.expire(id, Number(serverRuntimeConfig.SESSION_TTL ?? 3600));
 
       req.session.set("user", sessionID);
 
@@ -166,9 +168,9 @@ export default withIronSession(
   {
     cookieName: "SESSION_ID",
     cookieOptions: {
-      secure: process.env.NODE_ENV === "production",
-      maxAge: Number(process.env.SESSION_TTL ?? 3600),
+      secure: serverRuntimeConfig.NODE_ENV === "production",
+      maxAge: Number(serverRuntimeConfig.SESSION_TTL ?? 3600),
     },
-    password: process.env.APPLICATION_SECRET ?? "",
+    password: serverRuntimeConfig.APPLICATION_SECRET ?? "",
   }
 );

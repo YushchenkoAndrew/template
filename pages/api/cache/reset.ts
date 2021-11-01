@@ -3,15 +3,16 @@ import { botHost } from "../../../config";
 import redis from "../../../config/redis";
 import { PassValidate } from "../../../lib/auth";
 import { sendLogs } from "../../../lib/bot";
-import { LogMessage } from "../../../types/bot";
+import getConfig from "next/config";
 
+const { serverRuntimeConfig } = getConfig();
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).send("");
   }
 
   let key = (req.query.key ?? "") as string;
-  if (!PassValidate(key, process.env.ACCESS_KEY ?? "")) {
+  if (!PassValidate(key, serverRuntimeConfig.ACCESS_KEY ?? "")) {
     sendLogs({
       stat: "OK",
       name: "WEB",
@@ -29,7 +30,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       return;
     }
 
-    setTimeout(getMutex, Number(process.env.MUTEX_WAIT ?? 10));
+    setTimeout(getMutex, Number(serverRuntimeConfig.MUTEX_WAIT ?? 10));
   });
 
   redis.hmset("Info:Now", "Views", 0, "Visitors", 0, "Clicks", 0, "Media", 0);

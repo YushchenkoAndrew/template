@@ -1,8 +1,10 @@
 import { apiHost } from "../config";
+import getConfig from "next/config";
 import redis from "../config/redis";
 import { ApiError, ApiTokens } from "../types/api";
 import md5 from "./md5";
 
+const { serverRuntimeConfig } = getConfig();
 export function PassValidate(pass: string, pass2: string) {
   let equal = true;
   let max = pass.length > pass2.length ? pass.length : pass2.length;
@@ -60,14 +62,14 @@ export function ApiAuth() {
             "content-type": "application/json",
           },
           body: JSON.stringify({
-            user: process.env.API_USER ?? "",
+            user: serverRuntimeConfig.API_USER ?? "",
             pass:
               salt +
               "$" +
               md5(
-                (process.env.API_PEPPER ?? "") +
+                (serverRuntimeConfig.API_PEPPER ?? "") +
                   salt +
-                  (process.env.API_PASS ?? "")
+                  (serverRuntimeConfig.API_PASS ?? "")
               ),
           }),
         })

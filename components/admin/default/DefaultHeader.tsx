@@ -23,7 +23,7 @@ export default function DefaultHeader(props: DefaultHeaderProps) {
           ></DefaultNav>
         </NavContainer>
 
-        <RunningLine text={process.env.ADMIN_USER ?? "admin"} size={7} />
+        <RunningLine text="admin" size={7} />
       </NavBar>
       {props.children}
     </header>
