@@ -5,22 +5,21 @@ metadata:
   namespace: demo
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
 spec:
-  # tls:
-  #   - hosts:
-  #       - mortis-grimreaper.ddns.net
-  #     secretName: mortis-tls
+  tls:
+    - hosts:
+        - mortis-grimreaper.ddns.net
+      secretName: mortis-tls
   rules:
-    # - host: mortis-grimreaper.ddns.net
-    # - host: 192.168.1.2.nip.io
-    - http:
+    - host: mortis-grimreaper.ddns.net
+      http:
         paths:
           - backend:
               service:
                 name: web-service
                 port: 
                   number: 8000
-            path: /projects
+            path: /v2/projects
             pathType: Exact

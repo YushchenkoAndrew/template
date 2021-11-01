@@ -3,5 +3,5 @@
 scripts
 *Dockerfile*
 node_modules
-secrete.yaml
+kuberentes/
 .env
