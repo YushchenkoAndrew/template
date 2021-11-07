@@ -7,12 +7,11 @@ spec:
   selector:
     app: webserver
   ports:
-    - port: 8000
+    - port: 8008
       targetPort: 8000
   type: LoadBalancer
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:

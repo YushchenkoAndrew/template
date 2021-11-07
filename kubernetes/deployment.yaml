@@ -20,20 +20,19 @@ spec:
           ports:
             - containerPort: 8000
           envFrom:
-          - secretRef:
-              name: web-secrete
+            - secretRef:
+                name: web-secrete
           env:
             - name: REDIS_HOST
               value: $(FRONT_REDIS_SERVICE_SERVICE_HOST)
             - name: API_HOST
-              value: ""
+              value: $(API_SERVICE_SERVICE_HOST)
             - name: BOT_HOST
               value: ""
             - name: FILE_SERVER_URL
-              value: ""
+              value: "mortis-grimreaper.ddns.net"
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -53,7 +52,7 @@ spec:
     spec:
       containers:
         - name: redis
-          image: redis
+          image: redis:6-alpine
           # resources:
           #   requests:
           #     cpu: 100m

@@ -18,6 +18,5 @@ spec:
         paths:
           - backend:
               serviceName: web-service
-              servicePort: 8000
+              servicePort: 8008
             path: /v2/projects
-
