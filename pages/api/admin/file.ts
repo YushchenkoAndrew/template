@@ -5,7 +5,7 @@ import { Session, withIronSession } from "next-iron-session";
 import sessionConfig from "../../../config/session";
 import FormData from "form-data";
 import { FullResponse } from "../../../types/request";
-import { apiHost, fileServer } from "../../../config";
+import { apiUrl, voidUrl } from "../../../config";
 import { sendLogs } from "../../../lib/bot";
 import md5 from "../../../lib/md5";
 import { ApiAuth } from "../../../lib/auth";
@@ -19,7 +19,7 @@ function AddFile(file: File, args: ArgsType) {
   return new Promise<FullResponse>((resolve, reject) => {
     ApiAuth()
       .then((access) => {
-        fetch(`http://${apiHost}/api/file/${args.id}`, {
+        fetch(`${apiUrl}/file/${args.id}`, {
           method: "POST",
           headers: {
             "content-type": "application/json",
@@ -67,22 +67,17 @@ function UploadFile(file: File, args: ArgsType) {
       file.name ?? md5(Math.random().toString())
     );
 
-    fetch(
-      `http://${fileServer}/files?path=/${args.project}/${
-        args.role + args.dir
-      }`,
-      {
-        method: "POST",
-        headers: {
-          Authorization:
-            "Basic " +
-            Buffer.from(serverRuntimeConfig.FILE_SERVER_AUTH ?? "").toString(
-              "base64"
-            ),
-        },
-        body: formData as any,
-      }
-    )
+    fetch(`${voidUrl}?path=/${args.project}/${args.role + args.dir}`, {
+      method: "POST",
+      headers: {
+        Authorization:
+          "Basic " +
+          Buffer.from(serverRuntimeConfig.FILE_SERVER_AUTH ?? "").toString(
+            "base64"
+          ),
+      },
+      body: formData as any,
+    })
       .then((res) => res.json())
       .then((data) =>
         resolve({

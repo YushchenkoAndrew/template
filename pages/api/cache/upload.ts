@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../../config/redis";
-import { apiHost } from "../../../config";
+import { apiUrl } from "../../../config";
 import { formatDate } from "../../info";
 import { ApiAuth, PassValidate } from "../../../lib/auth";
 import { getValue } from "../../../lib/mutex";
@@ -35,7 +35,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
           // Visitor Stat Update
           if (countries.length == 0) return;
-          fetch(`http://${apiHost}/api/info/${now}`, {
+          fetch(`${apiUrl}/info/${now}`, {
             method: "POST",
             headers: {
               "content-type": "application/json",
@@ -59,7 +59,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
               sendLogs({
                 stat: "ERR",
                 name: "WEB",
-                url: `http://${apiHost}/api/info/${now}`,
+                url: `${apiUrl}/info/${now}`,
                 file: "/api/cache/upload.ts",
                 message: "Something went wrong with API request;",
                 desc: err,
@@ -74,7 +74,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
           const data = JSON.parse(str);
 
           if (Object.keys(data).length == 0) return;
-          fetch(`http://${apiHost}/api/world/list`, {
+          fetch(`${apiUrl}/world/list`, {
             method: "POST",
             headers: {
               Authorization: `Bear ${access}`,
@@ -92,7 +92,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
               sendLogs({
                 stat: "ERR",
                 name: "WEB",
-                url: `http://${apiHost}/api/world/list`,
+                url: `${apiUrl}/world/list`,
                 file: "/api/cache/upload.ts",
                 message: "Something went wrong with API request",
                 desc: err,

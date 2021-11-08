@@ -55,7 +55,7 @@ module.exports = {
 
     ACCESS_KEY: process.env.ACCESS_KEY,
 
-    FILE_SERVER_URL: process.env.FILE_SERVER_URL,
+    VOID_URL: process.env.FILE_SERVER_URL,
     FILE_SERVER_AUTH: process.env.FILE_SERVER_AUTH,
 
     RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY,

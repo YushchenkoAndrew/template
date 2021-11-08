@@ -7,7 +7,7 @@ import DefaultFooter from "../components/default/DefaultFooter";
 import DefaultHead from "../components/default/DefaultHead";
 import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultNav from "../components/default/DefaultNav";
-import { fileServer } from "../config";
+import { voidUrl } from "../config";
 import { formPath } from "../lib/files";
 import { loadProjectsThumbnail } from "../lib/projects";
 import { ProjectData } from "../types/api";
@@ -133,7 +133,7 @@ export default function ProjectsListPage(props: ProjectsListPageProps) {
                       <Card
                         key={j}
                         title={item.Title}
-                        img={`http://${fileServer}/files/${item.Name}${formPath(
+                        img={`${voidUrl}/${item.Name}${formPath(
                           item.Files[0]
                         )}`}
                         href={`${basePath}/${item.Name}`}

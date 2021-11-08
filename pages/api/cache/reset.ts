@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { botHost } from "../../../config";
 import redis from "../../../config/redis";
 import { PassValidate } from "../../../lib/auth";
 import { sendLogs } from "../../../lib/bot";

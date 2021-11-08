@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Session, withIronSession } from "next-iron-session";
 import sessionConfig from "../../../config/session";
 import { FullResponse } from "../../../types/request";
-import { apiHost } from "../../../config";
+import { apiUrl } from "../../../config";
 import { sendLogs } from "../../../lib/bot";
 import { ApiAuth } from "../../../lib/auth";
 import { ApiError, ApiRes, FileData, LinkData } from "../../../types/api";
@@ -13,7 +13,7 @@ function SendData(req: NextApiRequest & { session: Session }, args: ArgsType) {
   return new Promise<FullResponse>((resolve, reject) => {
     ApiAuth()
       .then((access) => {
-        fetch(`http://${apiHost}/api/link/list/${args.id}`, {
+        fetch(`${apiUrl}/link/list/${args.id}`, {
           method: "POST",
           headers: {
             "content-type": "application/json",

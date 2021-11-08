@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Session } from "next-iron-session";
-import { apiHost, fileServer } from "../../../config";
+import { apiUrl, voidUrl } from "../../../config";
 import redis from "../../../config/redis";
 import { formPath } from "../../../lib/files";
 import { createQuery } from "../../../lib/query";
@@ -24,7 +24,7 @@ export function LoadProjects(args: { [key: string]: number | string }) {
         });
       }
 
-      fetch(`http://${apiHost}/api/project${query}`)
+      fetch(`${apiUrl}/project${query}`)
         .then((res) => res.json())
         .then((data: ApiRes<ProjectData> | ApiError) => {
           if (data.status !== "OK" || !data.result.length) {
@@ -65,15 +65,13 @@ export function LoadProjects(args: { [key: string]: number | string }) {
 export function LoadFile(args: { [key: string]: number | string }) {
   return new Promise((resolve, reject) => {
     const query = createQuery(args);
-    fetch(`http://${apiHost}/api/file${query}`)
+    fetch(`${apiUrl}/file${query}`)
       .then((res) => res.json())
       .then((data: ApiRes<FileData> | ApiError) => {
         if (data.status !== "OK" || !data.result.length) return resolve("");
 
         fetch(
-          `http://${fileServer}/files/${args.project}${formPath(
-            data.result[0] as FileData
-          )}`
+          `${voidUrl}/${args.project}${formPath(data.result[0] as FileData)}`
         )
           .then((res) => res.text())
           .then((text) => resolve(text))

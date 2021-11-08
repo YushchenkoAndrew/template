@@ -1,5 +1,5 @@
 import md5 from "./md5";
-import { botHost } from "../config";
+import { botUrl } from "../config";
 import { LogMessage } from "../types/bot";
 import getConfig from "next/config";
 
@@ -7,7 +7,7 @@ const { serverRuntimeConfig } = getConfig();
 export function sendLogs(body: LogMessage) {
   let salt = Math.round(Math.random() * 100000 + 500);
   fetch(
-    `http://${botHost}/bot/logs/alert?key=${md5(
+    `${botUrl}/logs/alert?key=${md5(
       salt + (serverRuntimeConfig.BOT_KEY ?? "")
     )}`,
     {

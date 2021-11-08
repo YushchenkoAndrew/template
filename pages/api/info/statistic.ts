@@ -3,7 +3,7 @@ import redis from "../../../config/redis";
 import { ApiRes, InfoData, WorldData } from "../../../types/api";
 import { Country, DayStat, StatInfo } from "../../../types/info";
 import { DefaultRes, StatisticData } from "../../../types/request";
-import { apiHost } from "../../../config";
+import { apiUrl } from "../../../config";
 import { formatDate } from "../../info";
 import { sendLogs } from "../../../lib/bot";
 
@@ -39,7 +39,7 @@ export default function handler(
           });
         }
 
-        fetch(`http://${apiHost}/api/info?created_at=${date}`)
+        fetch(`${apiUrl}/info?created_at=${date}`)
           .then((res) => res.json())
           .then((res: ApiRes<InfoData>) => {
             if (res.status == "ERR") {
@@ -81,7 +81,7 @@ export default function handler(
           });
         }
 
-        fetch(`http://${apiHost}/api/info?created_at=${formatDate(prev)}`)
+        fetch(`${apiUrl}/info?created_at=${formatDate(prev)}`)
           .then((res) => res.json())
           .then((res: ApiRes<InfoData>) => {
             if (res.status == "ERR") {
@@ -109,7 +109,7 @@ export default function handler(
         if (!err && reply) return resolve(JSON.parse(reply));
 
         // NOTE: This will run only in the case where none of users were identified
-        fetch(`http://${apiHost}/api/world?page=-1`)
+        fetch(`${apiUrl}/world?page=-1`)
           .then((res) => res.json())
           .then((res: ApiRes<WorldData>) => {
             if (!res.items || res.status == "ERR")

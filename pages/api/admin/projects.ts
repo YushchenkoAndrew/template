@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Session, withIronSession } from "next-iron-session";
-import { apiHost } from "../../../config";
+import { apiUrl } from "../../../config";
 import redis, { FlushValue } from "../../../config/redis";
 import sessionConfig from "../../../config/session";
 import { ApiAuth } from "../../../lib/auth";
@@ -13,7 +13,7 @@ function AddProject(body: string) {
   return new Promise<FullResponse>((resolve, reject) => {
     ApiAuth()
       .then((access) => {
-        fetch(`http://${apiHost}/api/project`, {
+        fetch(`${apiUrl}/project`, {
           method: "POST",
           headers: {
             "content-type": "application/json",

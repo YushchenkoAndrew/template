@@ -5,7 +5,7 @@ import { DefaultRes } from "../../types/request";
 import styles from "./SignIn.module.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import { Image } from "react-bootstrap";
-import { fileServer } from "../../config";
+import { voidUrl } from "../../config";
 
 export interface SignInProps {
   title: string;
@@ -71,7 +71,7 @@ export default function SignIn(props: SignInProps) {
       <form className={styles["signin"]} onSubmit={onSubmit}>
         <Image
           className="center-block rounded-circle"
-          src={`http://${fileServer}/files/admin/icon.webp`}
+          src={`${voidUrl}/admin/icon.webp`}
           width="100"
           height="100"
           alt="Project image"

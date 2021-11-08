@@ -11,7 +11,7 @@ import {
 } from "../../../types/projects";
 import { TreeObj } from "../../../types/tree";
 import md5 from "../../../lib/md5";
-import { basePath, fileServer } from "../../../config";
+import { basePath, voidUrl } from "../../../config";
 import { DefaultRes } from "../../../types/request";
 import { ApiRes, FileData, ProjectData } from "../../../types/api";
 import Alert, { AlertProps } from "../../../components/Alert";
@@ -421,9 +421,7 @@ export const getServerSideProps = withIronSession(async function ({
           ...convertProject(project),
           img: {
             ...convertFile(thumbnail),
-            url: `http://${fileServer}/files/${project.Name}${formPath(
-              thumbnail
-            )}`,
+            url: `${voidUrl}/${project.Name}${formPath(thumbnail)}`,
           },
         },
 

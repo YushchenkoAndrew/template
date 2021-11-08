@@ -6,7 +6,7 @@ import DefaultProjectInfo from "../components/default/DefaultProjectInfo";
 import { GetServerSidePropsContext } from "next";
 import { LoadFile, LoadProjects } from "./api/projects/load";
 import { LinkData, ProjectData } from "../types/api";
-import { fileServer } from "../config";
+import { voidUrl } from "../config";
 import { parse } from "node-html-parser";
 import { HtmlMarkers } from "../config/placeholder";
 
@@ -24,7 +24,7 @@ export interface ProjectPageProps {
 export default function ProjectPage(props: ProjectPageProps) {
   const doc = parse(
     props.template
-      .replace(new RegExp(HtmlMarkers.FILE_SERVER, "g"), fileServer)
+      .replace(new RegExp(HtmlMarkers.FILE_SERVER, "g"), voidUrl)
       .replace(new RegExp(HtmlMarkers.PROJECT_NAME, "g"), props.project)
   );
   return (

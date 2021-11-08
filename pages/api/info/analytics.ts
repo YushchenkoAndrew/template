@@ -3,7 +3,7 @@ import redis from "../../../config/redis";
 import { formatDate } from "../../info";
 import { ApiRes, InfoData, InfoSum } from "../../../types/api";
 import { AnalyticsData, DefaultRes, Stat } from "../../../types/request";
-import { apiHost, botHost } from "../../../config";
+import { apiUrl } from "../../../config";
 import { Analytics } from "../../../types/info";
 import { LogMessage } from "../../../types/bot";
 import { sendLogs } from "../../../lib/bot";
@@ -44,7 +44,7 @@ export default function handler(
       redis.get("Info:Stat", (err, reply) => {
         if (!err && reply) return resolve(JSON.parse(reply));
 
-        fetch(`http://${apiHost}/api/info/sum`)
+        fetch(`${apiUrl}/info/sum`)
           .then((res) => res.json())
           .then((res: ApiRes<InfoData>) => {
             if (res.status == "ERR")
@@ -77,7 +77,7 @@ export default function handler(
         prev.setDate(prev.getDate() - 7);
 
         fetch(
-          `http://${apiHost}/api/info/range?end=${date}&start=${formatDate(
+          `${apiUrl}/info/range?end=${date}&start=${formatDate(
             prev
           )}&orderBy=CreatedAt`
         )

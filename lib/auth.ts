@@ -1,4 +1,4 @@
-import { apiHost } from "../config";
+import { apiUrl } from "../config";
 import getConfig from "next/config";
 import redis from "../config/redis";
 import { ApiError, ApiTokens } from "../types/api";
@@ -34,7 +34,7 @@ export function ApiAuth() {
       // If Access token expired, then refresh token
       redis.get("API:Refresh", (err, reply) => {
         if (!err && reply) {
-          return fetch(`http://${apiHost}/api/refresh`, {
+          return fetch(`${apiUrl}/refresh`, {
             method: "POST",
             headers: {
               "content-type": "application/json",
@@ -56,7 +56,7 @@ export function ApiAuth() {
 
         // If Refresh token expired, then relogin
         let salt = Math.round(Math.random() * 10000).toString();
-        fetch(`http://${apiHost}/api/login`, {
+        fetch(`${apiUrl}/login`, {
           method: "POST",
           headers: {
             "content-type": "application/json",

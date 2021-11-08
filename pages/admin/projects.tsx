@@ -6,7 +6,7 @@ import DefaultHead from "../../components/default/DefaultHead";
 import DefaultNav from "../../components/default/DefaultNav";
 import defaultServerSideHandler, { checkIfUserExist } from "../../lib/session";
 import { ProjectData } from "../../types/api";
-import { basePath, fileServer } from "../../config";
+import { basePath, voidUrl } from "../../config";
 import { FlagType } from "../../types/flag";
 import Card from "../../components/admin/Card";
 import { formPath } from "../../lib/files";
@@ -66,9 +66,7 @@ export default function AdminProjects(props: AdminProjectsProps) {
                 key={i}
                 id={item.ID}
                 title={item.Title}
-                img={`http://${fileServer}/files/${item.Name}${formPath(
-                  item.Files[0]
-                )}`}
+                img={`${voidUrl}/${item.Name}${formPath(item.Files[0])}`}
                 event={{
                   modify: {
                     href: `${basePath}/admin/projects/operation?type=edit&name=${item.Name}`,

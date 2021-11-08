@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getValue, setValue } from "../../../lib/mutex";
 import redis from "../../../config/redis";
-import { apiHost } from "../../../config";
+import { apiUrl } from "../../../config";
 import { ApiRes, WorldData } from "../../../types/api";
 import { sendLogs } from "../../../lib/bot";
 import md5 from "../../../lib/md5";
@@ -14,7 +14,7 @@ function finalValue(key: string) {
       // replay always will have value in this step
       if (reply && !err) return resolve(reply ?? "");
 
-      fetch(`http://${apiHost}/api/world?page=-1`)
+      fetch(`${apiUrl}/world?page=-1`)
         .then((res) => res.json())
         .then((res: ApiRes<WorldData>) => {
           if (!res.items || res.status == "ERR")
