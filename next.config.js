@@ -2,7 +2,7 @@ module.exports = {
   reactStrictMode: true,
   webpack5: true,
   swcMinify: false,
-  basePath: "/projects",
+  basePath: process.env.BASE_PATH || "/projects",
 
   async headers() {
     return [
@@ -36,7 +36,13 @@ module.exports = {
     ];
   },
 
+  publicRuntimeConfig: {
+    BASE_PATH: process.env.BASE_PATH,
+  },
+
   serverRuntimeConfig: {
+    BASE_PATH: process.env.BASE_PATH,
+
     ADMIN_USER: process.env.ADMIN_USER,
     ADMIN_PASS: process.env.ADMIN_PASS,
     APPLICATION_SECRET: process.env.APPLICATION_SECRET,

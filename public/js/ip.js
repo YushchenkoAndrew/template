@@ -25,7 +25,7 @@
   ) {
     clearLocalStorage();
   } else {
-    fetch("/projects/api/view/ping", {
+    fetch(`${basePath}/api/view/ping`, {
       method: "HEAD",
       headers: {
         "X-Custom-Header": localStorage.getItem("id"),
@@ -784,12 +784,12 @@
   })();
 
   function sendUser() {
-    fetch("/projects/api/view/rand", {
+    fetch(`${basePath}/api/view/rand`, {
       method: "HEAD",
     })
       .catch((err) => null)
       .then((res) => {
-        fetch("/projects/api/view/user", {
+        fetch(`${basePath}/api/view/user`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

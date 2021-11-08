@@ -31,6 +31,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           as="font"
           crossOrigin=""
         />
+        <script type="text/javascript">var basePath = {basePath};</script>
         <script defer src={`${basePath}/js/lib/md5.js`}></script>
         {/* <script defer src={`${basePath}/js/ip.js`}></script> */}
         <script defer src={`${basePath}/js/lib/ip.min.js`}></script>
