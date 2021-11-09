@@ -1,11 +1,10 @@
-import { useRouter } from "next/dist/client/router";
 import React, { useEffect, useRef, useState } from "react";
 import md5 from "../../lib/md5";
 import { DefaultRes } from "../../types/request";
 import styles from "./SignIn.module.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import { Image } from "react-bootstrap";
-import { voidUrl } from "../../config";
+import { basePath, voidUrl } from "../../config";
 
 export interface SignInProps {
   title: string;
@@ -13,8 +12,6 @@ export interface SignInProps {
 }
 
 export default function SignIn(props: SignInProps) {
-  const router = useRouter();
-  const basePath = router.basePath;
   const reCaptchaRef = useRef<ReCAPTCHA>(null);
 
   const [errMessage, onErrHappen] = useState("");

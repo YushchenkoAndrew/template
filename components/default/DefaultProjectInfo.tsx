@@ -1,5 +1,5 @@
-import { useRouter } from "next/dist/client/router";
 import React from "react";
+import { basePath } from "../../config";
 import { ProjectLink } from "../../types/projects";
 export interface DefaultProjectInfoProps {
   href: string;
@@ -9,8 +9,6 @@ export interface DefaultProjectInfoProps {
 }
 
 export default function DefaultProjectInfo(props: DefaultProjectInfoProps) {
-  const router = useRouter();
-  const basePath = router.basePath;
   return (
     <>
       <p className="text-dark">

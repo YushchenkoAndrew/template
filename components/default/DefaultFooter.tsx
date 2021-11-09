@@ -7,7 +7,7 @@ import {
   faLinkedinIn,
   faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
-import { useRouter } from "next/dist/client/router";
+import { basePath } from "../../config";
 
 export interface DefaultFooterProps {
   name: string;
@@ -15,8 +15,6 @@ export interface DefaultFooterProps {
 }
 
 export default function DefaultFooter(props: DefaultFooterProps) {
-  const router = useRouter();
-  const basePath = router.basePath;
   return (
     <div className="container">
       <footer className="pt-4 my-md-5 pt-md-5 border-top py-2">

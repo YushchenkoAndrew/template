@@ -1,4 +1,3 @@
-import { useRouter } from "next/dist/client/router";
 import React, { CSSProperties, useEffect, useState } from "react";
 
 export interface AlertProps {

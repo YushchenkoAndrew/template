@@ -1,13 +1,11 @@
-import { GetServerSidePropsContext } from "next";
-import { useRouter } from "next/dist/client/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Card from "../components/Card";
 import DefaultFooter from "../components/default/DefaultFooter";
 import DefaultHead from "../components/default/DefaultHead";
 import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultNav from "../components/default/DefaultNav";
-import { voidUrl } from "../config";
+import { basePath, voidUrl } from "../config";
 import { formPath } from "../lib/files";
 import { loadProjectsThumbnail } from "../lib/projects";
 import { ProjectData } from "../types/api";
@@ -20,9 +18,6 @@ export interface ProjectsListPageProps {
 }
 
 export default function ProjectsListPage(props: ProjectsListPageProps) {
-  const router = useRouter();
-  const basePath = router.basePath;
-
   const [hasMore, onReachEnd] = useState(props.hasMore);
   const [projects, onScrollLoad] = useState(props.projects);
 

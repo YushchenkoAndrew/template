@@ -4,11 +4,9 @@ import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultP5Container from "../components/default/DefaultP5Container";
 import DefaultFooter from "../components/default/DefaultFooter";
 import DefaultProjectInfo from "../components/default/DefaultProjectInfo";
-import { useRouter } from "next/dist/client/router";
+import { basePath } from "../config";
 
 export default function ApproximatingPiValue() {
-  const router = useRouter();
-  const basePath = router.basePath;
   return (
     <>
       <DefaultHead>

@@ -1,6 +1,5 @@
 import { faPlusCircle, faPlusSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useRouter } from "next/dist/client/router";
 import React from "react";
 import styles from "./AddCard.module.css";
 
@@ -9,9 +8,6 @@ export interface AddCardProps {
 }
 
 export default function AddCard(props: AddCardProps) {
-  const router = useRouter();
-  const basePath = router.basePath;
-
   return (
     // <div className="col-lg-4 col-md-6 mt-4">
     <div className="col col-lg-4 col-md-6 col-sm-11 my-3 text-center">

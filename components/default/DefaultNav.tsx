@@ -1,5 +1,5 @@
-import { useRouter } from "next/dist/client/router";
 import React from "react";
+import { basePath } from "../../config";
 import NavItem from "../NavBar/NavItem";
 
 export interface DefaultNavProps {
@@ -12,8 +12,6 @@ export interface DefaultNavProps {
 }
 
 export default function DefaultNav(props: DefaultNavProps) {
-  const router = useRouter();
-  const basePath = router.basePath;
   return (
     <>
       <NavItem

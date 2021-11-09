@@ -1,14 +1,12 @@
-import { useRouter } from "next/dist/client/router";
 import Head from "next/head";
 import React from "react";
+import { basePath } from "../../config";
 
 export interface DefaultHeadProps {
   children?: React.ReactNode;
 }
 
 export default function DefaultHead(props: DefaultHeadProps) {
-  const router = useRouter();
-  const basePath = router.basePath;
   return (
     <Head>
       <meta name="viewport" content="width=device-width, initial-scale=1" />

@@ -4,11 +4,9 @@ import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultFooter from "../components/default/DefaultFooter";
 import DefaultEmscContainer from "../components/default/DefaultEmscContainer";
 import DefaultProjectInfo from "../components/default/DefaultProjectInfo";
-import { useRouter } from "next/dist/client/router";
+import { basePath } from "../config";
 
 export default function CodeRain() {
-  const router = useRouter();
-  const basePath = router.basePath;
   return (
     <>
       <DefaultHead>

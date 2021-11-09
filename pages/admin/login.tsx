@@ -6,12 +6,8 @@ import sessionConfig from "../../config/session";
 import { NextSessionArgs } from "../../types/session";
 import { checkIfUserExist } from "../../lib/session";
 import { basePath } from "../../config";
-import { useRouter } from "next/dist/client/router";
 
 export default function Login() {
-  const router = useRouter();
-  const basePath = router.basePath;
-
   return (
     <>
       <DefaultHead>

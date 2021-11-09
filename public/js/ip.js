@@ -1,4 +1,5 @@
 (function yes() {
+  let basePath = document.getElementById("ip-min-js").getAttribute("data-path");
   let flag = !localStorage.getItem("id") || !localStorage.getItem("country");
   let nowTime = (function () {
     let now = new Date();

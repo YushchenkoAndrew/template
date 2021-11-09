@@ -4,12 +4,10 @@ import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultFooter from "../components/default/DefaultFooter";
 import DefaultEmscContainer from "../components/default/DefaultEmscContainer";
 import DefaultProjectInfo from "../components/default/DefaultProjectInfo";
-import { useRouter } from "next/dist/client/router";
+import { basePath } from "../config";
 
 // FIXME: Fix src code in C++ to change position of canvas has issue with small sizes !!!
 export default function ShadowCasting() {
-  const router = useRouter();
-  const basePath = router.basePath;
   return (
     <>
       <DefaultHead>

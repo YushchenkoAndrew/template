@@ -1,10 +1,10 @@
-import { AppProps } from "next/app";
 import Head from "next/head";
+import { useEffect } from "react";
+import { AppProps } from "next/app";
+import { basePath } from "../config";
 
 import "../styles/globals.css";
 import "../styles/bootstrap.min.css";
-import { useEffect } from "react";
-import { basePath } from "../config";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
@@ -31,10 +31,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           as="font"
           crossOrigin=""
         />
-        <script type="text/javascript">var basePath = {basePath};</script>
         <script defer src={`${basePath}/js/lib/md5.js`}></script>
+        <script defer src={`${basePath}/js/lib/ip.min.js`} id="ip-min-js" data-path={basePath}></script>
         {/* <script defer src={`${basePath}/js/ip.js`}></script> */}
-        <script defer src={`${basePath}/js/lib/ip.min.js`}></script>
       </Head>
       <Component {...pageProps} />
     </>

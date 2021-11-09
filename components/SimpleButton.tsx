@@ -1,4 +1,3 @@
-import { useRouter } from "next/dist/client/router";
 import React from "react";
 import Image from "react-bootstrap/Image";
 
