@@ -24,20 +24,22 @@ module.exports = {
           },
         ],
       },
-      {
-        source: "/api/view/rand",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=3600, must-revalidate",
-          },
-        ],
-      },
+      // {
+      //   source: "/api/view/rand",
+      //   headers: [
+      //     {
+      //       key: "Cache-Control",
+      //       value: "public, max-age=3600, must-revalidate",
+      //     },
+      //   ],
+      // },
     ];
   },
 
   publicRuntimeConfig: {
+    VOID_URL: process.env.FILE_SERVER_URL,
     BASE_PATH: process.env.BASE_PATH,
+    RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY,
   },
 
   serverRuntimeConfig: {
@@ -47,8 +49,7 @@ module.exports = {
     ADMIN_PASS: process.env.ADMIN_PASS,
     APPLICATION_SECRET: process.env.APPLICATION_SECRET,
 
-    API_HOST: process.env.API_HOST,
-    API_PORT: process.env.API_PORT,
+    API_URL: process.env.API_URL,
     API_USER: process.env.API_USER,
     API_PASS: process.env.API_PASS,
     API_PEPPER: process.env.API_PEPPER,
@@ -61,7 +62,6 @@ module.exports = {
 
     ACCESS_KEY: process.env.ACCESS_KEY,
 
-    VOID_URL: process.env.FILE_SERVER_URL,
     FILE_SERVER_AUTH: process.env.FILE_SERVER_AUTH,
 
     RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY,

@@ -143,7 +143,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   //
   useEffect(() => {
     const cacheId = md5(
-      localStorage.getItem("salt") ?? "" + localStorage.getItem("id") ?? ""
+      (localStorage.getItem("salt") ?? "") + (localStorage.getItem("id") ?? "")
     );
 
     fetch(`${basePath}/api/admin/projects/cache?id=${cacheId}`, {
@@ -177,7 +177,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
 
   function onDataCache(event: Event) {
     const cacheId = md5(
-      localStorage.getItem("salt") ?? "" + localStorage.getItem("id") ?? ""
+      (localStorage.getItem("salt") ?? "") + (localStorage.getItem("id") ?? "")
     );
     fetch(`${basePath}/api/admin/projects/cache?id=${cacheId}`, {
       method: "POST",
@@ -212,7 +212,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
     }
 
     const cacheId = md5(
-      localStorage.getItem("salt") ?? "" + localStorage.getItem("id") ?? ""
+      (localStorage.getItem("salt") ?? "") + (localStorage.getItem("id") ?? "")
     );
     fetch(`${basePath}/api/admin/projects?id=${cacheId}`, {
       method: router.query.operation === "add" ? "POST" : "PUT",

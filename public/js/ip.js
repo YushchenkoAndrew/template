@@ -1,42 +1,4 @@
-(function yes() {
-  let basePath = document.getElementById("ip-min-js").getAttribute("data-path");
-  let flag = !localStorage.getItem("id") || !localStorage.getItem("country");
-  let nowTime = (function () {
-    let now = new Date();
-    return now.getTime() - now.getTimezoneOffset() * 60000;
-  })();
-
-  if (!localStorage.getItem("salt")) {
-    localStorage.setItem(
-      "salt",
-      md5(Math.random().toString() + new Date().toString())
-    );
-  }
-
-  function clearLocalStorage() {
-    flag = true;
-    localStorage.removeItem("id");
-    localStorage.removeItem("country");
-    localStorage.removeItem("expire");
-  }
-
-  if (
-    localStorage.getItem("expire") &&
-    nowTime > localStorage.getItem("expire")
-  ) {
-    clearLocalStorage();
-  } else {
-    fetch(`${basePath}/api/view/ping`, {
-      method: "HEAD",
-      headers: {
-        "X-Custom-Header": localStorage.getItem("id"),
-      },
-    })
-      .catch((err) => clearLocalStorage())
-      .then((res) => (res.status !== 204 ? clearLocalStorage() : null));
-  }
-  let user = {};
-  const expired = 86.4e6;
+window.onload = () => {
   (function () {
     var r, t, n, e, i, o, a, s;
     (t = {}),
@@ -620,10 +582,68 @@
     });
   };
   !(function () {
-    // client
-    var d = "",
+    var d,
       s = !1,
       o = !1;
+    function dt() {
+      var u = document.getElementById("ip-min-js").getAttribute("data-path");
+      var p = ["id", "country", "expired", "salt"];
+
+      setTimeout(function tt() {
+        if (typeof localStorage !== "undefined") {
+          try {
+            localStorage.setItem("_test", "on");
+            if (localStorage.getItem("_test") === "on") {
+              localStorage.removeItem("_test");
+            } else return setTimeout(tt, 2000);
+          } catch (e) {
+            return setTimeout(tt, 2000);
+          }
+        } else return setTimeout(tt, 2000);
+
+        localStorage.getItem("expired") <
+          (function () {
+            var now = new Date();
+            return now.getTime() - now.getTimezoneOffset() * 60000;
+          })() || p.reduce((a, c) => a || !localStorage.getItem(c), false)
+          ? (p.map((n) => localStorage.removeItem(n)),
+            fetch(`${u}/api/view/rand`, {
+              method: "HEAD",
+            })
+              .then((r) => {
+                fetch(`${u}/api/view/user`, {
+                  method: "POST",
+                  headers: {
+                    "X-Custom-Header": r.headers.get("X-Custom-Header"),
+                    "X-Custom-IP": d,
+                  },
+                })
+                  .then((r) => r.json())
+                  .then((d) =>
+                    d.status === "OK"
+                      ? Object.entries(d.result).map(([k, n]) =>
+                          localStorage.setItem(k, n)
+                        )
+                      : null
+                  )
+                  .catch((e) => {});
+              })
+              .catch((e) => null))
+          : fetch(`${u}/api/view/ping`, {
+              method: "HEAD",
+              headers: {
+                "X-Custom-Header": localStorage.getItem("id"),
+              },
+            })
+              .then((r) =>
+                r.status !== 204
+                  ? d.result.map((n) => localStorage.removeItem(n))
+                  : null
+              )
+              .catch((e) => p.map((n) => localStorage.removeItem(n)));
+      }, 1e3);
+    }
+    window.addEventListener("click", dt);
     var i =
         /([0-9]{1,3}(\.[0-9]{1,3}){3}|(([0-9a-f]{1,4}:){7}([0-9a-f]{1,4}|:))|(([0-9a-f]{1,4}:){6}(:[0-9a-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9a-f]{1,4}:){5}(((:[0-9a-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9a-f]{1,4}:){4}(((:[0-9a-f]{1,4}){1,3})|((:[0-9a-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){3}(((:[0-9a-f]{1,4}){1,4})|((:[0-9a-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){2}(((:[0-9a-f]{1,4}){1,5})|((:[0-9a-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){1}(((:[0-9a-f]{1,4}){1,6})|((:[0-9a-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9a-f]{1,4}){1,7})|((:[0-9a-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))/,
       c = !1;
@@ -641,7 +661,9 @@
           e = new n(
             {
               iceServers: [
-                { urls: ["stun:stun.l.google.com:19302?transport=udp"] },
+                {
+                  urls: ["stun:stun.l.google.com:19302?transport=udp"],
+                },
               ],
             },
             {
@@ -713,39 +735,12 @@
                   if (!ipaddr.IPv6.isValid(t)) return;
                   e = ipaddr.subnetMatch(ipaddr.parse(t), c, "ipv6");
                 }
-
-                "local" == e
-                  ? o.append(flag_box("_local", t, !0))
-                  : ("ipv4" != e && "ipv6" != e) ||
-                    (t != d ? (s = "ip_" + t.replace(/[\.\:\%]/g, "_")) : null);
               })(e),
-              (a[e] = !0);
-            if (!localStorage.getItem("id"))
-              localStorage.setItem(
-                "id",
-                (user.id = md5(e + Math.random() * 100))
-              );
-            if (!localStorage.getItem("expire")) {
-              localStorage.setItem("expire", nowTime + expired);
-            }
-            if (!localStorage.getItem("country")) {
-              fetch("https://rdap.db.ripe.net/ip/" + e)
-                .then((res) => res.json())
-                .then((data) =>
-                  data && data.country
-                    ? localStorage.setItem(
-                        "country",
-                        (user.country = data.country)
-                      )
-                    : null
-                )
-                .catch((err) => null);
-            }
+              (a[e] = !0),
+              (d = e);
           } catch (t) {}
         }
-        e.onicecandidate = function (t) {
-          t.candidate && r(t.candidate.candidate);
-        };
+        e.onicecandidate = (t) => t.candidate && r(t.candidate.candidate);
         try {
           e.createDataChannel("bl");
         } catch (t) {
@@ -755,8 +750,8 @@
           e.createOffer().then(function (t) {
             e.setLocalDescription(
               t,
-              function () {},
-              function () {}
+              () => {},
+              () => {}
             );
           });
         } catch (t) {
@@ -764,80 +759,22 @@
             function (t) {
               e.setLocalDescription(
                 t,
-                function () {},
-                function () {}
+                () => {},
+                () => {}
               );
             },
-            function () {}
+            () => {}
           );
         }
         setTimeout(function () {
           e.localDescription.sdp.split("\n").forEach(function (t) {
             0 === t.indexOf("a=candidate:") && r(t);
-            checkFlags();
-            window.addEventListener("click", yes);
           });
-        }, 1000);
+          dt();
+        }, 1e3);
       })(),
       void 0 !== window.matchMedia)
     ) {
     }
   })();
-
-  function sendUser() {
-    fetch(`${basePath}/api/view/rand`, {
-      method: "HEAD",
-    })
-      .catch((err) => null)
-      .then((res) => {
-        fetch(`${basePath}/api/view/user`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Custom-Header": res.headers.get("X-Custom-Header"),
-          },
-          body: JSON.stringify({ ...user, expired: expired / 1000 }),
-        });
-      });
-  }
-
-  function updateCookie(i, c) {
-    if (!(user.id = localStorage.getItem("id")))
-      localStorage.setItem(
-        "id",
-        (user.id = md5(i + nowTime + Math.random() * 100))
-      );
-    if (!(user.expire = localStorage.getItem("expire")))
-      localStorage.setItem("expire", nowTime + expired);
-    localStorage.setItem("country", (user.country = c));
-    sendUser();
-  }
-
-  function checkFlags() {
-    if (flag) {
-      if (localStorage.getItem("id")) sendUser();
-      else
-        fetch("https://www.cloudflare.com/cdn-cgi/trace")
-          .then((res) => res.text())
-          .then((data) =>
-            updateCookie(data[2].split("=")[1], data[8].split("=")[1])
-          )
-          .catch((err) => {
-            fetch("https://api.db-ip.com/v2/free/self")
-              .then((res) => res.json())
-              .then((data) => updateCookie(data.ipAddress, data.countryCode))
-              .catch((err) => {
-                fetch("http://www.geoplugin.net/json.gp")
-                  .then((res) => res.json())
-                  .then((data) =>
-                    updateCookie(
-                      data.geoplugin_request,
-                      data.geoplugin_countryCode
-                    )
-                  )
-                  .catch((err) => null);
-              });
-          });
-    }
-  }
-})();
+};

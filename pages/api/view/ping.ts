@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../../config/redis";
-import md5 from "../../../lib/md5";
 
 function CheckUser(id: string) {
   return new Promise<boolean>((resolve, reject) => {

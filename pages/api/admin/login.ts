@@ -9,7 +9,7 @@ import { DefaultRes, FullResponse } from "../../../types/request";
 import getConfig from "next/config";
 
 const { serverRuntimeConfig } = getConfig();
-function checkUserInfo(id: string, salt: number, user: string, pass: string) {
+function checkUserInfo(id: string, salt: string, user: string, pass: string) {
   return new Promise<FullResponse>((resolve, reject) => {
     redis.get(`LOGIN:${id}`, (err, tries) => {
       if (err || !tries) {
@@ -99,7 +99,7 @@ function checkCaptcha(id: string, captcha: string) {
             status: 200,
             send: {
               status: data.success ? "OK" : "ERR",
-              message: data.success ? "" : "You are a ROBOT !!!",
+              message: data.success ? "Success!!" : "You are a ROBOT !!!",
             },
           });
 

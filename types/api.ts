@@ -74,3 +74,13 @@ export type ProjectData = {
   Files: FileData[];
   Links: LinkData[];
 };
+
+export type GeoIpLocationData = {
+  GeonameId: number;
+  LocaleCode: string;
+  ContinentCode: string;
+  ContinentName: string;
+  CountryIsoCode: string;
+  CountryName: string;
+  IsInEuropeanUnion: boolean;
+};

@@ -5,6 +5,8 @@ import styles from "./SignIn.module.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import { Image } from "react-bootstrap";
 import { basePath, voidUrl } from "../../config";
+import getConfig from "next/config";
+const { publicRuntimeConfig } = getConfig();
 
 export interface SignInProps {
   title: string;
@@ -13,12 +15,7 @@ export interface SignInProps {
 
 export default function SignIn(props: SignInProps) {
   const reCaptchaRef = useRef<ReCAPTCHA>(null);
-
   const [errMessage, onErrHappen] = useState("");
-
-  useEffect(() => {
-    // TODO:
-  }, []);
 
   function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
@@ -39,7 +36,7 @@ export default function SignIn(props: SignInProps) {
       );
     }
 
-    const salt = Math.round(Math.random() * 10000);
+    const salt = md5(Math.round(Math.random() * 10000).toString());
     fetch(`${basePath}/api/admin/login?id=${localStorage.getItem("id")}`, {
       method: "POST",
       headers: {
@@ -47,8 +44,8 @@ export default function SignIn(props: SignInProps) {
       },
       body: JSON.stringify({
         salt,
-        user: md5(salt.toString() + target.user.value),
-        pass: md5(salt.toString() + target.pass.value),
+        user: md5(salt + target.user.value),
+        pass: md5(salt + target.pass.value),
         captcha,
       }),
     })
@@ -90,7 +87,7 @@ export default function SignIn(props: SignInProps) {
           <ReCAPTCHA
             ref={reCaptchaRef}
             size="normal"
-            sitekey="6LeO8d0cAAAAAI_dIscgmdw35ig-IzTJo9fRPyGA"
+            sitekey={publicRuntimeConfig.RECAPTCHA_SITE_KEY}
           />
         </div>
 

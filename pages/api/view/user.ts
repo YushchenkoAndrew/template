@@ -2,11 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getValue, setValue } from "../../../lib/mutex";
 import redis from "../../../config/redis";
 import { apiUrl } from "../../../config";
-import { ApiRes, WorldData } from "../../../types/api";
+import { ApiRes, GeoIpLocationData, WorldData } from "../../../types/api";
 import { sendLogs } from "../../../lib/bot";
 import md5 from "../../../lib/md5";
-
-type User = { id: string; country: string; expired: number };
+import { FullResponse } from "../../../types/request";
 
 function finalValue(key: string) {
   return new Promise<string>((resolve, reject) => {
@@ -31,55 +30,105 @@ function finalValue(key: string) {
   });
 }
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== "POST") return res.status(405).send("");
 
-  let { id, country, expired } = req.body as User;
-  if (!id || !country || !expired || isNaN(+expired))
-    return res.status(400).send("");
+  const date = new Date();
+  const now = date.getTime() - date.getTimezoneOffset() * 60000;
+  const prev = Number(req.headers["x-custom-header"]);
+  const ip = req.headers["x-custom-ip"];
+  if (isNaN(prev) || now < prev || now - prev >= 5000 || !ip)
+    return res.status(400).send("Nop");
 
-  res.status(204).send("");
+  const hash = md5(prev.toString());
+  const { status, send } = await new Promise<FullResponse>(
+    (resolve, reject) => {
+      redis.get(`RAND:${hash}`, (err, ok) => {
+        if (err || !ok) return res.status(400).send("RAND");
+        redis.del(`RAND:${hash}`);
 
-  // Run in background
-  setTimeout(() => {
-    // TODO: Save countries
-    console.log("user ");
-    console.log(req.body as User);
+        fetch(`${apiUrl}/trace/${ip}`)
+          .then((res) => res.json())
+          .then((data: ApiRes<GeoIpLocationData>) => {
+            if (data.status === "ERR") {
+              return resolve({
+                status: 500,
+                send: {
+                  status: "ERR",
+                  message: "Hold up it's not my fault ... kinda",
+                },
+              });
+            }
 
-    const now = new Date().getTime();
-    const prev = Number(req.headers["x-custom-header"]);
-    if (isNaN(prev) || now < prev || now - prev >= 2000) return;
+            const user = {
+              id: md5(
+                (Math.random() * 100000 + 500).toString() +
+                  data.result[0].CountryIsoCode +
+                  now.toString()
+              ),
+              country: data.result[0].CountryIsoCode,
+              expired: now + 86.4e6,
+              salt: md5((Math.random() * 100000 + 500).toString()),
+            };
 
-    const hash = md5(prev.toString());
-    redis.get(`RAND:${hash}`, (err, ok) => {
-      if (err || !ok) return;
-      redis.del(`RAND:${hash}`);
+            console.log("user: ");
+            console.log(user);
 
-      redis.set(id, country);
-      redis.expire(id, expired);
+            resolve({
+              status: 201,
+              send: {
+                status: "OK",
+                message: "Success",
+                result: user,
+              },
+            });
 
-      redis.hincrby("Info:Now", "Visitors", 1);
-      redis.hincrby("Info:Now", "Views", 1);
+            // Run in background
+            setTimeout(() => {
+              redis.set(user.id, user.country);
+              redis.expire(user.id, user.expired);
+              redis.hincrby("Info:Now", "Visitors", 1);
+              redis.hincrby("Info:Now", "Views", 1);
 
-      // Need this for detect curr day countries
-      redis.lpush("Info:Countries", country);
+              // Need this for detect curr day countries
+              redis.lpush("Info:Countries", user.country);
 
-      // Use simple mutex handler for changing variables with kubernetes & docker
-      getValue("Info:World", finalValue("Info:World"))
-        .then((str: string) => {
-          let data = JSON.parse(str);
-          data[country] = data[country] ? data[country] + 1 : 1;
-          setValue("Info:World", JSON.stringify(data));
-        })
-        .catch((err) =>
-          sendLogs({
-            stat: "ERR",
-            name: "WEB",
-            file: "/api/view/user.ts",
-            message: "Ohhh noooo, Cache is broken!!!",
-            desc: err,
+              // Use simple mutex handler for changing variables with kubernetes & docker
+              getValue("Info:World", finalValue("Info:World"))
+                .then((str: string) => {
+                  let data = JSON.parse(str);
+                  data[user.country] = data[user.country]
+                    ? data[user.country] + 1
+                    : 1;
+                  setValue("Info:World", JSON.stringify(data));
+                })
+                .catch((err) =>
+                  sendLogs({
+                    stat: "ERR",
+                    name: "WEB",
+                    file: "/api/view/user.ts",
+                    message: "Ohhh noooo, Cache is broken!!!",
+                    desc: err,
+                  })
+                );
+            }, 0);
           })
-        );
-    });
-  }, 0);
+          .catch((err) => {
+            resolve({
+              status: 500,
+              send: {
+                status: "ERR",
+                message:
+                  "F@$k, I fixed this yeasted, why it's still not working !!!!",
+              },
+            });
+          });
+      });
+    }
+  );
+
+  return res.status(status).send(send);
 }

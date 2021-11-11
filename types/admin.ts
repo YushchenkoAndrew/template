@@ -1,5 +1,5 @@
 export type LoginRequest = {
-  salt: number;
+  salt: string;
   user: string;
   pass: string;
   captcha: string;
