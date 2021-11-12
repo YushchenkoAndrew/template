@@ -32,7 +32,7 @@ spec:
             - name: BOT_HOST
               value: http://$(BOT_SERVICE_SERVICE_HOST):$(BOT_SERVICE_SERVICE_PORT)/bot
             - name: VOID_URL
-              value: http://mortis-grimreaper.ddns.net/files
+              value: https://mortis-grimreaper.ddns.net/files
 
 ---
 apiVersion: apps/v1
