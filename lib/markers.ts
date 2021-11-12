@@ -6,7 +6,7 @@ const Parser = {
     const script = document.createElement("script");
     script.defer = true;
     script.type = file.type;
-    script.src = `http://${HtmlMarkers.FILE_SERVER}/files/${
+    script.src = `${HtmlMarkers.FILE_SERVER}/files/${
       HtmlMarkers.PROJECT_NAME
     }/${file.role}/${file.dir ?? ""}${file.name}`;
     return { id: HtmlMarkers.JS, el: script };
@@ -16,7 +16,7 @@ const Parser = {
     const link = document.createElement("link");
     link.rel = "preload";
     link.as = "style";
-    link.href = `http://${HtmlMarkers.FILE_SERVER}/files/${
+    link.href = `${HtmlMarkers.FILE_SERVER}/files/${
       HtmlMarkers.PROJECT_NAME
     }/${file.role}/${file.dir ?? ""}${file.name}`;
     return { id: HtmlMarkers.CSS, el: link };
