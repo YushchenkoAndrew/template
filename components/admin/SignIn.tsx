@@ -51,13 +51,17 @@ export default function SignIn(props: SignInProps) {
     })
       .then((res) => res.json())
       .then((body: DefaultRes) => {
-        if (body.status === "ERR")
-          return onErrHappen(
-            body.message.replace("[LOGIN]", target.user.value)
-          );
-        window.location.href = `${basePath}/admin`;
+        if (body.status === "OK") window.location.href = `${basePath}/admin`;
+
+        reCaptchaRef.current?.reset();
+        return onErrHappen(body.message.replace("[LOGIN]", target.user.value));
       })
-      .catch((err) => {});
+      .catch((err) => {
+        reCaptchaRef.current?.reset();
+        return onErrHappen(
+          "Something went wrong. Please refresh the page and sign in again"
+        );
+      });
   }
 
   return (
