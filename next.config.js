@@ -37,7 +37,7 @@ module.exports = {
   },
 
   publicRuntimeConfig: {
-    VOID_URL: process.env.FILE_SERVER_URL,
+    VOID_URL: process.env.VOID_URL,
     BASE_PATH: process.env.BASE_PATH,
     RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY,
   },
@@ -62,7 +62,7 @@ module.exports = {
 
     ACCESS_KEY: process.env.ACCESS_KEY,
 
-    FILE_SERVER_AUTH: process.env.FILE_SERVER_AUTH,
+    VOID_AUTH: process.env.VOID_AUTH,
 
     RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY,
     RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,

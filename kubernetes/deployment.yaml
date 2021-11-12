@@ -23,6 +23,8 @@ spec:
             - secretRef:
                 name: web-secrete
           env:
+            - name: BASE_PATH
+              value: /v2/projects
             - name: REDIS_HOST
               value: $(FRONT_REDIS_SERVICE_SERVICE_HOST)
             - name: API_URL
@@ -30,7 +32,7 @@ spec:
             - name: BOT_HOST
               value: http://$(BOT_SERVICE_SERVICE_HOST):$(BOT_SERVICE_SERVICE_PORT)/bot
             - name: VOID_URL
-              value: "http://mortis-grimreaper.ddns.net/files"
+              value: http://mortis-grimreaper.ddns.net/files
 
 ---
 apiVersion: apps/v1

@@ -72,7 +72,7 @@ function UploadFile(file: File, args: ArgsType) {
       headers: {
         Authorization:
           "Basic " +
-          Buffer.from(serverRuntimeConfig.FILE_SERVER_AUTH ?? "").toString(
+          Buffer.from(serverRuntimeConfig.VOID_AUTH ?? "").toString(
             "base64"
           ),
       },
