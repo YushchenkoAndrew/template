@@ -38,7 +38,7 @@ module.exports = {
 
   publicRuntimeConfig: {
     VOID_URL: process.env.VOID_URL,
-    BASE_PATH: process.env.BASE_PATH,
+    BASE_PATH: process.env.BASE_PATH || "/projects",
     RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY,
   },
 
