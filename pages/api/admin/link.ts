@@ -29,10 +29,11 @@ function SendData(req: NextApiRequest & { session: Session }, args: ArgsType) {
           .then((res) => res.json())
           .then((data: ApiRes<FileData> | ApiError) => {
             resolve({
-              status: data.status ? 500 : 200,
+              status: data.status !== "OK" ? 500 : 200,
               send: {
                 status: data.status,
-                message: data.status ? (data as ApiError).message : "Success",
+                message:
+                  data.status !== "OK" ? (data as ApiError).message : "Success",
                 result: data.result ?? [],
               },
             });
