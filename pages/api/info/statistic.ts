@@ -1,14 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../../config/redis";
 import { ApiRes, InfoData, WorldData } from "../../../types/api";
-import { Country, DayStat, StatInfo } from "../../../types/info";
+import { Country, DayStat } from "../../../types/info";
 import { DefaultRes, StatisticData } from "../../../types/request";
 import { apiUrl } from "../../../config";
 import { formatDate } from "../../info";
 import { sendLogs } from "../../../lib/bot";
 
 type QueryParams = { date: string };
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<StatisticData | DefaultRes>
 ) {
@@ -25,146 +25,146 @@ export default function handler(
       .json({ status: "ERR", message: "Not all Query params are declared!" });
   }
 
-  let prev = new Date(date);
-  prev.setDate(prev.getDate() - 7);
+  try {
+    let yesterday = new Date(date);
+    yesterday.setDate(yesterday.getDate() - 7);
 
-  const now = formatDate(new Date());
-  Promise.all([
-    new Promise((resolve, reject) => {
-      redis.hgetall("Info:Now", (err, reply) => {
-        if (!err && reply && date == now) {
-          return resolve({
-            Visitors: +reply.Visitors,
-            Views: +reply.Views,
-          });
-        }
+    const today = formatDate(new Date());
+    const results = await Promise.all([
+      new Promise((resolve, reject) => {
+        redis.hgetall("Info:Now", (err, reply) => {
+          if (!err && reply && date == today) {
+            return resolve({
+              Visitors: +reply.Visitors,
+              Views: +reply.Views,
+            });
+          }
 
-        fetch(`${apiUrl}/info?created_at=${date}`)
-          .then((res) => res.json())
-          .then((res: ApiRes<InfoData>) => {
-            if (res.status == "ERR") {
-              return reject("Idk something wrong happened at the backend");
-            }
-            const result = res.result.pop();
-
-            // Check if the date if current one, if so load the data
-            if (date == now) {
-              redis.hmset("Info:Now", {
-                Visitors: result?.Visitors ?? 0,
-                Views: result?.Views ?? 0,
-                Clicks: result?.Clicks ?? 0,
-                Media: result?.Media ?? 0,
-              });
-
-              // Save countries that visited today
-              if (result) {
-                result.Countries.split(",").map((item) =>
-                  redis.lpush("Info:Countries", item)
-                );
+          fetch(`${apiUrl}/info?created_at=${date}`)
+            .then((res) => res.json())
+            .then((res: ApiRes<InfoData>) => {
+              if (res.status == "ERR") {
+                return reject("Idk something wrong happened at the backend");
               }
-            }
+              const result = res.result.pop();
 
-            return resolve({
-              Visitors: result?.Visitors ?? 0,
-              Views: result?.Views ?? 0,
-            });
-          })
-          .catch((err) => reject(err));
-      });
-    }),
-    new Promise((resolve, reject) => {
-      redis.hgetall("Info:Prev", (err, reply) => {
-        if (!err && reply && date == now) {
-          return resolve({
-            Visitors: +reply.Visitors,
-            Views: +reply.Views,
-          });
-        }
+              // Check if the date if current one, if so load the data
+              if (date == today) {
+                redis.hmset("Info:Now", {
+                  Visitors: result?.Visitors ?? 0,
+                  Views: result?.Views ?? 0,
+                  Clicks: result?.Clicks ?? 0,
+                  Media: result?.Media ?? 0,
+                });
 
-        fetch(`${apiUrl}/info?created_at=${formatDate(prev)}`)
-          .then((res) => res.json())
-          .then((res: ApiRes<InfoData>) => {
-            if (res.status == "ERR") {
-              return reject("Idk something wrong happened at the backend");
-            }
+                // Save countries that visited today
+                if (result) {
+                  result.Countries.split(",").map((item) =>
+                    redis.lpush("Info:Countries", item)
+                  );
+                }
+              }
 
-            const result = res.result.pop();
-            if (date == now) {
-              redis.hmset("Info:Prev", {
+              return resolve({
                 Visitors: result?.Visitors ?? 0,
                 Views: result?.Views ?? 0,
               });
-            }
-
+            })
+            .catch((err) => reject(err));
+        });
+      }),
+      new Promise((resolve, reject) => {
+        redis.hgetall("Info:Prev", (err, reply) => {
+          if (!err && reply && date == today) {
             return resolve({
-              Visitors: result?.Visitors ?? 0,
-              Views: result?.Views ?? 0,
+              Visitors: +reply.Visitors,
+              Views: +reply.Views,
             });
-          })
-          .catch((err) => reject(err));
-      });
-    }),
-    new Promise((resolve, reject) => {
-      redis.get("Info:World", (err, reply) => {
-        if (!err && reply) return resolve(JSON.parse(reply));
+          }
 
-        // NOTE: This will run only in the case where none of users were identified
-        fetch(`${apiUrl}/world?page=-1`)
-          .then((res) => res.json())
-          .then((res: ApiRes<WorldData>) => {
-            if (!res.items || res.status == "ERR")
-              return reject("Idk something wrong happened at then backend");
+          fetch(`${apiUrl}/info?created_at=${formatDate(yesterday)}`)
+            .then((res) => res.json())
+            .then((res: ApiRes<InfoData>) => {
+              if (res.status == "ERR") {
+                return reject("Idk something wrong happened at the backend");
+              }
 
-            // Need this just to decrease space usage in RAM
-            let result = {} as { [country: string]: number };
-            res.result.forEach(
-              (item) => (result[item.Country] = item.Visitors)
-            );
+              const result = res.result.pop();
+              if (date == today) {
+                redis.hmset("Info:Prev", {
+                  Visitors: result?.Visitors ?? 0,
+                  Views: result?.Views ?? 0,
+                });
+              }
 
-            // TODO: Not sure about expiring the variable
-            // redis.expire("Info:World", 2 * 60 * 60);
-            redis.set("Info:World", JSON.stringify(result));
-            return resolve(result);
-          })
-          .catch((err) => reject(err));
-      });
-    }),
-  ])
-    .then((results) => {
-      const now = results[0] as DayStat;
-      const prev = results[1] as DayStat;
-      const map = Object.entries(
-        results[2] as { [country: string]: number }
-      ).reduce((acc, [key, value]) => {
-        acc.push({ country: key, value } as Country);
-        return acc;
-      }, [] as Country[]);
+              return resolve({
+                Visitors: result?.Visitors ?? 0,
+                Views: result?.Views ?? 0,
+              });
+            })
+            .catch((err) => reject(err));
+        });
+      }),
+      new Promise((resolve, reject) => {
+        redis.get("Info:World", (err, reply) => {
+          if (!err && reply) return resolve(JSON.parse(reply));
 
-      return res.status(200).json({
-        stat: "OK",
-        info: {
-          users: {
-            value: now.Visitors,
-            gain: (now.Visitors - prev.Visitors) / 100,
-          },
-          views: { value: now.Views, gain: (now.Views - prev.Views) / 100 },
-          countries: map.length,
+          // NOTE: This will run only in the case where none of users were identified
+          fetch(`${apiUrl}/world?page=-1`)
+            .then((res) => res.json())
+            .then((res: ApiRes<WorldData>) => {
+              if (!res.items || res.status == "ERR")
+                return reject("Idk something wrong happened at then backend");
+
+              // Need this just to decrease space usage in RAM
+              let result = {} as { [country: string]: number };
+              res.result.forEach(
+                (item) => (result[item.Country] = item.Visitors)
+              );
+
+              // TODO: Not sure about expiring the variable
+              // redis.expire("Info:World", 2 * 60 * 60);
+              redis.set("Info:World", JSON.stringify(result));
+              return resolve(result);
+            })
+            .catch((err) => reject(err));
+        });
+      }),
+    ]);
+    // .then((results) => {
+    const now = results[0] as DayStat;
+    const prev = results[1] as DayStat;
+    const map = Object.entries(
+      results[2] as { [country: string]: number }
+    ).reduce((acc, [key, value]) => {
+      acc.push({ country: key, value } as Country);
+      return acc;
+    }, [] as Country[]);
+
+    return res.status(200).json({
+      stat: "OK",
+      info: {
+        users: {
+          value: now.Visitors,
+          gain: (now.Visitors - prev.Visitors) / 100,
         },
-        map,
-      });
-    })
-    .catch((err) => {
-      res.status(200).json({
-        status: "ERR",
-        message: err,
-      });
-
-      sendLogs({
-        stat: "ERR",
-        name: "WEB",
-        file: "/api/info/statistic.ts",
-        message: "Couldn't reach statistic data",
-        desc: err,
-      });
+        views: { value: now.Views, gain: (now.Views - prev.Views) / 100 },
+        countries: map.length,
+      },
+      map,
     });
+  } catch (err) {
+    res.status(200).json({
+      status: "ERR",
+      message: err as string,
+    });
+
+    sendLogs({
+      stat: "ERR",
+      name: "WEB",
+      file: "/api/info/statistic.ts",
+      message: "Couldn't reach statistic data",
+      desc: err,
+    });
+  }
 }
