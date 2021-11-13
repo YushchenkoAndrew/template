@@ -9,7 +9,7 @@ export interface NavBarProps {
 export default function NavContainer(props: NavBarProps) {
   return (
     <>
-      <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+      <Navbar.Toggle className="mb-3" aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse
         className={props.className ?? ""}
         id="responsive-navbar-nav"
