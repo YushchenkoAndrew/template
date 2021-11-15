@@ -4,7 +4,7 @@ import { Event } from "../../pages/admin/projects/operation";
 export interface InputValueProps {
   name: string;
   value: string;
-  type?: string;
+  type?: React.HTMLInputTypeAttribute;
   required?: boolean;
   placeholder?: string;
   className?: string;

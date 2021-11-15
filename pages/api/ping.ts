@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import redis from "../../config/redis";
 import { DefaultRes } from "../../types/request";
 
 export default function handler(

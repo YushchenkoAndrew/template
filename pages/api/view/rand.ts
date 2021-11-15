@@ -12,6 +12,5 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   redis.set(`RAND:${hash}`, "OK");
   redis.expire(`RAND:${hash}`, 5);
 
-  console.log();
   res.setHeader("X-Custom-Header", now).status(204).send("");
 }
