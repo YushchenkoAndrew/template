@@ -68,5 +68,9 @@ module.exports = {
 
     RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,
     RECAPTCHA_INVISIBLE_SECRET_KEY: process.env.RECAPTCHA_INVISIBLE_SECRET_KEY,
+
+    EMAIL_TO: process.env.EMAIL_TO,
+    EMAIL_FROM: process.env.EMAIL_FROM,
+    EMAIL_PASS: process.env.EMAIL_PASS,
   },
 };
