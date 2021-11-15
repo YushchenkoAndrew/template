@@ -39,7 +39,9 @@ module.exports = {
   publicRuntimeConfig: {
     VOID_URL: process.env.VOID_URL,
     BASE_PATH: process.env.BASE_PATH || "/projects",
+
     RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY,
+    RECAPTCHA_INVISIBLE_SITE_KEY: process.env.RECAPTCHA_INVISIBLE_SITE_KEY,
   },
 
   serverRuntimeConfig: {
@@ -64,7 +66,7 @@ module.exports = {
 
     VOID_AUTH: process.env.VOID_AUTH,
 
-    RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY,
     RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,
+    RECAPTCHA_INVISIBLE_SECRET_KEY: process.env.RECAPTCHA_INVISIBLE_SECRET_KEY,
   },
 };
