@@ -11,6 +11,7 @@ import TreeView from "../../TreeView/TreeView";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs";
 import "prismjs/components/prism-markup";
+import "prismjs/components/prism-markdown";
 import "prismjs/components/prism-css";
 import "prismjs/themes/prism-coy.css";
 
@@ -76,7 +77,11 @@ export default function DefaultFileStructure(props: DefaultFileStructureProps) {
             className="form-control"
             value={props.code}
             onValueChange={props.onCodeChange}
-            highlight={(code) => highlight(code, languages.html, "html")}
+            highlight={(code) =>
+              props.formData.flag == "JS"
+                ? highlight(code, languages.html, "html")
+                : highlight(code, languages.markdown, "markdown")
+            }
             tabSize={2}
             padding={10}
             style={{

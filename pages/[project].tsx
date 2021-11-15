@@ -9,10 +9,12 @@ import { LinkData, ProjectData } from "../types/api";
 import { voidUrl } from "../config";
 import { parse } from "node-html-parser";
 import { HtmlMarkers } from "../config/placeholder";
-
+import { FlagType } from "../types/flag";
+import { marked } from "marked";
 export interface ProjectPageProps {
   project: string;
   title: string;
+  flag: FlagType;
   note: string;
   template: string;
   links: {
@@ -22,11 +24,74 @@ export interface ProjectPageProps {
 }
 
 export default function ProjectPage(props: ProjectPageProps) {
-  const doc = parse(
-    props.template
-      .replace(new RegExp(HtmlMarkers.FILE_SERVER, "g"), voidUrl)
-      .replace(new RegExp(HtmlMarkers.PROJECT_NAME, "g"), props.project)
-  );
+  if (props.flag == "JS") {
+    const doc = parse(
+      props.template
+        .replace(new RegExp(HtmlMarkers.FILE_SERVER, "g"), voidUrl)
+        .replace(new RegExp(HtmlMarkers.PROJECT_NAME, "g"), props.project)
+    );
+    return (
+      <>
+        <DefaultHead>
+          <title>{props.title}</title>
+        </DefaultHead>
+
+        <DefaultHeader name={props.title} projects />
+
+        <div
+          id={HtmlMarkers.CSS}
+          dangerouslySetInnerHTML={{
+            __html:
+              doc.querySelector("#" + HtmlMarkers.CSS)?.childNodes?.join("") ??
+              "",
+          }}
+        ></div>
+        <div
+          id={HtmlMarkers.JS}
+          dangerouslySetInnerHTML={{
+            __html:
+              doc.querySelector("#" + HtmlMarkers.JS)?.childNodes?.join("") ??
+              "",
+          }}
+        ></div>
+
+        <main role="main">
+          <div
+            className="jumbotron mx-auto bg-white"
+            id="CanvasContainer0"
+            dangerouslySetInnerHTML={{
+              __html:
+                doc
+                  .querySelector("#" + HtmlMarkers.BODY)
+                  ?.childNodes?.join("") ?? "",
+            }}
+          ></div>
+        </main>
+
+        <div
+          id={HtmlMarkers.FOOTER}
+          dangerouslySetInnerHTML={{
+            __html:
+              doc
+                .querySelector("#" + HtmlMarkers.FOOTER)
+                ?.childNodes?.join("") ?? "",
+          }}
+        ></div>
+
+        <DefaultFooter name={props.title}>
+          <DefaultProjectInfo
+            href={`http://${props.links.main}`}
+            links={props.links.other.map(({ Link, Name }) => ({
+              name: Name,
+              link: `http://${Link}`,
+            }))}
+            description={props.note}
+          />
+        </DefaultFooter>
+      </>
+    );
+  }
+
   return (
     <>
       <DefaultHead>
@@ -34,43 +99,15 @@ export default function ProjectPage(props: ProjectPageProps) {
       </DefaultHead>
 
       <DefaultHeader name={props.title} projects />
-
-      <div
-        id={HtmlMarkers.CSS}
-        dangerouslySetInnerHTML={{
-          __html:
-            doc.querySelector("#" + HtmlMarkers.CSS)?.childNodes?.join("") ??
-            "",
-        }}
-      ></div>
-      <div
-        id={HtmlMarkers.JS}
-        dangerouslySetInnerHTML={{
-          __html:
-            doc.querySelector("#" + HtmlMarkers.JS)?.childNodes?.join("") ?? "",
-        }}
-      ></div>
-
       <main role="main">
         <div
           className="jumbotron mx-auto bg-white"
           id="CanvasContainer0"
           dangerouslySetInnerHTML={{
-            __html:
-              doc.querySelector("#" + HtmlMarkers.BODY)?.childNodes?.join("") ??
-              "",
+            __html: marked.parse(props.template),
           }}
         ></div>
       </main>
-
-      <div
-        id={HtmlMarkers.FOOTER}
-        dangerouslySetInnerHTML={{
-          __html:
-            doc.querySelector("#" + HtmlMarkers.FOOTER)?.childNodes?.join("") ??
-            "",
-        }}
-      ></div>
 
       <DefaultFooter name={props.title}>
         <DefaultProjectInfo
@@ -111,6 +148,7 @@ export const getServerSideProps = async (
       project: name,
       title: project.Title,
       note: project.Note,
+      flag: project.Flag,
       template: template,
       links: links,
     } as ProjectPageProps,

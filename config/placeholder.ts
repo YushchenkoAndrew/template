@@ -5,7 +5,7 @@ import { TreeObj } from "../types/tree";
 export const ProjectInfo = {
   name: "CodeRain",
   title: "Code Rain",
-  flag: "js",
+  flag: "JS",
   img: {
     name: "CodeRain.webp",
     type: "webp",
@@ -19,7 +19,7 @@ export const ProjectInfo = {
 
 export const formPlaceholder = {
   name: "",
-  flag: "js",
+  flag: "JS",
   title: "",
   desc: "",
   note: "",
@@ -51,7 +51,7 @@ export const HtmlMarkers = {
   PROJECT_NAME: "{{PROJECT_NAME}}",
 };
 
-export const codeTemplate = `<!DOCTYPE html>
+export const codeHtmlTemplate = `<!DOCTYPE html>
 <html>
   <body>
     <div id="${HtmlMarkers.CSS}">
@@ -68,3 +68,12 @@ export const codeTemplate = `<!DOCTYPE html>
     </div>
   </body>
 </html>`;
+
+export const codeMarkdownTemplate = `
+# Project name
+
+Article text...
+
+## Used material
+* [Main Page](https://mortis-grimreaper.ddns.net/projects)
+`;

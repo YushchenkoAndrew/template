@@ -82,7 +82,7 @@ export default function DefaultThumbnailPreview(
           <InputTemplate label="Flag">
             <InputRadio
               name="flag"
-              options={["js", "c++", "link"]}
+              options={["JS", "Markdown", "Link"]}
               label="btn-outline-secondary"
               onChange={props.onChange}
             />

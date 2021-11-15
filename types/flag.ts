@@ -1,7 +1,7 @@
-export type FlagType = "js" | "c++" | "link";
+export type FlagType = "JS" | "Markdown" | "Link";
 
 export const flagColors = {
-  js: "bg-warning",
-  link: "bg-info",
-  "c++": "bg-danger",
+  JS: "bg-warning",
+  Link: "bg-info",
+  Markdown: "bg-danger",
 };

@@ -19,7 +19,8 @@ import { withIronSession } from "next-iron-session";
 import { NextSessionArgs } from "../../../types/session";
 import sessionConfig from "../../../config/session";
 import {
-  codeTemplate,
+  codeHtmlTemplate,
+  codeMarkdownTemplate,
   formPlaceholder,
   treePlaceholder,
 } from "../../../config/placeholder";
@@ -86,7 +87,7 @@ export interface ProjectOperationProps {
 
 export default function ProjectOperation(props: ProjectOperationProps) {
   const router = useRouter();
-  const [code, setCode] = useState(codeTemplate);
+  const [code, setCode] = useState(codeHtmlTemplate);
   const refForm = useRef<HTMLFormElement | null>(null);
   const [validated, setValidated] = useState(false);
   const [formData, onFormChange] = useState(props.formData);
@@ -107,6 +108,12 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           : value
         : undefined,
     });
+
+    if (name === "flag") {
+      return value === "JS"
+        ? setCode(codeHtmlTemplate)
+        : setCode(codeMarkdownTemplate);
+    }
 
     if (!(value as ProjectFile).name) return;
     onFileAdd(
@@ -190,14 +197,16 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     //  Test if file
     const templateFile = new File(
-      [new Blob([code], { type: "text/html" })],
-      "index.html",
+      [
+        new Blob([code], {
+          type: formData.flag === "JS" ? "text/html" : "text/markdown",
+        }),
+      ],
+      formData.flag === "JS" ? "index.html" : "index.md",
       {
-        type: "text/html",
+        type: formData.flag === "JS" ? "text/html" : "text/markdown",
       }
     );
-
-    console.log(templateFile);
 
     let reader = new FileReader();
     reader.readAsText(templateFile);
@@ -231,6 +240,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           return resHandler(data);
         }
 
+        // TODO: Add Markdown file
         // TODO: To add Template file !!!
         (
           (treeStructure.template as TreeObj)["index.html"] as ProjectFile
