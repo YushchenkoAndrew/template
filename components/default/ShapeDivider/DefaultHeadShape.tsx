@@ -1,8 +1,8 @@
-import styles from "./DefaultShapeDivider.module.css";
+import styles from "./DefaultHeadShape.module.css";
 
-export interface DefaultShapeDividerProps {}
+export interface DefaultHeadShapeProps {}
 
-export default function DefaultShapeDivider(props: DefaultShapeDividerProps) {
+export default function DefaultHeadShape(props: DefaultHeadShapeProps) {
   return (
     <div className={styles["shape-divider"]}>
       <svg
