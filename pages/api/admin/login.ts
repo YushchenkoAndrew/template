@@ -7,6 +7,7 @@ import md5 from "../../../lib/md5";
 import { LoginRequest } from "../../../types/admin";
 import { DefaultRes, FullResponse } from "../../../types/request";
 import getConfig from "next/config";
+import { checkCaptcha } from "../../../lib/captcha";
 
 const { serverRuntimeConfig } = getConfig();
 function checkUserInfo(id: string, salt: string, user: string, pass: string) {
@@ -69,63 +70,6 @@ function checkUserInfo(id: string, salt: string, user: string, pass: string) {
   });
 }
 
-function checkCaptcha(id: string, captcha: string) {
-  return new Promise<FullResponse>((resolve, reject) => {
-    redis.get(id, (err, reply) => {
-      if (err) {
-        return resolve({
-          status: 403,
-          send: {
-            status: "ERR",
-            message: "Man, who the heck are you ?",
-          },
-        });
-      }
-
-      fetch(
-        `https://www.google.com/recaptcha/api/siteverify?secret=${serverRuntimeConfig.RECAPTCHA_SECRET_KEY}&response=${captcha}`,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-          },
-          method: "POST",
-        }
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-
-          resolve({
-            status: 200,
-            send: {
-              status: data.success ? "OK" : "ERR",
-              message: data.success ? "Success!!" : "You are a ROBOT !!!",
-            },
-          });
-
-          if (!data.success) {
-            sendLogs({
-              stat: "ERR",
-              name: "WEB",
-              file: "/api/admin/captcha.ts",
-              message: "Robot is parsing my site !!!",
-              desc: data,
-            });
-          }
-        })
-        .catch((err) => {
-          resolve({
-            status: 500,
-            send: {
-              status: "ERR",
-              message: "Stooopp breaking stuff MAAANN !!",
-            },
-          });
-        });
-    });
-  });
-}
-
 export default withIronSession(
   async function (
     req: NextApiRequest & { session: Session },
@@ -146,7 +90,11 @@ export default withIronSession(
 
     const { status, send } = await new Promise<FullResponse>(
       (resolve, reject) => {
-        checkCaptcha(id, captcha).then((res) => {
+        checkCaptcha(
+          id,
+          captcha,
+          serverRuntimeConfig.RECAPTCHA_SECRET_KEY
+        ).then((res) => {
           if (res.send.status !== "OK") resolve(res);
           checkUserInfo(id, salt, user, pass).then((res) => resolve(res));
         });
