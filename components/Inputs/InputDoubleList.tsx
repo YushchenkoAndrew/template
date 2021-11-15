@@ -36,6 +36,7 @@ export default function InputList(props: InputValueProps) {
           <span className="input-group-text">{props.char[0]}</span>
         </div>
         <InputValue
+          className="rounded-right"
           name={props.name[0]}
           value={data[props.name[0]]}
           type={props.type?.[0]}
@@ -49,6 +50,7 @@ export default function InputList(props: InputValueProps) {
           <span className="input-group-text">{props.char[1]}</span>
         </div>
         <InputValue
+          className="rounded-right"
           name={props.name[1]}
           value={data[props.name[1]]}
           type={props.type?.[1]}

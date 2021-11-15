@@ -49,6 +49,7 @@ export default function DefaultThumbnailPreview(
             <InputValue
               name="title"
               required
+              className="rounded"
               value={props.formData.title}
               placeholder={ProjectInfo.title}
               onChange={props.onChange}

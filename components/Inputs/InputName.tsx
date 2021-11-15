@@ -21,6 +21,7 @@ export default function InputName(props: InputNameProps) {
         <span className="input-group-text">{props.char}</span>
       </div>
       <InputValue
+        className="rounded-right"
         name={props.name}
         value={props.value}
         type={props.type}

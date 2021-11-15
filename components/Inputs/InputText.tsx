@@ -18,7 +18,7 @@ export default function InputText(props: InputTextProps) {
       <textarea
         name={props.name}
         value={props.value}
-        className="form-control"
+        className="form-control rounded"
         placeholder={props.placeholder ?? ""}
         rows={props.rows ?? 3}
         required={props.required}

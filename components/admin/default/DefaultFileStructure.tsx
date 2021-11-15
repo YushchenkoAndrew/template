@@ -52,6 +52,7 @@ export default function DefaultFileStructure(props: DefaultFileStructureProps) {
           <InputTemplate label="Directory">
             <InputValue
               name="dir"
+              className="rounded"
               value={props.fileInfo.dir ?? ""}
               placeholder="/lua/"
               onChange={props.onChange}

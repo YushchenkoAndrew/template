@@ -7,6 +7,7 @@ export interface InputValueProps {
   type?: string;
   required?: boolean;
   placeholder?: string;
+  className?: string;
   onChange: (event: Event) => void;
   onBlur?: (event: Event) => void;
 }
@@ -18,7 +19,7 @@ export default function InputValue(props: InputValueProps) {
         name={props.name}
         value={props.value}
         type={props.type ?? "text"}
-        className="form-control"
+        className={`form-control ${props.className}`}
         placeholder={props.placeholder ?? ""}
         required={props.required}
         onChange={props.onChange}
