@@ -2,3 +2,31 @@
   font-family: "3Dventure";
   font-size: 3rem;
 }
+
+#pattern6 {
+  background-repeat: no-repeat;
+
+  background-size: 100% 100% !important;
+  /* background-position-x: 50% !important; */
+}
+
+@media (min-width: 576px) {
+  #pattern6 {
+    background-size: 80% 100% !important;
+    background-position-x: 50% !important;
+  }
+}
+
+@media (min-width: 768px) {
+  #pattern6 {
+    background-size: 60% 100% !important;
+    background-position-x: 50% !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  #pattern6 {
+    background-size: 40% 100% !important;
+    background-position-x: 50% !important;
+  }
+}

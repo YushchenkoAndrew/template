@@ -143,7 +143,7 @@ export default function ProjectsListPage(props: ProjectsListPageProps) {
         </div>
       </main>
 
-      <DefaultFooter name="Menu">
+      <DefaultFooter name="Menu" background>
         <ul className="list-unstyled">
           <DefaultNav style="text-muted" />
         </ul>
