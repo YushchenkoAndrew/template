@@ -6,6 +6,7 @@ import InputValue from "./Inputs/InputValue";
 import getConfig from "next/config";
 import { Event } from "../pages/admin/projects/operation";
 import { basePath } from "../config";
+import styles from "./ContactMe.module.css";
 import { DefaultRes } from "../types/request";
 const { publicRuntimeConfig } = getConfig();
 
@@ -70,13 +71,16 @@ export default function ContactMe(props: ContactMeProps) {
 
   return (
     <div className="bg-dark container-fluid d-flex justify-content-center py-5">
-      <div className="col-12 col-sm-11 col-md-10 col-lg-6">
-        <h1
-          className="text-center text-light font-weight-bold mb-5"
+      <div
+        className="col-12 col-sm-11 col-md-10 col-lg-6"
+        style={{ maxHeight: "800px" }}
+      >
+        <p
+          className={`text-center text-light font-weight-bold mb-5 ${styles["text"]}`}
           style={{ fontSize: "3.5rem", letterSpacing: ".2rem" }}
         >
           CONTACT ME
-        </h1>
+        </p>
 
         <form className="pt-3" onSubmit={onSubmit}>
           <InputTemplate label="Email" labelClassName="text-light">
