@@ -60,7 +60,7 @@ export default function Home() {
             <h4 className="font-weight-bold mb-3">So Hello there</h4>
 
             <p className={`text-justify ${styles["text"]}`}>
-              I'm Andrew Yushchenko and this is mine small portfolio, where I
+              I&apos;m Andrew Yushchenko and this is mine small portfolio, where I
               upload some of my work which I want to share with the rest of
               world. Currently you could find here visual implementation of
               algorithms and some other random stuff that I was interested back
@@ -69,8 +69,8 @@ export default function Home() {
               there. Plus I currently interesting in Web Design and Frontend
               magic. I think that, when you have a variety of skills by
               combining them together you could achieve quite unique and
-              fascinating result. So I guess this is mine goal which I'm trying
-              to achieve. I knew that I won't be skilled in one specific field
+              fascinating result. So I guess this is mine goal which I&apos;m trying
+              to achieve. I knew that I won&apos;t be skilled in one specific field
               then others but at least I be able to do an interesting work by
               myself.
             </p>

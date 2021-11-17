@@ -1,7 +1,6 @@
 import React from "react";
 import styles from "./Footer.module.css";
 import DefaultLinks from "./DefaultLinks";
-import DefaultPattern6 from "./Patterns/DefaultPattern6";
 
 export interface DefaultFooterProps {
   className?: string;
