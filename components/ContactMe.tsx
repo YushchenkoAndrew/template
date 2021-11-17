@@ -111,7 +111,7 @@ export default function ContactMe(props: ContactMeProps) {
           <ReCAPTCHA
             ref={reCaptchaRef}
             size="invisible"
-            sitekey={publicRuntimeConfig.RECAPTCHA_INVISIBLE_SITE_KEY}
+            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_INVISIBLE_SITE_KEY ?? ""}
           />
 
           <small className="text-warning" hidden={!errMessage}>

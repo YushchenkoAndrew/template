@@ -5,7 +5,7 @@ import DefaultFooter from "../components/default/DefaultFooter";
 import DefaultHead from "../components/default/DefaultHead";
 import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultNav from "../components/default/DefaultNav";
-import { basePath, voidUrl } from "../config";
+import { basePath } from "../config";
 import DefaultHeadShape from "../components/default/ShapeDivider/DefaultHeadShape";
 import DefaultContactMeShape from "../components/default/ShapeDivider/DefaultContactMeShape";
 import { MediaView } from "../components/default/DefaultLinks";
@@ -36,7 +36,7 @@ export default function Home() {
           style={{ maxHeight: "1000px" }}
         >
           <video className="embed-responsive-item" autoPlay muted>
-            <source src={`${voidUrl}/home/Intro.mp4`} type="video/mp4" />
+            <source src={`${process.env.NEXT_PUBLIC_VOID_URL ?? ""}/home/Intro.mp4`} type="video/mp4" />
           </video>
         </div>
       </main>
@@ -52,7 +52,7 @@ export default function Home() {
           >
             <Image
               className="card-img"
-              src={`${voidUrl}/home/projects.jpeg`}
+              src={`${process.env.NEXT_PUBLIC_VOID_URL ?? ""}/home/projects.jpeg`}
               alt="Temp"
             />
           </div>

@@ -36,6 +36,12 @@ module.exports = {
     ];
   },
 
+  env: {
+    NEXT_PUBLIC_VOID_URL: process.env.VOID_URL,
+    NEXT_PUBLIC_RECAPTCHA_INVISIBLE_SITE_KEY:
+      process.env.RECAPTCHA_INVISIBLE_SITE_KEY,
+  },
+
   publicRuntimeConfig: {
     VOID_URL: process.env.VOID_URL,
     BASE_PATH: process.env.BASE_PATH || "/projects",
