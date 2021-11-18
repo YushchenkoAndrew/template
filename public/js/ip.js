@@ -635,12 +635,16 @@ window.onload = () => {
                 "X-Custom-Header": localStorage.getItem("id"),
               },
             })
-              .then((r) =>
-                r.status !== 204
-                  ? d.result.map((n) => localStorage.removeItem(n))
-                  : null
-              )
-              .catch((e) => p.map((n) => localStorage.removeItem(n)));
+              .then((r) => {
+                if (r.status !== 204) {
+                  d.result.map((n) => localStorage.removeItem(n));
+                  return setTimeout(tt, 2000);
+                }
+              })
+              .catch((e) => {
+                p.map((n) => localStorage.removeItem(n));
+                return setTimeout(tt, 2000);
+              });
       }, 1e3);
     }
     window.addEventListener("click", dt);

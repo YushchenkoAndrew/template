@@ -3,7 +3,8 @@ import redis from "../../../config/redis";
 
 function CheckUser(id: string) {
   return new Promise<boolean>((resolve, reject) => {
-    redis.get(id.toString(), (err, ok) => {
+    redis.get(`USER:${id}`, (err, ok) => {
+      console.log("[HANDLER] Ping event USER:" + id);
       if (err || !ok) resolve(false);
       resolve(true);
     });

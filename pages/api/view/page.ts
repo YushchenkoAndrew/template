@@ -9,8 +9,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   // Run in background
   setTimeout(() => {
-    let id = req.query["id"] as string;
-    redis.get(id, (err, reply) => {
+    const id = req.query["id"] as string;
+    redis.get(`USER:${id}`, (err, reply) => {
+      console.log("[HANDLER] Page event USER:" + id);
       if (err) {
         return sendLogs({
           stat: "ERR",

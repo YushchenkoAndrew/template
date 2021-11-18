@@ -104,7 +104,10 @@ export default withIronSession(
     if (send.status === "OK") {
       const sessionID = md5(Math.random().toString() + id);
       redis.set(`SESSION:${sessionID}`, id);
-      redis.expire(id, Number(serverRuntimeConfig.SESSION_TTL ?? 3600));
+      redis.expire(
+        `SESSION:${sessionID}`,
+        Number(serverRuntimeConfig.SESSION_TTL ?? 3600)
+      );
 
       req.session.set("user", sessionID);
 

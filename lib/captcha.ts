@@ -4,7 +4,7 @@ import { sendLogs } from "./bot";
 
 export function checkCaptcha(id: string, captcha: string, secrete: string) {
   return new Promise<FullResponse>((resolve, reject) => {
-    redis.get(id, (err, reply) => {
+    redis.get(`USER:${id}`, (err, reply) => {
       if (err) {
         return resolve({
           status: 403,
