@@ -1,76 +1,57 @@
 import redis from "../config/redis";
+import { sendLogs } from "./bot";
 
 // Init simple Mutex for Docker with Redis
+let nTries = 0;
+export function busyMutex() {
+  console.log("[MUTEX] Busy");
+  return new Promise<boolean>((resolve, reject) => {
+    redis.set("Mutex:Free", "0", (err, stat) => resolve(stat === "OK"));
+  });
+}
 
-function finalGet(key: string) {
-  return new Promise<string>((resolve, reject) => {
-    redis.get(key, (err, reply) => {
-      if (!reply || err) reject(err);
-      resolve(reply ?? "");
+export function waitMutex() {
+  return new Promise<boolean>((resolve, reject) => {
+    redis.get("Mutex:Free", (err, reply) => {
+      let stat: number;
+      if (
+        err ||
+        reply === null ||
+        isNaN((stat = Number(reply))) ||
+        stat === 1
+      ) {
+        return busyMutex().then((res) => {
+          nTries = 0;
+          resolve(res);
+          if (res) return;
+
+          sendLogs({
+            stat: "ERR",
+            name: "WEB",
+            file: "/api/mutext.ts",
+            message: "There some problem with cache",
+          });
+        });
+      }
+
+      // If process waiting for mutex too long then unfreeze it and just
+      // keep going, despite it state
+      if (nTries++ > Number(process.env.MUTEX_INAFF ?? 10)) {
+        nTries = 0;
+        resolve(true);
+      }
+
+      // If mutex is busy then wait when it will be free
+      console.log("[MUTEX] Wait");
+      setTimeout(
+        () => waitMutex().then((res) => resolve(res)),
+        Number(process.env.MUTEX_WAIT ?? 10)
+      );
     });
   });
 }
 
-export function getValue(key: string, handler?: Promise<string>) {
-  return new Promise<string>((resolve, reject) => {
-    redis.get("Mutex", (err, reply) => {
-      if (!reply || err) {
-        redis.set("Mutex", "0");
-        (handler ?? finalGet(key))
-          .then((res) => resolve(res))
-          .catch((err) => reject(err))
-          .finally(() => redis.incr("Mutex"));
-      } else if (Number(reply) % 2 == 0) {
-        setTimeout(function Wait() {
-          redis.get("Mutex", (err, reply) => {
-            if (!reply || err) reject(err);
-            if (Number(reply) % 2 != 0) {
-              // Mark that data in use
-              redis.incr("Mutex");
-              (handler ?? finalGet(key))
-                .then((res) => resolve(res))
-                .catch((err) => reject(err))
-                .finally(() => redis.incr("Mutex"));
-            } else setTimeout(Wait, Number(process.env.MUTEX_WAIT ?? 10));
-          });
-        }, Number(process.env.MUTEX_WAIT ?? 10));
-      } else {
-        redis.incr("Mutex");
-        (handler ?? finalGet(key))
-          .then((res) => resolve(res))
-          .catch((err) => reject(err))
-          .finally(() => redis.incr("Mutex"));
-      }
-    });
-  });
-}
-
-export function setValue(key: string, value: string) {
-  return new Promise((resolve, reject) => {
-    redis.get("Mutex", (err, reply) => {
-      if (!reply || err) {
-        redis.set("Mutex", "0");
-        redis.set(key, value);
-        redis.incr("Mutex");
-        resolve("");
-      } else if (Number(reply) % 2 == 0) {
-        setTimeout(function Wait() {
-          redis.get("Mutex", (err, reply) => {
-            if (!reply || err) reject(err);
-            if (Number(reply) % 2 != 0) {
-              // Mark that data in use
-              redis.incr("Mutex");
-              redis.set(key, value);
-              redis.incr("Mutex");
-              resolve("");
-            } else setTimeout(Wait, Number(process.env.MUTEX_WAIT ?? 10));
-          });
-        }, Number(process.env.MUTEX_WAIT ?? 10));
-      } else {
-        redis.incr("Mutex");
-        redis.set(key, value);
-        redis.incr("Mutex");
-      }
-    });
-  });
+export function freeMutex() {
+  console.log("[MUTEX] Free");
+  redis.set("Mutex:Free", "1");
 }

@@ -21,7 +21,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(401).send("");
   }
 
-  redis.del("Mutex");
   redis.del("Info:Now");
   redis.del("Info:Prev");
   redis.del("Info:Stat");

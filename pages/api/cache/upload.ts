@@ -3,7 +3,7 @@ import redis from "../../../config/redis";
 import { apiUrl } from "../../../config";
 import { formatDate } from "../../info";
 import { ApiAuth, PassValidate } from "../../../lib/auth";
-import { getValue } from "../../../lib/mutex";
+import { freeMutex, waitMutex } from "../../../lib/mutex";
 import { sendLogs } from "../../../lib/bot";
 import getConfig from "next/config";
 
@@ -69,10 +69,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       });
 
       // Update World Table
-      getValue("Info:World")
-        .then((str: string) => {
-          const data = JSON.parse(str);
+      waitMutex().then(() => {
+        redis.get("Info:World", (err, reply) => {
+          freeMutex();
+          if (err || !reply) return;
 
+          const data = JSON.parse(reply);
           if (Object.keys(data).length == 0) return;
           fetch(`${apiUrl}/world/list`, {
             method: "POST",
@@ -98,16 +100,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
                 desc: err,
               })
             );
-        })
-        .catch((err) =>
-          sendLogs({
-            stat: "ERR",
-            name: "WEB",
-            file: "/api/cache/upload.ts",
-            message: "Something went wrong with Cache",
-            desc: err,
-          })
-        );
+        });
+      });
     })
     .catch((err) =>
       sendLogs({

@@ -6,6 +6,7 @@ import { AnalyticsData, DefaultRes } from "../../../types/request";
 import { apiUrl } from "../../../config";
 import { Analytics } from "../../../types/info";
 import { sendLogs } from "../../../lib/bot";
+import { freeMutex, waitMutex } from "../../../lib/mutex";
 
 type QueryParams = { date: string };
 
@@ -41,72 +42,94 @@ export default async function handler(
     const now = formatDate(new Date());
     const results = await Promise.all([
       new Promise((resolve, reject) => {
-        redis.get("Info:Stat", (err, reply) => {
-          if (!err && reply) return resolve(JSON.parse(reply));
+        waitMutex().then(() => {
+          redis.get("Info:Stat", (err, reply) => {
+            freeMutex();
+            if (!err && reply) return resolve(JSON.parse(reply));
 
-          fetch(`${apiUrl}/info/sum`)
-            .then((res) => res.json())
-            .then((res: ApiRes<InfoData>) => {
-              if (res.status == "ERR")
-                return reject("Idk something wrong happened at the backend");
+            fetch(`${apiUrl}/info/sum`)
+              .then((res) => res.json())
+              .then((res: ApiRes<InfoData>) => {
+                if (res.status == "ERR")
+                  return reject("Idk something wrong happened at the backend");
 
-              const result = res.result.pop();
-              if (!res.items || !result)
-                return reject("Idk something wrong happened at the backend");
+                const result = res.result.pop();
+                if (!res.items || !result)
+                  return reject("Idk something wrong happened at the backend");
 
-              const stat = {
-                ctr: result.Views ? result.Clicks / result.Views : 1,
-                cr_media: result.Visitors ? result.Media / result.Visitors : 1,
-                cr_projects: result.Visitors
-                  ? result.Clicks / result.Visitors
-                  : 1,
-              };
+                const stat = {
+                  ctr: result.Views ? result.Clicks / result.Views : 1,
+                  cr_media: result.Visitors
+                    ? result.Media / result.Visitors
+                    : 1,
+                  cr_projects: result.Visitors
+                    ? result.Clicks / result.Visitors
+                    : 1,
+                };
 
-              redis.set("Info:Stat", JSON.stringify(stat));
-              redis.expire("Info:Stat", 2 * 60 * 60);
-              return resolve(stat);
-            })
-            .catch((err) => reject(err));
+                waitMutex().then(() => {
+                  redis.set("Info:Stat", JSON.stringify(stat), (err, ok) => {
+                    if (ok === "OK") redis.expire("Info:Stat", 2 * 60 * 60);
+                    freeMutex();
+                  });
+                });
+                return resolve(stat);
+              })
+              .catch((err) => reject(err));
+          });
         });
       }),
+
       new Promise((resolve, reject) => {
-        redis.get("Info:Days", (err, reply) => {
-          if (!err && reply && now == date) return resolve(JSON.parse(reply));
+        waitMutex().then(() => {
+          redis.get("Info:Days", (err, reply) => {
+            freeMutex();
+            if (!err && reply && now == date) return resolve(JSON.parse(reply));
 
-          let prev = new Date(date);
-          prev.setDate(prev.getDate() - 7);
+            let prev = new Date(date);
+            prev.setDate(prev.getDate() - 7);
 
-          fetch(
-            `${apiUrl}/info/range?end=${date}&start=${formatDate(
-              prev
-            )}&orderBy=CreatedAt`
-          )
-            .then((res) => res.json())
-            .then((res: ApiRes<InfoData>) => {
-              if (!res.items || res.status == "ERR")
-                return reject("Idk something wrong happened at the backend");
+            fetch(
+              `${apiUrl}/info/range?end=${date}&start=${formatDate(
+                prev
+              )}&orderBy=CreatedAt`
+            )
+              .then((res) => res.json())
+              .then((res: ApiRes<InfoData>) => {
+                if (!res.items || res.status == "ERR")
+                  return reject("Idk something wrong happened at the backend");
 
-              // Need this just to decrease space usage in RAM
-              let result = {} as { [time: string]: number };
-              res.result.forEach(
-                (item) => (result[item.CreatedAt.split("T")[0]] = item.Visitors)
-              );
+                // Need this just to decrease space usage in RAM
+                let result = {} as { [time: string]: number };
+                res.result.forEach(
+                  (item) =>
+                    (result[item.CreatedAt.split("T")[0]] = item.Visitors)
+                );
 
-              redis.set("Info:Days", JSON.stringify(result));
-              if (
-                new Date(prev) > new Date(now) ||
-                new Date(date) < new Date(now)
-              ) {
-                return resolve(result);
-              }
+                waitMutex().then(() => {
+                  redis.set("Info:Days", JSON.stringify(result), () => {
+                    freeMutex();
+                  });
+                });
 
-              // Add now values from another place in Cache
-              redis.hget("Info:Now", "Visitors", (err, reply) => {
-                if (!err && reply) result[now] = +reply;
-                resolve(result);
-              });
-            })
-            .catch((err) => reject(err));
+                if (
+                  new Date(prev) > new Date(now) ||
+                  new Date(date) < new Date(now)
+                ) {
+                  return resolve(result);
+                }
+
+                // Add now values from another place in Cache
+                waitMutex().then(() => {
+                  redis.hget("Info:Now", "Visitors", (err, reply) => {
+                    freeMutex();
+                    if (!err && reply) result[now] = +reply;
+                    resolve(result);
+                  });
+                });
+              })
+              .catch((err) => reject(err));
+          });
         });
       }),
     ]);

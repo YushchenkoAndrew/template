@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getValue, setValue } from "../../../lib/mutex";
+import { freeMutex, waitMutex } from "../../../lib/mutex";
 import redis from "../../../config/redis";
 import { apiUrl } from "../../../config";
 import { ApiRes, GeoIpLocationData, WorldData } from "../../../types/api";
@@ -47,6 +47,8 @@ export default async function handler(
   const { status, send } = await new Promise<FullResponse>(
     (resolve, reject) => {
       redis.get(`RAND:${hash}`, (err, ok) => {
+        console.log("[HANDLER] Rand is passed !!!");
+
         if (err || !ok) return res.status(400).send("RAND");
         redis.del(`RAND:${hash}`);
 
@@ -88,8 +90,10 @@ export default async function handler(
 
             // Run in background
             setTimeout(() => {
-              redis.set(user.id, user.country);
-              redis.expire(user.id, user.expired);
+              redis.set(`USER:${user.id}`, user.country);
+
+              // FIXME: Can be done with botodachi instead
+              redis.expire(`USER:${user.id}`, user.expired);
               redis.hincrby("Info:Now", "Visitors", 1);
               redis.hincrby("Info:Now", "Views", 1);
 
@@ -97,23 +101,18 @@ export default async function handler(
               redis.lpush("Info:Countries", user.country);
 
               // Use simple mutex handler for changing variables with kubernetes & docker
-              getValue("Info:World", finalValue("Info:World"))
-                .then((str: string) => {
-                  let data = JSON.parse(str);
+              waitMutex().then((stat) => {
+                redis.get("Info:World", (err, reply) => {
+                  let data = reply !== null ? JSON.parse(reply) : {};
                   data[user.country] = data[user.country]
                     ? data[user.country] + 1
                     : 1;
-                  setValue("Info:World", JSON.stringify(data));
-                })
-                .catch((err) =>
-                  sendLogs({
-                    stat: "ERR",
-                    name: "WEB",
-                    file: "/api/view/user.ts",
-                    message: "Ohhh noooo, Cache is broken!!!",
-                    desc: err,
-                  })
-                );
+
+                  redis.set("Info:World", JSON.stringify(data), (err, ok) => {
+                    freeMutex();
+                  });
+                });
+              });
             }, 0);
           })
           .catch((err) => {
