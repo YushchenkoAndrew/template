@@ -55,7 +55,7 @@ export function ApiAuth() {
         }
 
         // If Refresh token expired, then relogin
-        let salt = Math.round(Math.random() * 10000).toString();
+        const salt = md5((Math.random() * 10000 + 500).toString());
         fetch(`${apiUrl}/login`, {
           method: "POST",
           headers: {
@@ -67,9 +67,9 @@ export function ApiAuth() {
               salt +
               "$" +
               md5(
-                (serverRuntimeConfig.API_PEPPER ?? "") +
-                  salt +
-                  (serverRuntimeConfig.API_PASS ?? "")
+                salt +
+                  serverRuntimeConfig.API_PEPPER +
+                  serverRuntimeConfig.API_PASS
               ),
           }),
         })
