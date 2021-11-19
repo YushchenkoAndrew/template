@@ -24,6 +24,7 @@ export default function ProjectLink(props: ProjectLinkProps) {
             className="text-muted"
             icon={faExternalLinkAlt}
             size="1x"
+            fontSize="1rem"
           />
         </a>
       </div>

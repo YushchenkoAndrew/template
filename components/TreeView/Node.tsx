@@ -33,6 +33,7 @@ function Node(props: NodeProps) {
               props.icon === faFolder && props.open ? faFolderOpen : props.icon
             }
             size="lg"
+            fontSize="1rem"
           />
         ) : (
           <span />

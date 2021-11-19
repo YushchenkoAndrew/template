@@ -21,6 +21,7 @@ export default function AddCard(props: AddCardProps) {
               className="text-info mt-4"
               icon={faPlusCircle}
               size="6x"
+              fontSize="2rem"
             />
             <p className={`text-info ${styles["add-title"]}`}>Project</p>
           </div>

@@ -29,7 +29,7 @@ export default function DefaultLinks(props: DefaultLinksProps) {
         target="_blank"
         rel="noreferrer"
       >
-        <FontAwesomeIcon icon={faGithub} size="lg" />
+        <FontAwesomeIcon icon={faGithub} size="lg" fontSize="1rem" />
       </a>
       <a
         className="text-muted mx-2 mx-md-3"
@@ -38,7 +38,7 @@ export default function DefaultLinks(props: DefaultLinksProps) {
         target="_blank"
         rel="noreferrer"
       >
-        <FontAwesomeIcon icon={faTwitter} size="lg" />
+        <FontAwesomeIcon icon={faTwitter} size="lg" fontSize="1rem" />
       </a>
       <a
         className="text-muted mx-2 mx-md-3"
@@ -47,7 +47,7 @@ export default function DefaultLinks(props: DefaultLinksProps) {
         target="_blank"
         rel="noreferrer"
       >
-        <FontAwesomeIcon icon={faLinkedinIn} size="lg" />
+        <FontAwesomeIcon icon={faLinkedinIn} size="lg" fontSize="1rem" />
       </a>
     </>
   );

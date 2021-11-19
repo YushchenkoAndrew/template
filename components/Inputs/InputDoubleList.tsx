@@ -1,6 +1,4 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
-import md5 from "../../lib/md5";
 import { Event } from "../../pages/admin/projects/operation";
 import InputValue from "./InputValue";
 

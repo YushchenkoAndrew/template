@@ -45,7 +45,7 @@ export default function CardStat(props: CardStatProps) {
           </div>
           <div className="ml-auto mt-md-3 mt-lg-0">
             <span className="opacity-7 text-muted">
-              <FontAwesomeIcon icon={props.icon} size="2x" />
+              <FontAwesomeIcon icon={props.icon} size="2x" fontSize="1rem" />
             </span>
           </div>
         </div>

@@ -39,9 +39,7 @@ export default function SignIn(props: SignInProps) {
     const salt = md5(Math.round(Math.random() * 10000).toString());
     fetch(`${basePath}/api/admin/login?id=${localStorage.getItem("id")}`, {
       method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
+      headers: { "content-type": "application/json" },
       body: JSON.stringify({
         salt,
         user: md5(salt + target.user.value),
@@ -51,7 +49,10 @@ export default function SignIn(props: SignInProps) {
     })
       .then((res) => res.json())
       .then((body: DefaultRes) => {
-        if (body.status === "OK") window.location.href = `${basePath}/admin`;
+        if (body.status === "OK") {
+          window.location.href = `${basePath}/admin`;
+          return;
+        }
 
         reCaptchaRef.current?.reset();
         return onErrHappen(body.message.replace("[LOGIN]", target.user.value));
@@ -62,6 +63,7 @@ export default function SignIn(props: SignInProps) {
           "Something went wrong. Please refresh the page and sign in again"
         );
       });
+    return false;
   }
 
   return (
