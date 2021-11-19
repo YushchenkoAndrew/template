@@ -14,11 +14,11 @@ function checkUserInfo(id: string, salt: string, user: string, pass: string) {
   return new Promise<FullResponse>((resolve, reject) => {
     redis.get(`LOGIN:${id}`, (err, tries) => {
       if (err || !tries) {
-        redis.set(`LOGIN:${id}`, "1");
+        redis.set(`LOGIN:${id}`, (tries = "1"));
         redis.expire(id, 8.64e4);
       } else redis.incr(`LOGIN:${id}`);
 
-      if (Number(tries) >= 5) {
+      if (Number(tries) >= 6) {
         sendLogs({
           stat: "ERR",
           name: "WEB",
@@ -58,7 +58,7 @@ function checkUserInfo(id: string, salt: string, user: string, pass: string) {
         });
       }
 
-      redis.set(`LOGIN:${id}`, "0");
+      redis.set(`LOGIN:${id}`, "1");
       return resolve({
         status: 200,
         send: {
@@ -103,6 +103,8 @@ export default withIronSession(
 
     if (send.status === "OK") {
       const sessionID = md5(Math.random().toString() + id);
+      console.log("[LOGIN] Generate session SESSION:" + sessionID);
+
       redis.set(`SESSION:${sessionID}`, id);
       redis.expire(
         `SESSION:${sessionID}`,

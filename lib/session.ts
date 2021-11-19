@@ -8,7 +8,7 @@ export function checkIfUserExist(sessionID: string) {
   return new Promise<boolean>((resolve, reject) => {
     redis.get(`SESSION:${sessionID}`, (err, userID) => {
       if (err || !userID) return resolve(false);
-      redis.get(userID, (err, data) => {
+      redis.get(`USER:${userID}`, (err, data) => {
         if (err || !data) return resolve(false);
         resolve(true);
       });

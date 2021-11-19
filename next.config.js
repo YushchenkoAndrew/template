@@ -68,7 +68,8 @@ module.exports = {
     REDIS_HOST: process.env.REDIS_HOST,
     REDIS_PORT: process.env.REDIS_PORT,
 
-    ACCESS_KEY: process.env.ACCESS_KEY,
+    WEB_KEY: process.env.WEB_KEY,
+    WEB_PEPPER: process.env.WEB_PEPPER,
 
     VOID_AUTH: process.env.VOID_AUTH,
 

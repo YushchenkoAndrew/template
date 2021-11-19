@@ -3,15 +3,20 @@ import redis from "../../../config/redis";
 import { PassValidate } from "../../../lib/auth";
 import { sendLogs } from "../../../lib/bot";
 import getConfig from "next/config";
+import md5 from "../../../lib/md5";
 
 const { serverRuntimeConfig } = getConfig();
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") {
-    return res.status(405).send("");
-  }
+  if (req.method !== "POST") return res.status(405).send("");
 
-  let key = (req.query.key ?? "") as string;
-  if (!PassValidate(key, serverRuntimeConfig.ACCESS_KEY ?? "")) {
+  const key = (req.query.key as string) || "";
+  const salt = req.headers["x-custom-header"] || "";
+  if (
+    !PassValidate(
+      key,
+      md5(salt + serverRuntimeConfig.WEB_PEPPER + serverRuntimeConfig.WEB_KEY)
+    )
+  ) {
     sendLogs({
       stat: "OK",
       name: "WEB",
