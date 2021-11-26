@@ -1,4 +1,4 @@
-import React, { CSSProperties, useEffect, useState } from "react";
+import React, { CSSProperties, useEffect, useRef, useState } from "react";
 import Image from "react-bootstrap/Image";
 import { basePath } from "../config";
 import styles from "./Card.module.css";
@@ -15,21 +15,25 @@ export interface CardProps {
 }
 
 export default function Card(props: CardProps) {
-  let [offset, setOffset] = useState({ top: -1, left: -1 } as DOMRect);
-  let [opacityStyle, setOpacity] = useState("");
-  let [animation, setAnimation] = useState("");
-  let [transitionStyle, setStyle] = useState({
+  const divRef = useRef<HTMLDivElement>(null);
+  const [offset, setOffset] = useState({ top: -1, left: -1 } as DOMRect);
+  const [opacityStyle, setOpacity] = useState("");
+  const [animation, setAnimation] = useState("");
+  const [transitionStyle, setStyle] = useState({
     top: 0,
     left: 0,
   } as CSSProperties);
 
   useEffect(() => {
-    document.addEventListener("scroll", () =>
-      setOffset({ top: -1, left: -1 } as DOMRect)
-    );
+    // NOTE: Event loop
+    setTimeout(function AndTheDontStopComing() {
+      const bound = divRef.current?.getBoundingClientRect?.();
+      if (bound && offset.top != bound.top && offset.left != bound.left) {
+        setOffset(bound);
+      }
 
-    // FIXME: Kinda strange bug with resize window
-    window.onresize = () => setOffset({ top: -1, left: -1 } as DOMRect);
+      setTimeout(AndTheDontStopComing, 100);
+    }, 100);
   }, []);
 
   function showElement(x: number, y: number) {
@@ -47,11 +51,7 @@ export default function Card(props: CardProps) {
   return (
     <div
       className="card overflow-hidden mb-3"
-      ref={(el) =>
-        el && offset.top == -1 && offset.left == -1
-          ? setOffset(el.getBoundingClientRect())
-          : null
-      }
+      ref={divRef}
       onMouseEnter={(e) =>
         showElement(
           e.pageX - offset.left - window.scrollX,
