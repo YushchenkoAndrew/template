@@ -1,10 +1,10 @@
 import React from "react";
 import { basePath } from "../../config";
-import { ProjectLink } from "../../types/projects";
+import { LinkData } from "../../types/api";
 export interface DefaultProjectInfoProps {
   href: string;
   lang?: string;
-  links?: ProjectLink[];
+  links?: LinkData[];
   description: string;
 }
 

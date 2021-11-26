@@ -1,7 +1,8 @@
 import React from "react";
 import { ProjectInfo } from "../../../config/placeholder";
 import { Event } from "../../../pages/admin/projects/operation";
-import { ProjectForm } from "../../../types/projects";
+import { FileData, ProjectData } from "../../../types/api";
+import { ProjectElement } from "../../../types/projects";
 import Card from "../../Card";
 import InputFile from "../../Inputs/InputFile";
 import InputName from "../../Inputs/InputName";
@@ -11,8 +12,10 @@ import InputText from "../../Inputs/InputText";
 import InputValue from "../../Inputs/InputValue";
 
 export interface DefaultThumbnailPreviewProps {
-  formData: ProjectForm;
+  thumbnail?: FileData;
+  formData: ProjectData;
   onChange: (event: Event) => void;
+  onUpload: (event: ProjectElement) => void;
   onBlur?: (event: Event) => void;
 }
 
@@ -23,7 +26,7 @@ export default function DefaultThumbnailPreview(
     <div className="row">
       <div className="col-md-5 order-md-2 mb-4">
         <Card
-          img={props.formData.img?.url || (ProjectInfo.img.url ?? "")}
+          img={props.thumbnail?.url || (ProjectInfo.img.url ?? "")}
           title={props.formData.title || ProjectInfo.title}
           size="title-lg"
           href="#"
@@ -72,11 +75,26 @@ export default function DefaultThumbnailPreview(
         <div className="input-group d-flex justify-content-between">
           <InputTemplate label="Image">
             <InputFile
-              name="img"
+              name="file"
               role="thumbnail"
               type="image/*"
               required
-              onChange={props.onChange}
+              onChange={(event: ProjectElement) => {
+                let reader = new FileReader();
+
+                function ReadFiles(i: number) {
+                  reader.readAsDataURL(
+                    event.target.value[i].file || new Blob()
+                  );
+                  reader.onloadend = (e) => {
+                    event.target.value[i].url = String(reader.result);
+                    if (++i < event.target.value.length) ReadFiles(i);
+                  };
+                }
+
+                ReadFiles(0);
+                props.onUpload(event);
+              }}
             />
           </InputTemplate>
 

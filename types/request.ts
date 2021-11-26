@@ -1,15 +1,16 @@
 import { Analytics, Country, StatInfo } from "./info";
 
 export type Stat = "OK" | "ERR";
-export type DefaultRes = {
+
+export type DefaultRes<Type = any> = {
   status: Stat;
   message: string;
-  result?: any;
+  result?: Type;
 };
 
-export type FullResponse = {
+export type FullResponse<Type = any> = {
   status: number;
-  send: DefaultRes;
+  send: DefaultRes<Type>;
 };
 
 export type AnalyticsData = {

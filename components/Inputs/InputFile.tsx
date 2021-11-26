@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Event } from "../../pages/admin/projects/operation";
-import { ProjectElement, ProjectFile } from "../../types/projects";
+import { FileData } from "../../types/api";
+import { ProjectElement } from "../../types/projects";
 
 export interface InputFileProps {
   name: string;
@@ -9,25 +10,24 @@ export interface InputFileProps {
   required?: boolean;
   multiple?: boolean;
   message?: string;
-  onChange: (event: Event) => void;
+  onChange: (event: ProjectElement) => void;
 }
 
 export default function InputFile(props: InputFileProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [file, onFileUpload] = useState<string | null>(null);
 
-  function createFile(file: File, arg?: Object): ProjectFile {
+  function createFile(file: File): FileData {
     const form = new FormData();
-    form.append("test", file);
-    console.log(form);
+    form.append("file", file);
 
     return {
       file,
       name: file.name,
       type: file.type,
       role: props.role,
-      ...(arg ?? {}),
-    };
+      // ...(arg ?? {}),
+    } as FileData;
   }
 
   return (
@@ -41,12 +41,13 @@ export default function InputFile(props: InputFileProps) {
         multiple={props.multiple}
         accept={props.type}
         onChange={() => {
+          console.log("HERE");
           console.log(fileRef.current?.files);
 
           if (!fileRef.current?.files?.[0]) return;
           onFileUpload(fileRef.current.files[0].name);
 
-          let files = [] as ProjectFile[];
+          let files = [] as FileData[];
           for (let i = 0; i < fileRef.current.files.length; i++) {
             files.push(createFile(fileRef.current.files[i]));
           }
@@ -54,25 +55,9 @@ export default function InputFile(props: InputFileProps) {
           props.onChange({
             target: {
               name: props.name,
-              value: props.multiple ? files : files[0],
+              value: files,
             },
           });
-
-          if (props.type !== "image/*") return;
-
-          let reader = new FileReader();
-          reader.readAsDataURL(fileRef.current.files[0]);
-          reader.onloadend = (e) => {
-            if (!fileRef.current?.files?.[0]) return;
-            props.onChange({
-              target: {
-                name: props.name,
-                value: createFile(fileRef.current.files[0], {
-                  url: String(reader.result),
-                }),
-              },
-            } as ProjectElement);
-          };
         }}
       />
       <button

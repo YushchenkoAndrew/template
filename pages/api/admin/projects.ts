@@ -3,10 +3,9 @@ import { Session, withIronSession } from "next-iron-session";
 import { apiUrl } from "../../../config";
 import redis, { FlushValue } from "../../../config/redis";
 import sessionConfig from "../../../config/session";
-import { ApiAuth } from "../../../lib/auth";
-import { sendLogs } from "../../../lib/bot";
+import { ApiAuth } from "../../../lib/api/auth";
+import { sendLogs } from "../../../lib/api/bot";
 import { ApiRes, ApiError, ProjectData } from "../../../types/api";
-import { ProjectForm } from "../../../types/projects";
 import { FullResponse } from "../../../types/request";
 
 function AddProject(body: string) {
@@ -22,7 +21,7 @@ function AddProject(body: string) {
           body,
         })
           .then((res) => res.json())
-          .then((data: ApiRes<ProjectData> | ApiError) => {
+          .then((data: ApiRes<ProjectData[]> | ApiError) => {
             resolve({
               status: 200,
               send: {
@@ -69,7 +68,7 @@ export default withIronSession(async function (
   }
 
   let id = req.query["id"] as string;
-  let { name, flag, title, desc, link, note } = req.body as ProjectForm;
+  let { name, flag, title, desc, note } = req.body as ProjectData;
   if (!id || !name || !flag || !title || !desc || !note) {
     return res
       .status(400)
@@ -77,7 +76,7 @@ export default withIronSession(async function (
   }
 
   const { status, send } = await AddProject(
-    JSON.stringify({ name, flag, title, desc, link, note })
+    JSON.stringify({ name, flag, title, desc, note })
   );
 
   if (send.status === "OK") {

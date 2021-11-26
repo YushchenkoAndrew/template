@@ -1,14 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Session } from "next-iron-session";
-import { apiUrl, voidUrl } from "../../../config";
+import { apiUrl, localVoidUrl } from "../../../config";
 import redis from "../../../config/redis";
-import { formPath } from "../../../lib/files";
-import { createQuery } from "../../../lib/query";
+import { formPath } from "../../../lib/public/files";
+import { createQuery } from "../../../lib/api/query";
 import { ApiError, ApiRes, FileData, ProjectData } from "../../../types/api";
 import { FullResponse } from "../../../types/request";
 
-export function LoadProjects(args: { [key: string]: number | string }) {
-  return new Promise<FullResponse>((resolve, reject) => {
+export function LoadProjects<Type = any>(args: {
+  [key: string]: number | string;
+}) {
+  return new Promise<FullResponse<Type[]>>((resolve, reject) => {
     const query = createQuery(args);
     redis.get(`Project:${query}`, (err, result) => {
       if (!err && result) {
@@ -26,8 +28,8 @@ export function LoadProjects(args: { [key: string]: number | string }) {
 
       fetch(`${apiUrl}/project${query}`)
         .then((res) => res.json())
-        .then((data: ApiRes<ProjectData> | ApiError) => {
-          if (data.status !== "OK" || !data.result.length) {
+        .then((data: ApiRes<Type[]> | ApiError) => {
+          if (data.status !== "OK" || !data.result?.length) {
             return resolve({
               status: data.status === "ERR" ? 500 : 416,
               send: {
@@ -42,7 +44,7 @@ export function LoadProjects(args: { [key: string]: number | string }) {
             send: {
               status: data.status,
               message: data.status === "OK" ? "Success" : "Error",
-              result: data.result,
+              result: data.result as Type[],
             },
           });
 
@@ -67,11 +69,13 @@ export function LoadFile(args: { [key: string]: number | string }) {
     const query = createQuery(args);
     fetch(`${apiUrl}/file${query}`)
       .then((res) => res.json())
-      .then((data: ApiRes<FileData> | ApiError) => {
+      .then((data: ApiRes<FileData[]> | ApiError) => {
         if (data.status !== "OK" || !data.result.length) return resolve("");
 
         fetch(
-          `${voidUrl}/${args.project}${formPath(data.result[0] as FileData)}`
+          `${localVoidUrl}/${args.project}${formPath(
+            data.result[0] as FileData
+          )}`
         )
           .then((res) => res.text())
           .then((text) => resolve(text))

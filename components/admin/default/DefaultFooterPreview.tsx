@@ -1,8 +1,9 @@
 import React from "react";
 import { ProjectInfo } from "../../../config/placeholder";
 import { Event } from "../../../pages/admin/projects/operation";
-import { ProjectForm, ProjectLink } from "../../../types/projects";
+import { ProjectData } from "../../../types/api";
 import DefaultFooter from "../../default/DefaultFooter";
+import DefaultLinks from "../../default/DefaultLinks";
 import DefaultProjectInfo from "../../default/DefaultProjectInfo";
 import InputList from "../../Inputs/InputDoubleList";
 import InputName from "../../Inputs/InputName";
@@ -12,7 +13,7 @@ import ListEntity from "../../Inputs/ListEntity";
 
 export interface DefaultFooterPreviewProps {
   links: { [name: string]: string };
-  formData: ProjectForm;
+  formData: ProjectData;
   onChange: (event: Event) => void;
   onBlur?: (event: Event) => void;
   onLinkAdd: (data: { [name: string]: string }) => boolean;
@@ -20,6 +21,14 @@ export interface DefaultFooterPreviewProps {
 }
 
 export default function DefaultFooterPreview(props: DefaultFooterPreviewProps) {
+  // const [data, onDataChange] = useState({} as { [name: string]: string });
+
+  // function onChange(event: Event) {
+  //   onDataChange({
+  //     ...data,
+  //     [event.target.name]: event.target.value as string,
+  //   });
+  // }
   return (
     <div className="d-flex justify-content-center mb-3">
       <div className="col-md-11 ">
@@ -40,9 +49,11 @@ export default function DefaultFooterPreview(props: DefaultFooterPreviewProps) {
             char="http://"
             name="link"
             required
-            value={props.formData.link}
+            value={props.links["main"] || ""}
             placeholder={ProjectInfo.link}
-            onChange={props.onChange}
+            onChange={(event: Event) => {
+              props.onLinkAdd({ name: "main", link: event.target.value });
+            }}
             onBlur={props.onBlur}
           />
         </InputTemplate>
@@ -55,21 +66,24 @@ export default function DefaultFooterPreview(props: DefaultFooterPreviewProps) {
             onChange={props.onLinkAdd}
           />
           <ul className="list-group">
-            {Object.entries(props.links).map(([name, link], i) => (
-              <div key={i} className="row">
-                <ListEntity
-                  char={["http://", "@"]}
-                  value={[link, name]}
-                  onChange={() => delete props.links[name]}
-                />
-              </div>
-            ))}
+            {Object.entries(props.links).map(([name, link], i) =>
+              name != "main" ? (
+                <div key={i} className="row">
+                  <ListEntity
+                    char={["http://", "@"]}
+                    value={[link, name]}
+                    onChange={() => delete props.links[name]}
+                  />
+                </div>
+              ) : null
+            )}
           </ul>
         </InputTemplate>
 
         <DefaultFooter name={props.formData.name}>
           <DefaultProjectInfo
-            href={props.formData.link ? `http://${props.formData.link}` : "#"}
+            href={"#"}
+            // href={props.formData.link ? `http://${props.formData.link}` : "#"}
             links={Object.entries(props.links).map(([name, link]) => ({
               name,
               link: `http://${link}`,

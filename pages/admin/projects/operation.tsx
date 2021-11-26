@@ -3,12 +3,8 @@ import DefaultHeader from "../../../components/admin/default/DefaultHeader";
 import DefaultFooter from "../../../components/default/DefaultFooter";
 import DefaultHead from "../../../components/default/DefaultHead";
 import DefaultNav from "../../../components/default/DefaultNav";
-import { checkIfUserExist } from "../../../lib/session";
-import {
-  ProjectElement,
-  ProjectFile,
-  ProjectForm,
-} from "../../../types/projects";
+import { checkIfUserExist } from "../../../lib/api/session";
+import { ProjectElement } from "../../../types/projects";
 import { TreeObj } from "../../../types/tree";
 import md5 from "../../../lib/md5";
 import { basePath, voidUrl } from "../../../config";
@@ -19,44 +15,37 @@ import { withIronSession } from "next-iron-session";
 import { NextSessionArgs } from "../../../types/session";
 import sessionConfig from "../../../config/session";
 import {
-  codeHtmlTemplate,
-  codeMarkdownTemplate,
+  codeTemplate,
   formPlaceholder,
   treePlaceholder,
 } from "../../../config/placeholder";
 import { useRouter } from "next/dist/client/router";
 import { LoadProjects } from "../../api/projects/load";
-import {
-  formPath,
-  getDir,
-  convertProject,
-  convertFile,
-} from "../../../lib/files";
+import { formPath, getPath } from "../../../lib/public/files";
 import DefaultThumbnailPreview from "../../../components/admin/default/DefaultThumbnailPreview";
 import DefaultFileStructure from "../../../components/admin/default/DefaultFileStructure";
 import DefaultFooterPreview from "../../../components/admin/default/DefaultFooterPreview";
-import { parseHTML } from "../../../lib/markers";
+import { parseHTML } from "../../../lib/public/markers";
 
-export type Event =
-  | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  | ProjectElement;
+export type Event = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
+// | ProjectElement;
 
 export function formTree(
   tree: TreeObj,
-  info: ProjectFile,
-  files?: ProjectFile[]
+  info: FileData,
+  files?: FileData[]
 ): TreeObj {
-  const dirs = [
-    info.role,
-    ...(info.dir ?? "").split("/").filter((item) => item),
+  const path = [
+    files?.[0]?.role || info.role,
+    ...(info.path ?? "").split("/").filter((item) => item),
   ];
   return {
     ...tree,
     ...(function combine(
-      prev: TreeObj | ProjectFile | null,
+      prev: TreeObj | FileData | null,
       index: number = 0
     ): TreeObj {
-      if (index === dirs.length) {
+      if (index === path.length) {
         if (!files) return {};
         return files.reduce(
           (acc, curr) => ({
@@ -68,10 +57,10 @@ export function formTree(
       }
 
       return {
-        [dirs[index]]: {
-          ...(prev && !prev.name ? (prev as TreeObj)[dirs[index]] : prev ?? {}),
+        [path[index]]: {
+          ...(prev && !prev.name ? (prev as TreeObj)[path[index]] : prev ?? {}),
           ...combine(
-            prev && !prev.name ? (prev as TreeObj)[dirs[index]] : prev,
+            prev && !prev.name ? (prev as TreeObj)[path[index]] : prev,
             index + 1
           ),
         },
@@ -81,18 +70,18 @@ export function formTree(
 }
 
 export interface ProjectOperationProps {
-  formData: ProjectForm;
+  formData: ProjectData;
   treeStructure: TreeObj;
 }
 
 export default function ProjectOperation(props: ProjectOperationProps) {
   const router = useRouter();
-  const [code, setCode] = useState(codeHtmlTemplate);
+  const [code, setCode] = useState(codeTemplate.JS);
   const refForm = useRef<HTMLFormElement | null>(null);
   const [validated, setValidated] = useState(false);
   const [formData, onFormChange] = useState(props.formData);
   const [treeStructure, onFileAdd] = useState(props.treeStructure);
-  const [fileInfo, onFileInfoAdd] = useState({ role: "assets" } as ProjectFile);
+  const [fileInfo, onFileInfoAdd] = useState({ role: "assets" } as FileData);
   const [alert, onAlert] = useState({ state: "alert-success" } as AlertProps);
   const [links, onLinksChange] = useState({} as { [name: string]: string });
 
@@ -109,16 +98,8 @@ export default function ProjectOperation(props: ProjectOperationProps) {
         : undefined,
     });
 
-    if (name === "flag") {
-      return value === "JS"
-        ? setCode(codeHtmlTemplate)
-        : setCode(codeMarkdownTemplate);
-    }
-
-    if (!(value as ProjectFile).name) return;
-    onFileAdd(
-      formTree(treeStructure, value as ProjectFile, [value] as ProjectFile[])
-    );
+    if (name !== "flag") return;
+    setCode(codeTemplate[value] || code);
   }
 
   function onFileInfoChange(event: Event) {
@@ -129,18 +110,20 @@ export default function ProjectOperation(props: ProjectOperationProps) {
     });
   }
 
-  function onFilesUpload(event: Event) {
+  function onFilesUpload(event: ProjectElement) {
     if (!Array.isArray(event.target.value)) return;
     setValidated(false);
 
-    setCode(parseHTML(code, event.target.value));
+    let html = parseHTML(code, event.target.value);
+    if (html) setCode(html);
+
     return onFileAdd(
-      formTree(treeStructure, fileInfo, event.target.value as ProjectFile[])
+      formTree(treeStructure, fileInfo, event.target.value as FileData[])
     );
   }
 
   function onNewLinkAdd(data: { [name: string]: string }): boolean {
-    if (!data["name"] || !data["link"]) return false;
+    if (!data["name"] || data["link"] === undefined) return false;
     onLinksChange({ ...links, [data["name"]]: data["link"] });
     return true;
   }
@@ -168,13 +151,13 @@ export default function ProjectOperation(props: ProjectOperationProps) {
         if (router.query.operation !== "edit" || !router.query.id) return;
         fetch(`${basePath}/api/projects/load?id=${router.query.id}`)
           .then((res) => res.json())
-          .then((data: ApiRes<ProjectData>) => {
+          .then((data: ApiRes<ProjectData[]>) => {
             if (data.status !== "OK" || !data.result.length) return;
             console.log(data);
 
             return onFormChange({
               ...formData,
-              ...convertProject(data.result[0]),
+              ...data.result[0],
             });
           })
           .catch((err) => null);
@@ -231,37 +214,28 @@ export default function ProjectOperation(props: ProjectOperationProps) {
       body: JSON.stringify(getData()),
     })
       .then((res) => res.json())
-      .then((data: DefaultRes) => {
-        if (
-          data.status !== "OK" ||
-          !(data.result as ProjectData[]).length ||
-          !(data.result as ProjectData[])[0]
-        ) {
+      .then((data: DefaultRes<ProjectData[]>) => {
+        if (data.status !== "OK" || !data.result?.length || !data.result[0]) {
           return resHandler(data);
         }
 
         // TODO: Add Markdown file
         // TODO: To add Template file !!!
-        (
-          (treeStructure.template as TreeObj)["index.html"] as ProjectFile
-        ).file = new File(
-          [new Blob([code], { type: "text/html" })],
-          "index.html",
-          {
+        ((treeStructure.template as TreeObj)["index.html"] as FileData).file =
+          new File([new Blob([code], { type: "text/html" })], "index.html", {
             type: "text/html",
-          }
-        );
+          });
 
-        const { ID } = (data.result as ProjectData[])[0];
-        (function parseTree(tree: TreeObj | ProjectFile | null) {
+        const { id } = data.result[0];
+        (function parseTree(tree: TreeObj | FileData | null) {
           if (!tree) return;
-          if (tree.name) {
+          if (tree.name && tree.file) {
             const data = new FormData();
-            data.append("file", (tree as ProjectFile).file);
+            data.append("file", tree.file as File);
             return fetch(
-              `${basePath}/api/admin/file?id=${ID}&project=${
+              `${basePath}/api/admin/file?id=${id}&project=${
                 formData.name
-              }&role=${tree.role}${getDir(tree.dir as string | undefined)}`,
+              }&role=${tree.role}${getPath(tree.path as string | undefined)}`,
               {
                 method: "POST",
                 body: data,
@@ -275,10 +249,10 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           Object.entries(tree).forEach(([name, value]) => parseTree(value));
         })(treeStructure);
 
-        fetch(`${basePath}/api/admin/link?id=${ID}`, {
+        fetch(`${basePath}/api/admin/link?id=${id}`, {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ ...links, main: formData.link }),
+          body: JSON.stringify(links),
         })
           .then((res) => res.json())
           .then(resHandler)
@@ -338,8 +312,12 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           onClose={() => onAlert({} as AlertProps)}
         />
         <DefaultThumbnailPreview
+          thumbnail={
+            treeStructure.thumbnail?.[Object.keys(treeStructure.thumbnail)[0]]
+          }
           formData={formData}
           onChange={onThumbnailChange}
+          onUpload={onFilesUpload}
           onBlur={onDataCache}
         />
 
@@ -410,28 +388,30 @@ export const getServerSideProps = withIronSession(async function ({
   if (params.get("type") === "edit") {
     if (!params.get("name")) return { notFound: true };
 
-    const { send } = await LoadProjects({ name: params.get("name") ?? "" });
+    const { send } = await LoadProjects<ProjectData>({
+      name: params.get("name") ?? "",
+    });
     if (send.status === "ERR" || !send.result?.length) {
       return { notFound: true };
     }
 
     let thumbnail = {} as FileData;
     let treeStructure = treePlaceholder;
-    const project = send.result[0] as ProjectData;
+    const project = send.result[0];
 
-    for (let i in project.Files) {
-      const file = convertFile(project.Files[i]);
-      if (project.Files[i].Role === "thumbnail") thumbnail = project.Files[i];
+    for (let i in project.files) {
+      const file = project.files[i];
+      if (project.files[i].role === "thumbnail") thumbnail = project.files[i];
       treeStructure = formTree(treeStructure, file, [file]);
     }
 
     return {
       props: {
         formData: {
-          ...convertProject(project),
+          ...project,
           img: {
-            ...convertFile(thumbnail),
-            url: `${voidUrl}/${project.Name}${formPath(thumbnail)}`,
+            ...thumbnail,
+            url: `${voidUrl}/${project.name}${formPath(thumbnail)}`,
           },
         },
 

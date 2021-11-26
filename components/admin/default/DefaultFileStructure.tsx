@@ -2,7 +2,6 @@ import React from "react";
 import { ProjectInfo } from "../../../config/placeholder";
 import { Event } from "../../../pages/admin/projects/operation";
 import { TreeObj } from "../../../types/tree";
-import { ProjectFile, ProjectForm } from "../../../types/projects";
 import InputFile from "../../Inputs/InputFile";
 import InputRadio from "../../Inputs/InputRadio";
 import InputTemplate from "../../Inputs/InputTemplate";
@@ -14,15 +13,17 @@ import "prismjs/components/prism-markup";
 import "prismjs/components/prism-markdown";
 import "prismjs/components/prism-css";
 import "prismjs/themes/prism-coy.css";
+import { FileData, ProjectData } from "../../../types/api";
+import { ProjectElement } from "../../../types/projects";
 
 export interface DefaultFileStructureProps {
   code: string;
-  formData: ProjectForm;
-  fileInfo: ProjectFile;
+  formData: ProjectData;
+  fileInfo: FileData;
   projectTree: TreeObj;
   onChange: (event: Event) => void;
   onCodeChange: (code: string) => void;
-  onUpload: (event: Event) => void;
+  onUpload: (event: ProjectElement) => void;
   onBlur?: (event: Event) => void;
 }
 
@@ -36,7 +37,7 @@ export default function DefaultFileStructure(props: DefaultFileStructureProps) {
           <TreeView
             name={props.formData.name || ProjectInfo.name}
             role={props.fileInfo.role}
-            dir={props.fileInfo.dir}
+            dir={props.fileInfo.path}
             projectTree={props.projectTree}
           />
         </div>
@@ -51,9 +52,9 @@ export default function DefaultFileStructure(props: DefaultFileStructureProps) {
 
           <InputTemplate label="Directory">
             <InputValue
-              name="dir"
+              name="path"
               className="rounded"
-              value={props.fileInfo.dir ?? ""}
+              value={props.fileInfo.path || ""}
               placeholder="/lua/"
               onChange={props.onChange}
             />
@@ -61,7 +62,7 @@ export default function DefaultFileStructure(props: DefaultFileStructureProps) {
 
           <InputTemplate label="File">
             <InputFile
-              name="img"
+              name="file"
               role={props.fileInfo.role}
               multiple
               onChange={props.onUpload}

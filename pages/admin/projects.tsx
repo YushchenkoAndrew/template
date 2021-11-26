@@ -4,14 +4,14 @@ import DefaultHeader from "../../components/admin/default/DefaultHeader";
 import DefaultFooter from "../../components/default/DefaultFooter";
 import DefaultHead from "../../components/default/DefaultHead";
 import DefaultNav from "../../components/default/DefaultNav";
-import defaultServerSideHandler, { checkIfUserExist } from "../../lib/session";
+import { checkIfUserExist } from "../../lib/api/session";
 import { ProjectData } from "../../types/api";
 import { basePath, voidUrl } from "../../config";
 import { FlagType } from "../../types/flag";
 import Card from "../../components/admin/Card";
-import { formPath } from "../../lib/files";
+import { formPath } from "../../lib/public/files";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { loadProjectsThumbnail } from "../../lib/projects";
+import { loadProjectsThumbnail } from "../../lib/public/projects";
 import { withIronSession } from "next-iron-session";
 import { NextSessionArgs } from "../../types/session";
 import sessionConfig from "../../config/session";
@@ -64,12 +64,12 @@ export default function AdminProjects(props: AdminProjectsProps) {
             return (
               <Card
                 key={i}
-                id={item.ID}
-                title={item.Title}
-                img={`${voidUrl}/${item.Name}${formPath(item.Files[0])}`}
+                id={item.id || 0}
+                title={item.title}
+                img={`${voidUrl}/${item.name}${formPath(item.files[0])}`}
                 event={{
                   modify: {
-                    href: `${basePath}/admin/projects/operation?type=edit&name=${item.Name}`,
+                    href: `${basePath}/admin/projects/operation?type=edit&name=${item.name}`,
                   },
                   delete: {
                     onClick: () => {
@@ -77,8 +77,8 @@ export default function AdminProjects(props: AdminProjectsProps) {
                     },
                   },
                 }}
-                flag={item.Flag as FlagType}
-                desc={item.Desc}
+                flag={item.flag as FlagType}
+                desc={item.desc}
               />
             );
           })}

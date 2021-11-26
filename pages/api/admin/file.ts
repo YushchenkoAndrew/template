@@ -5,15 +5,15 @@ import { Session, withIronSession } from "next-iron-session";
 import sessionConfig from "../../../config/session";
 import FormData from "form-data";
 import { FullResponse } from "../../../types/request";
-import { apiUrl, voidUrl } from "../../../config";
-import { sendLogs } from "../../../lib/bot";
+import { apiUrl, localVoidUrl } from "../../../config";
+import { sendLogs } from "../../../lib/api/bot";
 import md5 from "../../../lib/md5";
-import { ApiAuth } from "../../../lib/auth";
+import { ApiAuth } from "../../../lib/api/auth";
 import { ApiError, ApiRes, FileData } from "../../../types/api";
 import getConfig from "next/config";
 
 const { serverRuntimeConfig } = getConfig();
-type ArgsType = { id: number; project: string; dir: string; role: string };
+type ArgsType = { id: number; project: string; path: string; role: string };
 
 function AddFile(file: File, args: ArgsType) {
   return new Promise<FullResponse>((resolve, reject) => {
@@ -26,14 +26,14 @@ function AddFile(file: File, args: ArgsType) {
             Authorization: `Bear ${access}`,
           },
           body: JSON.stringify({
-            Name: file.name ?? md5(Math.random().toString()),
-            Role: args.role,
-            Path: args.dir,
-            Type: file.type ?? "",
+            name: file.name ?? md5(Math.random().toString()),
+            role: args.role,
+            path: args.path,
+            type: file.type ?? "",
           } as FileData),
         })
           .then((res) => res.json())
-          .then((data: ApiRes<FileData> | ApiError) => {
+          .then((data: ApiRes<FileData[]> | ApiError) => {
             resolve({
               status: data.status ? 500 : 200,
               send: {
@@ -67,7 +67,7 @@ function UploadFile(file: File, args: ArgsType) {
       file.name ?? md5(Math.random().toString())
     );
 
-    fetch(`${voidUrl}?path=/${args.project}/${args.role + args.dir}`, {
+    fetch(`${localVoidUrl}?path=/${args.project}/${args.role + args.path}`, {
       method: "POST",
       headers: {
         Authorization:
@@ -169,7 +169,7 @@ export default withIronSession(async function (
   let id = Number(req.query["id"] as string);
   let project = req.query["project"] as string;
   let role = req.query["role"] as string;
-  let dir = (req.query["dir"] as string) ?? "";
+  let path = (req.query["path"] as string) ?? "";
   if (!role || !project || isNaN(id)) {
     return res.status(400).send({
       stat: "ERR",
@@ -177,7 +177,7 @@ export default withIronSession(async function (
     });
   }
 
-  const { status, send } = await SendFile(req, { id, project, dir, role });
+  const { status, send } = await SendFile(req, { id, project, path, role });
   res.status(status).send(send);
 },
 sessionConfig);

@@ -19,8 +19,6 @@ export default function InputList(props: InputValueProps) {
   const [data, onDataChange] = useState({} as { [name: string]: string });
 
   function onChange(event: Event) {
-    console.log(data);
-
     onDataChange({
       ...data,
       [event.target.name]: event.target.value as string,

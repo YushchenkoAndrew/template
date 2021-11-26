@@ -1,5 +1,5 @@
-import { ProjectFile } from "./projects";
+import { FileData } from "./api";
 
 export type TreeObj = {
-  [name: string]: TreeObj | ProjectFile | null;
+  [name: string]: TreeObj | FileData | null;
 };

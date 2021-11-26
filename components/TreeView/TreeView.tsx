@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import md5 from "../../lib/md5";
-import { ProjectFile } from "../../types/projects";
 import { TreeObj } from "../../types/tree";
 import styles from "./TreeView.module.css";
 import Node from "./Node";
@@ -14,6 +13,7 @@ import {
   IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import { faCss3Alt, faHtml5, faJs } from "@fortawesome/free-brands-svg-icons";
+import { FileData } from "../../types/api";
 
 function getIcons(type: string | undefined): {
   icon: IconDefinition;
@@ -92,7 +92,7 @@ export default function TreeView(props: TreeViewProps) {
   }
 
   function ParseTree(
-    obj: TreeObj | ProjectFile | null,
+    obj: TreeObj | FileData | null,
     forced?: boolean,
     index: number = 0
   ): React.ReactNode | undefined {

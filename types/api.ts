@@ -16,71 +16,74 @@ export type ApiResult = InfoSum | InfoData | WorldData | ProjectData | FileData;
 
 export type ApiRes<Type> = {
   items: number;
-  result: Type[];
+  result: Type;
   status: Stat;
   totalItems: number;
 };
 
 export type InfoData = {
-  ID: number;
-  CreatedAt: string;
-  Countries: string;
-  Views: number;
-  Clicks: number;
-  Media: number;
-  Visitors: number;
+  id: number;
+  created_at: string;
+  countries: string;
+  views: number;
+  clicks: number;
+  media: number;
+  visitors: number;
 };
 
 export type InfoSum = {
-  Views: number;
-  Clicks: number;
-  Media: number;
-  Visitors: number;
+  views: number;
+  clicks: number;
+  media: number;
+  visitors: number;
 };
 
 export type WorldData = {
-  ID: number;
-  UpdatedAt: string;
-  Country: string;
-  Visitors: number;
+  id: number;
+  updated_at: string;
+  country: string;
+  visitors: number;
 };
 
 export type FileData = {
-  ID: number;
-  UpdatedAt: string;
-  Name: string;
-  Path: string;
-  Type: string;
-  Role: string;
-  ProjectID: number;
+  id?: number;
+  updated_at?: string;
+  name: string;
+  path: string;
+  type: string;
+  role: string;
+  project_id?: number;
+
+  file?: File;
+  url?: string;
 };
 
 export type LinkData = {
-  ID: number;
-  UpdatedAt: string;
-  Name: string;
-  Link: string;
-  ProjectID: number;
+  id?: number;
+  updated_at?: string;
+  name: string;
+  link: string;
+  project_id?: number;
 };
 
 export type ProjectData = {
-  ID: number;
-  CreatedAt: string;
-  Name: string;
-  Title: string;
-  Flag: string;
-  Desc: string;
-  Note: string;
-  Files: FileData[];
-  Links: LinkData[];
+  id?: number;
+  created_at?: string;
+  name: string;
+  title: string;
+  flag: string;
+  desc: string;
+  note: string;
+  files: FileData[];
+  links: LinkData[];
 };
 
 export type GeoIpLocationData = {
-  GeonameId: number;
-  LocaleCode: string;
-  ContinentCode: string;
-  ContinentName: string;
-  CountryIsoCode: string;
-  CountryName: string;
-  IsInEuropeanUnion: boolean;
+  geoname_id: number;
+  locale_code: string;
+  continent_code: string;
+  continent_name: string;
+  country_iso_code: string;
+  country_name: string;
+  is_in_european_union: boolean;
 };
