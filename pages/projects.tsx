@@ -6,8 +6,8 @@ import DefaultHead from "../components/default/DefaultHead";
 import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultNav from "../components/default/DefaultNav";
 import { basePath, voidUrl } from "../config";
-import { formPath } from "../lib/files";
-import { loadProjectsThumbnail } from "../lib/projects";
+import { formPath } from "../lib/public/files";
+import { loadProjectsThumbnail } from "../lib/public/projects";
 import { ProjectData } from "../types/api";
 import { LoadProjects } from "./api/projects/load";
 
@@ -127,12 +127,12 @@ export default function ProjectsListPage(props: ProjectsListPageProps) {
                     return (
                       <Card
                         key={j}
-                        title={item.Title}
-                        img={`${voidUrl}/${item.Name}${formPath(
-                          item.Files[0]
+                        title={item.title}
+                        img={`${voidUrl}/${item.name}${formPath(
+                          item.files[0]
                         )}`}
-                        href={`${basePath}/${item.Name}`}
-                        description={item.Desc}
+                        href={`${basePath}/${item.name}`}
+                        description={item.desc}
                       />
                     );
                   })}
@@ -153,7 +153,10 @@ export default function ProjectsListPage(props: ProjectsListPageProps) {
 }
 
 export const getServerSideProps = async () => {
-  const { send } = await LoadProjects({ page: 0, role: "thumbnail" });
+  const { send } = await LoadProjects<ProjectData>({
+    page: 0,
+    role: "thumbnail",
+  });
   if (send.status === "ERR" || !send.result?.length) {
     return {
       props: {
@@ -163,6 +166,7 @@ export const getServerSideProps = async () => {
     };
   }
 
+  console.log(send);
   const chunk = send.result.length / 3;
   return {
     props: {

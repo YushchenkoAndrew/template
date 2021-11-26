@@ -5,8 +5,8 @@ import { Country, DayStat } from "../../../types/info";
 import { DefaultRes, StatisticData } from "../../../types/request";
 import { apiUrl } from "../../../config";
 import { formatDate } from "../../info";
-import { sendLogs } from "../../../lib/bot";
-import { freeMutex, waitMutex } from "../../../lib/mutex";
+import { sendLogs } from "../../../lib/api/bot";
+import { freeMutex, waitMutex } from "../../../lib/api/mutex";
 
 type QueryParams = { date: string };
 export default async function handler(
@@ -45,7 +45,7 @@ export default async function handler(
 
             fetch(`${apiUrl}/info?created_at=${date}`)
               .then((res) => res.json())
-              .then((res: ApiRes<InfoData>) => {
+              .then((res: ApiRes<InfoData[]>) => {
                 if (res.status == "ERR") {
                   return reject("Idk something wrong happened at the backend");
                 }
@@ -57,10 +57,10 @@ export default async function handler(
                     redis.hmset(
                       "Info:Now",
                       {
-                        Visitors: result?.Visitors ?? 0,
-                        Views: result?.Views ?? 0,
-                        Clicks: result?.Clicks ?? 0,
-                        Media: result?.Media ?? 0,
+                        Visitors: result?.visitors ?? 0,
+                        Views: result?.views ?? 0,
+                        Clicks: result?.clicks ?? 0,
+                        Media: result?.media ?? 0,
                       },
                       () => freeMutex()
                     );
@@ -68,7 +68,7 @@ export default async function handler(
 
                   // Save countries that visited today
                   if (result) {
-                    result.Countries.split(",").map((item) => {
+                    result.countries.split(",").map((item) => {
                       waitMutex().then(() => {
                         redis.lpush("Info:Countries", item, () => freeMutex());
                       });
@@ -77,8 +77,8 @@ export default async function handler(
                 }
 
                 return resolve({
-                  Visitors: result?.Visitors ?? 0,
-                  Views: result?.Views ?? 0,
+                  Visitors: result?.visitors ?? 0,
+                  Views: result?.views ?? 0,
                 });
               })
               .catch((err) => reject(err));
@@ -98,7 +98,7 @@ export default async function handler(
 
             fetch(`${apiUrl}/info?created_at=${formatDate(yesterday)}`)
               .then((res) => res.json())
-              .then((res: ApiRes<InfoData>) => {
+              .then((res: ApiRes<InfoData[]>) => {
                 if (res.status == "ERR") {
                   return reject("Idk something wrong happened at the backend");
                 }
@@ -109,8 +109,8 @@ export default async function handler(
                     redis.hmset(
                       "Info:Prev",
                       {
-                        Visitors: result?.Visitors ?? 0,
-                        Views: result?.Views ?? 0,
+                        Visitors: result?.visitors ?? 0,
+                        Views: result?.views ?? 0,
                       },
                       () => freeMutex()
                     );
@@ -118,8 +118,8 @@ export default async function handler(
                 }
 
                 return resolve({
-                  Visitors: result?.Visitors ?? 0,
-                  Views: result?.Views ?? 0,
+                  Visitors: result?.visitors ?? 0,
+                  Views: result?.views ?? 0,
                 });
               })
               .catch((err) => reject(err));
@@ -135,14 +135,14 @@ export default async function handler(
             // NOTE: This will run only in the case where none of users were identified
             fetch(`${apiUrl}/world?page=-1`)
               .then((res) => res.json())
-              .then((res: ApiRes<WorldData>) => {
+              .then((res: ApiRes<WorldData[]>) => {
                 if (!res.items || res.status == "ERR")
                   return reject("Idk something wrong happened at then backend");
 
                 // Need this just to decrease space usage in RAM
                 let result = {} as { [country: string]: number };
                 res.result.forEach(
-                  (item) => (result[item.Country] = item.Visitors)
+                  (item) => (result[item.country] = item.visitors)
                 );
 
                 waitMutex().then(() => {

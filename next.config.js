@@ -37,13 +37,12 @@ module.exports = {
   },
 
   env: {
-    NEXT_PUBLIC_VOID_URL: process.env.VOID_URL,
+    NEXT_PUBLIC_VOID_URL: process.env.NEXT_PUBLIC_VOID_URL,
     NEXT_PUBLIC_RECAPTCHA_INVISIBLE_SITE_KEY:
       process.env.RECAPTCHA_INVISIBLE_SITE_KEY,
   },
 
   publicRuntimeConfig: {
-    VOID_URL: process.env.VOID_URL,
     BASE_PATH: process.env.BASE_PATH || "/projects",
 
     RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY,
@@ -71,6 +70,8 @@ module.exports = {
     WEB_KEY: process.env.WEB_KEY,
     WEB_PEPPER: process.env.WEB_PEPPER,
 
+    VOID_URL: process.env.VOID_URL,
+    VOID_AUTH: process.env.VOID_AUTH,
     VOID_AUTH: process.env.VOID_AUTH,
 
     RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,

@@ -81,9 +81,9 @@ export default function ProjectPage(props: ProjectPageProps) {
         <DefaultFooter name={props.title}>
           <DefaultProjectInfo
             href={`http://${props.links.main}`}
-            links={props.links.other.map(({ Link, Name }) => ({
-              name: Name,
-              link: `http://${Link}`,
+            links={props.links.other.map(({ link, name }) => ({
+              name: name,
+              link: `http://${link}`,
             }))}
             description={props.note}
           />
@@ -112,9 +112,9 @@ export default function ProjectPage(props: ProjectPageProps) {
       <DefaultFooter name={props.title}>
         <DefaultProjectInfo
           href={`http://${props.links.main}`}
-          links={props.links.other.map(({ Link, Name }) => ({
-            name: Name,
-            link: `http://${Link}`,
+          links={props.links.other.map(({ link, name }) => ({
+            name: name,
+            link: `http://${link}`,
           }))}
           description={props.note}
         />
@@ -139,16 +139,16 @@ export const getServerSideProps = async (
     other: [] as LinkData[],
   };
 
-  project.Links.forEach((link) =>
-    link.Name === "main" ? (links.main = link.Link) : links.other.push(link)
+  project.links.forEach((link) =>
+    link.name === "main" ? (links.main = link.link) : links.other.push(link)
   );
 
   return {
     props: {
       project: name,
-      title: project.Title,
-      note: project.Note,
-      flag: project.Flag,
+      title: project.title,
+      note: project.note,
+      flag: project.flag,
       template: template,
       links: links,
     } as ProjectPageProps,

@@ -5,8 +5,8 @@ import { ApiRes, InfoData, InfoSum } from "../../../types/api";
 import { AnalyticsData, DefaultRes } from "../../../types/request";
 import { apiUrl } from "../../../config";
 import { Analytics } from "../../../types/info";
-import { sendLogs } from "../../../lib/bot";
-import { freeMutex, waitMutex } from "../../../lib/mutex";
+import { sendLogs } from "../../../lib/api/bot";
+import { freeMutex, waitMutex } from "../../../lib/api/mutex";
 
 type QueryParams = { date: string };
 
@@ -49,7 +49,7 @@ export default async function handler(
 
             fetch(`${apiUrl}/info/sum`)
               .then((res) => res.json())
-              .then((res: ApiRes<InfoData>) => {
+              .then((res: ApiRes<InfoData[]>) => {
                 if (res.status == "ERR")
                   return reject("Idk something wrong happened at the backend");
 
@@ -58,12 +58,12 @@ export default async function handler(
                   return reject("Idk something wrong happened at the backend");
 
                 const stat = {
-                  ctr: result.Views ? result.Clicks / result.Views : 1,
-                  cr_media: result.Visitors
-                    ? result.Media / result.Visitors
+                  ctr: result.views ? result.clicks / result.views : 1,
+                  cr_media: result.visitors
+                    ? result.media / result.visitors
                     : 1,
-                  cr_projects: result.Visitors
-                    ? result.Clicks / result.Visitors
+                  cr_projects: result.visitors
+                    ? result.clicks / result.visitors
                     : 1,
                 };
 
@@ -95,7 +95,7 @@ export default async function handler(
               )}&orderBy=CreatedAt`
             )
               .then((res) => res.json())
-              .then((res: ApiRes<InfoData>) => {
+              .then((res: ApiRes<InfoData[]>) => {
                 if (!res.items || res.status == "ERR")
                   return reject("Idk something wrong happened at the backend");
 
@@ -103,7 +103,7 @@ export default async function handler(
                 let result = {} as { [time: string]: number };
                 res.result.forEach(
                   (item) =>
-                    (result[item.CreatedAt.split("T")[0]] = item.Visitors)
+                    (result[item.created_at.split("T")[0]] = item.visitors)
                 );
 
                 waitMutex().then(() => {
