@@ -26,6 +26,11 @@ export function UpdateTokens(data: ApiTokens) {
   redis.expire("API:Refresh", 7 * 24 * 60 * 60);
 }
 
+export function DeleteTokens() {
+  redis.del("API:Access");
+  redis.del("API:Refresh");
+}
+
 export function ApiAuth() {
   return new Promise((resolve, reject) => {
     redis.get("API:Access", (err, reply) => {
@@ -45,8 +50,14 @@ export function ApiAuth() {
           })
             .then((res) => res.json())
             .then((data: ApiTokens | ApiError) => {
-              if (data.status == "ERR")
-                return reject("Incorrect refresh token value");
+              // If something wrong with keys or refresh token already
+              // has been expired then just delete them and try again
+              if (data.status == "ERR") {
+                DeleteTokens();
+                return ApiAuth()
+                  .then((res) => resolve(res))
+                  .catch((err) => reject(err));
+              }
 
               UpdateTokens(data as ApiTokens);
               resolve((data as ApiTokens).access_token);

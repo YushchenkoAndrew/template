@@ -121,6 +121,7 @@ export default function ProjectsListPage(props: ProjectsListPageProps) {
             }
           >
             {projects.map((chunk, i) => {
+              if (!chunk.length) return null;
               return (
                 <div key={i} className="col-12 col-lg-4 col-md-6 px-2">
                   {chunk.map((item, j) => {

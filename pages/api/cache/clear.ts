@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import redis from "../../../config/redis";
+import redis, { FlushValue } from "../../../config/redis";
 import { PassValidate } from "../../../lib/api/auth";
 import { sendLogs } from "../../../lib/api/bot";
 import getConfig from "next/config";
@@ -35,6 +35,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   redis.del("API:Access");
   redis.del("API:Refresh");
+  FlushValue("USER");
 
   res.status(204).send("");
 }

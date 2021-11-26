@@ -36,7 +36,10 @@ export default function Home() {
           style={{ maxHeight: "1000px" }}
         >
           <video className="embed-responsive-item" autoPlay muted>
-            <source src={`${process.env.NEXT_PUBLIC_VOID_URL ?? ""}/home/Intro.mp4`} type="video/mp4" />
+            <source
+              src={`${process.env.NEXT_PUBLIC_VOID_URL ?? ""}/home/Intro.mp4`}
+              type="video/mp4"
+            />
           </video>
         </div>
       </main>
@@ -52,7 +55,9 @@ export default function Home() {
           >
             <Image
               className="card-img"
-              src={`${process.env.NEXT_PUBLIC_VOID_URL ?? ""}/home/projects.jpeg`}
+              src={`${
+                process.env.NEXT_PUBLIC_VOID_URL ?? ""
+              }/home/projects.jpeg`}
               alt="Temp"
             />
           </div>
@@ -60,8 +65,8 @@ export default function Home() {
             <h4 className="font-weight-bold mb-3">So Hello there</h4>
 
             <p className={`text-justify ${styles["text"]}`}>
-              I&apos;m Andrew Yushchenko and this is mine small portfolio, where I
-              upload some of my work which I want to share with the rest of
+              I&apos;m Andrew Yushchenko and this is mine small portfolio, where
+              I upload some of my work which I want to share with the rest of
               world. Currently you could find here visual implementation of
               algorithms and some other random stuff that I was interested back
               in the days. Most of mine interest are laid on such fields as
@@ -69,10 +74,10 @@ export default function Home() {
               there. Plus I currently interesting in Web Design and Frontend
               magic. I think that, when you have a variety of skills by
               combining them together you could achieve quite unique and
-              fascinating result. So I guess this is mine goal which I&apos;m trying
-              to achieve. I knew that I won&apos;t be skilled in one specific field
-              then others but at least I be able to do an interesting work by
-              myself.
+              fascinating result. So I guess this is mine goal which I&apos;m
+              trying to achieve. I knew that I won&apos;t be skilled in one
+              specific field then others but at least I be able to do an
+              interesting work by myself.
             </p>
             <p className={`text-justify ${styles["text"]}`}>
               Shortly speaking this site is actually is hosted on Raspberry Pi
