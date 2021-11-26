@@ -1,13 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Session, withIronSession } from "next-iron-session";
 import redis from "../../../config/redis";
-import { PassValidate } from "../../../lib/auth";
-import { sendLogs } from "../../../lib/bot";
+import { PassValidate } from "../../../lib/api/auth";
+import { sendLogs } from "../../../lib/api/bot";
 import md5 from "../../../lib/md5";
 import { LoginRequest } from "../../../types/admin";
 import { DefaultRes, FullResponse } from "../../../types/request";
 import getConfig from "next/config";
-import { checkCaptcha } from "../../../lib/captcha";
+import { checkCaptcha } from "../../../lib/api/captcha";
 
 const { serverRuntimeConfig } = getConfig();
 function checkUserInfo(id: string, salt: string, user: string, pass: string) {

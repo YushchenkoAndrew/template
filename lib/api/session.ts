@@ -1,8 +1,8 @@
 import { withIronSession } from "next-iron-session";
-import sessionConfig from "../config/session";
-import { NextSessionArgs } from "../types/session";
-import redis from "../config/redis";
-import { basePath } from "../config";
+import sessionConfig from "../../config/session";
+import { NextSessionArgs } from "../../types/session";
+import redis from "../../config/redis";
+import { basePath } from "../../config";
 
 export function checkIfUserExist(sessionID: string) {
   return new Promise<boolean>((resolve, reject) => {

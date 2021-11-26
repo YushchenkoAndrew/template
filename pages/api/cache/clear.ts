@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../../config/redis";
-import { PassValidate } from "../../../lib/auth";
-import { sendLogs } from "../../../lib/bot";
+import { PassValidate } from "../../../lib/api/auth";
+import { sendLogs } from "../../../lib/api/bot";
 import getConfig from "next/config";
 import md5 from "../../../lib/md5";
 

@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../config/redis";
 import getConfig from "next/config";
-import { checkCaptcha } from "../../lib/captcha";
+import { checkCaptcha } from "../../lib/api/captcha";
 import { createTransport } from "nodemailer";
 import { DefaultRes, FullResponse } from "../../types/request";
-import { sendLogs } from "../../lib/bot";
+import { sendLogs } from "../../lib/api/bot";
 const { serverRuntimeConfig } = getConfig();
 
 export type EmailRequest = {

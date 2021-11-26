@@ -1,4 +1,4 @@
-import redis from "../config/redis";
+import redis from "../../config/redis";
 import { sendLogs } from "./bot";
 
 // Init simple Mutex for Docker with Redis

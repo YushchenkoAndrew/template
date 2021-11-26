@@ -1,8 +1,8 @@
-import { apiUrl } from "../config";
+import { apiUrl } from "../../config";
 import getConfig from "next/config";
-import redis from "../config/redis";
-import { ApiError, ApiTokens } from "../types/api";
-import md5 from "./md5";
+import redis from "../../config/redis";
+import { ApiError, ApiTokens } from "../../types/api";
+import md5 from "../md5";
 
 const { serverRuntimeConfig } = getConfig();
 export function PassValidate(pass: string, pass2: string) {

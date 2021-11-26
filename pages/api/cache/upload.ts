@@ -2,9 +2,9 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../../config/redis";
 import { apiUrl } from "../../../config";
 import { formatDate } from "../../info";
-import { ApiAuth, PassValidate } from "../../../lib/auth";
-import { freeMutex, waitMutex } from "../../../lib/mutex";
-import { sendLogs } from "../../../lib/bot";
+import { ApiAuth, PassValidate } from "../../../lib/api/auth";
+import { freeMutex, waitMutex } from "../../../lib/api/mutex";
+import { sendLogs } from "../../../lib/api/bot";
 import getConfig from "next/config";
 import { DefaultRes } from "../../../types/request";
 import { ApiError, ApiRes, InfoData, WorldData } from "../../../types/api";
@@ -80,7 +80,7 @@ export default async function handler(
                 }),
               })
                 .then((res) => res.json())
-                .then((data: ApiRes<InfoData> | ApiError) => {
+                .then((data: ApiRes<InfoData[]> | ApiError) => {
                   resolve({
                     status: data.status,
                     message: (data as ApiError).message ?? "Success",
@@ -126,7 +126,7 @@ export default async function handler(
               ),
             })
               .then((res) => res.json())
-              .then((data: ApiRes<WorldData> | ApiError) => {
+              .then((data: ApiRes<WorldData[]> | ApiError) => {
                 resolve({
                   status: data.status,
                   message: (data as ApiError).message ?? "Success",

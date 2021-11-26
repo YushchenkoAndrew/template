@@ -1,5 +1,5 @@
-import redis from "../config/redis";
-import { FullResponse } from "../types/request";
+import redis from "../../config/redis";
+import { FullResponse } from "../../types/request";
 import { sendLogs } from "./bot";
 
 export function checkCaptcha(id: string, captcha: string, secrete: string) {

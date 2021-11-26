@@ -3,7 +3,7 @@ import React from "react";
 import DefaultHead from "../../components/default/DefaultHead";
 import sessionConfig from "../../config/session";
 import { NextSessionArgs } from "../../types/session";
-import { checkIfUserExist } from "../../lib/session";
+import { checkIfUserExist } from "../../lib/api/session";
 import redis from "../../config/redis";
 import { basePath } from "../../config";
 

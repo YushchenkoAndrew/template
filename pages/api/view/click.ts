@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../../config/redis";
-import { sendLogs } from "../../../lib/bot";
+import { sendLogs } from "../../../lib/api/bot";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "PATCH") return res.status(405).send("");

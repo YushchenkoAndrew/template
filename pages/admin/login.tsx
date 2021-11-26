@@ -4,7 +4,7 @@ import SignIn from "../../components/admin/SignIn";
 import DefaultHead from "../../components/default/DefaultHead";
 import sessionConfig from "../../config/session";
 import { NextSessionArgs } from "../../types/session";
-import { checkIfUserExist } from "../../lib/session";
+import { checkIfUserExist } from "../../lib/api/session";
 import { basePath } from "../../config";
 
 export default function Login() {

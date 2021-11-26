@@ -1,6 +1,6 @@
 import redis from "redis";
 import getConfig from "next/config";
-import { sendLogs } from "../lib/bot";
+import { sendLogs } from "../lib/api/bot";
 
 const { serverRuntimeConfig } = getConfig();
 const PORT = Number(serverRuntimeConfig.REDIS_PORT ?? 6379);

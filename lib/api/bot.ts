@@ -1,6 +1,6 @@
-import md5 from "./md5";
-import { botUrl } from "../config";
-import { LogMessage } from "../types/bot";
+import md5 from "../md5";
+import { botUrl } from "../../config";
+import { LogMessage } from "../../types/bot";
 import getConfig from "next/config";
 
 const { serverRuntimeConfig } = getConfig();

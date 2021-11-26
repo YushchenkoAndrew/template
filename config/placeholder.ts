@@ -1,5 +1,5 @@
 import { basePath } from ".";
-import { ProjectFile, ProjectForm } from "../types/projects";
+import { FileData, ProjectData } from "../types/api";
 import { TreeObj } from "../types/tree";
 
 export const ProjectInfo = {
@@ -23,8 +23,7 @@ export const formPlaceholder = {
   title: "",
   desc: "",
   note: "",
-  link: "",
-} as ProjectForm;
+} as ProjectData;
 
 export const treePlaceholder = {
   assets: {},
@@ -36,7 +35,7 @@ export const treePlaceholder = {
       name: "index.html",
       role: "template",
       type: "text/html",
-    } as ProjectFile,
+    } as FileData,
   },
 } as TreeObj;
 
@@ -51,7 +50,8 @@ export const HtmlMarkers = {
   PROJECT_NAME: "{{PROJECT_NAME}}",
 };
 
-export const codeHtmlTemplate = `<!DOCTYPE html>
+export const codeTemplate = {
+  JS: `<!DOCTYPE html>
 <html>
   <body>
     <div id="${HtmlMarkers.CSS}">
@@ -67,13 +67,14 @@ export const codeHtmlTemplate = `<!DOCTYPE html>
     <div id="${HtmlMarkers.FOOTER}">
     </div>
   </body>
-</html>`;
+</html>`,
 
-export const codeMarkdownTemplate = `
+  Markdown: `
 # Project name
 
 Article text...
 
 ## Used material
 * [Main Page](https://mortis-grimreaper.ddns.net/projects)
-`;
+`,
+};
