@@ -8,7 +8,9 @@ import { Event } from "../pages/admin/projects/operation";
 import { basePath } from "../config";
 import styles from "./ContactMe.module.css";
 import { DefaultRes } from "../types/request";
-const { publicRuntimeConfig } = getConfig();
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastDefault } from "../config/alert";
 
 export interface ContactMeProps {}
 
@@ -19,7 +21,7 @@ type ContactMeType = {
 
 export default function ContactMe(props: ContactMeProps) {
   const [contactMe, updateFields] = useState({} as ContactMeType);
-  const [errMessage, onErrHappen] = useState("");
+  // const [errMessage, onErrHappen] = useState("");
   const reCaptchaRef = useRef<ReCAPTCHA>(null);
 
   function changeContactMe(event: Event) {
@@ -28,19 +30,27 @@ export default function ContactMe(props: ContactMeProps) {
 
   async function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
+    const toastId = toast.loading("Please wait...");
     if (!localStorage.getItem("id")) {
-      return onErrHappen(
-        "Something went wrong. Please refresh the page and sign in again"
-      );
+      return toast.update(toastId, {
+        render: "Something went wrong",
+        type: "error",
+        isLoading: false,
+        ...ToastDefault,
+      });
     }
 
     reCaptchaRef.current
       ?.executeAsync()
       .then((captcha) => {
         if (!captcha) {
-          return onErrHappen(
-            "It appears that you are a bot, if not. Please refresh page and try again"
-          );
+          reCaptchaRef.current?.reset();
+          return toast.update(toastId, {
+            render: "It appears that you are a bot",
+            type: "error",
+            isLoading: false,
+            ...ToastDefault,
+          });
         }
 
         fetch(`${basePath}/api/email?id=${localStorage.getItem("id")}`, {
@@ -52,25 +62,58 @@ export default function ContactMe(props: ContactMeProps) {
           .then((body: DefaultRes) => {
             reCaptchaRef.current?.reset();
 
-            if (body.status !== "OK") return onErrHappen(body.message);
-            return updateFields({ email: "", text: "" });
+            if (body.status !== "OK") {
+              return toast.update(toastId, {
+                render: body.message,
+                type: "error",
+                isLoading: false,
+                ...ToastDefault,
+              });
+            }
+
+            updateFields({ email: "", text: "" });
+            toast.update(toastId, {
+              render: body.message,
+              type: "success",
+              isLoading: false,
+              ...ToastDefault,
+            });
           })
           .catch((err) => {
             reCaptchaRef.current?.reset();
-            return onErrHappen(
-              "Something went wrong. Please refresh the page and sign in again"
-            );
+            return toast.update(toastId, {
+              render: "Something went wrong",
+              type: "error",
+              isLoading: false,
+              ...ToastDefault,
+            });
           });
       })
       .catch((err) => {
-        onErrHappen(
-          "Something went wrong. Please refresh the page and sign in again"
-        );
+        reCaptchaRef.current?.reset();
+        return toast.update(toastId, {
+          render: "Something went wrong",
+          type: "error",
+          isLoading: false,
+          ...ToastDefault,
+        });
       });
   }
 
   return (
     <div className="bg-dark container-fluid d-flex justify-content-center py-5">
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        transition={Bounce}
+        closeOnClick
+        theme="colored"
+        rtl={false}
+        draggable
+      />
+
       <div
         className="col-12 col-sm-11 col-md-10 col-lg-6"
         style={{ maxHeight: "800px" }}
@@ -114,9 +157,6 @@ export default function ContactMe(props: ContactMeProps) {
             sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_INVISIBLE_SITE_KEY ?? ""}
           />
 
-          <small className="text-warning" hidden={!errMessage}>
-            Warning: {errMessage}
-          </small>
           <div className="d-flex my-4">
             <button type="submit" className="btn btn-lg btn-outline-light">
               Submit

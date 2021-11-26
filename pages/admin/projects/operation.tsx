@@ -10,7 +10,6 @@ import md5 from "../../../lib/md5";
 import { basePath, voidUrl } from "../../../config";
 import { DefaultRes } from "../../../types/request";
 import { ApiRes, FileData, ProjectData } from "../../../types/api";
-import Alert, { AlertProps } from "../../../components/Alert";
 import { withIronSession } from "next-iron-session";
 import { NextSessionArgs } from "../../../types/session";
 import sessionConfig from "../../../config/session";
@@ -26,6 +25,9 @@ import DefaultThumbnailPreview from "../../../components/admin/default/DefaultTh
 import DefaultFileStructure from "../../../components/admin/default/DefaultFileStructure";
 import DefaultFooterPreview from "../../../components/admin/default/DefaultFooterPreview";
 import { parseHTML } from "../../../lib/public/markers";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastDefault } from "../../../config/alert";
 
 export type Event = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
 // | ProjectElement;
@@ -82,7 +84,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   const [formData, onFormChange] = useState(props.formData);
   const [treeStructure, onFileAdd] = useState(props.treeStructure);
   const [fileInfo, onFileInfoAdd] = useState({ role: "assets" } as FileData);
-  const [alert, onAlert] = useState({ state: "alert-success" } as AlertProps);
+  // const [alert, onAlert] = useState({ state: "alert-success" } as AlertProps);
   const [links, onLinksChange] = useState({} as { [name: string]: string });
 
   function onThumbnailChange(event: Event) {
@@ -206,6 +208,8 @@ export default function ProjectOperation(props: ProjectOperationProps) {
     const cacheId = md5(
       (localStorage.getItem("salt") ?? "") + (localStorage.getItem("id") ?? "")
     );
+
+    const toastProjectId = toast.loading("Please wait...");
     fetch(`${basePath}/api/admin/projects?id=${cacheId}`, {
       method: router.query.operation === "add" ? "POST" : "PUT",
       headers: {
@@ -216,8 +220,20 @@ export default function ProjectOperation(props: ProjectOperationProps) {
       .then((res) => res.json())
       .then((data: DefaultRes<ProjectData[]>) => {
         if (data.status !== "OK" || !data.result?.length || !data.result[0]) {
-          return resHandler(data);
+          return toast.update(toastProjectId, {
+            render: `Project: ${data.message}`,
+            type: "error",
+            isLoading: false,
+            ...ToastDefault,
+          });
         }
+
+        toast.update(toastProjectId, {
+          render: "Project: Record is created",
+          type: "success",
+          isLoading: false,
+          ...ToastDefault,
+        });
 
         // TODO: Add Markdown file
         // TODO: To add Template file !!!
@@ -230,6 +246,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
         (function parseTree(tree: TreeObj | FileData | null) {
           if (!tree) return;
           if (tree.name && tree.file) {
+            const toastFileId = toast.loading("Please wait...");
             const data = new FormData();
             data.append("file", tree.file as File);
             return fetch(
@@ -242,23 +259,59 @@ export default function ProjectOperation(props: ProjectOperationProps) {
               }
             )
               .then((res) => res.json())
-              .then(resHandler)
-              .catch(resErrHandler);
+              .then((data: DefaultRes) => {
+                toast.update(toastFileId, {
+                  render: `File [${tree.name}]: ${data.message}`,
+                  type: data.status === "OK" ? "success" : "error",
+                  isLoading: false,
+                  ...ToastDefault,
+                });
+              })
+              .catch(() => {
+                toast.update(toastFileId, {
+                  render: `File [${tree.name}]: crashed at upload`,
+                  type: "error",
+                  isLoading: false,
+                  ...ToastDefault,
+                });
+              });
           }
 
           Object.entries(tree).forEach(([name, value]) => parseTree(value));
         })(treeStructure);
 
+        const toastLinkId = toast.loading("Please wait...");
         fetch(`${basePath}/api/admin/link?id=${id}`, {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify(links),
         })
           .then((res) => res.json())
-          .then(resHandler)
-          .catch(resErrHandler);
+          .then((data: DefaultRes) => {
+            toast.update(toastLinkId, {
+              render: `Link: ${data.message}`,
+              type: data.status === "OK" ? "success" : "error",
+              isLoading: false,
+              ...ToastDefault,
+            });
+          })
+          .catch(() => {
+            toast.update(toastLinkId, {
+              render: "Link: Server error",
+              type: "error",
+              isLoading: false,
+              ...ToastDefault,
+            });
+          });
       })
-      .catch(resErrHandler);
+      .catch(() => {
+        toast.update(toastProjectId, {
+          render: "Project: Server error",
+          type: "error",
+          isLoading: false,
+          ...ToastDefault,
+        });
+      });
 
     return false;
   };
@@ -271,24 +324,6 @@ export default function ProjectOperation(props: ProjectOperationProps) {
       desc: formData.desc,
       note: formData.note,
     };
-  }
-
-  function resHandler(data: DefaultRes) {
-    refForm.current?.scrollIntoView({ behavior: "smooth" });
-    onAlert({
-      state: data.status === "OK" ? "alert-success" : "alert-danger",
-      title: data.status === "OK" ? "Success" : "Error",
-      note: data.message ?? "Backend error",
-    });
-  }
-
-  function resErrHandler() {
-    refForm.current?.scrollIntoView({ behavior: "smooth" });
-    onAlert({
-      state: "alert-danger",
-      title: "Backend error",
-      note: "Something wrong happened on backend side. You should check server logs",
-    });
   }
 
   return (
@@ -305,11 +340,15 @@ export default function ProjectOperation(props: ProjectOperationProps) {
         noValidate
         onSubmit={onSubmit as FormEventHandler<HTMLFormElement>}
       >
-        <Alert
-          state={alert.state}
-          title={alert.title}
-          note={alert.note}
-          onClose={() => onAlert({} as AlertProps)}
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          transition={Bounce}
+          closeOnClick
+          rtl={false}
+          draggable
         />
         <DefaultThumbnailPreview
           thumbnail={
@@ -395,26 +434,18 @@ export const getServerSideProps = withIronSession(async function ({
       return { notFound: true };
     }
 
-    let thumbnail = {} as FileData;
     let treeStructure = treePlaceholder;
     const project = send.result[0];
 
     for (let i in project.files) {
-      const file = project.files[i];
-      if (project.files[i].role === "thumbnail") thumbnail = project.files[i];
+      let file = project.files[i];
+      file.url = `${voidUrl}/${project.name}${formPath(file)}`;
       treeStructure = formTree(treeStructure, file, [file]);
     }
 
     return {
       props: {
-        formData: {
-          ...project,
-          img: {
-            ...thumbnail,
-            url: `${voidUrl}/${project.name}${formPath(thumbnail)}`,
-          },
-        },
-
+        formData: project,
         treeStructure,
       } as ProjectOperationProps,
     };
