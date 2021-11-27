@@ -40,11 +40,9 @@ export const treePlaceholder = {
 } as TreeObj;
 
 export const HtmlMarkers = {
+  HEADER: "HEADER",
   BODY: "BODY",
   FOOTER: "FOOTER",
-
-  JS: "JS_FILES",
-  CSS: "CSS_FILE",
 
   FILE_SERVER: "{{FILE_SERVER}}",
   PROJECT_NAME: "{{PROJECT_NAME}}",
@@ -54,10 +52,7 @@ export const codeTemplate = {
   JS: `<!DOCTYPE html>
 <html>
   <body>
-    <div id="${HtmlMarkers.CSS}">
-    </div>
-
-    <div id="${HtmlMarkers.JS}">
+    <div id="${HtmlMarkers.HEADER}">
     </div>
 
     <div id="${HtmlMarkers.BODY}">
@@ -69,8 +64,7 @@ export const codeTemplate = {
   </body>
 </html>`,
 
-  Markdown: `
-# Project name
+  Markdown: `# Project name
 
 Article text...
 

@@ -9,7 +9,7 @@ const Parser = {
     script.src = `${HtmlMarkers.FILE_SERVER}/${HtmlMarkers.PROJECT_NAME}/${
       file.role
     }/${file.path ?? ""}${file.name}`;
-    return { id: HtmlMarkers.JS, el: script };
+    return { id: HtmlMarkers.HEADER, el: script };
   },
 
   "text/css": (file: FileData) => {
@@ -19,7 +19,7 @@ const Parser = {
     link.href = `${HtmlMarkers.FILE_SERVER}/${HtmlMarkers.PROJECT_NAME}/${
       file.role
     }/${file.path ?? ""}${file.name}`;
-    return { id: HtmlMarkers.CSS, el: link };
+    return { id: HtmlMarkers.HEADER, el: link };
   },
 } as { [name: string]: (file: FileData) => { id: string; el: HTMLElement } };
 

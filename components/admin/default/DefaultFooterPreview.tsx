@@ -3,7 +3,6 @@ import { ProjectInfo } from "../../../config/placeholder";
 import { Event } from "../../../pages/admin/projects/operation";
 import { ProjectData } from "../../../types/api";
 import DefaultFooter from "../../default/DefaultFooter";
-import DefaultLinks from "../../default/DefaultLinks";
 import DefaultProjectInfo from "../../default/DefaultProjectInfo";
 import InputList from "../../Inputs/InputDoubleList";
 import InputName from "../../Inputs/InputName";
@@ -21,14 +20,6 @@ export interface DefaultFooterPreviewProps {
 }
 
 export default function DefaultFooterPreview(props: DefaultFooterPreviewProps) {
-  // const [data, onDataChange] = useState({} as { [name: string]: string });
-
-  // function onChange(event: Event) {
-  //   onDataChange({
-  //     ...data,
-  //     [event.target.name]: event.target.value as string,
-  //   });
-  // }
   return (
     <div className="d-flex justify-content-center mb-3">
       <div className="col-md-11 ">
@@ -82,11 +73,9 @@ export default function DefaultFooterPreview(props: DefaultFooterPreviewProps) {
 
         <DefaultFooter name={props.formData.name}>
           <DefaultProjectInfo
-            href={"#"}
-            // href={props.formData.link ? `http://${props.formData.link}` : "#"}
             links={Object.entries(props.links).map(([name, link]) => ({
               name,
-              link: `http://${link}`,
+              link: link && `http://${link}`,
             }))}
             description={props.formData.note || ProjectInfo.note}
           />

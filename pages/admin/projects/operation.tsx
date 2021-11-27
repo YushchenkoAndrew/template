@@ -6,10 +6,9 @@ import DefaultNav from "../../../components/default/DefaultNav";
 import { checkIfUserExist } from "../../../lib/api/session";
 import { ProjectElement } from "../../../types/projects";
 import { TreeObj } from "../../../types/tree";
-import md5 from "../../../lib/md5";
 import { basePath, voidUrl } from "../../../config";
 import { DefaultRes } from "../../../types/request";
-import { ApiRes, FileData, ProjectData } from "../../../types/api";
+import { FileData, ProjectData } from "../../../types/api";
 import { withIronSession } from "next-iron-session";
 import { NextSessionArgs } from "../../../types/session";
 import sessionConfig from "../../../config/session";
@@ -18,8 +17,7 @@ import {
   formPlaceholder,
   treePlaceholder,
 } from "../../../config/placeholder";
-import { useRouter } from "next/dist/client/router";
-import { LoadProjects } from "../../api/projects/load";
+import { LoadFile, LoadProjects } from "../../api/projects/load";
 import { formPath, getPath } from "../../../lib/public/files";
 import DefaultThumbnailPreview from "../../../components/admin/default/DefaultThumbnailPreview";
 import DefaultFileStructure from "../../../components/admin/default/DefaultFileStructure";
@@ -28,9 +26,9 @@ import { parseHTML } from "../../../lib/public/markers";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastDefault } from "../../../config/alert";
+import { CacheId } from "../../../lib/public";
 
 export type Event = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
-// | ProjectElement;
 
 export function formTree(
   tree: TreeObj,
@@ -72,36 +70,28 @@ export function formTree(
 }
 
 export interface ProjectOperationProps {
+  type: string;
   formData: ProjectData;
   treeStructure: TreeObj;
+  template: string;
+  links: { [name: string]: string };
 }
 
 export default function ProjectOperation(props: ProjectOperationProps) {
-  const router = useRouter();
-  const [code, setCode] = useState(codeTemplate.JS);
+  const [code, setCode] = useState(props.template);
   const refForm = useRef<HTMLFormElement | null>(null);
   const [validated, setValidated] = useState(false);
   const [formData, onFormChange] = useState(props.formData);
   const [treeStructure, onFileAdd] = useState(props.treeStructure);
   const [fileInfo, onFileInfoAdd] = useState({ role: "assets" } as FileData);
-  // const [alert, onAlert] = useState({ state: "alert-success" } as AlertProps);
-  const [links, onLinksChange] = useState({} as { [name: string]: string });
+  const [links, onLinksChange] = useState(props.links);
 
   function onThumbnailChange(event: Event) {
     setValidated(false);
-
-    const { name, value } = event.target;
     onFormChange({
       ...formData,
-      [name]: value
-        ? name === "name"
-          ? (value as string).replace(" ", "")
-          : value
-        : undefined,
+      [event.target.name]: event.target.value,
     });
-
-    if (name !== "flag") return;
-    setCode(codeTemplate[value] || code);
   }
 
   function onFileInfoChange(event: Event) {
@@ -116,7 +106,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
     if (!Array.isArray(event.target.value)) return;
     setValidated(false);
 
-    let html = parseHTML(code, event.target.value);
+    const html = parseHTML(code, event.target.value);
     if (html) setCode(html);
 
     return onFileAdd(
@@ -134,89 +124,47 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   //  Cache part
   //
   useEffect(() => {
-    const cacheId = md5(
-      (localStorage.getItem("salt") ?? "") + (localStorage.getItem("id") ?? "")
-    );
-
-    fetch(`${basePath}/api/admin/projects/cache?id=${cacheId}`, {
+    fetch(`${basePath}/api/admin/projects/cache?id=${CacheId(props.type)}`, {
       method: "GET",
     })
       .then((res) => res.json())
       .then((data: DefaultRes) => {
-        if (data.status === "OK") {
-          return onFormChange({
-            ...formData,
-            ...data.result,
-          });
-        }
-
-        if (router.query.operation !== "edit" || !router.query.id) return;
-        fetch(`${basePath}/api/projects/load?id=${router.query.id}`)
-          .then((res) => res.json())
-          .then((data: ApiRes<ProjectData[]>) => {
-            if (data.status !== "OK" || !data.result.length) return;
-            console.log(data);
-
-            return onFormChange({
-              ...formData,
-              ...data.result[0],
-            });
-          })
-          .catch((err) => null);
+        if (data.status !== "OK") return;
+        onFormChange({
+          ...formData,
+          ...data.result,
+        });
       })
       .catch((err) => null);
   }, []);
 
   function onDataCache(event: Event) {
-    const cacheId = md5(
-      (localStorage.getItem("salt") ?? "") + (localStorage.getItem("id") ?? "")
-    );
-    fetch(`${basePath}/api/admin/projects/cache?id=${cacheId}`, {
+    fetch(`${basePath}/api/admin/projects/cache?id=${CacheId(props.type)}`, {
       method: "POST",
-      body: JSON.stringify(getData()),
+      body: JSON.stringify(formData),
     })
       .then((res) => console.log(res.status))
       .catch((err) => null);
   }
 
   const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
-    //  Test if file
-    const templateFile = new File(
-      [
-        new Blob([code], {
-          type: formData.flag === "JS" ? "text/html" : "text/markdown",
-        }),
-      ],
-      formData.flag === "JS" ? "index.html" : "index.md",
-      {
-        type: formData.flag === "JS" ? "text/html" : "text/markdown",
-      }
-    );
-
-    let reader = new FileReader();
-    reader.readAsText(templateFile);
-
-    reader.onload = () => console.log(reader.result);
-    reader.onerror = () => console.log(reader.error);
-
     event?.preventDefault();
     if (!event?.currentTarget?.checkValidity()) {
       setValidated(true);
       return;
     }
 
-    const cacheId = md5(
-      (localStorage.getItem("salt") ?? "") + (localStorage.getItem("id") ?? "")
-    );
-
     const toastProjectId = toast.loading("Please wait...");
-    fetch(`${basePath}/api/admin/projects?id=${cacheId}`, {
-      method: router.query.operation === "add" ? "POST" : "PUT",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(getData()),
-    })
+    fetch(
+      `${basePath}/api/admin/projects/${props.type}?id=${CacheId(props.type)}`,
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      }
+    )
       .then((res) => res.json())
       .then((data: DefaultRes<ProjectData[]>) => {
         if (data.status !== "OK" || !data.result?.length || !data.result[0]) {
@@ -250,7 +198,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
             const data = new FormData();
             data.append("file", tree.file as File);
             return fetch(
-              `${basePath}/api/admin/file?id=${id}&project=${
+              `${basePath}/api/admin/file/${props.type}?id=${id}&project=${
                 formData.name
               }&role=${tree.role}${getPath(tree.path as string | undefined)}`,
               {
@@ -281,7 +229,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
         })(treeStructure);
 
         const toastLinkId = toast.loading("Please wait...");
-        fetch(`${basePath}/api/admin/link?id=${id}`, {
+        fetch(`${basePath}/api/admin/link/${props.type}?id=${id}`, {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify(links),
@@ -316,16 +264,6 @@ export default function ProjectOperation(props: ProjectOperationProps) {
     return false;
   };
 
-  function getData() {
-    return {
-      name: formData.name,
-      flag: formData.flag,
-      title: formData.title,
-      desc: formData.desc,
-      note: formData.note,
-    };
-  }
-
   return (
     <>
       <DefaultHead>
@@ -355,12 +293,13 @@ export default function ProjectOperation(props: ProjectOperationProps) {
             treeStructure.thumbnail?.[Object.keys(treeStructure.thumbnail)[0]]
           }
           formData={formData}
+          setCode={setCode}
           onChange={onThumbnailChange}
           onUpload={onFilesUpload}
           onBlur={onDataCache}
         />
 
-        {formData.flag === "link" ? (
+        {formData.flag === "Link" ? (
           <span />
         ) : (
           <DefaultFileStructure
@@ -423,9 +362,15 @@ export const getServerSideProps = withIronSession(async function ({
     };
   }
 
+  let type;
   const params = new URLSearchParams((req.url ?? "").split("?")[1] ?? "");
-  if (params.get("type") === "edit") {
+  if ((type = params.get("type")) === "edit") {
     if (!params.get("name")) return { notFound: true };
+
+    const template = await LoadFile({
+      project: params.get("name") ?? "",
+      role: "template",
+    });
 
     const { send } = await LoadProjects<ProjectData>({
       name: params.get("name") ?? "",
@@ -445,16 +390,25 @@ export const getServerSideProps = withIronSession(async function ({
 
     return {
       props: {
+        type,
         formData: project,
         treeStructure,
+        template,
+        links: project.links.reduce(
+          (acc, { name, link }) => ({ ...acc, [name]: link }),
+          {}
+        ),
       } as ProjectOperationProps,
     };
   }
 
   return {
     props: {
+      type,
       formData: formPlaceholder,
       treeStructure: treePlaceholder,
+      template: codeTemplate.JS,
+      links: { main: "" },
     } as ProjectOperationProps,
   };
 },

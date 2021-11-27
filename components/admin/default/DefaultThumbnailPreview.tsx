@@ -1,5 +1,5 @@
 import React from "react";
-import { ProjectInfo } from "../../../config/placeholder";
+import { codeTemplate, ProjectInfo } from "../../../config/placeholder";
 import { Event } from "../../../pages/admin/projects/operation";
 import { FileData, ProjectData } from "../../../types/api";
 import { ProjectElement } from "../../../types/projects";
@@ -14,6 +14,7 @@ import InputValue from "../../Inputs/InputValue";
 export interface DefaultThumbnailPreviewProps {
   thumbnail?: FileData;
   formData: ProjectData;
+  setCode: React.Dispatch<React.SetStateAction<string>>;
   onChange: (event: Event) => void;
   onUpload: (event: ProjectElement) => void;
   onBlur?: (event: Event) => void;
@@ -42,7 +43,10 @@ export default function DefaultThumbnailPreview(
             required
             value={props.formData.name}
             placeholder={ProjectInfo.name}
-            onChange={props.onChange}
+            onChange={(event) => {
+              event.target.value = event.target.value.replace(" ", "");
+              props.onChange(event);
+            }}
             onBlur={props.onBlur}
           />
         </InputTemplate>
@@ -108,7 +112,11 @@ export default function DefaultThumbnailPreview(
               name="flag"
               options={["JS", "Markdown", "Link"]}
               label="btn-outline-secondary"
-              onChange={props.onChange}
+              onChange={(event) => {
+                props.onChange(event);
+                if (!codeTemplate[event.target.value]) return;
+                props.setCode(codeTemplate[event.target.value]);
+              }}
             />
           </InputTemplate>
         </div>
