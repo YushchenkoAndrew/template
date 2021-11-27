@@ -12,7 +12,12 @@ import {
   faImage,
   IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
-import { faCss3Alt, faHtml5, faJs } from "@fortawesome/free-brands-svg-icons";
+import {
+  faCss3Alt,
+  faHtml5,
+  faJs,
+  faMarkdown,
+} from "@fortawesome/free-brands-svg-icons";
 import { FileData } from "../../types/api";
 
 function getIcons(type: string | undefined): {
@@ -34,6 +39,12 @@ function getIcons(type: string | undefined): {
       return {
         icon: faFont,
         color: "text-muted",
+      };
+
+    case "text/markdown":
+      return {
+        icon: faMarkdown,
+        color: "text-dark",
       };
 
     case "text/html":

@@ -64,30 +64,6 @@ export function LoadProjects<Type = any>(args: {
   });
 }
 
-export function LoadFile(args: { [key: string]: number | string }) {
-  return new Promise((resolve, reject) => {
-    const query = createQuery(args);
-    fetch(`${apiUrl}/file${query}`)
-      .then((res) => res.json())
-      .then((data: ApiRes<FileData[]> | ApiError) => {
-        if (data.status !== "OK" || !data.result.length) return resolve("");
-
-        fetch(
-          `${localVoidUrl}/${args.project}${formPath(
-            data.result[0] as FileData
-          )}`
-        )
-          .then((res) => res.text())
-          .then((text) => resolve(text))
-          .catch((err) => resolve(""));
-
-        // redis.set(`Project:${query}`, JSON.stringify(data.result));
-        // redis.expire(`Project:${query}`, 2 * 60 * 60);
-      })
-      .catch((err) => resolve(""));
-  });
-}
-
 export default async function (
   req: NextApiRequest & { session: Session },
   res: NextApiResponse

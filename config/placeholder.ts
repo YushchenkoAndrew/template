@@ -49,7 +49,10 @@ export const HtmlMarkers = {
 };
 
 export const codeTemplate = {
-  JS: `<!DOCTYPE html>
+  JS: {
+    name: "index.html",
+    type: "text/html",
+    code: `<!DOCTYPE html>
 <html>
   <body>
     <div id="${HtmlMarkers.HEADER}">
@@ -63,12 +66,17 @@ export const codeTemplate = {
     </div>
   </body>
 </html>`,
+  },
 
-  Markdown: `# Project name
+  Markdown: {
+    name: "index.md",
+    type: "text/markdown",
+    code: `# Project name
 
 Article text...
 
 ## Used material
 * [Main Page](https://mortis-grimreaper.ddns.net/projects)
 `,
+  },
 };

@@ -21,7 +21,10 @@ export default function InputList(props: InputValueProps) {
   function onChange(event: Event) {
     onDataChange({
       ...data,
-      [event.target.name]: event.target.value as string,
+      [event.target.name]: event.target.value.replace(
+        /http:\/\/|https:\/\//g,
+        ""
+      ),
     });
   }
 

@@ -17,19 +17,6 @@ export default function InputFile(props: InputFileProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [file, onFileUpload] = useState<string | null>(null);
 
-  function createFile(file: File): FileData {
-    const form = new FormData();
-    form.append("file", file);
-
-    return {
-      file,
-      name: file.name,
-      type: file.type,
-      role: props.role,
-      // ...(arg ?? {}),
-    } as FileData;
-  }
-
   return (
     <div className="input-group">
       <input
@@ -41,15 +28,20 @@ export default function InputFile(props: InputFileProps) {
         multiple={props.multiple}
         accept={props.type}
         onChange={() => {
-          console.log("HERE");
-          console.log(fileRef.current?.files);
-
           if (!fileRef.current?.files?.[0]) return;
           onFileUpload(fileRef.current.files[0].name);
 
           let files = [] as FileData[];
           for (let i = 0; i < fileRef.current.files.length; i++) {
-            files.push(createFile(fileRef.current.files[i]));
+            const form = new FormData();
+            form.append("file", fileRef.current.files[i]);
+            files.push({
+              file: fileRef.current.files[i],
+              name: fileRef.current.files[i].name,
+              type: fileRef.current.files[i].type,
+              role: props.role,
+              path: "",
+            });
           }
 
           props.onChange({

@@ -3,6 +3,7 @@ import { codeTemplate, ProjectInfo } from "../../../config/placeholder";
 import { Event } from "../../../pages/admin/projects/operation";
 import { FileData, ProjectData } from "../../../types/api";
 import { ProjectElement } from "../../../types/projects";
+import { TreeObj } from "../../../types/tree";
 import Card from "../../Card";
 import InputFile from "../../Inputs/InputFile";
 import InputName from "../../Inputs/InputName";
@@ -12,9 +13,10 @@ import InputText from "../../Inputs/InputText";
 import InputValue from "../../Inputs/InputValue";
 
 export interface DefaultThumbnailPreviewProps {
-  thumbnail?: FileData;
+  projectTree: TreeObj;
   formData: ProjectData;
   setCode: React.Dispatch<React.SetStateAction<string>>;
+  onFileChange: React.Dispatch<React.SetStateAction<TreeObj>>;
   onChange: (event: Event) => void;
   onUpload: (event: ProjectElement) => void;
   onBlur?: (event: Event) => void;
@@ -27,7 +29,12 @@ export default function DefaultThumbnailPreview(
     <div className="row">
       <div className="col-md-5 order-md-2 mb-4">
         <Card
-          img={props.thumbnail?.url || (ProjectInfo.img.url ?? "")}
+          img={
+            props.projectTree.thumbnail?.[
+              Object.keys(props.projectTree.thumbnail)[0]
+            ]?.url ||
+            (ProjectInfo.img.url ?? "")
+          }
           title={props.formData.title || ProjectInfo.title}
           size="title-lg"
           href="#"
@@ -82,7 +89,6 @@ export default function DefaultThumbnailPreview(
               name="file"
               role="thumbnail"
               type="image/*"
-              required
               onChange={(event: ProjectElement) => {
                 let reader = new FileReader();
 
@@ -114,8 +120,22 @@ export default function DefaultThumbnailPreview(
               label="btn-outline-secondary"
               onChange={(event) => {
                 props.onChange(event);
-                if (!codeTemplate[event.target.value]) return;
-                props.setCode(codeTemplate[event.target.value]);
+                if (!codeTemplate[event.target.value]) {
+                  props.projectTree.template = {};
+                  props.onFileChange(props.projectTree);
+                  return;
+                }
+
+                props.projectTree.template = {
+                  [codeTemplate[event.target.value].name]: {
+                    role: "template",
+                    name: codeTemplate[event.target.value].name,
+                    type: codeTemplate[event.target.value].type,
+                  } as FileData,
+                };
+
+                props.onFileChange(props.projectTree);
+                props.setCode(codeTemplate[event.target.value].code);
               }}
             />
           </InputTemplate>

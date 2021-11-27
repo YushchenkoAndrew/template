@@ -4,11 +4,12 @@ import DefaultHeader from "../components/default/DefaultHeader";
 import DefaultFooter from "../components/default/DefaultFooter";
 import DefaultProjectInfo from "../components/default/DefaultProjectInfo";
 import { GetServerSidePropsContext } from "next";
-import { LoadFile, LoadProjects } from "./api/projects/load";
+import { LoadProjects } from "./api/projects/load";
 import { LinkData, ProjectData } from "../types/api";
 import { FlagType } from "../types/flag";
 import DefaultJsProject from "../components/default/DefaultJsProject";
 import DefaultMarkdownProject from "../components/default/DefaultMarkdownProject";
+import { LoadFile } from "./api/file/load";
 export interface ProjectPageProps {
   project: string;
   title: string;
@@ -66,7 +67,7 @@ export const getServerSideProps = async (
       title: project.title,
       note: project.note,
       flag: project.flag,
-      template: template,
+      template: template.send.result,
       links: project.links,
     } as ProjectPageProps,
   };

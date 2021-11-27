@@ -17,7 +17,7 @@ import {
   formPlaceholder,
   treePlaceholder,
 } from "../../../config/placeholder";
-import { LoadFile, LoadProjects } from "../../api/projects/load";
+import { LoadProjects } from "../../api/projects/load";
 import { formPath, getPath } from "../../../lib/public/files";
 import DefaultThumbnailPreview from "../../../components/admin/default/DefaultThumbnailPreview";
 import DefaultFileStructure from "../../../components/admin/default/DefaultFileStructure";
@@ -27,6 +27,7 @@ import { Bounce, toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastDefault } from "../../../config/alert";
 import { CacheId } from "../../../lib/public";
+import { LoadFile } from "../../api/file/load";
 
 export type Event = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
 
@@ -124,7 +125,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   //  Cache part
   //
   useEffect(() => {
-    fetch(`${basePath}/api/admin/projects/cache?id=${CacheId(props.type)}`, {
+    fetch(`${basePath}/api/projects/cache?id=${CacheId(props.type)}`, {
       method: "GET",
     })
       .then((res) => res.json())
@@ -139,7 +140,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   }, []);
 
   function onDataCache(event: Event) {
-    fetch(`${basePath}/api/admin/projects/cache?id=${CacheId(props.type)}`, {
+    fetch(`${basePath}/api/projects/cache?id=${CacheId(props.type)}`, {
       method: "POST",
       body: JSON.stringify(formData),
     })
@@ -155,16 +156,11 @@ export default function ProjectOperation(props: ProjectOperationProps) {
     }
 
     const toastProjectId = toast.loading("Please wait...");
-    fetch(
-      `${basePath}/api/admin/projects/${props.type}?id=${CacheId(props.type)}`,
-      {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      }
-    )
+    fetch(`${basePath}/api/projects/${props.type}?id=${CacheId(props.type)}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(formData),
+    })
       .then((res) => res.json())
       .then((data: DefaultRes<ProjectData[]>) => {
         if (data.status !== "OK" || !data.result?.length || !data.result[0]) {
@@ -183,22 +179,31 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           ...ToastDefault,
         });
 
-        // TODO: Add Markdown file
-        // TODO: To add Template file !!!
-        ((treeStructure.template as TreeObj)["index.html"] as FileData).file =
-          new File([new Blob([code], { type: "text/html" })], "index.html", {
-            type: "text/html",
-          });
+        if (codeTemplate[formData.flag]) {
+          (
+            (treeStructure.template as TreeObj)[
+              codeTemplate[formData.flag].name
+            ] as FileData
+          ).file = new File(
+            [new Blob([code], { type: codeTemplate[formData.flag].type })],
+            codeTemplate[formData.flag].name,
+            { type: codeTemplate[formData.flag].type }
+          );
+        }
 
         const { id } = data.result[0];
         (function parseTree(tree: TreeObj | FileData | null) {
           if (!tree) return;
+          // TODO: Think about this !!
+          // console.log("FILE");
+          // console.log(tree);
+
           if (tree.name && tree.file) {
             const toastFileId = toast.loading("Please wait...");
             const data = new FormData();
             data.append("file", tree.file as File);
             return fetch(
-              `${basePath}/api/admin/file/${props.type}?id=${id}&project=${
+              `${basePath}/api/file/add?id=${id}&project=${
                 formData.name
               }&role=${tree.role}${getPath(tree.path as string | undefined)}`,
               {
@@ -225,11 +230,12 @@ export default function ProjectOperation(props: ProjectOperationProps) {
               });
           }
 
-          Object.entries(tree).forEach(([name, value]) => parseTree(value));
+          // FIXME:
+          // Object.entries(tree).forEach(([name, value]) => parseTree(value));
         })(treeStructure);
 
         const toastLinkId = toast.loading("Please wait...");
-        fetch(`${basePath}/api/admin/link/${props.type}?id=${id}`, {
+        fetch(`${basePath}/api/link/${props.type}?id=${id}`, {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify(links),
@@ -289,11 +295,10 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           draggable
         />
         <DefaultThumbnailPreview
-          thumbnail={
-            treeStructure.thumbnail?.[Object.keys(treeStructure.thumbnail)[0]]
-          }
+          projectTree={treeStructure}
           formData={formData}
           setCode={setCode}
+          onFileChange={onFileAdd}
           onChange={onThumbnailChange}
           onUpload={onFilesUpload}
           onBlur={onDataCache}
@@ -393,7 +398,7 @@ export const getServerSideProps = withIronSession(async function ({
         type,
         formData: project,
         treeStructure,
-        template,
+        template: template.send.result,
         links: project.links.reduce(
           (acc, { name, link }) => ({ ...acc, [name]: link }),
           {}
@@ -407,7 +412,7 @@ export const getServerSideProps = withIronSession(async function ({
       type,
       formData: formPlaceholder,
       treeStructure: treePlaceholder,
-      template: codeTemplate.JS,
+      template: codeTemplate.JS.code,
       links: { main: "" },
     } as ProjectOperationProps,
   };

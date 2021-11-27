@@ -3,7 +3,6 @@ import ReCAPTCHA from "react-google-recaptcha";
 import InputTemplate from "./Inputs/InputTemplate";
 import InputText from "./Inputs/InputText";
 import InputValue from "./Inputs/InputValue";
-import getConfig from "next/config";
 import { Event } from "../pages/admin/projects/operation";
 import { basePath } from "../config";
 import styles from "./ContactMe.module.css";

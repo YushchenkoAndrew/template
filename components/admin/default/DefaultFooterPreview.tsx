@@ -43,7 +43,10 @@ export default function DefaultFooterPreview(props: DefaultFooterPreviewProps) {
             value={props.links["main"] || ""}
             placeholder={ProjectInfo.link}
             onChange={(event: Event) => {
-              props.onLinkAdd({ name: "main", link: event.target.value });
+              props.onLinkAdd({
+                name: "main",
+                link: event.target.value.replace(/http:\/\/|https:\/\//g, ""),
+              });
             }}
             onBlur={props.onBlur}
           />
