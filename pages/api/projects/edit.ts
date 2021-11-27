@@ -1,19 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Session, withIronSession } from "next-iron-session";
-import { apiUrl } from "../../../../config";
-import redis, { FlushValue } from "../../../../config/redis";
-import sessionConfig from "../../../../config/session";
-import { ApiAuth } from "../../../../lib/api/auth";
-import { sendLogs } from "../../../../lib/api/bot";
-import { ApiRes, ApiError, ProjectData } from "../../../../types/api";
-import { FullResponse } from "../../../../types/request";
+import { apiUrl } from "../../../config";
+import redis, { FlushValue } from "../../../config/redis";
+import sessionConfig from "../../../config/session";
+import { ApiAuth } from "../../../lib/api/auth";
+import { sendLogs } from "../../../lib/api/bot";
+import { ApiRes, ApiError, ProjectData } from "../../../types/api";
+import { FullResponse } from "../../../types/request";
 
-function EditProject(body: string) {
+function EditProject(id: number, body: string) {
   return new Promise<FullResponse>((resolve, reject) => {
     ApiAuth()
       .then((access) => {
-        fetch(`${apiUrl}/project`, {
-          method: "POST",
+        fetch(`${apiUrl}/project?id=${id}`, {
+          method: "PUT",
           headers: {
             "content-type": "application/json",
             Authorization: `Bear ${access}`,
@@ -61,8 +61,8 @@ export default withIronSession(async function (
     return res.status(405).send({ stat: "ERR", message: "Unknown method" });
   }
 
-  let id = req.query["id"] as string;
-  let { name, flag, title, desc, note } = req.body as ProjectData;
+  const cacheId = req.query["id"] as string;
+  const { id, name, flag, title, desc, note } = req.body as ProjectData;
   if (!id || !name || !flag || !title || !desc || !note) {
     return res
       .status(400)
@@ -70,11 +70,12 @@ export default withIronSession(async function (
   }
 
   const { status, send } = await EditProject(
+    id,
     JSON.stringify({ name, flag, title, desc, note })
   );
 
-  if (send.status === "OK") {
-    redis.del(`CACHE:${id}`);
+  if (send.status === "OK" && cacheId) {
+    redis.del(`CACHE:${cacheId}`);
     FlushValue("Project");
   }
 

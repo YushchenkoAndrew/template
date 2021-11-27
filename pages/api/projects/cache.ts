@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Session, withIronSession } from "next-iron-session";
-import redis from "../../../../config/redis";
-import sessionConfig from "../../../../config/session";
-import { FullResponse } from "../../../../types/request";
+import redis from "../../../config/redis";
+import sessionConfig from "../../../config/session";
+import { FullResponse } from "../../../types/request";
 
 function GetData(id: string) {
   return new Promise<FullResponse>((resolve, reject) => {
