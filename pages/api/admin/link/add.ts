@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Session, withIronSession } from "next-iron-session";
-import sessionConfig from "../../../config/session";
-import { FullResponse } from "../../../types/request";
-import { apiUrl } from "../../../config";
-import { sendLogs } from "../../../lib/api/bot";
-import { ApiAuth } from "../../../lib/api/auth";
-import { ApiError, ApiRes, FileData, LinkData } from "../../../types/api";
+import sessionConfig from "../../../../config/session";
+import { FullResponse } from "../../../../types/request";
+import { apiUrl } from "../../../../config";
+import { sendLogs } from "../../../../lib/api/bot";
+import { ApiAuth } from "../../../../lib/api/auth";
+import { ApiError, ApiRes, FileData, LinkData } from "../../../../types/api";
 
 type ArgsType = { id: number; links: { [name: string]: string } };
 

@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Session, withIronSession } from "next-iron-session";
-import { apiUrl } from "../../../config";
-import redis, { FlushValue } from "../../../config/redis";
-import sessionConfig from "../../../config/session";
-import { ApiAuth } from "../../../lib/api/auth";
-import { sendLogs } from "../../../lib/api/bot";
-import { ApiRes, ApiError, ProjectData } from "../../../types/api";
-import { FullResponse } from "../../../types/request";
+import { apiUrl } from "../../../../config";
+import redis, { FlushValue } from "../../../../config/redis";
+import sessionConfig from "../../../../config/session";
+import { ApiAuth } from "../../../../lib/api/auth";
+import { sendLogs } from "../../../../lib/api/bot";
+import { ApiRes, ApiError, ProjectData } from "../../../../types/api";
+import { FullResponse } from "../../../../types/request";
 
 function AddProject(body: string) {
   return new Promise<FullResponse>((resolve, reject) => {
@@ -59,11 +59,7 @@ export default withIronSession(async function (
 ) {
   // TODO: Create PUT & DELETE request handler
   // TODO: Clear Cache on Add new project !!!
-  if (
-    req.method !== "POST" &&
-    req.method !== "PUT" &&
-    req.method !== "DELETE"
-  ) {
+  if (req.method !== "POST") {
     return res.status(405).send({ stat: "ERR", message: "Unknown method" });
   }
 
