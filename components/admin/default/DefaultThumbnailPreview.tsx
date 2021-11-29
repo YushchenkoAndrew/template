@@ -128,9 +128,11 @@ export default function DefaultThumbnailPreview(
 
                 props.projectTree.template = {
                   [codeTemplate[event.target.value].name]: {
-                    role: "template",
+                    ...(Object.values(props.projectTree.template ?? {})[0] ??
+                      {}),
                     name: codeTemplate[event.target.value].name,
                     type: codeTemplate[event.target.value].type,
+                    role: "template",
                   } as FileData,
                 };
 

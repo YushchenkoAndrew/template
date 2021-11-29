@@ -56,6 +56,7 @@ export default function InputFile(props: InputFileProps) {
         className={`btn ${
           file && !props.multiple ? "btn-success" : "btn-outline-info"
         }`}
+        type="button"
         onClick={() => fileRef.current?.click()}
       >
         {file && !props.multiple ? file : "Upload"}

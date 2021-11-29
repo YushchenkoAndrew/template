@@ -18,12 +18,12 @@ export default function AddCard(props: AddCardProps) {
         <div className="container d-flex h-100 w-80">
           <div className="col align-self-center text-center">
             <FontAwesomeIcon
-              className="text-info mt-4"
+              className="text-info my-4"
               icon={faPlusCircle}
               size="6x"
               fontSize="2rem"
             />
-            <p className={`text-info ${styles["add-title"]}`}>Project</p>
+            <p className={`text-info mt-4 ${styles["add-title"]}`}>Project</p>
           </div>
         </div>
       </a>

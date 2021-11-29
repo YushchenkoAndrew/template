@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Event } from "../../pages/admin/projects/operation";
+import { LinkData } from "../../types/api";
 import InputValue from "./InputValue";
 
 export type DoubleType<Type> = {
@@ -12,7 +13,7 @@ export interface InputValueProps {
   type?: DoubleType<string>;
   required?: DoubleType<boolean>;
   placeholder?: DoubleType<string>;
-  onChange: (data: { [name: string]: string }) => boolean;
+  onChange: (data: LinkData) => boolean;
 }
 
 export default function InputList(props: InputValueProps) {
@@ -37,7 +38,7 @@ export default function InputList(props: InputValueProps) {
         <InputValue
           className="rounded-right"
           name={props.name[0]}
-          value={data[props.name[0]]}
+          value={data[props.name[0]] ?? ""}
           type={props.type?.[0]}
           required={props.required?.[0]}
           placeholder={props.placeholder?.[0]}
@@ -51,7 +52,7 @@ export default function InputList(props: InputValueProps) {
         <InputValue
           className="rounded-right"
           name={props.name[1]}
-          value={data[props.name[1]]}
+          value={data[props.name[1]] ?? ""}
           type={props.type?.[1]}
           required={props.required?.[1]}
           placeholder={props.placeholder?.[1]}
@@ -61,8 +62,14 @@ export default function InputList(props: InputValueProps) {
           <button
             className="btn btn-primary"
             type="button"
-            onClick={() => {
-              if (props.onChange(data)) {
+            onClick={(e) => {
+              e.preventDefault();
+              if (
+                props.onChange({
+                  name: data[props.name[0]],
+                  link: data[props.name[1]],
+                })
+              ) {
                 // Reset input on Success
                 onDataChange({ [props.name[0]]: "", [props.name[1]]: "" });
               }

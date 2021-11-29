@@ -13,7 +13,7 @@ export default function DefaultMarkdownProject(
     <>
       <main role="main">
         <div
-          className="jumbotron mx-auto bg-white"
+          className="jumbotron container bg-white"
           id="CanvasContainer0"
           dangerouslySetInnerHTML={{
             __html: marked.parse(props.template),
