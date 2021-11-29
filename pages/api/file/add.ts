@@ -13,14 +13,20 @@ import { ApiError, ApiRes, FileData } from "../../../types/api";
 import getConfig from "next/config";
 
 const { serverRuntimeConfig } = getConfig();
-type ArgsType = { id: number; project: string; path: string; role: string };
+type ArgsType = {
+  id: number;
+  project: string;
+  path: string;
+  role: string;
+  fileId: number | null;
+};
 
 function AddFile(file: File, args: ArgsType) {
   return new Promise<FullResponse>((resolve, reject) => {
     ApiAuth()
       .then((access) => {
-        fetch(`${apiUrl}/file/${args.id}`, {
-          method: "POST",
+        fetch(`${apiUrl}/file/${args.fileId || args.id}`, {
+          method: args.fileId ? "PUT" : "POST",
           headers: {
             "content-type": "application/json",
             Authorization: `Bear ${access}`,
@@ -77,15 +83,17 @@ function UploadFile(file: File, args: ArgsType) {
       body: formData as any,
     })
       .then((res) => res.json())
-      .then((data) =>
+      .then((data) => {
+        console.log(data);
+
         resolve({
           status: 200,
           send: {
             status: data.status ?? "ERR",
             message: data.message ?? "What's wrong with you, File Server",
           },
-        })
-      )
+        });
+      })
       .catch((err) => {
         resolve({
           status: 500,
@@ -161,15 +169,14 @@ export default withIronSession(async function (
   req: NextApiRequest & { session: Session },
   res: NextApiResponse
 ) {
-  // TODO: Create PUT request handler
-  if (req.method !== "POST" && req.method !== "PUT" && req.method !== "GET") {
+  if (req.method !== "POST") {
     return res.status(405).send({ stat: "ERR", message: "Unknown method" });
   }
 
-  let id = Number(req.query["id"] as string);
-  let project = req.query["project"] as string;
-  let role = req.query["role"] as string;
-  let path = (req.query["path"] as string) ?? "";
+  const id = Number(req.query["id"] as string);
+  const project = req.query["project"] as string;
+  const role = req.query["role"] as string;
+  const path = (req.query["path"] as string) ?? "";
   if (!role || !project || isNaN(id)) {
     return res.status(400).send({
       stat: "ERR",
@@ -177,7 +184,15 @@ export default withIronSession(async function (
     });
   }
 
-  const { status, send } = await SendFile(req, { id, project, path, role });
+  const { status, send } = await SendFile(req, {
+    id,
+    project,
+    path,
+    role,
+    fileId: req.query["file_id"]
+      ? Number(req.query["file_id"] as string)
+      : null,
+  });
   res.status(status).send(send);
 },
 sessionConfig);
