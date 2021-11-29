@@ -1,7 +1,7 @@
 import React from "react";
 import { ProjectInfo } from "../../../config/placeholder";
 import { Event } from "../../../pages/admin/projects/operation";
-import { ProjectData } from "../../../types/api";
+import { LinkData, ProjectData } from "../../../types/api";
 import DefaultFooter from "../../default/DefaultFooter";
 import DefaultProjectInfo from "../../default/DefaultProjectInfo";
 import InputList from "../../Inputs/InputDoubleList";
@@ -11,12 +11,12 @@ import InputText from "../../Inputs/InputText";
 import ListEntity from "../../Inputs/ListEntity";
 
 export interface DefaultFooterPreviewProps {
-  links: { [name: string]: string };
+  links: { [name: string]: LinkData };
   formData: ProjectData;
   onChange: (event: Event) => void;
   onBlur?: (event: Event) => void;
-  onLinkAdd: (data: { [name: string]: string }) => boolean;
-  onLinkChange: (data: { [name: string]: string }) => void;
+  onLinkAdd: (data: LinkData) => boolean;
+  onLinkChange: (data: { [name: string]: LinkData }) => void;
 }
 
 export default function DefaultFooterPreview(props: DefaultFooterPreviewProps) {
@@ -40,7 +40,7 @@ export default function DefaultFooterPreview(props: DefaultFooterPreviewProps) {
             char="http://"
             name="link"
             required
-            value={props.links["main"] || ""}
+            value={props.links["main"].link || ""}
             placeholder={ProjectInfo.link}
             onChange={(event: Event) => {
               props.onLinkAdd({
@@ -60,7 +60,7 @@ export default function DefaultFooterPreview(props: DefaultFooterPreviewProps) {
             onChange={props.onLinkAdd}
           />
           <ul className="list-group">
-            {Object.entries(props.links).map(([name, link], i) =>
+            {Object.entries(props.links).map(([name, { link }], i) =>
               name != "main" ? (
                 <div key={i} className="row">
                   <ListEntity
@@ -76,7 +76,7 @@ export default function DefaultFooterPreview(props: DefaultFooterPreviewProps) {
 
         <DefaultFooter name={props.formData.name}>
           <DefaultProjectInfo
-            links={Object.entries(props.links).map(([name, link]) => ({
+            links={Object.entries(props.links).map(([name, { link }]) => ({
               name,
               link: link && `http://${link}`,
             }))}

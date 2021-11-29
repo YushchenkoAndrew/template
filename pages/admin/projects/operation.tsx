@@ -8,7 +8,7 @@ import { ProjectElement } from "../../../types/projects";
 import { TreeObj } from "../../../types/tree";
 import { basePath, voidUrl } from "../../../config";
 import { DefaultRes } from "../../../types/request";
-import { FileData, ProjectData } from "../../../types/api";
+import { FileData, LinkData, ProjectData } from "../../../types/api";
 import { withIronSession } from "next-iron-session";
 import { NextSessionArgs } from "../../../types/session";
 import sessionConfig from "../../../config/session";
@@ -28,6 +28,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastDefault } from "../../../config/alert";
 import { CacheId } from "../../../lib/public";
 import { LoadFile } from "../../api/file/load";
+import DefaultLinkPreview from "../../../components/admin/default/DefaultLinkPreview";
 
 export type Event = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
 
@@ -75,7 +76,7 @@ export interface ProjectOperationProps {
   formData: ProjectData;
   treeStructure: TreeObj;
   template: string;
-  links: { [name: string]: string };
+  links: { [name: string]: LinkData };
 }
 
 export default function ProjectOperation(props: ProjectOperationProps) {
@@ -115,9 +116,9 @@ export default function ProjectOperation(props: ProjectOperationProps) {
     );
   }
 
-  function onNewLinkAdd(data: { [name: string]: string }): boolean {
+  function onNewLinkAdd(data: LinkData): boolean {
     if (!data["name"] || data["link"] === undefined) return false;
-    onLinksChange({ ...links, [data["name"]]: data["link"] });
+    onLinksChange({ ...links, [data["name"]]: data });
     return true;
   }
 
@@ -163,6 +164,8 @@ export default function ProjectOperation(props: ProjectOperationProps) {
     })
       .then((res) => res.json())
       .then((data: DefaultRes<ProjectData[]>) => {
+        console.log(data);
+
         if (data.status !== "OK" || !data.result?.length || !data.result[0]) {
           return toast.update(toastProjectId, {
             render: `Project: ${data.message}`,
@@ -191,21 +194,24 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           );
         }
 
-        const { id } = data.result[0];
+        const id = data.result[0].id || formData.id;
         (function parseTree(tree: TreeObj | FileData | null) {
           if (!tree) return;
-          // TODO: Think about this !!
-          // console.log("FILE");
-          // console.log(tree);
 
-          if (tree.name && tree.file) {
+          // Check if obj is FileData
+          if (tree.name) {
+            // If File not exist then break
+            if (!tree.file) return;
+
             const toastFileId = toast.loading("Please wait...");
             const data = new FormData();
             data.append("file", tree.file as File);
             return fetch(
               `${basePath}/api/file/add?id=${id}&project=${
                 formData.name
-              }&role=${tree.role}${getPath(tree.path as string | undefined)}`,
+              }&role=${tree.role}${getPath(tree.path as string | undefined)}${
+                tree.id ? `&file_id=${tree.id}` : ""
+              }`,
               {
                 method: "POST",
                 body: data,
@@ -230,12 +236,11 @@ export default function ProjectOperation(props: ProjectOperationProps) {
               });
           }
 
-          // FIXME:
-          // Object.entries(tree).forEach(([name, value]) => parseTree(value));
+          Object.entries(tree).forEach(([_, value]) => parseTree(value));
         })(treeStructure);
 
         const toastLinkId = toast.loading("Please wait...");
-        fetch(`${basePath}/api/link/${props.type}?id=${id}`, {
+        fetch(`${basePath}/api/link/add?id=${id}`, {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify(links),
@@ -305,29 +310,37 @@ export default function ProjectOperation(props: ProjectOperationProps) {
         />
 
         {formData.flag === "Link" ? (
-          <span />
+          <>
+            <hr />
+            <DefaultLinkPreview
+              links={links}
+              onBlur={onDataCache}
+              onLinkAdd={onNewLinkAdd}
+            />
+          </>
         ) : (
-          <DefaultFileStructure
-            code={code}
-            formData={formData}
-            fileInfo={fileInfo}
-            projectTree={formTree(treeStructure, fileInfo)}
-            onChange={onFileInfoChange}
-            onCodeChange={(code: string) => setCode(code)}
-            onUpload={onFilesUpload}
-            onBlur={onDataCache}
-          />
+          <>
+            <DefaultFileStructure
+              code={code}
+              formData={formData}
+              fileInfo={fileInfo}
+              projectTree={formTree(treeStructure, fileInfo)}
+              onChange={onFileInfoChange}
+              onCodeChange={(code: string) => setCode(code)}
+              onUpload={onFilesUpload}
+              onBlur={onDataCache}
+            />
+            <hr />
+            <DefaultFooterPreview
+              links={links}
+              formData={formData}
+              onChange={onThumbnailChange}
+              onBlur={onDataCache}
+              onLinkAdd={onNewLinkAdd}
+              onLinkChange={onLinksChange}
+            />
+          </>
         )}
-
-        <hr />
-        <DefaultFooterPreview
-          links={links}
-          formData={formData}
-          onChange={onThumbnailChange}
-          onBlur={onDataCache}
-          onLinkAdd={onNewLinkAdd}
-          onLinkChange={onLinksChange}
-        />
 
         <hr className="mb-5" />
         <div className="d-flex justify-content-center mb-3">
@@ -372,14 +385,16 @@ export const getServerSideProps = withIronSession(async function ({
   if ((type = params.get("type")) === "edit") {
     if (!params.get("name")) return { notFound: true };
 
+    const { send } = await LoadProjects<ProjectData>({
+      name: params.get("name") ?? "",
+    });
+
     const template = await LoadFile({
+      project_id: send.result?.[0]?.id || 0,
       project: params.get("name") ?? "",
       role: "template",
     });
 
-    const { send } = await LoadProjects<ProjectData>({
-      name: params.get("name") ?? "",
-    });
     if (send.status === "ERR" || !send.result?.length) {
       return { notFound: true };
     }
@@ -400,7 +415,7 @@ export const getServerSideProps = withIronSession(async function ({
         treeStructure,
         template: template.send.result,
         links: project.links.reduce(
-          (acc, { name, link }) => ({ ...acc, [name]: link }),
+          (acc, curr) => ({ ...acc, [curr.name]: curr }),
           {}
         ),
       } as ProjectOperationProps,
@@ -413,7 +428,7 @@ export const getServerSideProps = withIronSession(async function ({
       formData: formPlaceholder,
       treeStructure: treePlaceholder,
       template: codeTemplate.JS.code,
-      links: { main: "" },
+      links: { main: { name: "main", link: "" } },
     } as ProjectOperationProps,
   };
 },
