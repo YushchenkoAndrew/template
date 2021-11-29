@@ -58,8 +58,21 @@ export const getServerSideProps = async (
   const { send } = await LoadProjects({ name });
   if (send.status === "ERR" || !send.result?.length) return { notFound: true };
   const project = send.result[0] as ProjectData;
-  const template = await LoadFile({ project: name, role: "template" });
-  console.log(project);
+  if (project.flag === "Link") {
+    return {
+      redirect: {
+        basePath: false,
+        destination: "http://" + project.links[0].link,
+        permanent: false,
+      },
+    };
+  }
+
+  const template = await LoadFile({
+    project: name,
+    project_id: project.id || 0,
+    role: "template",
+  });
 
   return {
     props: {

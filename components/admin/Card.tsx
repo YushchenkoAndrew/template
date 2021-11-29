@@ -18,6 +18,7 @@ export type EventLinks = {
 export interface CardProps {
   id: number;
   img: string;
+  href: string;
   title: string;
   flag: FlagType;
   desc?: string;
@@ -37,13 +38,15 @@ export default function Card(props: CardProps) {
           </div>
         </div>
         <div className="container text-center">
-          <Image
-            className={`${styles["circular"]}`}
-            src={props.img}
-            // FIXME: Do not change img
-            // width="100"
-            alt="Project image"
-          />
+          <a href={props.href} target="_blank">
+            <Image
+              className={`${styles["circular"]}`}
+              src={props.img}
+              // FIXME: Do not change img
+              // width="100"
+              alt="Project image"
+            />
+          </a>
           <h4 className="d-block text-dark font-weight-bold mt-3">
             {props.title}
           </h4>

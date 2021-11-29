@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import AddCard from "../../components/admin/AddCard";
 import DefaultHeader from "../../components/admin/default/DefaultHeader";
 import DefaultFooter from "../../components/default/DefaultFooter";
@@ -66,6 +66,7 @@ export default function AdminProjects(props: AdminProjectsProps) {
                 key={i}
                 id={item.id || 0}
                 title={item.title}
+                href={`/projects/${item.name}`}
                 img={`${voidUrl}/${item.name}${formPath(item.files[0])}`}
                 event={{
                   modify: {

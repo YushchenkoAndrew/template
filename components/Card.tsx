@@ -6,6 +6,7 @@ import styles from "./Card.module.css";
 export interface CardProps {
   img: string;
   title: string;
+  target?: React.HTMLAttributeAnchorTarget;
   href: string;
   size?: string;
   color?: string;
@@ -102,6 +103,7 @@ export default function Card(props: CardProps) {
             : null
         }
         href={props.href}
+        target={props.target || "_self"}
       >
         <div className={`card-body ${opacityStyle}`}>
           <h4

@@ -132,6 +132,7 @@ export default function ProjectsListPage(props: ProjectsListPageProps) {
                         img={`${voidUrl}/${item.name}${formPath(
                           item.files[0]
                         )}`}
+                        target={item.flag == "Link" ? "_blank" : "_self"}
                         href={`${basePath}/${item.name}`}
                         description={item.desc}
                       />
