@@ -38,18 +38,21 @@ export default function Card(props: CardProps) {
           </div>
         </div>
         <div className="container text-center">
-          <a href={props.href} target="_blank">
-            <Image
-              className={`${styles["circular"]}`}
-              src={props.img}
-              // FIXME: Do not change img
-              // width="100"
-              alt="Project image"
-            />
+          <a className="text-decoration-none" href={props.href} target="_blank">
+            <div className={`container ${styles["project-link"]}`}>
+              <Image
+                className={`${styles["circular"]}`}
+                src={props.img}
+                // FIXME: Do not change img
+                // width="100"
+                alt="Project image"
+              />
+
+              <h4 className="d-block text-dark font-weight-bold mt-3">
+                {props.title}
+              </h4>
+            </div>
           </a>
-          <h4 className="d-block text-dark font-weight-bold mt-3">
-            {props.title}
-          </h4>
           <hr />
           <p className="font-italic text-muted ml-1">
             {desc.length < 15

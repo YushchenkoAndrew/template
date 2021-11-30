@@ -26,3 +26,12 @@
   width: auto;
   height: 80%;
 }
+
+.project-link {
+  transition-duration: 250ms;
+}
+
+.project-link:hover {
+  transform: scale(0.9);
+  filter: grayscale(40%);
+}
