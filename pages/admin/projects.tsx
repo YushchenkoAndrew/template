@@ -16,12 +16,52 @@ import { withIronSession } from "next-iron-session";
 import { NextSessionArgs } from "../../types/session";
 import sessionConfig from "../../config/session";
 import { LoadProjects } from "../api/projects/load";
+import { DefaultRes } from "../../types/request";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastDefault } from "../../config/alert";
 
 let page = 1;
 
 export interface AdminProjectsProps {
   hasMore: boolean;
   projects: ProjectData[];
+}
+
+function FetchHandler(url: string, type: string = "Project") {
+  return new Promise((resolve, reject) => {
+    const toastId = toast.loading("Please wait...");
+    fetch(url, { method: "POST" })
+      .then((res) => res.json())
+      .then((data: DefaultRes) => {
+        if (data.status !== "OK") {
+          resolve(false);
+          return toast.update(toastId, {
+            render: `${type}: ${data.message}`,
+            type: "error",
+            isLoading: false,
+            ...ToastDefault,
+          });
+        }
+
+        resolve(true);
+        toast.update(toastId, {
+          render: `${type}: Success`,
+          type: "success",
+          isLoading: false,
+          ...ToastDefault,
+        });
+      })
+      .catch((err) => {
+        resolve(false);
+        return toast.update(toastId, {
+          render: `${type}: ${err.message}`,
+          type: "error",
+          isLoading: false,
+          ...ToastDefault,
+        });
+      });
+  });
 }
 
 export default function AdminProjects(props: AdminProjectsProps) {
@@ -40,6 +80,18 @@ export default function AdminProjects(props: AdminProjectsProps) {
         />
       </DefaultHead>
       <DefaultHeader />
+
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        transition={Bounce}
+        closeOnClick
+        theme="colored"
+        rtl={false}
+        draggable
+      />
 
       <div className="container mt-4">
         <InfiniteScroll
@@ -74,7 +126,26 @@ export default function AdminProjects(props: AdminProjectsProps) {
                   },
                   delete: {
                     onClick: () => {
-                      console.log("DELETE");
+                      FetchHandler(
+                        `${basePath}/api/link/del?project_id=${item.id}&project=${item.name}`,
+                        "Link"
+                      ).then((ok) => {
+                        if (!ok) return;
+
+                        FetchHandler(
+                          `${basePath}/api/file/del?project_id=${item.id}&project=${item.name}`,
+                          "Files"
+                        ).then((ok) => {
+                          if (!ok) return;
+
+                          FetchHandler(
+                            `${basePath}/api/projects/del?project=${item.name}&flag=${item.flag}`
+                          ).then((ok) => {
+                            if (!ok) return;
+                            setTimeout(() => window.location.reload(), 1000);
+                          });
+                        });
+                      });
                     },
                   },
                 }}
