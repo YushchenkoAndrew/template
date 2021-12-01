@@ -194,12 +194,12 @@ export default function ProjectOperation(props: ProjectOperationProps) {
 
         const id = data.result[0].id || formData.id;
         (function parseTree(tree: TreeObj | FileData | null) {
-          return new Promise((resolve, reject) => {
+          return new Promise(async (resolve, reject) => {
             // Check if obj is FileData and if File not exist then break
             if (!tree?.name || !tree.file) {
-              Object.entries(tree || {}).forEach(
-                async ([_, value]) => await parseTree(value)
-              );
+              for (let [_, value] of Object.entries(tree || {})) {
+                await parseTree(value);
+              }
               return resolve(true);
             }
 
