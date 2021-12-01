@@ -23,6 +23,7 @@ export default function Card(props: CardProps) {
   const [transitionStyle, setStyle] = useState({
     top: 0,
     left: 0,
+    borderRadius: "1000px",
   } as CSSProperties);
 
   useEffect(() => {
@@ -38,13 +39,13 @@ export default function Card(props: CardProps) {
   }, []);
 
   function showElement(x: number, y: number) {
-    setStyle({ top: y, left: x });
+    setStyle({ ...transitionStyle, top: y, left: x });
     setOpacity(styles["dim"]);
     setAnimation(styles["explode-animation"]);
   }
 
   function hideElement(x: number, y: number) {
-    setStyle({ top: y, left: x });
+    setStyle({ ...transitionStyle, top: y, left: x });
     setOpacity(styles["appear"]);
     setAnimation(styles["displode-animation"]);
   }
@@ -85,6 +86,12 @@ export default function Card(props: CardProps) {
         src={props.img}
         alt={`Project: ${props.title}`}
         style={{ mixBlendMode: "multiply" }}
+        onLoad={({ currentTarget: { height, width } }) =>
+          setStyle({
+            ...transitionStyle,
+            borderRadius: Math.max(height, width),
+          })
+        }
       />
       <a
         className={`card-img-overlay d-flex flex-column ${
