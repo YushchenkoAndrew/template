@@ -8,9 +8,10 @@ import { FullResponse } from "../../../types/request";
 import { apiUrl, localVoidUrl } from "../../../config";
 import { sendLogs } from "../../../lib/api/bot";
 import md5 from "../../../lib/md5";
-import { ApiAuth } from "../../../lib/api/auth";
+import { ApiAuth, DeleteTokens } from "../../../lib/api/auth";
 import { ApiError, ApiRes, FileData } from "../../../types/api";
 import getConfig from "next/config";
+import { DelFileRecord } from "./del";
 
 const { serverRuntimeConfig } = getConfig();
 type ArgsType = {
@@ -21,7 +22,7 @@ type ArgsType = {
   fileId: number | null;
 };
 
-function AddFile(file: File, args: ArgsType) {
+export function AddFileRecord(file: File, args: ArgsType) {
   return new Promise<FullResponse>((resolve, reject) => {
     ApiAuth()
       .then((access) => {
@@ -84,8 +85,6 @@ function UploadFile(file: File, args: ArgsType) {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
-
         resolve({
           status: 200,
           send: {
@@ -131,11 +130,16 @@ function SendFile(req: NextApiRequest & { session: Session }, args: ArgsType) {
         });
       }
 
-      AddFile(files.file as File, args)
+      AddFileRecord(files.file as File, args)
         .then((res: FullResponse) => {
           if (res.send.status !== "OK") return resolve(res);
           UploadFile(files.file as File, args)
-            .then((res) => resolve(res))
+            .then((res) => {
+              if (res.send.status === "OK") return resolve(res);
+              DelFileRecord(
+                `?project_id=${args.id}&name=${(files.file as File).name}`
+              );
+            })
             .catch((err) => {
               resolve({
                 status: 500,

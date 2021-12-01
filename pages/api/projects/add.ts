@@ -63,7 +63,7 @@ export default withIronSession(async function (
 
   let id = req.query["id"] as string;
   let { name, flag, title, desc, note } = req.body as ProjectData;
-  if (!name || !flag || !title || !desc || !note) {
+  if (!name || !flag || !title || !desc || (flag !== "Link" && !note)) {
     return res
       .status(400)
       .send({ stat: "ERR", message: "Not all required fields are setted" });

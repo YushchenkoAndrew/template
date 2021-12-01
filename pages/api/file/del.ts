@@ -78,7 +78,7 @@ function VoidDelFile(files: FileData[], args: ArgsType) {
   });
 }
 
-function DelFileRecord(query: string) {
+export function DelFileRecord(query: string) {
   return new Promise<FullResponse>((resolve, reject) => {
     ApiAuth()
       .then((access) => {

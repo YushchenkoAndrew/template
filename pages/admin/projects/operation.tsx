@@ -164,8 +164,6 @@ export default function ProjectOperation(props: ProjectOperationProps) {
     })
       .then((res) => res.json())
       .then((data: DefaultRes<ProjectData[]>) => {
-        console.log(data);
-
         if (data.status !== "OK" || !data.result?.length || !data.result[0]) {
           return toast.update(toastProjectId, {
             render: `Project: ${data.message}`,
@@ -196,12 +194,14 @@ export default function ProjectOperation(props: ProjectOperationProps) {
 
         const id = data.result[0].id || formData.id;
         (function parseTree(tree: TreeObj | FileData | null) {
-          if (!tree) return;
-
-          // Check if obj is FileData
-          if (tree.name) {
-            // If File not exist then break
-            if (!tree.file) return;
+          return new Promise((resolve, reject) => {
+            // Check if obj is FileData and if File not exist then break
+            if (!tree?.name || !tree.file) {
+              Object.entries(tree || {}).forEach(
+                async ([_, value]) => await parseTree(value)
+              );
+              return resolve(true);
+            }
 
             const toastFileId = toast.loading("Please wait...");
             const data = new FormData();
@@ -219,6 +219,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
             )
               .then((res) => res.json())
               .then((data: DefaultRes) => {
+                resolve(true);
                 toast.update(toastFileId, {
                   render: `File [${tree.name}]: ${data.message}`,
                   type: data.status === "OK" ? "success" : "error",
@@ -227,6 +228,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
                 });
               })
               .catch(() => {
+                resolve(true);
                 toast.update(toastFileId, {
                   render: `File [${tree.name}]: crashed at upload`,
                   type: "error",
@@ -234,34 +236,36 @@ export default function ProjectOperation(props: ProjectOperationProps) {
                   ...ToastDefault,
                 });
               });
-          }
-
-          Object.entries(tree).forEach(([_, value]) => parseTree(value));
-        })(treeStructure);
-
-        const toastLinkId = toast.loading("Please wait...");
-        fetch(`${basePath}/api/link/add?id=${id}`, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(links),
-        })
-          .then((res) => res.json())
-          .then((data: DefaultRes) => {
-            toast.update(toastLinkId, {
-              render: `Link: ${data.message}`,
-              type: data.status === "OK" ? "success" : "error",
-              isLoading: false,
-              ...ToastDefault,
-            });
-          })
-          .catch(() => {
-            toast.update(toastLinkId, {
-              render: "Link: Server error",
-              type: "error",
-              isLoading: false,
-              ...ToastDefault,
-            });
           });
+        })(treeStructure).then(() => {
+          const toastLinkId = toast.loading("Please wait...");
+          fetch(`${basePath}/api/link/add?id=${id}`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(links),
+          })
+            .then((res) => res.json())
+            .then((data: DefaultRes) => {
+              setTimeout(
+                () => (window.location.href = basePath + "/admin/projects/"),
+                2000
+              );
+              toast.update(toastLinkId, {
+                render: `Link: ${data.message}`,
+                type: data.status === "OK" ? "success" : "error",
+                isLoading: false,
+                ...ToastDefault,
+              });
+            })
+            .catch(() => {
+              toast.update(toastLinkId, {
+                render: "Link: Server error",
+                type: "error",
+                isLoading: false,
+                ...ToastDefault,
+              });
+            });
+        });
       })
       .catch(() => {
         toast.update(toastProjectId, {
