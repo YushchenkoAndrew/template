@@ -6,6 +6,7 @@ import { apiUrl } from "../../../config";
 import { sendLogs } from "../../../lib/api/bot";
 import { ApiAuth } from "../../../lib/api/auth";
 import { ApiError, ApiRes, FileData, LinkData } from "../../../types/api";
+import { FlushValue } from "../../../config/redis";
 
 type ArgsType = { id: number; links: { add: LinkData[]; edit: LinkData[] } };
 
@@ -127,6 +128,8 @@ export default withIronSession(async function (
   }
 
   const { status, send } = await SendData({ id, links });
+
+  if (send.status == "OK") FlushValue("Project");
   res.status(status).send(send);
 },
 sessionConfig);

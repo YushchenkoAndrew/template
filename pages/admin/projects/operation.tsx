@@ -282,7 +282,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   return (
     <>
       <DefaultHead>
-        <title>Admin</title>
+        <title>Add Project</title>
       </DefaultHead>
       <DefaultHeader />
       <form
@@ -417,7 +417,8 @@ export const getServerSideProps = withIronSession(async function ({
         type,
         formData: project,
         treeStructure,
-        template: template.send.result,
+        template:
+          template.send.result || codeTemplate[project.flag]?.code || "",
         links: project.links.reduce(
           (acc, curr) => ({ ...acc, [curr.name]: curr }),
           {}

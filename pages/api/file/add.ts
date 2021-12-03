@@ -12,6 +12,7 @@ import { ApiAuth, DeleteTokens } from "../../../lib/api/auth";
 import { ApiError, ApiRes, FileData } from "../../../types/api";
 import getConfig from "next/config";
 import { DelFileRecord } from "./del";
+import { FlushValue } from "../../../config/redis";
 
 const { serverRuntimeConfig } = getConfig();
 type ArgsType = {
@@ -197,6 +198,8 @@ export default withIronSession(async function (
       ? Number(req.query["file_id"] as string)
       : null,
   });
+
+  if (send.status == "OK") FlushValue("Project");
   res.status(status).send(send);
 },
 sessionConfig);

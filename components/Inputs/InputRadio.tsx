@@ -6,13 +6,16 @@ import { ProjectElement } from "../../types/projects";
 export interface InputRadioProps {
   name: string;
   options: string[];
+  placeholder?: string;
   label?: string;
   row?: boolean;
   onChange: (event: Event) => void;
 }
 
 export default function InputRadio(props: InputRadioProps) {
-  const [selected, onSelected] = useState<string | null>(props.options[0]);
+  const [selected, onSelected] = useState<string | null>(
+    props.placeholder || props.options[0]
+  );
 
   return (
     <div className="input-group">

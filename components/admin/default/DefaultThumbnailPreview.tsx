@@ -116,6 +116,7 @@ export default function DefaultThumbnailPreview(
           <InputTemplate label="Flag">
             <InputRadio
               name="flag"
+              placeholder={props.formData.flag}
               options={["JS", "Markdown", "Link"]}
               label="btn-outline-secondary"
               onChange={(event) => {
