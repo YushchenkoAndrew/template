@@ -30,6 +30,8 @@ import { CacheId } from "../../../lib/public";
 import { LoadFile } from "../../api/file/load";
 import DefaultLinkPreview from "../../../components/admin/default/DefaultLinkPreview";
 
+import {CoreV1Api, KubeConfig, } from "@kubernetes/client-node";
+
 export type Event = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
 
 export function formTree(
@@ -386,6 +388,21 @@ export const getServerSideProps = withIronSession(async function ({
       },
     };
   }
+
+    // FIXME: TEST
+  //   const kube = new KubeConfig();
+  //   kube.loadFromOptions({
+  //     cluster: [{
+  //       name: "cluster",
+  //       server: "192.168.1.2"
+  //     }]
+  //   });
+
+  // kube.loadFromDefault();
+  // const k3sApi = kube.makeApiClient(CoreV1Api);
+  // k3sApi.listNamespacedPod('default').then((res) => {
+  //   console.log(res.body);
+  // });
 
   let type;
   const params = new URLSearchParams((req.url ?? "").split("?")[1] ?? "");
