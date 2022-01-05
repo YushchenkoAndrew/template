@@ -120,6 +120,7 @@ export default function TreeView(props: TreeViewProps) {
           index={key}
           icon={icon}
           iconClass={color}
+          href={value.url}
           onChange={onStateChange}
         >
           {value.name

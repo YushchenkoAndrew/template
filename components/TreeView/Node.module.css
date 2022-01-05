@@ -1,0 +1,18 @@
+.el-prop {
+  position: relative;
+  left: -15px;
+  transform: scale(0.9);
+
+  opacity: 0;
+  transition: 0.5s;
+}
+
+span:hover .el-prop {
+  left: 0px;
+  opacity: 1;
+  transition: 0.5s;
+}
+
+.el-prop:hover {
+  transform: scale(1.4);
+}

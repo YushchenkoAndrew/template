@@ -102,13 +102,13 @@ export default function Info() {
       `${basePath}/api/info/statistic?date=${formatDate(
         date
       )}&id=${localStorage.getItem("id")}`,
-      { cache: "default" }
+      // { cache: "default" }
+      { cache: "no-cache" }
     )
       .then((res) => res.json())
       .then((data: StatisticData) => {
         if (data.stat !== "OK") return;
         onMapLoad(data.map);
-
         onInfoLoad(data.info);
       })
       .catch((err) => {});
@@ -119,7 +119,8 @@ export default function Info() {
       `${basePath}/api/info/analytics?date=${formatDate(
         date
       )}&id=${localStorage.getItem("id")}`,
-      { cache: "default" }
+      // { cache: "default" }
+      { cache: "no-cache" }
     )
       .then((res) => res.json())
       .then((data: AnalyticsData) => {

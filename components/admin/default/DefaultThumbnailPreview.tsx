@@ -89,27 +89,7 @@ export default function DefaultThumbnailPreview(
               name="file"
               role="thumbnail"
               type="image/*"
-              onChange={(event: ProjectElement) => {
-                let reader = new FileReader();
-
-                function ReadFiles(i: number) {
-                  return new Promise((resolve, reject) => {
-                    reader.readAsDataURL(
-                      event.target.value[i].file || new Blob()
-                    );
-                    reader.onloadend = (e) => {
-                      event.target.value[i].url = String(reader.result);
-                      if (++i == event.target.value.length) {
-                        return resolve(true);
-                      }
-
-                      return ReadFiles(i).finally(() => resolve(true));
-                    };
-                  });
-                }
-
-                ReadFiles(0).finally(() => props.onUpload(event));
-              }}
+              onChange={props.onUpload}
             />
           </InputTemplate>
 

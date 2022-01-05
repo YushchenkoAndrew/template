@@ -44,11 +44,23 @@ export default function InputFile(props: InputFileProps) {
             });
           }
 
-          props.onChange({
-            target: {
-              name: props.name,
-              value: files,
-            },
+          (function ReadFiles(i: number) {
+            return new Promise((resolve, reject) => {
+              let reader = new FileReader();
+              reader.readAsDataURL(files[i].file || new Blob());
+              reader.onloadend = (e) => {
+                files[i].url = String(reader.result);
+                if (++i == files.length) return resolve(true);
+                return ReadFiles(i).finally(() => resolve(true));
+              };
+            });
+          })(0).finally(() => {
+            props.onChange({
+              target: {
+                name: props.name,
+                value: files,
+              },
+            });
           });
         }}
       />

@@ -1,14 +1,18 @@
 import {
+  faExternalLinkAlt,
   faFolder,
   faFolderOpen,
+  faPencilAlt,
+  faTrashAlt,
   IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useRef, useState } from "react";
-import styles from "./TreeView.module.css";
+import React from "react";
+import styles from "./Node.module.css";
 export interface NodeProps {
   name: string;
   index?: string;
+  href?: string;
   open?: boolean;
   className?: string;
   icon?: IconDefinition;
@@ -39,6 +43,40 @@ function Node(props: NodeProps) {
           <span />
         )}
         {props.name}
+
+        {/* TODO: Maybe to do some node editing */}
+        {/* <a href={props.href ?? "#"}>
+          <FontAwesomeIcon
+            className={`ml-4 mr-1 ${styles["el-prop"]} text-primary`}
+            icon={faPencilAlt}
+            size="lg"
+            fontSize="1rem"
+          />
+        </a> */}
+        <a
+          href={props.href ?? "#"}
+          target={props.href ? "_blank" : "_self"}
+          download={
+            props.href && props.href.startsWith("data:")
+              ? props.name
+              : undefined
+          }
+        >
+          <FontAwesomeIcon
+            className={`ml-4 mr-1 ${styles["el-prop"]} text-primary`}
+            icon={faExternalLinkAlt}
+            size="lg"
+            fontSize="1rem"
+          />
+        </a>
+        <a>
+          <FontAwesomeIcon
+            className={`ml-1 mr-2 ${styles["el-prop"]} text-danger `}
+            icon={faTrashAlt}
+            size="lg"
+            fontSize="1rem"
+          />
+        </a>
       </span>
       {props.children && props.open ? <ul>{props.children}</ul> : null}
     </li>

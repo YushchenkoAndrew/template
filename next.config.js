@@ -80,5 +80,7 @@ module.exports = {
     EMAIL_TO: process.env.EMAIL_TO,
     EMAIL_FROM: process.env.EMAIL_FROM,
     EMAIL_PASS: process.env.EMAIL_PASS,
+
+    SESSION_TTL: process.env.SESSION_TTL,
   },
 };

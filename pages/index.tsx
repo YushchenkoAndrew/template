@@ -126,7 +126,7 @@ export default function Home() {
               , also you could reach me on
               <a
                 className="text-primary mx-1"
-                href="https://twitter.com/AndrewY69942173"
+                href="https://twitter.com/AndrewMortis"
                 onClick={MediaView}
                 target="_blank"
                 rel="noreferrer"

@@ -33,7 +33,7 @@ export default function DefaultLinks(props: DefaultLinksProps) {
       </a>
       <a
         className="text-muted mx-2 mx-md-3"
-        href="https://twitter.com/AndrewY69942173"
+        href="https://twitter.com/AndrewMortis"
         onClick={MediaView}
         target="_blank"
         rel="noreferrer"

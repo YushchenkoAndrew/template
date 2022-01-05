@@ -32,7 +32,7 @@ export default function DefaultFileStructure(props: DefaultFileStructureProps) {
     <>
       <hr />
       <div className="row">
-        <div className="col-md-6 order-md-1 mb-4">
+        <div className="col-md-7 order-md-1 mb-4">
           <h4 className="font-weight-bold mb-3">Projects Files Structure</h4>
           <TreeView
             name={props.formData.name || ProjectInfo.name}
@@ -41,11 +41,11 @@ export default function DefaultFileStructure(props: DefaultFileStructureProps) {
             projectTree={props.projectTree}
           />
         </div>
-        <div className="col-md-6 order-md-2">
+        <div className="col-md-5 order-md-2">
           <InputTemplate label="Role">
             <InputRadio
               name="role"
-              options={["assets", "src", "styles", "template"]}
+              options={["assets", "src", "styles"]}
               onChange={props.onChange}
             />
           </InputTemplate>

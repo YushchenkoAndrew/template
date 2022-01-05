@@ -197,6 +197,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           return new Promise(async (resolve, reject) => {
             // Check if obj is FileData and if File not exist then break
             if (!tree?.name || !tree.file) {
+              if (tree && tree.name) return resolve(true);
               for (let [_, value] of Object.entries(tree || {})) {
                 await parseTree(value);
               }
@@ -282,7 +283,9 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   return (
     <>
       <DefaultHead>
-        <title>Add Project</title>
+        <title>
+          {props.type.charAt(0).toUpperCase() + props.type.slice(1)} Project
+        </title>
       </DefaultHead>
       <DefaultHeader />
       <form
