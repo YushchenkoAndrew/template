@@ -1,0 +1,8 @@
+.terminal {
+  max-height: 500px;
+  overflow-y: scroll;
+}
+
+.terminal-line:focus {
+  outline: 0;
+}

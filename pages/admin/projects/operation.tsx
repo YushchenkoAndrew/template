@@ -29,8 +29,14 @@ import { ToastDefault } from "../../../config/alert";
 import { CacheId } from "../../../lib/public";
 import { LoadFile } from "../../api/file/load";
 import DefaultLinkPreview from "../../../components/admin/default/DefaultLinkPreview";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faChevronDown,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
 
-import {CoreV1Api, KubeConfig, } from "@kubernetes/client-node";
+import { CoreV1Api, KubeConfig } from "@kubernetes/client-node";
+import Terminal from "../../../components/admin/Terminal";
 
 export type Event = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
 
@@ -90,6 +96,9 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   const [fileInfo, onFileInfoAdd] = useState({ role: "assets" } as FileData);
   const [links, onLinksChange] = useState(props.links);
 
+  const [minimized, onMinimize] = useState(false);
+  const terminalRef = useRef<any>(null);
+
   function onThumbnailChange(event: Event) {
     setValidated(false);
     onFormChange({
@@ -128,6 +137,14 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   //  Cache part
   //
   useEffect(() => {
+    // FIXME:
+    // fetch(`${basePath}/api/admin/k3s/namespace/create`, {
+    //   method: "POST",
+    // })
+    //   .then((res) => res.json())
+    //   .then((data) => console.log(data))
+    //   .catch((err) => console.log(err));
+
     fetch(`${basePath}/api/projects/cache?id=${CacheId(props.type)}`, {
       method: "GET",
     })
@@ -145,6 +162,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   function onDataCache(event: Event) {
     fetch(`${basePath}/api/projects/cache?id=${CacheId(props.type)}`, {
       method: "POST",
+      headers: { "content-type": "application/json" },
       body: JSON.stringify(formData),
     })
       .then((res) => console.log(res.status))
@@ -357,12 +375,32 @@ export default function ProjectOperation(props: ProjectOperationProps) {
             <button
               type="submit"
               className="btn btn-lg w-100 btn-outline-success"
+
+              // NOTE: Example
+              // onClick={() => testRef?.current?.runCommand("docker ps -a")}
             >
               Submit
             </button>
           </div>
         </div>
       </form>
+
+      {formData.flag === "Docker" ? (
+        <div className="container">
+          <hr className="mb-4" />
+          <div className="row" onClick={() => onMinimize(!minimized)}>
+            <h4 className="font-weight-bold mr-2">Terminal</h4>
+            <FontAwesomeIcon
+              icon={minimized ? faChevronDown : faChevronRight}
+              className="my-1"
+              fontSize="1rem"
+            />
+          </div>
+          {minimized ? <></> : <Terminal ref={terminalRef} />}
+        </div>
+      ) : (
+        <></>
+      )}
 
       <DefaultFooter name="Menu">
         <ul className="list-unstyled">
@@ -388,21 +426,6 @@ export const getServerSideProps = withIronSession(async function ({
       },
     };
   }
-
-    // FIXME: TEST
-  //   const kube = new KubeConfig();
-  //   kube.loadFromOptions({
-  //     cluster: [{
-  //       name: "cluster",
-  //       server: "192.168.1.2"
-  //     }]
-  //   });
-
-  // kube.loadFromDefault();
-  // const k3sApi = kube.makeApiClient(CoreV1Api);
-  // k3sApi.listNamespacedPod('default').then((res) => {
-  //   console.log(res.body);
-  // });
 
   let type;
   const params = new URLSearchParams((req.url ?? "").split("?")[1] ?? "");
