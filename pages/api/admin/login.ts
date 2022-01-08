@@ -121,7 +121,7 @@ export default withIronSession(
   {
     cookieName: "SESSION_ID",
     cookieOptions: {
-      secure: serverRuntimeConfig.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production",
       maxAge: Number(serverRuntimeConfig.SESSION_TTL ?? 3600),
     },
     password: serverRuntimeConfig.APPLICATION_SECRET ?? "",

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ProjectInfo } from "../../../config/placeholder";
 import { Event } from "../../../pages/admin/projects/operation";
 import { TreeObj } from "../../../types/tree";
@@ -9,6 +9,7 @@ import InputValue from "../../Inputs/InputValue";
 import TreeView from "../../TreeView/TreeView";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs";
+import "prismjs/components/prism-docker";
 import "prismjs/components/prism-markup";
 import "prismjs/components/prism-markdown";
 import "prismjs/components/prism-css";
@@ -28,6 +29,8 @@ export interface DefaultFileStructureProps {
 }
 
 export default function DefaultFileStructure(props: DefaultFileStructureProps) {
+  const [fileName, onFileSelect] = useState("template/index.html");
+
   return (
     <>
       <hr />
@@ -39,6 +42,7 @@ export default function DefaultFileStructure(props: DefaultFileStructureProps) {
             role={props.fileInfo.role}
             dir={props.fileInfo.path}
             projectTree={props.projectTree}
+            onFileSelect={onFileSelect}
           />
         </div>
         <div className="col-md-5 order-md-2">
@@ -74,15 +78,21 @@ export default function DefaultFileStructure(props: DefaultFileStructureProps) {
       <hr />
       <div className="d-flex justify-content-center mb-3">
         <div className="col-md-11">
-          <h4 className="font-weight-bold mb-2">Template</h4>
+          <div className="row">
+            <h5 className="font-weight-bold mr-2">File:</h5>
+            <p className="font-italic">{fileName}</p>
+          </div>
+
           <Editor
             className="form-control"
             value={props.code}
             onValueChange={props.onCodeChange}
             highlight={(code) =>
-              props.formData.flag == "JS"
-                ? highlight(code, languages.html, "html")
-                : highlight(code, languages.markdown, "markdown")
+              ({
+                JS: highlight(code, languages.html, "html"),
+                Markdown: highlight(code, languages.markdown, "markdown"),
+                Docker: highlight(code, languages.docker, "docker"),
+              }[props.formData.flag])
             }
             tabSize={2}
             padding={10}

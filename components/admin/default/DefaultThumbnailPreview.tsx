@@ -97,7 +97,7 @@ export default function DefaultThumbnailPreview(
             <InputRadio
               name="flag"
               placeholder={props.formData.flag}
-              options={["JS", "Markdown", "Link"]}
+              options={["JS", "Markdown", "Link", "Docker"]}
               label="btn-outline-secondary"
               onChange={(event) => {
                 props.onChange(event);

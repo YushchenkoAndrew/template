@@ -19,6 +19,7 @@ export interface NodeProps {
   iconClass?: string;
   children?: React.ReactNode;
   onChange?: (key: string) => void;
+  onSelect?: (key: string) => void;
 }
 
 function Node(props: NodeProps) {
@@ -28,7 +29,10 @@ function Node(props: NodeProps) {
         className={`${
           props.className ?? ""
         } row text-dark text-decoration-none`}
-        onClick={() => props.onChange?.(props.index || "")}
+        onClick={() => {
+          if (props.icon !== faFolder) return props.onSelect?.(props.name);
+          props.onChange?.(props.index || "");
+        }}
       >
         {props.icon ? (
           <FontAwesomeIcon
@@ -45,14 +49,14 @@ function Node(props: NodeProps) {
         {props.name}
 
         {/* TODO: Maybe to do some node editing */}
-        {/* <a href={props.href ?? "#"}>
+        <a>
           <FontAwesomeIcon
-            className={`ml-4 mr-1 ${styles["el-prop"]} text-primary`}
+            className={`ml-4 mr-1 ${styles["el-prop"]} text-primary `}
             icon={faPencilAlt}
             size="lg"
             fontSize="1rem"
           />
-        </a> */}
+        </a>
         <a
           href={props.href ?? "#"}
           target={props.href ? "_blank" : "_self"}
@@ -63,7 +67,7 @@ function Node(props: NodeProps) {
           }
         >
           <FontAwesomeIcon
-            className={`ml-4 mr-1 ${styles["el-prop"]} text-primary`}
+            className={`ml-1 mr-1 ${styles["el-prop"]} text-primary`}
             icon={faExternalLinkAlt}
             size="lg"
             fontSize="1rem"

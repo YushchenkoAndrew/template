@@ -4,6 +4,7 @@ import { TreeObj } from "../../types/tree";
 import styles from "./TreeView.module.css";
 import Node from "./Node";
 import {
+  faBolt,
   faFile,
   faFileCode,
   faFolder,
@@ -14,79 +15,37 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faCss3Alt,
+  faDocker,
   faHtml5,
   faJs,
   faMarkdown,
 } from "@fortawesome/free-brands-svg-icons";
 import { FileData } from "../../types/api";
 
-function getIcons(type: string | undefined): {
-  icon: IconDefinition;
-  color: string;
-} {
-  switch (type) {
-    case "image/gif":
-    case "image/jpg":
-    case "image/jpeg":
-    case "image/webp":
-    case "image/png":
-      return {
-        icon: faImage,
-        color: "text-primary",
-      };
+const fileType = {
+  "image/gif": { icon: faImage, color: "text-primary" },
+  "image/jpg": { icon: faImage, color: "text-primary" },
+  "image/jpeg": { icon: faImage, color: "text-primary" },
+  "image/webp": { icon: faImage, color: "text-primary" },
+  "image/png": { icon: faImage, color: "text-primary" },
 
-    case "font/ttf":
-      return {
-        icon: faFont,
-        color: "text-muted",
-      };
+  "text/markdown": { icon: faMarkdown, color: "text-dark" },
+  "text/html": { icon: faHtml5, color: styles["text-orange"] },
+  "text/css": { icon: faCss3Alt, color: "text-primary" },
+  "text/javascript": { icon: faJs, color: "text-warning" },
+  "text/dockerfile": { icon: faDocker, color: "text-primary" },
+  "text/yaml": { icon: faFileCode, color: "text-danger" },
 
-    case "text/markdown":
-      return {
-        icon: faMarkdown,
-        color: "text-dark",
-      };
-
-    case "text/html":
-      return {
-        icon: faHtml5,
-        color: styles["text-orange"],
-      };
-
-    case "text/css":
-      return {
-        icon: faCss3Alt,
-        color: "text-primary",
-      };
-
-    case "application/json":
-      return {
-        icon: faFileCode,
-        color: "text-success",
-      };
-
-    case "text/javascript":
-      return {
-        icon: faJs,
-        color: "text-warning",
-      };
-
-    case undefined:
-      return {
-        icon: faFolder,
-        color: "text-info",
-      };
-  }
-  return {
-    icon: faFile,
-    color: "text-muted",
-  };
-}
+  "font/ttf": { icon: faFont, color: "text-muted" },
+  "application/json": { icon: faFileCode, color: "text-success" },
+  undefined: { icon: faFolder, color: "text-info" },
+};
 export interface TreeViewProps {
   name: string;
   role: string;
   dir?: string;
   projectTree: TreeObj;
+  onFileSelect: (key: string) => void;
 }
 
 //
@@ -94,13 +53,6 @@ export interface TreeViewProps {
 //
 export default function TreeView(props: TreeViewProps) {
   const [showNode, onNodeChange] = useState({} as { [name: string]: boolean });
-
-  function onStateChange(key: string) {
-    onNodeChange({
-      ...showNode,
-      [key]: !showNode[key],
-    });
-  }
 
   function ParseTree(
     obj: TreeObj | FileData | null,
@@ -110,7 +62,10 @@ export default function TreeView(props: TreeViewProps) {
     if (!obj) return;
     return Object.entries(obj).map(([name, value], i) => {
       const key = md5(name + index.toString());
-      const { icon, color } = getIcons(value.type);
+      const { icon, color } = fileType[value.type] ?? {
+        icon: faFile,
+        color: "text-muted",
+      };
 
       return (
         <Node
@@ -121,7 +76,13 @@ export default function TreeView(props: TreeViewProps) {
           icon={icon}
           iconClass={color}
           href={value.url}
-          onChange={onStateChange}
+          onChange={(key: string) => {
+            onNodeChange({
+              ...showNode,
+              [key]: !showNode[key],
+            });
+          }}
+          onSelect={props.onFileSelect}
         >
           {value.name
             ? null
