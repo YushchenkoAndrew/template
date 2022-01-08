@@ -76,7 +76,15 @@ export const codeTemplate = {
 Article text...
 
 ## Used material
-* [Main Page](https://mortis-grimreaper.ddns.net/projects)
-`,
+* [Main Page](https://mortis-grimreaper.ddns.net/projects)`,
+  },
+
+  Docker: {
+    name: "Dockerfile",
+    type: "text/dockerfile",
+    code: `FROM ubuntu:18.04
+COPY . /app
+RUN make /app
+CMD python /app/app.py`,
   },
 };

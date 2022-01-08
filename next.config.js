@@ -82,5 +82,13 @@ module.exports = {
     EMAIL_PASS: process.env.EMAIL_PASS,
 
     SESSION_TTL: process.env.SESSION_TTL,
+
+    K3S_CLUSTER: process.env.K3S_CLUSTER,
+    K3S_SERVER: process.env.K3S_SERVER,
+    K3S_CA_DATA: process.env.K3S_CA_DATA,
+    K3S_USER: process.env.K3S_USER,
+    K3S_CERT_DATA: process.env.K3S_CERT_DATA,
+    K3S_KEY_DATA: process.env.K3S_KEY_DATA,
+    K3S_CONTEXT: process.env.K3S_CONTEXT,
   },
 };
