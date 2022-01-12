@@ -1,14 +1,10 @@
-import React, { FormEventHandler, useEffect, useRef, useState } from "react";
+import React, { FormEventHandler, useRef, useState } from "react";
 import DefaultHeader from "../../../components/admin/default/DefaultHeader";
-import DefaultFooter from "../../../components/default/DefaultFooter";
 import DefaultHead from "../../../components/default/DefaultHead";
-import DefaultNav from "../../../components/default/DefaultNav";
 import { checkIfUserExist } from "../../../lib/api/session";
-import { ProjectElement } from "../../../types/projects";
 import { TreeObj } from "../../../types/tree";
 import { basePath, voidUrl } from "../../../config";
-import { DefaultRes } from "../../../types/request";
-import { FileData, LinkData, ProjectData } from "../../../types/api";
+import { LinkData, ProjectData } from "../../../types/api";
 import { withIronSession } from "next-iron-session";
 import { NextSessionArgs } from "../../../types/session";
 import sessionConfig from "../../../config/session";
@@ -18,66 +14,22 @@ import {
   treePlaceholder,
 } from "../../../config/placeholder";
 import { LoadProjects } from "../../api/projects/load";
-import { formPath, getPath } from "../../../lib/public/files";
-import DefaultThumbnailPreview from "../../../components/admin/default/DefaultThumbnailPreview";
-import DefaultFileStructure from "../../../components/admin/default/DefaultFileStructure";
-import DefaultFooterPreview from "../../../components/admin/default/DefaultFooterPreview";
-import { parseHTML } from "../../../lib/public/markers";
+import { formPath } from "../../../lib/public/files";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastDefault } from "../../../config/alert";
-import { CacheId } from "../../../lib/public";
 import { LoadFile } from "../../api/file/load";
-import DefaultLinkPreview from "../../../components/admin/default/DefaultLinkPreview";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronDown,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
-
-import { CoreV1Api, KubeConfig } from "@kubernetes/client-node";
-import Terminal from "../../../components/admin/Terminal";
+import InputRadio from "../../../components/Inputs/InputRadio";
+import Preview, {
+  PreviewRef,
+} from "../../../components/admin/operation/Preview";
+import CodeView, {
+  CodeViewRef,
+  formTree,
+} from "../../../components/admin/operation/CodeView";
+import { ToastDefault } from "../../../config/alert";
+import K3sConfig from "../../../components/admin/operation/K3sConfig";
 
 export type Event = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
-
-export function formTree(
-  tree: TreeObj,
-  info: FileData,
-  files?: FileData[]
-): TreeObj {
-  const path = [
-    files?.[0]?.role || info.role,
-    ...(info.path ?? "").split("/").filter((item) => item),
-  ];
-  return {
-    ...tree,
-    ...(function combine(
-      prev: TreeObj | FileData | null,
-      index: number = 0
-    ): TreeObj {
-      if (index === path.length) {
-        if (!files) return {};
-        return files.reduce(
-          (acc, curr) => ({
-            ...acc,
-            [curr.name]: curr,
-          }),
-          {} as TreeObj
-        );
-      }
-
-      return {
-        [path[index]]: {
-          ...(prev && !prev.name ? (prev as TreeObj)[path[index]] : prev ?? {}),
-          ...combine(
-            prev && !prev.name ? (prev as TreeObj)[path[index]] : prev,
-            index + 1
-          ),
-        },
-      };
-    })(tree),
-  };
-}
 
 export interface ProjectOperationProps {
   type: string;
@@ -88,214 +40,49 @@ export interface ProjectOperationProps {
 }
 
 export default function ProjectOperation(props: ProjectOperationProps) {
-  const [code, setCode] = useState(props.template);
-  const refForm = useRef<HTMLFormElement | null>(null);
+  const [type, onSetType] = useState("GUI");
+  const [config, onSetConfig] = useState("Preview");
   const [validated, setValidated] = useState(false);
-  const [formData, onFormChange] = useState(props.formData);
-  const [treeStructure, onFileAdd] = useState(props.treeStructure);
-  const [fileInfo, onFileInfoAdd] = useState({ role: "assets" } as FileData);
-  const [links, onLinksChange] = useState(props.links);
 
-  const [minimized, onMinimize] = useState(false);
-  const terminalRef = useRef<any>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const previewRef = useRef<PreviewRef>(null);
+  const codeViewRef = useRef<CodeViewRef>(null);
 
-  function onThumbnailChange(event: Event) {
-    setValidated(false);
-    onFormChange({
-      ...formData,
-      [event.target.name]: event.target.value,
-    });
-  }
+  // FIXME:
+  // useEffect(() => {
+  //   // fetch(`${basePath}/api/admin/k3s/namespace/create`, {
+  //   //   method: "POST",
+  //   // })
+  //   //   .then((res) => res.json())
+  //   //   .then((data) => console.log(data))
+  //   //   .catch((err) => console.log(err));
+  // }, []);
 
-  function onFileInfoChange(event: Event) {
-    setValidated(false);
-    onFileInfoAdd({
-      ...fileInfo,
-      [event.target.name]: event.target.value,
-    });
-  }
-
-  function onFilesUpload(event: ProjectElement) {
-    if (!Array.isArray(event.target.value)) return;
-    setValidated(false);
-
-    const html = parseHTML(code, event.target.value);
-    if (html) setCode(html);
-
-    return onFileAdd(
-      formTree(treeStructure, fileInfo, event.target.value as FileData[])
-    );
-  }
-
-  function onNewLinkAdd(data: LinkData): boolean {
-    if (!data["name"] || data["link"] === undefined) return false;
-    onLinksChange({ ...links, [data["name"]]: data });
-    return true;
-  }
-
-  //
-  //  Cache part
-  //
-  useEffect(() => {
-    // FIXME:
-    // fetch(`${basePath}/api/admin/k3s/namespace/create`, {
-    //   method: "POST",
-    // })
-    //   .then((res) => res.json())
-    //   .then((data) => console.log(data))
-    //   .catch((err) => console.log(err));
-
-    fetch(`${basePath}/api/projects/cache?id=${CacheId(props.type)}`, {
-      method: "GET",
-    })
-      .then((res) => res.json())
-      .then((data: DefaultRes) => {
-        if (data.status !== "OK") return;
-        onFormChange({
-          ...formData,
-          ...data.result,
-        });
-      })
-      .catch((err) => null);
-  }, []);
-
-  function onDataCache(event: Event) {
-    fetch(`${basePath}/api/projects/cache?id=${CacheId(props.type)}`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(formData),
-    })
-      .then((res) => console.log(res.status))
-      .catch((err) => null);
-  }
-
-  const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
+  const onSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event?.preventDefault();
     if (!event?.currentTarget?.checkValidity()) {
       setValidated(true);
       return;
     }
 
-    const toastProjectId = toast.loading("Please wait...");
-    fetch(`${basePath}/api/projects/${props.type}?id=${CacheId(props.type)}`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(formData),
-    })
-      .then((res) => res.json())
-      .then((data: DefaultRes<ProjectData[]>) => {
-        if (data.status !== "OK" || !data.result?.length || !data.result[0]) {
-          return toast.update(toastProjectId, {
-            render: `Project: ${data.message}`,
-            type: "error",
-            isLoading: false,
-            ...ToastDefault,
-          });
-        }
+    try {
+      const data = await previewRef?.current?.onSubmit?.();
+      await codeViewRef?.current?.onSubmit?.(data);
+      await previewRef?.current?.onLinkSubmit?.(data);
 
-        toast.update(toastProjectId, {
-          render: "Project: Record is created",
-          type: "success",
-          isLoading: false,
-          ...ToastDefault,
-        });
-
-        if (codeTemplate[formData.flag]) {
-          (
-            (treeStructure.template as TreeObj)[
-              codeTemplate[formData.flag].name
-            ] as FileData
-          ).file = new File(
-            [new Blob([code], { type: codeTemplate[formData.flag].type })],
-            codeTemplate[formData.flag].name,
-            { type: codeTemplate[formData.flag].type }
-          );
-        }
-
-        const id = data.result[0].id || formData.id;
-        (function parseTree(tree: TreeObj | FileData | null) {
-          return new Promise(async (resolve, reject) => {
-            // Check if obj is FileData and if File not exist then break
-            if (!tree?.name || !tree.file) {
-              if (tree && tree.name) return resolve(true);
-              for (let [_, value] of Object.entries(tree || {})) {
-                await parseTree(value);
-              }
-              return resolve(true);
-            }
-
-            const toastFileId = toast.loading("Please wait...");
-            const data = new FormData();
-            data.append("file", tree.file as File);
-            return fetch(
-              `${basePath}/api/file/add?id=${id}&project=${
-                formData.name
-              }&role=${tree.role}${getPath(tree.path as string | undefined)}${
-                tree.id ? `&file_id=${tree.id}` : ""
-              }`,
-              {
-                method: "POST",
-                body: data,
-              }
-            )
-              .then((res) => res.json())
-              .then((data: DefaultRes) => {
-                resolve(true);
-                toast.update(toastFileId, {
-                  render: `File [${tree.name}]: ${data.message}`,
-                  type: data.status === "OK" ? "success" : "error",
-                  isLoading: false,
-                  ...ToastDefault,
-                });
-              })
-              .catch(() => {
-                resolve(true);
-                toast.update(toastFileId, {
-                  render: `File [${tree.name}]: crashed at upload`,
-                  type: "error",
-                  isLoading: false,
-                  ...ToastDefault,
-                });
-              });
-          });
-        })(treeStructure).then(() => {
-          const toastLinkId = toast.loading("Please wait...");
-          fetch(`${basePath}/api/link/add?id=${id}`, {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify(links),
-          })
-            .then((res) => res.json())
-            .then((data: DefaultRes) => {
-              setTimeout(
-                () => (window.location.href = basePath + "/admin/projects/"),
-                2000
-              );
-              toast.update(toastLinkId, {
-                render: `Link: ${data.message}`,
-                type: data.status === "OK" ? "success" : "error",
-                isLoading: false,
-                ...ToastDefault,
-              });
-            })
-            .catch(() => {
-              toast.update(toastLinkId, {
-                render: "Link: Server error",
-                type: "error",
-                isLoading: false,
-                ...ToastDefault,
-              });
-            });
-        });
-      })
-      .catch(() => {
-        toast.update(toastProjectId, {
-          render: "Project: Server error",
-          type: "error",
-          isLoading: false,
-          ...ToastDefault,
-        });
+      setTimeout(
+        () => (window.location.href = basePath + "/admin/projects/"),
+        2000
+      );
+    } catch (err: any) {
+      if (!err) return;
+      toast.update(err.id, {
+        render: err.message ?? "Client error",
+        type: "error",
+        isLoading: false,
+        ...ToastDefault,
       });
+    }
 
     return false;
   };
@@ -308,11 +95,12 @@ export default function ProjectOperation(props: ProjectOperationProps) {
         </title>
       </DefaultHead>
       <DefaultHeader />
+
       <form
-        ref={refForm}
+        ref={formRef}
         className={`container needs-validation ${
           validated ? "was-validated" : ""
-        } mt-4`}
+        } mt-3`}
         noValidate
         onSubmit={onSubmit as FormEventHandler<HTMLFormElement>}
       >
@@ -326,87 +114,62 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           rtl={false}
           draggable
         />
-        <DefaultThumbnailPreview
-          projectTree={treeStructure}
-          formData={formData}
-          setCode={setCode}
-          onFileChange={onFileAdd}
-          onChange={onThumbnailChange}
-          onUpload={onFilesUpload}
-          onBlur={onDataCache}
+
+        <div className="container mb-3">
+          <div className="row w-100 d-flex justify-content-between">
+            {/* <span></span> */}
+            <div>
+              <InputRadio
+                name="flag"
+                className="btn-group btn-group-sm btn-group-toggle"
+                placeholder={type}
+                options={["GUI", "RAW"]}
+                label="btn-outline-secondary"
+                onChange={(event) => onSetType(event.target.value)}
+              />
+            </div>
+
+            <div className="row">
+              <div>
+                <InputRadio
+                  name="flag"
+                  className="btn-group btn-group-sm btn-group-toggle"
+                  placeholder={config}
+                  options={["Preview", "Code", "Config"]}
+                  label="btn-outline-dark"
+                  onChange={(event) => onSetConfig(event.target.value)}
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="btn btn-sm btn-outline-success ml-4"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <Preview
+          ref={previewRef}
+          codeViewRef={codeViewRef}
+          type={props.type}
+          links={props.links}
+          formData={props.formData}
+          show={config === "Preview"}
         />
 
-        {formData.flag === "Link" ? (
-          <>
-            <hr />
-            <DefaultLinkPreview
-              links={links}
-              onBlur={onDataCache}
-              onLinkAdd={onNewLinkAdd}
-            />
-          </>
-        ) : (
-          <>
-            <DefaultFileStructure
-              code={code}
-              formData={formData}
-              fileInfo={fileInfo}
-              projectTree={formTree(treeStructure, fileInfo)}
-              onChange={onFileInfoChange}
-              onCodeChange={(code: string) => setCode(code)}
-              onUpload={onFilesUpload}
-              onBlur={onDataCache}
-            />
-            <hr />
-            <DefaultFooterPreview
-              links={links}
-              formData={formData}
-              onChange={onThumbnailChange}
-              onBlur={onDataCache}
-              onLinkAdd={onNewLinkAdd}
-              onLinkChange={onLinksChange}
-            />
-          </>
-        )}
+        <CodeView
+          ref={codeViewRef}
+          code={props.template}
+          previewRef={previewRef}
+          treeStructure={props.treeStructure}
+          show={config === "Code"}
+        />
 
-        <hr className="mb-5" />
-        <div className="d-flex justify-content-center mb-3">
-          <div className="col-md-9">
-            <button
-              type="submit"
-              className="btn btn-lg w-100 btn-outline-success"
-
-              // NOTE: Example
-              // onClick={() => testRef?.current?.runCommand("docker ps -a")}
-            >
-              Submit
-            </button>
-          </div>
-        </div>
+        <K3sConfig show={config === "Config"} />
       </form>
-
-      {formData.flag === "Docker" ? (
-        <div className="container">
-          <hr className="mb-4" />
-          <div className="row" onClick={() => onMinimize(!minimized)}>
-            <h4 className="font-weight-bold mr-2">Terminal</h4>
-            <FontAwesomeIcon
-              icon={minimized ? faChevronDown : faChevronRight}
-              className="my-1"
-              fontSize="1rem"
-            />
-          </div>
-          {minimized ? <></> : <Terminal ref={terminalRef} />}
-        </div>
-      ) : (
-        <></>
-      )}
-
-      <DefaultFooter name="Menu">
-        <ul className="list-unstyled">
-          <DefaultNav style="text-muted" />
-        </ul>
-      </DefaultFooter>
     </>
   );
 }

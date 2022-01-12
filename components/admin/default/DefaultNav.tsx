@@ -25,13 +25,13 @@ export default function DefaultNav(props: DefaultNavProps) {
         style={props.style}
         active={props.projects}
       />
-      <NavItem
+      {/* <NavItem
         name="Preview"
         href={`${basePath}/`}
         target="_blank"
         style={props.style}
         active={props.settings}
-      />
+      /> */}
       <NavItem
         name="Settings"
         href={`${basePath}/admin/settings`}
