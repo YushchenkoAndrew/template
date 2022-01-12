@@ -2,7 +2,13 @@ import React, { useImperativeHandle, useRef, useState } from "react";
 import { basePath } from "../../config";
 import styles from "./Terminal.module.css";
 
-export interface TerminalProps {}
+export interface TerminalProps {
+  show?: boolean;
+}
+
+export interface TerminalRef {
+  runCommand: (command: string) => void;
+}
 
 export default React.forwardRef((props: TerminalProps, ref) => {
   const cmdRef = useRef<HTMLDivElement>(null);
@@ -10,7 +16,7 @@ export default React.forwardRef((props: TerminalProps, ref) => {
   const [line, setLine] = useState("");
   const [history, setHistory] = useState<string[]>([]);
 
-  useImperativeHandle(ref, () => ({
+  useImperativeHandle<unknown, TerminalRef>(ref, () => ({
     runCommand(command: string) {
       fetch(`${basePath}/api/admin/exec`, {
         method: "POST",
@@ -33,7 +39,9 @@ export default React.forwardRef((props: TerminalProps, ref) => {
   return (
     <div
       ref={cmdRef}
-      className={`container bg-dark p-3 ${styles["terminal"]}`}
+      className={`container bg-dark p-3 ${styles["terminal"]} ${
+        props.show ? "" : "d-none"
+      }`}
       onClick={() => cmdLineRef?.current?.focus()}
     >
       {history.map((item, key) => (

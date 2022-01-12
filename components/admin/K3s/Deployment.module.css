@@ -1,0 +1,27 @@
+.icon {
+  color: var(--success);
+  transition: 300ms;
+}
+
+a:hover .icon {
+  color: var(--light) !important;
+}
+
+.el-container {
+  position: relative;
+  right: -15px;
+  transform: scale(0.9);
+
+  opacity: 0;
+  transition: 0.5s;
+}
+
+.el-index:hover .el-container {
+  right: 0px;
+  opacity: 1;
+  transition: 0.5s;
+}
+
+.el-container:hover {
+  transform: scale(1.2);
+}
