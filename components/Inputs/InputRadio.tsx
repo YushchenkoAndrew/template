@@ -5,6 +5,7 @@ import { ProjectElement } from "../../types/projects";
 
 export interface InputRadioProps {
   name: string;
+  className?: string;
   options: string[];
   placeholder?: string;
   label?: string;
@@ -19,7 +20,10 @@ export default function InputRadio(props: InputRadioProps) {
 
   return (
     <div className="input-group">
-      <div className="btn-group btn-group-toggle" data-toggle="buttons">
+      <div
+        className={props.className ?? "btn-group btn-group-toggle"}
+        data-toggle="buttons"
+      >
         {props.options.map((item) => (
           <label
             key={md5(item + Math.random().toString())}

@@ -18,8 +18,8 @@ export interface NodeProps {
   icon?: IconDefinition;
   iconClass?: string;
   children?: React.ReactNode;
+  onSelect?: () => void;
   onChange?: (key: string) => void;
-  onSelect?: (key: string) => void;
 }
 
 function Node(props: NodeProps) {
@@ -30,7 +30,7 @@ function Node(props: NodeProps) {
           props.className ?? ""
         } row text-dark text-decoration-none`}
         onClick={() => {
-          if (props.icon !== faFolder) return props.onSelect?.(props.name);
+          if (props.icon !== faFolder) return props.onSelect?.();
           props.onChange?.(props.index || "");
         }}
       >

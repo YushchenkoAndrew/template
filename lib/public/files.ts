@@ -9,3 +9,8 @@ export function getPath(path: string | undefined) {
   if (!path) return "";
   return "&path=" + (path[0] !== "/" ? "/" + path : path);
 }
+
+export const convertTypes = {
+  "application/x-javascript": "text/javascript",
+  "x-application/x-javascript": "text/javascript",
+};

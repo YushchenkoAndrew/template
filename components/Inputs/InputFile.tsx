@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { convertTypes } from "../../lib/public/files";
 import { Event } from "../../pages/admin/projects/operation";
 import { FileData } from "../../types/api";
 import { ProjectElement } from "../../types/projects";
@@ -38,7 +39,9 @@ export default function InputFile(props: InputFileProps) {
             files.push({
               file: fileRef.current.files[i],
               name: fileRef.current.files[i].name,
-              type: fileRef.current.files[i].type,
+              type:
+                convertTypes[fileRef.current.files[i].type] ??
+                fileRef.current.files[i].type,
               role: props.role,
               path: "",
             });

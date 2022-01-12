@@ -4,14 +4,12 @@ import { TreeObj } from "../../types/tree";
 import styles from "./TreeView.module.css";
 import Node from "./Node";
 import {
-  faBolt,
   faFile,
   faFileCode,
   faFolder,
   faFolderOpen,
   faFont,
   faImage,
-  IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faCss3Alt,
@@ -37,6 +35,7 @@ const fileType = {
   "text/yaml": { icon: faFileCode, color: "text-danger" },
 
   "font/ttf": { icon: faFont, color: "text-muted" },
+
   "application/json": { icon: faFileCode, color: "text-success" },
   undefined: { icon: faFolder, color: "text-info" },
 };
@@ -57,6 +56,7 @@ export default function TreeView(props: TreeViewProps) {
   function ParseTree(
     obj: TreeObj | FileData | null,
     forced?: boolean,
+    path: string = "",
     index: number = 0
   ): React.ReactNode | undefined {
     if (!obj) return;
@@ -82,11 +82,16 @@ export default function TreeView(props: TreeViewProps) {
               [key]: !showNode[key],
             });
           }}
-          onSelect={props.onFileSelect}
+          onSelect={() => props.onFileSelect(path.slice(1) + "/" + name)}
         >
           {value.name
             ? null
-            : ParseTree(value, name === props.role || forced, i)}
+            : ParseTree(
+                value,
+                name === props.role || forced,
+                path + "/" + name,
+                i
+              )}
         </Node>
       );
     });

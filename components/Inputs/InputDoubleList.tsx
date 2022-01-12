@@ -9,11 +9,12 @@ export type DoubleType<Type> = {
 };
 export interface InputValueProps {
   char: DoubleType<string>;
+  className?: string;
   name: DoubleType<string>;
   type?: DoubleType<string>;
   required?: DoubleType<boolean>;
   placeholder?: DoubleType<string>;
-  onChange: (data: LinkData) => boolean;
+  onChange: (data: any) => boolean;
 }
 
 export default function InputList(props: InputValueProps) {
@@ -22,15 +23,12 @@ export default function InputList(props: InputValueProps) {
   function onChange(event: Event) {
     onDataChange({
       ...data,
-      [event.target.name]: event.target.value.replace(
-        /http:\/\/|https:\/\//g,
-        ""
-      ),
+      [event.target.name]: event.target.value,
     });
   }
 
   return (
-    <div className="row">
+    <div className={`row ${props.className ?? ""}`}>
       <div className="input-group col-md-6 order-sm-1 p-2">
         <div className="input-group-prepend">
           <span className="input-group-text">{props.char[0]}</span>
@@ -59,15 +57,14 @@ export default function InputList(props: InputValueProps) {
           onChange={onChange}
         />
         <div className="input-group-append">
-          <button
-            className="btn btn-primary"
-            type="button"
+          <a
+            className="btn btn-primary text-light"
             onClick={(e) => {
               e.preventDefault();
               if (
                 props.onChange({
-                  name: data[props.name[0]],
-                  link: data[props.name[1]],
+                  [props.name[0]]: data[props.name[0]],
+                  [props.name[1]]: data[props.name[1]],
                 })
               ) {
                 // Reset input on Success
@@ -76,7 +73,7 @@ export default function InputList(props: InputValueProps) {
             }}
           >
             Create
-          </button>
+          </a>
         </div>
       </div>
     </div>
