@@ -1,4 +1,4 @@
-export type FlagType = "JS" | "Markdown" | "Link";
+export type FlagType = "JS" | "Markdown" | "Link" | "Docker";
 
 export const flagColors = {
   JS: "bg-warning",

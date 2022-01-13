@@ -13,7 +13,6 @@
     "@fortawesome/free-brands-svg-icons": "^5.15.4",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.16",
-    "@kubernetes/client-node": "^0.16.1",
     "@types/formidable": "^1.2.4",
     "@types/marked": "^4.0.0",
     "@types/nodemailer": "^6.4.4",
