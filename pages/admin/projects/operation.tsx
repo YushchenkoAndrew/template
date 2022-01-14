@@ -27,7 +27,11 @@ import CodeView, {
   formTree,
 } from "../../../components/admin/operation/CodeView";
 import { ToastDefault } from "../../../config/alert";
-import K3sConfig from "../../../components/admin/operation/K3sConfig";
+import K3sConfig, {
+  K3sConfigRef,
+} from "../../../components/admin/operation/K3sConfig";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlay } from "@fortawesome/free-solid-svg-icons";
 
 export type Event = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
 
@@ -47,6 +51,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const previewRef = useRef<PreviewRef>(null);
   const codeViewRef = useRef<CodeViewRef>(null);
+  const k3sConfigRef = useRef<K3sConfigRef>(null);
 
   // FIXME:
   // useEffect(() => {
@@ -129,6 +134,13 @@ export default function ProjectOperation(props: ProjectOperationProps) {
               />
             </div>
 
+            <a
+              className="btn btn-success"
+              onClick={() => k3sConfigRef?.current?.onSubmit?.()}
+            >
+              <FontAwesomeIcon className="text-light" icon={faPlay} />
+            </a>
+
             <div className="row">
               <div>
                 <InputRadio
@@ -168,7 +180,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           show={config === "Code"}
         />
 
-        <K3sConfig show={config === "Config"} />
+        <K3sConfig ref={k3sConfigRef} show={config === "Config"} />
       </form>
     </>
   );

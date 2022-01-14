@@ -5,50 +5,141 @@ import {
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
-import { K3sContainer } from "../../../config/placeholder";
-import { Event } from "../../../pages/admin/projects/operation";
+import React, {
+  createRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
+import { Deployment, Status } from "../../../types/K3s/Deployment";
+import { Metadata } from "../../../types/K3s/Metadata";
+import InputList from "../../Inputs/InputDoubleList";
 import InputName from "../../Inputs/InputName";
 import InputRadio from "../../Inputs/InputRadio";
 import InputTemplate from "../../Inputs/InputTemplate";
 import InputValue from "../../Inputs/InputValue";
-import Container from "./Container";
-import styles from "./Deployment.module.css";
+import ListEntity from "../../Inputs/ListEntity";
+import Container, { ContainerRef } from "./Container";
+import styles from "./Default.module.css";
+
+export class V1Deployment {
+  "apiVersion"?: string;
+  "kind"?: string;
+  "metadata"?: Metadata;
+  "spec"?: V1Spec;
+  "status"?: Status;
+}
+
+class V1Spec {
+  "minReadySeconds"?: number;
+  "paused"?: boolean;
+  "progressDeadlineSeconds"?: number;
+  "replicas"?: string;
+  "revisionHistoryLimit"?: number;
+  "selector"?: { matchLabels: { [key: string]: string } };
+  "strategy"?: { type: string };
+  "template"?: V1Template;
+}
+export class V1Template {
+  "metadata"?: Metadata;
+  "spec"?: V1PodSpec;
+}
+
+export class V1PodSpec {
+  "activeDeadlineSeconds"?: number;
+  "automountServiceAccountToken"?: boolean;
+  "containers": React.RefObject<ContainerRef>[];
+  "enableServiceLinks"?: boolean;
+  "hostIPC"?: boolean;
+  "hostNetwork"?: boolean;
+  "hostPID"?: boolean;
+  "hostname"?: string;
+  // "initContainers"?: Container[];
+  "nodeName"?: string;
+  "nodeSelector"?: { [key: string]: string };
+  "overhead"?: { [key: string]: string };
+  "preemptionPolicy"?: string;
+  "priority"?: number;
+  "priorityClassName"?: string;
+  "restartPolicy"?: string;
+  "runtimeClassName"?: string;
+  "schedulerName"?: string;
+  "serviceAccount"?: string;
+  "serviceAccountName"?: string;
+  "setHostnameAsFQDN"?: boolean;
+  "shareProcessNamespace"?: boolean;
+  "subdomain"?: string;
+  "terminationGracePeriodSeconds"?: number;
+}
 
 export interface DeploymentProps {
   show?: boolean;
-  value: { [name: string]: any };
-  onChange: (value: { [name: string]: any }) => void;
 }
-
-export interface DeploymentRef {}
+export interface DeploymentRef {
+  getValue: () => Deployment;
+}
 
 export default React.forwardRef((props: DeploymentProps, ref) => {
   const [minimized, onMinimize] = useState({
     metadata: true,
     spec: true,
+    matchLabels: true,
     containers: true,
   });
 
-  const [containers, onContainerChange] = useState([true]);
+  const [deployment, onDeploymentChange] = useState<V1Deployment>({
+    apiVersion: "app/v1",
+    kind: "Deployment",
+    metadata: {},
+    spec: {
+      selector: { matchLabels: {} },
+      template: {
+        metadata: {},
+        spec: {
+          containers: [],
+        },
+      },
+    },
+  });
 
-  function onChange(event: Event) {
-    const keys = event.target.name.split(".");
-    const name = keys.slice(-1)[0];
-    let obj = props.value;
-    keys.slice(0, -1).reduce((acc, curr) => acc[curr], obj)[name] =
-      event.target.value;
-    console.log(obj);
+  const [containers, onContainerChange] = useState<boolean[]>([]);
+  const [containersRef, onContainerRefChange] = useState<
+    React.RefObject<ContainerRef>[]
+  >([]);
 
-    props.onChange(obj);
-  }
+  useEffect(() => {
+    onContainerRefChange(
+      containers.map((_, i) => containersRef[i] || createRef<ContainerRef>())
+    );
+  }, [containers.length]);
+
+  let [labels, onLabelsChange] = useState({} as { [key: string]: string });
+
+  useImperativeHandle<unknown, DeploymentRef>(ref, () => ({
+    getValue() {
+      return {
+        ...deployment,
+        spec: {
+          ...deployment.spec,
+          selector: { matchLabels: { ...labels } },
+          template: {
+            ...deployment.spec?.template,
+            metadata: {
+              ...deployment.spec?.template?.metadata,
+              labels: { ...labels },
+            },
+            spec: {
+              ...deployment.spec?.template?.spec,
+              containers: containersRef.map((item) => item.current?.getValue()),
+            },
+          },
+        },
+      } as Deployment;
+    },
+  }));
 
   return (
-    <div
-      className={`card col-12 col-md-8 col-lg-5 p-3 m-3 ${
-        props.show ? "" : "d-none"
-      }`}
-    >
+    <div className={`card col-lg-6 p-3 m-3 ${props.show ? "" : "d-none"}`}>
       <InputTemplate
         labelClassName="font-weight-bold ml-2"
         label={[
@@ -69,11 +160,19 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
           <InputTemplate className="col-6" label="Name">
             <InputName
               char="@"
-              name="metadata.name"
+              name="name"
               required
-              value={props.value.metadata.name ?? ""}
-              placeholder="deployment"
-              onChange={onChange}
+              value={deployment.metadata?.name ?? ""}
+              placeholder="void-deployment"
+              onChange={({ target: { name, value } }) => {
+                onDeploymentChange({
+                  ...deployment,
+                  metadata: {
+                    ...deployment.metadata,
+                    [name]: value,
+                  },
+                });
+              }}
               // onBlur={onDataCache}
             />
           </InputTemplate>
@@ -81,11 +180,19 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
           <InputTemplate className="col-6" label="Namespace">
             <div className="input-group">
               <InputValue
-                name="metadata.namespace"
+                name="namespace"
                 className="rounded"
-                value={props.value.metadata.namespace ?? ""}
-                placeholder="namespace"
-                onChange={onChange}
+                value={deployment.metadata?.namespace ?? ""}
+                placeholder="demo"
+                onChange={({ target: { name, value } }) => {
+                  onDeploymentChange({
+                    ...deployment,
+                    metadata: {
+                      ...deployment.metadata,
+                      [name]: value,
+                    },
+                  });
+                }}
                 // onBlur={onDataCache}
               />
             </div>
@@ -104,33 +211,106 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
         onClick={() => onMinimize({ ...minimized, spec: !minimized.spec })}
       >
         <div
-          className={`row border rounded mx-1 py-2 ${
+          className={`container border rounded mx-1 py-2 ${
             minimized.spec ? "" : "d-none"
           }`}
         >
-          <InputTemplate className="col-6" label="Replicas">
-            <div className="input-group">
-              <InputName
-                char="$"
-                name="spec.replicas"
-                required
-                value={props.value.spec.replicas ?? "1"}
-                placeholder={"1"}
-                onChange={onChange}
-                // onBlur={onDataCache}
-              />
-            </div>
-          </InputTemplate>
+          <div className="row">
+            <InputTemplate className="col-6" label="Replicas">
+              <div className="input-group">
+                <InputName
+                  char="$"
+                  name="replicas"
+                  required
+                  value={deployment.spec?.replicas ?? ""}
+                  placeholder="1"
+                  onChange={({ target: { name, value } }) => {
+                    onDeploymentChange({
+                      ...deployment,
+                      spec: {
+                        ...deployment.spec,
+                        [name]: value,
+                      },
+                    });
+                  }}
+                  // onBlur={onDataCache}
+                />
+              </div>
+            </InputTemplate>
 
-          <InputTemplate className="col-6" label="Strategy">
-            <InputRadio
-              name="spec.strategy"
-              placeholder={"RollingUpdate"}
-              className="btn-group btn-group-sm btn-group-toggle"
-              options={["RollingUpdate", "Recreate"]}
-              label="btn-outline-info"
-              onChange={onChange}
-            />
+            <InputTemplate className="col-6" label="Strategy">
+              <InputRadio
+                name="strategy"
+                placeholder="RollingUpdate"
+                className="btn-group btn-group-sm btn-group-toggle"
+                options={["RollingUpdate", "Recreate"]}
+                label="btn-outline-info"
+                onChange={({ target: { name, value } }) => {
+                  onDeploymentChange({
+                    ...deployment,
+                    spec: {
+                      ...deployment.spec,
+                      strategy: { type: value },
+                    },
+                  });
+                }}
+              />
+            </InputTemplate>
+          </div>
+
+          <InputTemplate
+            className="mt-1"
+            label={[
+              "MatchLabels ",
+              <FontAwesomeIcon
+                icon={minimized.matchLabels ? faChevronDown : faChevronRight}
+              />,
+            ]}
+            onClick={() =>
+              onMinimize({
+                ...minimized,
+                matchLabels: !minimized.matchLabels,
+              })
+            }
+          >
+            <div
+              className={`border rounded py-2 ${
+                minimized.matchLabels ? "" : "d-none"
+              }`}
+            >
+              <div className="container">
+                <InputList
+                  char={["var", "="]}
+                  name={["name", "value"]}
+                  placeholder={["app", "void"]}
+                  onChange={(data) => {
+                    if (!data["name"] || data["value"] === undefined) {
+                      return false;
+                    }
+                    onLabelsChange({
+                      ...labels,
+                      [data["name"]]: data["value"],
+                    });
+                    return true;
+                  }}
+                />
+                <ul className="list-group">
+                  {Object.entries(labels).map(([name, value], i) => (
+                    <div key={`matchLabels-${i}`} className="row">
+                      <ListEntity
+                        char={["var", "="]}
+                        value={[name, value]}
+                        onChange={() => {
+                          let temp = { ...labels };
+                          delete temp[name];
+                          onLabelsChange(temp);
+                        }}
+                      />
+                    </div>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </InputTemplate>
         </div>
       </InputTemplate>
@@ -153,16 +333,18 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
           }`}
         >
           {containers.map((show, index) => (
-            <div key={index} className={`mb-3 w-100 ${styles["el-index"]}`}>
+            <div
+              key={`container-${index}`}
+              className={`mb-3 w-100 ${styles["el-index"]}`}
+            >
               <div className="row mx-1">
                 <label
                   className="ml-1 mr-auto"
                   onClick={() => {
-                    onContainerChange([
-                      ...containers.slice(0, index),
-                      !containers[index],
-                      ...containers.slice(index + 1),
-                    ]);
+                    onContainerChange({
+                      ...containers,
+                      [index]: !containers[index],
+                    });
                   }}
                 >
                   {`[${index}] `}
@@ -183,27 +365,19 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
                   }}
                 />
               </div>
-              <Container
-                show={show}
-                offset={`spec.spec.containers.${index}`}
-                value={props.value.spec.spec.containers[index]}
-                onChange={onChange}
-              />
+              <Container ref={containersRef[index]} show={show} />
             </div>
           ))}
 
           <div className="container my-2">
             <a
               className="btn btn-outline-success w-100"
-              onClick={() => {
-                onContainerChange([...containers, true]);
-
-                // FIXME: ARE U SURE ABOUT THAT ???
-                props.value.spec.spec.containers.push(K3sContainer);
-                props.onChange(props.value);
-              }}
+              onClick={() => onContainerChange([...containers, true])}
             >
-              <FontAwesomeIcon className={styles["icon"]} icon={faPlus} />
+              <FontAwesomeIcon
+                className={`text-success ${styles["icon"]}`}
+                icon={faPlus}
+              />
             </a>
           </div>
         </div>

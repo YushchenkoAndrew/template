@@ -25,7 +25,7 @@ export class Spec {
   "replicas"?: number;
   "revisionHistoryLimit"?: number;
   "selector": { matchLabels: { [key: string]: string } };
-  "strategy"?: { type: "Recreate" | "RollingUpdate" };
+  "strategy"?: { type: string };
   "template": Template;
 }
 
@@ -43,7 +43,7 @@ export class PodSpec {
   "hostNetwork"?: boolean;
   "hostPID"?: boolean;
   "hostname"?: string;
-  "initContainers"?: Container[];
+  // "initContainers"?: Container[];
   "nodeName"?: string;
   "nodeSelector"?: { [key: string]: string };
   "overhead"?: { [key: string]: string };
@@ -84,9 +84,9 @@ export class Container {
 }
 
 export class Port {
-  "containerPort": number;
+  "containerPort": string;
   "hostIP"?: string;
-  "hostPort"?: number;
+  "hostPort"?: string;
   "name"?: string;
   "protocol"?: string;
 }

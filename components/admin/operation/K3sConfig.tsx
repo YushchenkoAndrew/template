@@ -1,26 +1,23 @@
-import {
-  faChevronDown,
-  faChevronRight,
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useRef, useState } from "react";
-import { K3sDeployment, K3sNamespace } from "../../../config/placeholder";
-import Deployment from "../K3s/Deployment";
-import Ingress from "../K3s/Ingress";
+import React, {
+  createRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
+import { basePath } from "../../../config";
+import Deployment, { DeploymentRef } from "../K3s/Deployment";
 import K3sField from "../K3s/K3sField";
-import Namespace from "../K3s/Namespace";
-import Service from "../K3s/Service";
+import Namespace, { NamespaceRef } from "../K3s/Namespace";
+import Service, { ServiceRef } from "../K3s/Service";
 import Terminal, { TerminalRef } from "../Terminal";
 
 export interface K3sConfigProps {
   show?: boolean;
 }
 
-export interface K3sConfigRef {}
-
-interface Any {
-  [name: string]: any;
+export interface K3sConfigRef {
+  onSubmit: () => Promise<any>;
 }
 
 export default React.forwardRef((props: K3sConfigProps, ref) => {
@@ -32,16 +29,94 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
     terminal: true,
   });
 
-  const [namespace, onChangeNamespace] = useState<{ [key: number]: Any }>({
-    0: K3sNamespace("te"),
-  });
-  const [deployment, onChangeDeployment] = useState<{ [key: number]: Any }>({
-    0: K3sDeployment,
-  });
-  const [service, onChangeService] = useState([]);
-  const [ingress, onChangeIngress] = useState([]);
+  const [namespace, onNamespaceChange] = useState<boolean[]>([]);
+  const [namespaceRef, onNamespaceRefChange] = useState<
+    React.RefObject<NamespaceRef>[]
+  >([]);
+
+  useEffect(() => {
+    onNamespaceRefChange(
+      namespace.map((_, i) => namespaceRef[i] || createRef<NamespaceRef>())
+    );
+  }, [namespace.length]);
+
+  const [deployment, onDeploymentChange] = useState<boolean[]>([]);
+  const [deploymentRef, onDeploymentRefChange] = useState<
+    React.RefObject<DeploymentRef>[]
+  >([]);
+
+  useEffect(() => {
+    onDeploymentRefChange(
+      deployment.map((_, i) => deploymentRef[i] || createRef<DeploymentRef>())
+    );
+  }, [deployment.length]);
+
+  const [service, onServiceChange] = useState<boolean[]>([]);
+  const [serviceRef, onServiceRefChange] = useState<
+    React.RefObject<ServiceRef>[]
+  >([]);
+
+  useEffect(() => {
+    onServiceRefChange(
+      service.map((_, i) => serviceRef[i] || createRef<ServiceRef>())
+    );
+  }, [service.length]);
+
+  let [ingress, onChangeIngress] = useState([]);
 
   const terminalRef = useRef<TerminalRef>(null);
+
+  useImperativeHandle<unknown, K3sConfigRef>(ref, () => ({
+    onSubmit() {
+      return Promise.all([
+        ...namespaceRef
+          .filter((item) => item?.current)
+          .map(
+            (item) =>
+              new Promise((resolve, reject) => {
+                fetch(`${basePath}/api/admin/k3s/namespace/create`, {
+                  method: "POST",
+                  headers: { "content-type": "application/json" },
+                  body: JSON.stringify(item.current?.getValue()),
+                })
+                  .then((res) => res.json())
+                  .then((data) => resolve(resolve))
+                  .catch((err) => reject(err));
+              })
+          ),
+        ...deploymentRef
+          .filter((item) => item?.current)
+          .map(
+            (item) =>
+              new Promise((resolve, reject) => {
+                fetch(`${basePath}/api/admin/k3s/deployment/create`, {
+                  method: "POST",
+                  headers: { "content-type": "application/json" },
+                  body: JSON.stringify(item.current?.getValue()),
+                })
+                  .then((res) => res.json())
+                  .then((data) => resolve(resolve))
+                  .catch((err) => reject(err));
+              })
+          ),
+        ...serviceRef
+          .filter((item) => item?.current)
+          .map(
+            (item) =>
+              new Promise((resolve, reject) => {
+                fetch(`${basePath}/api/admin/k3s/service/create`, {
+                  method: "POST",
+                  headers: { "content-type": "application/json" },
+                  body: JSON.stringify(item.current?.getValue()),
+                })
+                  .then((res) => res.json())
+                  .then((data) => resolve(resolve))
+                  .catch((err) => reject(err));
+              })
+          ),
+      ]);
+    },
+  }));
 
   return (
     <div className={props.show ? "" : "d-none"}>
@@ -49,18 +124,16 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
         <K3sField
           name="Namespace"
           show={minimized.namespace}
+          onAdd={() => onNamespaceChange([...namespace, true])}
           onHide={() =>
             onMinimize({ ...minimized, namespace: !minimized.namespace })
           }
         >
-          {Object.values(namespace).map((item, index) => (
+          {namespace.map((item, index) => (
             <Namespace
-              key={index}
+              key={`deployment-${index}`}
+              ref={namespaceRef[index]}
               show={minimized.namespace}
-              value={item}
-              onChange={(value) => {
-                onChangeNamespace({ ...namespace, [index]: value });
-              }}
             />
           ))}
         </K3sField>
@@ -68,35 +141,38 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
         <K3sField
           name="Deployment"
           show={minimized.deployment}
+          onAdd={() => onDeploymentChange([...deployment, true])}
           onHide={() =>
             onMinimize({ ...minimized, deployment: !minimized.deployment })
           }
         >
-          {Object.values(deployment).map((item, index) => (
+          {deployment.map((item, index) => (
             <Deployment
-              key={index}
+              ref={deploymentRef[index]}
+              key={`deployment-${index}`}
               show={minimized.deployment}
-              value={item}
-              onChange={(value) => {
-                onChangeDeployment({ ...deployment, [index]: value });
-              }}
             />
           ))}
         </K3sField>
 
-        {/* <K3sField
+        <K3sField
           name="Service"
           show={minimized.service}
+          onAdd={() => onServiceChange([...service, true])}
           onHide={() =>
             onMinimize({ ...minimized, service: !minimized.service })
           }
         >
           {service.map((item, index) => (
-            <Service key={index} show={minimized.service} />
+            <Service
+              ref={serviceRef[index]}
+              key={index}
+              show={minimized.service}
+            />
           ))}
         </K3sField>
 
-        <K3sField
+        {/* <K3sField
           name="Ingress"
           show={minimized.ingress}
           onHide={() =>

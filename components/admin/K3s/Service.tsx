@@ -5,36 +5,102 @@ import {
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React, {
+  createRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
+import { Metadata } from "../../../types/K3s/Metadata";
+import { Service } from "../../../types/K3s/Service";
+import InputList from "../../Inputs/InputDoubleList";
 import InputName from "../../Inputs/InputName";
 import InputRadio from "../../Inputs/InputRadio";
 import InputTemplate from "../../Inputs/InputTemplate";
 import InputValue from "../../Inputs/InputValue";
-import Container from "./Container";
-import styles from "./Deployment.module.css";
-import Port from "./Port";
+import ListEntity from "../../Inputs/ListEntity";
+import styles from "./Default.module.css";
+import Port, { PortRef } from "./Port";
 
+export class V1Service {
+  "apiVersion"?: string;
+  "kind"?: string;
+  "metadata"?: Metadata;
+  "spec"?: V1Spec;
+  "status"?: {
+    loadBalancer: { ingress: { hostname?: string; ip?: string }[] };
+  };
+}
+
+export class V1Spec {
+  "allocateLoadBalancerNodePorts"?: boolean;
+  "clusterIP"?: string;
+  "clusterIPs"?: string[];
+  "externalIPs"?: string[];
+  "externalName"?: string;
+  "externalTrafficPolicy"?: string;
+  "healthCheckNodePort"?: number;
+  "internalTrafficPolicy"?: string;
+  "ipFamilies"?: string[];
+  "ipFamilyPolicy"?: string;
+  "loadBalancerClass"?: string;
+  "loadBalancerIP"?: string;
+  "loadBalancerSourceRanges"?: string[];
+  "ports"?: React.RefObject<PortRef>[];
+  "publishNotReadyAddresses"?: boolean;
+  "selector"?: { [key: string]: string };
+  "type"?: string;
+}
 export interface ServiceProps {
   show?: boolean;
 }
 
-export interface ServiceRef {}
+export interface ServiceRef {
+  getValue: () => Service;
+}
 
 export default React.forwardRef((props: ServiceProps, ref) => {
   const [minimized, onMinimize] = useState({
     metadata: true,
     spec: true,
+    selector: true,
     ports: true,
   });
 
-  const [ports, onPortChange] = useState([true]);
+  const [service, onServiceChange] = useState<V1Service>({
+    apiVersion: "v1",
+    kind: "Service",
+    metadata: { name: "" },
+    spec: {
+      selector: {},
+      type: "LoadBalancer",
+    },
+  });
+
+  const [ports, onPortChange] = useState<boolean[]>([]);
+  const [portsRef, onPortRefChange] = useState<React.RefObject<PortRef>[]>([]);
+
+  useEffect(() => {
+    onPortRefChange(ports.map((_, i) => portsRef[i] || createRef<PortRef>()));
+  }, [ports.length]);
+
+  let [labels, onLabelsChange] = useState({} as { [key: string]: string });
+
+  useImperativeHandle<unknown, ServiceRef>(ref, () => ({
+    getValue() {
+      return {
+        ...service,
+        spec: {
+          ...service.spec,
+          selector: { ...labels },
+          ports: portsRef.map((item) => item.current?.getValue()),
+        },
+      } as Service;
+    },
+  }));
 
   return (
-    <div
-      className={`card col-12 col-md-8 col-lg-5 p-3 m-3 ${
-        props.show ? "" : "d-none"
-      }`}
-    >
+    <div className={`card col-lg-6 p-3 m-3 ${props.show ? "" : "d-none"}`}>
       <InputTemplate
         labelClassName="font-weight-bold ml-2"
         label={[
@@ -57,11 +123,16 @@ export default React.forwardRef((props: ServiceProps, ref) => {
               char="@"
               name="name"
               required
-              value={""}
-              placeholder={"Test"}
-              onChange={(event) => {
-                event.target.value = event.target.value.replace(" ", "");
-                // onThumbnailChange(event);
+              value={service.metadata?.name ?? ""}
+              placeholder="void-service"
+              onChange={({ target: { name, value } }) => {
+                onServiceChange({
+                  ...service,
+                  metadata: {
+                    ...service.metadata,
+                    [name]: value,
+                  },
+                });
               }}
               // onBlur={onDataCache}
             />
@@ -70,11 +141,20 @@ export default React.forwardRef((props: ServiceProps, ref) => {
           <InputTemplate className="col-6" label="Namespace">
             <div className="input-group">
               <InputValue
-                name="title"
+                name="namespace"
                 className="rounded"
-                value={""}
-                placeholder={"test"}
-                onChange={() => null}
+                value={service.metadata?.namespace ?? ""}
+                placeholder="demo"
+                onChange={({ target: { name, value } }) => {
+                  onServiceChange({
+                    ...service,
+                    metadata: {
+                      ...service.metadata,
+                      [name]: value,
+                    },
+                  });
+                }}
+
                 // onBlur={onDataCache}
               />
             </div>
@@ -93,29 +173,33 @@ export default React.forwardRef((props: ServiceProps, ref) => {
         onClick={() => onMinimize({ ...minimized, spec: !minimized.spec })}
       >
         <div
-          className={`border rounded mx-1 py-2 ${
+          className={`container border rounded mx-1 py-2 ${
             minimized.spec ? "" : "d-none"
           }`}
         >
-          <InputTemplate className="mx-3" label="Cluster IP">
+          <InputTemplate label="Cluster IP">
             <InputName
               char="$"
-              name="name"
-              required
-              value={""}
-              placeholder={"10.0.171.239"}
-              onChange={(event) => {
-                event.target.value = event.target.value.replace(" ", "");
-                // onThumbnailChange(event);
+              name="clusterIP"
+              value={service.spec?.clusterIP ?? ""}
+              placeholder="10.0.171.239"
+              onChange={({ target: { name, value } }) => {
+                onServiceChange({
+                  ...service,
+                  spec: {
+                    ...service.spec,
+                    [name]: value,
+                  },
+                });
               }}
               // onBlur={onDataCache}
             />
           </InputTemplate>
 
-          <InputTemplate className="mx-3" label="Type">
+          <InputTemplate label="Type">
             <InputRadio
-              name="flag"
-              placeholder={"ClusterIP"}
+              name="type"
+              placeholder="LoadBalancer"
               className="btn-group btn-group-sm btn-group-toggle"
               options={[
                 "ClusterIP",
@@ -124,8 +208,71 @@ export default React.forwardRef((props: ServiceProps, ref) => {
                 "ExternalName",
               ]}
               label="btn-outline-info"
-              onChange={(event) => {}}
+              onChange={({ target: { name, value } }) => {
+                onServiceChange({
+                  ...service,
+                  spec: {
+                    ...service.spec,
+                    [name]: value,
+                  },
+                });
+              }}
             />
+          </InputTemplate>
+
+          <InputTemplate
+            className="mt-1"
+            label={[
+              "Selector ",
+              <FontAwesomeIcon
+                icon={minimized.selector ? faChevronDown : faChevronRight}
+              />,
+            ]}
+            onClick={() =>
+              onMinimize({
+                ...minimized,
+                selector: !minimized.selector,
+              })
+            }
+          >
+            <div
+              className={`border rounded py-2 ${
+                minimized.selector ? "" : "d-none"
+              }`}
+            >
+              <div className="container">
+                <InputList
+                  char={["var", "="]}
+                  name={["name", "value"]}
+                  placeholder={["app", "void"]}
+                  onChange={(data) => {
+                    if (!data["name"] || data["value"] === undefined) {
+                      return false;
+                    }
+                    onLabelsChange({
+                      ...labels,
+                      [data["name"]]: data["value"],
+                    });
+                    return true;
+                  }}
+                />
+                <ul className="list-group">
+                  {Object.entries(labels).map(([name, value], i) => (
+                    <div key={`matchLabels-${i}`} className="row">
+                      <ListEntity
+                        char={["var", "="]}
+                        value={[name, value]}
+                        onChange={() => {
+                          let temp = { ...labels };
+                          delete temp[name];
+                          onLabelsChange(temp);
+                        }}
+                      />
+                    </div>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </InputTemplate>
         </div>
       </InputTemplate>
@@ -146,16 +293,15 @@ export default React.forwardRef((props: ServiceProps, ref) => {
           }`}
         >
           {ports.map((show, index) => (
-            <div key={index} className={`mb-3 w-100 ${styles["el-index"]}`}>
+            <div
+              key={`port-${index}`}
+              className={`mb-3 w-100 ${styles["el-index"]}`}
+            >
               <div className="row mx-1">
                 <label
                   className="ml-1 mr-auto"
                   onClick={() => {
-                    onPortChange([
-                      ...ports.slice(0, index),
-                      !ports[index],
-                      ...ports.slice(index + 1),
-                    ]);
+                    onPortChange({ ...ports, [index]: !ports[index] });
                   }}
                 >
                   {`[${index}] `}
@@ -176,7 +322,7 @@ export default React.forwardRef((props: ServiceProps, ref) => {
                   }}
                 />
               </div>
-              <Port show={show} />
+              <Port ref={portsRef[index]} show={show} />
             </div>
           ))}
 
@@ -185,7 +331,10 @@ export default React.forwardRef((props: ServiceProps, ref) => {
               className="btn btn-outline-success w-100"
               onClick={() => onPortChange([...ports, true])}
             >
-              <FontAwesomeIcon className={styles["icon"]} icon={faPlus} />
+              <FontAwesomeIcon
+                className={`text-success ${styles["icon"]}`}
+                icon={faPlus}
+              />
             </a>
           </div>
         </div>

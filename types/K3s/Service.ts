@@ -33,10 +33,10 @@ export class Spec {
 export class Port {
   "appProtocol"?: string;
   "name"?: string;
-  "nodePort"?: number;
-  "port": number;
+  "nodePort"?: string;
+  "port": string;
   "protocol"?: string;
-  "targetPort"?: object;
+  "targetPort"?: string;
 }
 
 export class Status {}

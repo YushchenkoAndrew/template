@@ -2,75 +2,200 @@ import {
   faChevronDown,
   faChevronRight,
   faPlus,
+  faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useRef, useState } from "react";
+import React, {
+  createRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { Event } from "../../../pages/admin/projects/operation";
+import { Container } from "../../../types/K3s/Deployment";
 import InputList from "../../Inputs/InputDoubleList";
 import InputName from "../../Inputs/InputName";
 import InputRadio from "../../Inputs/InputRadio";
 import InputTemplate from "../../Inputs/InputTemplate";
 import InputValue from "../../Inputs/InputValue";
 import ListEntity from "../../Inputs/ListEntity";
+import ContainerPort, { ContainerPortRef } from "./ContainerPort";
+import styles from "./Default.module.css";
 
+export class V1Container {
+  "args"?: string[];
+  "command"?: string[];
+  "env"?: { name: string; value?: string }[];
+  "image"?: string;
+  "imagePullPolicy"?: "IfNotPresent" | "Always" | "Never";
+  "name": string;
+  "ports"?: React.RefObject<any>[];
+  "resources"?: {
+    limits?: { [key: string]: string };
+    requests?: { [key: string]: string };
+  };
+  "stdin"?: boolean;
+  "stdinOnce"?: boolean;
+  "terminationMessagePath"?: string;
+  "terminationMessagePolicy"?: string;
+  "tty"?: boolean;
+  // "volumeDevices"?:
+  // "volumeMounts"?:
+  "workingDir"?: string;
+}
 export interface ContainerProps {
   show?: boolean;
-  offset: string;
-  value: { [name: string]: any };
-  onChange: (value: Event) => void;
 }
 
-export interface ContainerRef {}
+export interface ContainerRef {
+  getValue: () => Container;
+}
 
 export default React.forwardRef((props: ContainerProps, ref) => {
   const [minimized, onMinimize] = useState({
     resources: false,
+    ports: true,
     env: false,
   });
 
+  const [container, onContainerChange] = useState<V1Container>({
+    name: "",
+    image: "",
+    imagePullPolicy: "Always",
+    ports: [],
+    resources: {},
+  });
+
+  function onChange({ target: { name, value } }: Event) {
+    onContainerChange({ ...container, [name]: value });
+  }
+
   const [env, onEnvAdd] = useState({} as { [name: string]: string });
+
+  const [ports, onPortChange] = useState<boolean[]>([]);
+  const [portsRef, onPortRefChange] = useState<
+    React.RefObject<ContainerPortRef>[]
+  >([]);
+
+  useEffect(() => {
+    onPortRefChange(
+      ports.map((_, i) => portsRef[i] || createRef<ContainerRef>())
+    );
+  }, [ports.length]);
+
+  useImperativeHandle<unknown, ContainerRef>(ref, () => ({
+    getValue() {
+      return {
+        ...container,
+        ports: portsRef.map((item) => item.current?.getValue()),
+        env: Object.entries(env).map(([name, value]) => ({ name, value })),
+      } as Container;
+    },
+  }));
 
   return (
     <div className={`border rounded mx-1 py-2 ${props.show ? "" : "d-none"}`}>
+      <InputTemplate className="mx-3" label="Name">
+        <div className="input-group">
+          <InputName
+            char="#"
+            name="name"
+            required
+            value={container.name}
+            placeholder="void"
+            onChange={onChange}
+            // onBlur={onDataCache}
+          />
+        </div>
+      </InputTemplate>
       <InputTemplate className="mx-3" label="Image">
         <div className="input-group">
           <InputName
             char="#"
-            name={props.offset + ".image"}
+            name="image"
             required
-            value={props.value.image ?? ""}
+            value={container.image ?? ""}
             placeholder="grimreapermortis/void:0.0.2"
-            onChange={props.onChange}
+            onChange={onChange}
             // onBlur={onDataCache}
           />
         </div>
       </InputTemplate>
 
-      <div className="row mx-1 w-100">
-        <InputTemplate className="col-7" label="ImagePullPolicy">
-          <InputRadio
-            name="flag"
-            placeholder={"IfNotPresent"}
-            className="btn-group btn-group-sm btn-group-toggle"
-            options={["IfNotPresent", "Always", "Never"]}
-            label="btn-outline-info"
-            onChange={(event) => {}}
-          />
-        </InputTemplate>
+      <InputTemplate className="mx-3" label="ImagePullPolicy">
+        <InputRadio
+          name="imagePullPolicy"
+          placeholder="Always"
+          className="btn-group btn-group-sm btn-group-toggle"
+          options={["IfNotPresent", "Always", "Never"]}
+          label="btn-outline-info"
+          onChange={onChange}
+        />
+      </InputTemplate>
 
-        <InputTemplate className="col-3" label="Port">
-          <div className="input-group">
-            <InputValue
-              name="title"
-              className="rounded"
-              value={""}
-              placeholder={"test"}
-              onChange={() => null}
-              // onBlur={onDataCache}
-            />
+      <InputTemplate
+        className="container"
+        label={[
+          "Ports ",
+          <FontAwesomeIcon
+            icon={minimized.ports ? faChevronDown : faChevronRight}
+          />,
+        ]}
+        onClick={() => onMinimize({ ...minimized, ports: !minimized.ports })}
+      >
+        <div
+          className={`container border rounded py-2 ${
+            minimized.ports ? "" : "d-none"
+          }`}
+        >
+          {ports.map((show, index) => (
+            <div
+              key={`containerPort-${index}`}
+              className={`mb-3 w-100 ${styles["el-index"]}`}
+            >
+              <div className="row mx-1">
+                <label
+                  className="ml-1 mr-auto"
+                  onClick={() => {
+                    onPortChange({ ...ports, [index]: !ports[index] });
+                  }}
+                >
+                  {`[${index}] `}
+                  <FontAwesomeIcon
+                    icon={show ? faChevronDown : faChevronRight}
+                  />
+                </label>
+                <FontAwesomeIcon
+                  className={`mr-1 ${styles["el-container"]} text-danger`}
+                  icon={faTrashAlt}
+                  size="lg"
+                  fontSize="1rem"
+                  onClick={() => {
+                    onPortChange([
+                      ...ports.slice(0, index),
+                      ...ports.slice(index + 1),
+                    ]);
+                  }}
+                />
+              </div>
+              <ContainerPort ref={portsRef[index]} show={show} />
+            </div>
+          ))}
+
+          <div className="container my-2">
+            <a
+              className="btn btn-outline-success w-100"
+              onClick={() => onPortChange([...ports, true])}
+            >
+              <FontAwesomeIcon
+                className={`text-success ${styles["icon"]}`}
+                icon={faPlus}
+              />
+            </a>
           </div>
-        </InputTemplate>
-      </div>
+        </div>
+      </InputTemplate>
 
       <InputTemplate
         className="mx-2"
@@ -96,11 +221,22 @@ export default React.forwardRef((props: ContainerProps, ref) => {
           <InputTemplate className="col-6" label="CPU">
             <div className="input-group">
               <InputValue
-                name="title"
+                name="cpu"
                 className="rounded"
-                value={""}
-                placeholder={"test"}
-                onChange={() => null}
+                value={container.resources?.requests?.cpu ?? ""}
+                placeholder="100m"
+                onChange={({ target: { name, value } }) => {
+                  onContainerChange({
+                    ...container,
+                    resources: {
+                      ...container.resources,
+                      requests: {
+                        ...container.resources?.requests,
+                        [name]: value,
+                      },
+                    },
+                  });
+                }}
                 // onBlur={onDataCache}
               />
             </div>
@@ -108,11 +244,22 @@ export default React.forwardRef((props: ContainerProps, ref) => {
           <InputTemplate className="col-6" label="RAM">
             <div className="input-group">
               <InputValue
-                name="title"
+                name="memory"
                 className="rounded"
-                value={""}
-                placeholder={"test"}
-                onChange={() => null}
+                value={container.resources?.requests?.memory ?? ""}
+                placeholder="100Mi"
+                onChange={({ target: { name, value } }) => {
+                  onContainerChange({
+                    ...container,
+                    resources: {
+                      ...container.resources,
+                      requests: {
+                        ...container.resources?.requests,
+                        [name]: value,
+                      },
+                    },
+                  });
+                }}
                 // onBlur={onDataCache}
               />
             </div>
@@ -145,9 +292,9 @@ export default React.forwardRef((props: ContainerProps, ref) => {
             <InputList
               char={["var", "="]}
               name={["name", "value"]}
-              placeholder={["test", "test"]}
+              placeholder={["USER", "admin"]}
               onChange={(data) => {
-                // if (!data["name"] || data["value"] === undefined) return false;
+                if (!data["name"] || data["value"] === undefined) return false;
                 onEnvAdd({ ...env, [data["name"]]: data["value"] });
                 return true;
               }}
@@ -159,9 +306,9 @@ export default React.forwardRef((props: ContainerProps, ref) => {
                     char={["var", "="]}
                     value={[name, value]}
                     onChange={() => {
-                      let temp = env;
+                      let temp = { ...env };
                       delete temp[name];
-                      onEnvAdd({ ...temp });
+                      onEnvAdd(temp);
                     }}
                   />
                 </div>

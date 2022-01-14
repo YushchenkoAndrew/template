@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useRef, useState } from "react";
 import InputName from "../../Inputs/InputName";
 import InputTemplate from "../../Inputs/InputTemplate";
-import styles from "./Deployment.module.css";
+import styles from "./Default.module.css";
 import Path from "./Path";
 
 export interface TlsProps {
@@ -88,7 +88,10 @@ export default React.forwardRef((props: TlsProps, ref) => {
               className="btn btn-outline-success w-100"
               onClick={() => onPathChange([...paths, true])}
             >
-              <FontAwesomeIcon className={styles["icon"]} icon={faPlus} />
+              <FontAwesomeIcon
+                className={`text-success ${styles["icon"]}`}
+                icon={faPlus}
+              />
             </a>
           </div>
         </div>
