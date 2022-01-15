@@ -6,7 +6,7 @@ import sessionConfig from "../../../config/session";
 import { ApiAuth } from "../../../lib/api/auth";
 import { sendLogs } from "../../../lib/api/bot";
 import { ApiRes, ApiError, ProjectData } from "../../../types/api";
-import { FullResponse } from "../../../types/request";
+import { DefaultRes, FullResponse } from "../../../types/request";
 
 function AddProject(body: string) {
   return new Promise<FullResponse>((resolve, reject) => {
@@ -55,10 +55,10 @@ function AddProject(body: string) {
 
 export default withIronSession(async function (
   req: NextApiRequest & { session: Session },
-  res: NextApiResponse
+  res: NextApiResponse<DefaultRes>
 ) {
   if (req.method !== "POST") {
-    return res.status(405).send({ stat: "ERR", message: "Unknown method" });
+    return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
   let id = req.query["id"] as string;
@@ -66,7 +66,7 @@ export default withIronSession(async function (
   if (!name || !flag || !title || !desc || (flag !== "Link" && !note)) {
     return res
       .status(400)
-      .send({ stat: "ERR", message: "Not all required fields are setted" });
+      .send({ status: "ERR", message: "Not all required fields are setted" });
   }
 
   const { status, send } = await AddProject(

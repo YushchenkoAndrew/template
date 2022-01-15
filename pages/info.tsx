@@ -107,7 +107,7 @@ export default function Info() {
     )
       .then((res) => res.json())
       .then((data: StatisticData) => {
-        if (data.stat !== "OK") return;
+        if (data.status !== "OK") return;
         onMapLoad(data.map);
         onInfoLoad(data.info);
       })
@@ -124,7 +124,7 @@ export default function Info() {
     )
       .then((res) => res.json())
       .then((data: AnalyticsData) => {
-        if (data.stat !== "OK") return;
+        if (data.status !== "OK") return;
         onLineLoad(data.line);
         onLabelsLoad(
           data.days.map((item) =>

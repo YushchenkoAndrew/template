@@ -169,7 +169,7 @@ export default async function handler(
     }, [] as Country[]);
 
     return res.status(200).json({
-      stat: "OK",
+      status: "OK",
       info: {
         users: {
           value: now.Visitors,

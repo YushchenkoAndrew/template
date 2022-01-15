@@ -5,7 +5,7 @@ import redis from "../../../config/redis";
 import { formPath } from "../../../lib/public/files";
 import { createQuery } from "../../../lib/api/query";
 import { ApiError, ApiRes, FileData, ProjectData } from "../../../types/api";
-import { FullResponse } from "../../../types/request";
+import { DefaultRes, FullResponse } from "../../../types/request";
 
 export function LoadProjects<Type = any>(args: {
   [key: string]: number | string;
@@ -66,10 +66,10 @@ export function LoadProjects<Type = any>(args: {
 
 export default async function (
   req: NextApiRequest & { session: Session },
-  res: NextApiResponse
+  res: NextApiResponse<DefaultRes>
 ) {
   if (req.method !== "GET") {
-    return res.status(405).send({ stat: "ERR", message: "Unknown method" });
+    return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
   let role = req.query["role"] as string;
@@ -77,7 +77,7 @@ export default async function (
   let page = Number(req.query["page"] as string);
 
   if (isNaN(page) && isNaN(id)) {
-    return res.status(400).send({ stat: "ERR", message: "Bad 'page' param" });
+    return res.status(400).send({ status: "ERR", message: "Bad 'page' param" });
   }
 
   const { status, send } = await LoadProjects({ id, role, page });

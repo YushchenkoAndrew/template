@@ -14,14 +14,14 @@ export type FullResponse<Type = any> = {
 };
 
 export type AnalyticsData = {
-  stat: Stat;
+  status: Stat;
   doughnut: Analytics;
   line: number[];
   days: string[];
 };
 
 export type StatisticData = {
-  stat: Stat;
+  status: Stat;
   info: StatInfo;
   map: Country[];
 };

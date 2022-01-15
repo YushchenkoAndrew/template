@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Session, withIronSession } from "next-iron-session";
 import sessionConfig from "../../../config/session";
-import { FullResponse } from "../../../types/request";
+import { DefaultRes, FullResponse } from "../../../types/request";
 import { apiUrl } from "../../../config";
 import { sendLogs } from "../../../lib/api/bot";
 import { ApiAuth } from "../../../lib/api/auth";
@@ -106,17 +106,17 @@ function SendData(args: ArgsType) {
 
 export default withIronSession(async function (
   req: NextApiRequest & { session: Session },
-  res: NextApiResponse
+  res: NextApiResponse<DefaultRes>
 ) {
   if (req.method !== "POST") {
-    return res.status(405).send({ stat: "ERR", message: "Unknown method" });
+    return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
   const id = Number(req.query["id"] as string);
   const body = req.body as { [name: string]: LinkData };
   if (isNaN(id) || !body) {
     return res.status(400).send({
-      stat: "ERR",
+      status: "ERR",
       message: "This request is too bad to be a true one",
     });
   }

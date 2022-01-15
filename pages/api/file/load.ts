@@ -5,7 +5,7 @@ import redis from "../../../config/redis";
 import { formPath } from "../../../lib/public/files";
 import { createQuery } from "../../../lib/api/query";
 import { ApiError, ApiRes, FileData, ProjectData } from "../../../types/api";
-import { FullResponse } from "../../../types/request";
+import { DefaultRes, FullResponse } from "../../../types/request";
 
 export function LoadFile(args: { [key: string]: number | string }) {
   return new Promise<FullResponse>((resolve, reject) => {
@@ -67,10 +67,10 @@ export function LoadFile(args: { [key: string]: number | string }) {
 
 export default async function (
   req: NextApiRequest & { session: Session },
-  res: NextApiResponse
+  res: NextApiResponse<DefaultRes>
 ) {
   if (req.method !== "GET") {
-    return res.status(405).send({ stat: "ERR", message: "Unknown method" });
+    return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
   const project = req.query["project"] as string;
@@ -79,7 +79,7 @@ export default async function (
   if (!project) {
     return res
       .status(400)
-      .send({ stat: "ERR", message: "Bad 'project' param" });
+      .send({ status: "ERR", message: "Bad 'project' param" });
   }
 
   const { status, send } = await LoadFile({ project, role });

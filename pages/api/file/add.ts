@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Session, withIronSession } from "next-iron-session";
 import sessionConfig from "../../../config/session";
 import FormData from "form-data";
-import { FullResponse } from "../../../types/request";
+import { DefaultRes, FullResponse } from "../../../types/request";
 import { apiUrl, localVoidUrl } from "../../../config";
 import { sendLogs } from "../../../lib/api/bot";
 import md5 from "../../../lib/md5";
@@ -172,10 +172,10 @@ export const config = {
 
 export default withIronSession(async function (
   req: NextApiRequest & { session: Session },
-  res: NextApiResponse
+  res: NextApiResponse<DefaultRes>
 ) {
   if (req.method !== "POST") {
-    return res.status(405).send({ stat: "ERR", message: "Unknown method" });
+    return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
   const id = Number(req.query["id"] as string);
@@ -184,7 +184,7 @@ export default withIronSession(async function (
   const path = (req.query["path"] as string) ?? "";
   if (!role || !project || isNaN(id)) {
     return res.status(400).send({
-      stat: "ERR",
+      status: "ERR",
       message: "This request is too bad to be a true one",
     });
   }

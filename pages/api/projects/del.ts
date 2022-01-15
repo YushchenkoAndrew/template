@@ -94,10 +94,10 @@ function DelProject(project: string, flag: string) {
 
 export default withIronSession(async function (
   req: NextApiRequest & { session: Session },
-  res: NextApiResponse
+  res: NextApiResponse<DefaultRes>
 ) {
   if (req.method !== "POST") {
-    return res.status(405).send({ stat: "ERR", message: "Unknown method" });
+    return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
   const project = req.query["project"] as string;
@@ -105,7 +105,7 @@ export default withIronSession(async function (
   if (!project || !flag) {
     return res
       .status(400)
-      .send({ stat: "ERR", message: "Not all required fields are setted" });
+      .send({ status: "ERR", message: "Not all required fields are setted" });
   }
 
   const { status, send } = await DelProject(project, flag);
