@@ -32,7 +32,7 @@ export function DeleteTokens() {
 }
 
 export function ApiAuth() {
-  return new Promise((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     redis.get("API:Access", (err, reply) => {
       if (!err && reply) return resolve(reply);
 
