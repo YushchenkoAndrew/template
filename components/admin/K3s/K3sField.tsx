@@ -44,30 +44,38 @@ export default function K3sField(props: K3sFieldProps) {
             />
           </span>
           <div className="row mr-1">
-            <a
-              className={`mr-1 btn btn-outline-info ${styles["el-container-2"]}`}
-              onClick={props.onAdd}
-            >
-              <FontAwesomeIcon
-                className={`text-info ${styles["icon"]}`}
-                icon={faPlus}
-                size="lg"
-                fontSize="1rem"
-              />
-            </a>
+            {props.onAdd ? (
+              <a
+                className={`mr-1 btn btn-outline-info ${styles["el-container-2"]}`}
+                onClick={props.onAdd}
+              >
+                <FontAwesomeIcon
+                  className={`text-info ${styles["icon"]}`}
+                  icon={faPlus}
+                  size="lg"
+                  fontSize="1rem"
+                />
+              </a>
+            ) : (
+              <></>
+            )}
 
-            <a
-              className={`mr-1 btn btn-outline-danger ${styles["el-container-2"]}`}
-              onClick={props.onAdd}
-            >
-              <FontAwesomeIcon
-                className={`text-danger ${styles["icon"]}`}
-                icon={faTrashAlt}
-                size="lg"
-                fontSize="1rem"
-                onClick={props.onDel}
-              />
-            </a>
+            {props.onDel ? (
+              <a
+                className={`mr-1 btn btn-outline-danger ${styles["el-container-2"]}`}
+                onClick={props.onAdd}
+              >
+                <FontAwesomeIcon
+                  className={`text-danger ${styles["icon"]}`}
+                  icon={faTrashAlt}
+                  size="lg"
+                  fontSize="1rem"
+                  onClick={props.onDel}
+                />
+              </a>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
 

@@ -11,7 +11,7 @@ import React, {
   useImperativeHandle,
   useState,
 } from "react";
-import { Deployment, Status } from "../../../types/K3s/Deployment";
+import { Deployment, Spec, Status } from "../../../types/K3s/Deployment";
 import { Metadata } from "../../../types/K3s/Metadata";
 import InputList from "../../Inputs/InputDoubleList";
 import InputName from "../../Inputs/InputName";
@@ -21,56 +21,6 @@ import InputValue from "../../Inputs/InputValue";
 import ListEntity from "../../Inputs/ListEntity";
 import Container, { ContainerRef } from "./Container";
 import styles from "./Default.module.css";
-
-export class V1Deployment {
-  "apiVersion"?: string;
-  "kind"?: string;
-  "metadata"?: Metadata;
-  "spec"?: V1Spec;
-  "status"?: Status;
-}
-
-class V1Spec {
-  "minReadySeconds"?: number;
-  "paused"?: boolean;
-  "progressDeadlineSeconds"?: number;
-  "replicas"?: string;
-  "revisionHistoryLimit"?: number;
-  "selector"?: { matchLabels: { [key: string]: string } };
-  "strategy"?: { type: string };
-  "template"?: V1Template;
-}
-export class V1Template {
-  "metadata"?: Metadata;
-  "spec"?: V1PodSpec;
-}
-
-export class V1PodSpec {
-  "activeDeadlineSeconds"?: number;
-  "automountServiceAccountToken"?: boolean;
-  "containers": React.RefObject<ContainerRef>[];
-  "enableServiceLinks"?: boolean;
-  "hostIPC"?: boolean;
-  "hostNetwork"?: boolean;
-  "hostPID"?: boolean;
-  "hostname"?: string;
-  // "initContainers"?: Container[];
-  "nodeName"?: string;
-  "nodeSelector"?: { [key: string]: string };
-  "overhead"?: { [key: string]: string };
-  "preemptionPolicy"?: string;
-  "priority"?: number;
-  "priorityClassName"?: string;
-  "restartPolicy"?: string;
-  "runtimeClassName"?: string;
-  "schedulerName"?: string;
-  "serviceAccount"?: string;
-  "serviceAccountName"?: string;
-  "setHostnameAsFQDN"?: boolean;
-  "shareProcessNamespace"?: boolean;
-  "subdomain"?: string;
-  "terminationGracePeriodSeconds"?: number;
-}
 
 export interface DeploymentProps {
   show?: boolean;
@@ -87,7 +37,7 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
     containers: true,
   });
 
-  const [deployment, onDeploymentChange] = useState<V1Deployment>({
+  const [deployment, onDeploymentChange] = useState<Deployment>({
     apiVersion: "app/v1",
     kind: "Deployment",
     metadata: {},
@@ -230,7 +180,7 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
                       spec: {
                         ...deployment.spec,
                         [name]: value,
-                      },
+                      } as Spec,
                     });
                   }}
                   // onBlur={onDataCache}
@@ -251,7 +201,7 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
                     spec: {
                       ...deployment.spec,
                       strategy: { type: value },
-                    },
+                    } as Spec,
                   });
                 }}
               />

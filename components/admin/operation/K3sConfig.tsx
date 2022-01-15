@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { basePath } from "../../../config";
 import Deployment, { DeploymentRef } from "../K3s/Deployment";
+import Ingress, { IngressRef } from "../K3s/Ingress";
 import K3sField from "../K3s/K3sField";
 import Namespace, { NamespaceRef } from "../K3s/Namespace";
 import Service, { ServiceRef } from "../K3s/Service";
@@ -62,7 +63,16 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
     );
   }, [service.length]);
 
-  let [ingress, onChangeIngress] = useState([]);
+  const [ingress, onIngressChange] = useState<boolean[]>([]);
+  const [ingressRef, onIngressRefChange] = useState<
+    React.RefObject<IngressRef>[]
+  >([]);
+
+  useEffect(() => {
+    onIngressRefChange(
+      ingress.map((_, i) => ingressRef[i] || createRef<IngressRef>())
+    );
+  }, [ingress.length]);
 
   const terminalRef = useRef<TerminalRef>(null);
 
@@ -74,7 +84,7 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
           .map(
             (item) =>
               new Promise((resolve, reject) => {
-                fetch(`${basePath}/api/admin/k3s/namespace/create`, {
+                fetch(`${basePath}/api/admin/k3s/create?type=namespace`, {
                   method: "POST",
                   headers: { "content-type": "application/json" },
                   body: JSON.stringify(item.current?.getValue()),
@@ -89,7 +99,7 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
           .map(
             (item) =>
               new Promise((resolve, reject) => {
-                fetch(`${basePath}/api/admin/k3s/deployment/create`, {
+                fetch(`${basePath}/api/admin/k3s/create?type=deployment`, {
                   method: "POST",
                   headers: { "content-type": "application/json" },
                   body: JSON.stringify(item.current?.getValue()),
@@ -104,7 +114,22 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
           .map(
             (item) =>
               new Promise((resolve, reject) => {
-                fetch(`${basePath}/api/admin/k3s/service/create`, {
+                fetch(`${basePath}/api/admin/k3s/create?type=service`, {
+                  method: "POST",
+                  headers: { "content-type": "application/json" },
+                  body: JSON.stringify(item.current?.getValue()),
+                })
+                  .then((res) => res.json())
+                  .then((data) => resolve(resolve))
+                  .catch((err) => reject(err));
+              })
+          ),
+        ...ingressRef
+          .filter((item) => item?.current)
+          .map(
+            (item) =>
+              new Promise((resolve, reject) => {
+                fetch(`${basePath}/api/admin/k3s/create?type=ingress`, {
                   method: "POST",
                   headers: { "content-type": "application/json" },
                   body: JSON.stringify(item.current?.getValue()),
@@ -172,17 +197,22 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
           ))}
         </K3sField>
 
-        {/* <K3sField
+        <K3sField
           name="Ingress"
           show={minimized.ingress}
+          onAdd={() => onIngressChange([...ingress, true])}
           onHide={() =>
             onMinimize({ ...minimized, ingress: !minimized.ingress })
           }
         >
           {ingress.map((item, index) => (
-            <Ingress key={index} show={minimized.ingress} />
+            <Ingress
+              ref={ingressRef[index]}
+              key={index}
+              show={minimized.ingress}
+            />
           ))}
-        </K3sField> */}
+        </K3sField>
 
         <K3sField
           name="Terminal"

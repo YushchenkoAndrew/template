@@ -23,27 +23,6 @@ import ListEntity from "../../Inputs/ListEntity";
 import ContainerPort, { ContainerPortRef } from "./ContainerPort";
 import styles from "./Default.module.css";
 
-export class V1Container {
-  "args"?: string[];
-  "command"?: string[];
-  "env"?: { name: string; value?: string }[];
-  "image"?: string;
-  "imagePullPolicy"?: "IfNotPresent" | "Always" | "Never";
-  "name": string;
-  "ports"?: React.RefObject<any>[];
-  "resources"?: {
-    limits?: { [key: string]: string };
-    requests?: { [key: string]: string };
-  };
-  "stdin"?: boolean;
-  "stdinOnce"?: boolean;
-  "terminationMessagePath"?: string;
-  "terminationMessagePolicy"?: string;
-  "tty"?: boolean;
-  // "volumeDevices"?:
-  // "volumeMounts"?:
-  "workingDir"?: string;
-}
 export interface ContainerProps {
   show?: boolean;
 }
@@ -59,7 +38,7 @@ export default React.forwardRef((props: ContainerProps, ref) => {
     env: false,
   });
 
-  const [container, onContainerChange] = useState<V1Container>({
+  const [container, onContainerChange] = useState<Container>({
     name: "",
     image: "",
     imagePullPolicy: "Always",

@@ -5,31 +5,63 @@ import {
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useRef, useState } from "react";
+import React, {
+  createRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
+import { Rule } from "../../../types/K3s/Ingress";
 import InputName from "../../Inputs/InputName";
 import InputTemplate from "../../Inputs/InputTemplate";
 import styles from "./Default.module.css";
-import Path from "./Path";
+import Path, { PathRef } from "./Path";
 
-export interface TlsProps {
+export interface RulesProps {
   show?: boolean;
 }
 
-export interface TlsRef {}
+export interface RulesRef {
+  getValue: () => Rule;
+}
 
-export default React.forwardRef((props: TlsProps, ref) => {
-  const [minimized, onMinimize] = useState(false);
-  const [paths, onPathChange] = useState([true]);
+export default React.forwardRef((props: RulesProps, ref) => {
+  const [minimized, onMinimize] = useState(true);
+
+  const [rule, onRuleChange] = useState<Rule>({
+    host: "",
+  });
+
+  const [paths, onPathChange] = useState<boolean[]>([]);
+  const [pathsRef, onPathRefChange] = useState<React.RefObject<PathRef>[]>([]);
+
+  useImperativeHandle<unknown, RulesRef>(ref, () => ({
+    getValue() {
+      return {
+        ...rule,
+        http: {
+          ...rule.http,
+          paths: pathsRef.map((item) => item.current?.getValue()),
+        },
+      } as Rule;
+    },
+  }));
+
+  useEffect(() => {
+    onPathRefChange(paths.map((_, i) => pathsRef[i] || createRef<PathRef>()));
+  }, [paths.length]);
 
   return (
     <div className={`border rounded mx-1 py-2 ${props.show ? "" : "d-none"}`}>
       <InputTemplate className="mx-3" label="Host">
         <InputName
-          name="title"
+          name="host"
           char="http://"
-          value={""}
-          placeholder={"test"}
-          onChange={() => null}
+          value={rule.host ?? ""}
+          placeholder="mortis-grimreaper.ddns.net"
+          onChange={({ target: { name, value } }) => {
+            onRuleChange({ ...rule, [name]: value });
+          }}
           // onBlur={onDataCache}
         />
       </InputTemplate>
@@ -54,11 +86,7 @@ export default React.forwardRef((props: TlsProps, ref) => {
                 <label
                   className="ml-1 mr-auto"
                   onClick={() => {
-                    onPathChange([
-                      ...paths.slice(0, index),
-                      !paths[index],
-                      ...paths.slice(index + 1),
-                    ]);
+                    onPathChange({ ...paths, [index]: !paths[index] });
                   }}
                 >
                   {`[${index}] `}
@@ -79,7 +107,7 @@ export default React.forwardRef((props: TlsProps, ref) => {
                   }}
                 />
               </div>
-              <Path show={show} />
+              <Path ref={pathsRef[index]} show={show} />
             </div>
           ))}
 

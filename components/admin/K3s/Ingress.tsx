@@ -5,21 +5,27 @@ import {
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React, {
+  createRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
+import { Ingress } from "../../../types/K3s/Ingress";
+import { Metadata } from "../../../types/K3s/Metadata";
 import InputName from "../../Inputs/InputName";
-import InputRadio from "../../Inputs/InputRadio";
 import InputTemplate from "../../Inputs/InputTemplate";
 import InputValue from "../../Inputs/InputValue";
-import Container from "./Container";
-import styles from "./Deployment.module.css";
-import Port from "./Port";
-import Rules from "./Rules";
+import styles from "./Default.module.css";
+import Rules, { RulesRef } from "./Rules";
 
 export interface IngressProps {
   show?: boolean;
 }
 
-export interface IngressRef {}
+export interface IngressRef {
+  getValue: () => Ingress;
+}
 
 export default React.forwardRef((props: IngressProps, ref) => {
   const [minimized, onMinimize] = useState({
@@ -27,7 +33,33 @@ export default React.forwardRef((props: IngressProps, ref) => {
     rules: true,
   });
 
-  const [ports, onPortChange] = useState([true]);
+  const [ingress, onIngressChange] = useState<Ingress>({
+    apiVersion: "networking.k8s.io/v1",
+    kind: "Ingress",
+    metadata: { name: "" },
+    spec: { tls: {} },
+  });
+
+  const [rules, onRulesChange] = useState<boolean[]>([]);
+  const [rulesRef, onRulesRefChange] = useState<React.RefObject<RulesRef>[]>(
+    []
+  );
+
+  useEffect(() => {
+    onRulesRefChange(rules.map((_, i) => rulesRef[i] || createRef<RulesRef>()));
+  }, [rules.length]);
+
+  useImperativeHandle<unknown, IngressRef>(ref, () => ({
+    getValue() {
+      return {
+        ...ingress,
+        spec: {
+          ...ingress.spec,
+          rules: rulesRef.map((item) => item.current?.getValue()),
+        },
+      } as Ingress;
+    },
+  }));
 
   return (
     <div
@@ -57,11 +89,16 @@ export default React.forwardRef((props: IngressProps, ref) => {
               char="@"
               name="name"
               required
-              value={""}
-              placeholder={"Test"}
-              onChange={(event) => {
-                event.target.value = event.target.value.replace(" ", "");
-                // onThumbnailChange(event);
+              value={ingress.metadata?.name ?? ""}
+              placeholder="void-ingress"
+              onChange={({ target: { name, value } }) => {
+                onIngressChange({
+                  ...ingress,
+                  metadata: {
+                    ...ingress.metadata,
+                    [name]: value,
+                  },
+                });
               }}
               // onBlur={onDataCache}
             />
@@ -70,11 +107,19 @@ export default React.forwardRef((props: IngressProps, ref) => {
           <InputTemplate className="col-6" label="Namespace">
             <div className="input-group">
               <InputValue
-                name="title"
+                name="namespace"
                 className="rounded"
-                value={""}
-                placeholder={"test"}
-                onChange={() => null}
+                value={ingress.metadata?.namespace ?? ""}
+                placeholder="demo"
+                onChange={({ target: { name, value } }) => {
+                  onIngressChange({
+                    ...ingress,
+                    metadata: {
+                      ...ingress.metadata,
+                      [name]: value,
+                    },
+                  });
+                }}
                 // onBlur={onDataCache}
               />
             </div>
@@ -97,17 +142,13 @@ export default React.forwardRef((props: IngressProps, ref) => {
             minimized.rules ? "" : "d-none"
           }`}
         >
-          {ports.map((show, index) => (
+          {rules.map((show, index) => (
             <div key={index} className={`mb-3 w-100 ${styles["el-index"]}`}>
               <div className="row mx-1">
                 <label
                   className="ml-1 mr-auto"
                   onClick={() => {
-                    onPortChange([
-                      ...ports.slice(0, index),
-                      !ports[index],
-                      ...ports.slice(index + 1),
-                    ]);
+                    onRulesChange({ ...rules, [index]: !rules[index] });
                   }}
                 >
                   {`[${index}] `}
@@ -121,23 +162,26 @@ export default React.forwardRef((props: IngressProps, ref) => {
                   size="lg"
                   fontSize="1rem"
                   onClick={() => {
-                    onPortChange([
-                      ...ports.slice(0, index),
-                      ...ports.slice(index + 1),
+                    onRulesChange([
+                      ...rules.slice(0, index),
+                      ...rules.slice(index + 1),
                     ]);
                   }}
                 />
               </div>
-              <Rules show={show} />
+              <Rules ref={rulesRef[index]} show={show} />
             </div>
           ))}
 
           <div className="container my-2">
             <a
               className="btn btn-outline-success w-100"
-              onClick={() => onPortChange([...ports, true])}
+              onClick={() => onRulesChange([...rules, true])}
             >
-              <FontAwesomeIcon className={styles["icon"]} icon={faPlus} />
+              <FontAwesomeIcon
+                className={`text-success ${styles["icon"]}`}
+                icon={faPlus}
+              />
             </a>
           </div>
         </div>

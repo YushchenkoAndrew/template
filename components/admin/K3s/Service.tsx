@@ -22,35 +22,6 @@ import ListEntity from "../../Inputs/ListEntity";
 import styles from "./Default.module.css";
 import Port, { PortRef } from "./Port";
 
-export class V1Service {
-  "apiVersion"?: string;
-  "kind"?: string;
-  "metadata"?: Metadata;
-  "spec"?: V1Spec;
-  "status"?: {
-    loadBalancer: { ingress: { hostname?: string; ip?: string }[] };
-  };
-}
-
-export class V1Spec {
-  "allocateLoadBalancerNodePorts"?: boolean;
-  "clusterIP"?: string;
-  "clusterIPs"?: string[];
-  "externalIPs"?: string[];
-  "externalName"?: string;
-  "externalTrafficPolicy"?: string;
-  "healthCheckNodePort"?: number;
-  "internalTrafficPolicy"?: string;
-  "ipFamilies"?: string[];
-  "ipFamilyPolicy"?: string;
-  "loadBalancerClass"?: string;
-  "loadBalancerIP"?: string;
-  "loadBalancerSourceRanges"?: string[];
-  "ports"?: React.RefObject<PortRef>[];
-  "publishNotReadyAddresses"?: boolean;
-  "selector"?: { [key: string]: string };
-  "type"?: string;
-}
 export interface ServiceProps {
   show?: boolean;
 }
@@ -67,7 +38,7 @@ export default React.forwardRef((props: ServiceProps, ref) => {
     ports: true,
   });
 
-  const [service, onServiceChange] = useState<V1Service>({
+  const [service, onServiceChange] = useState<Service>({
     apiVersion: "v1",
     kind: "Service",
     metadata: { name: "" },

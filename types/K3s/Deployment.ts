@@ -22,7 +22,7 @@ export class Spec {
   "minReadySeconds"?: number;
   "paused"?: boolean;
   "progressDeadlineSeconds"?: number;
-  "replicas"?: number;
+  "replicas"?: string;
   "revisionHistoryLimit"?: number;
   "selector": { matchLabels: { [key: string]: string } };
   "strategy"?: { type: string };

@@ -22,26 +22,21 @@ export class Spec {
 
 export class Rule {
   "host"?: string;
-  "http"?: {
-    paths: {
-      backend: {
-        resource?: {
-          apiGroup?: string;
-          kind: string;
-          name: string;
-        };
-        service?: {
-          name: string;
-          port?: {
-            name?: string;
-            number?: number;
-          };
-        };
+  "http"?: { paths: Path[] };
+}
+
+export class Path {
+  "backend"?: {
+    service?: {
+      name: string;
+      port?: {
+        name?: string;
+        number?: string;
       };
-      path?: string;
-      pathType: string;
-    }[];
+    };
   };
+  "path"?: string;
+  "pathType"?: string;
 }
 
 export class Stat {}
