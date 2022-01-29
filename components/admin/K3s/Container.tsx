@@ -65,10 +65,15 @@ export default React.forwardRef((props: ContainerProps, ref) => {
 
   useImperativeHandle<unknown, ContainerRef>(ref, () => ({
     getValue() {
+      const envVars = Object.entries(env).map(([name, value]) => ({
+        name,
+        value,
+      }));
+
       return {
         ...container,
         ports: portsRef.map((item) => item.current?.getValue()),
-        env: Object.entries(env).map(([name, value]) => ({ name, value })),
+        ...(envVars.length ? { env: envVars } : {}),
       } as Container;
     },
   }));

@@ -120,6 +120,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           draggable
         />
 
+        {/* FIXME: */}
         <div className="container mb-3">
           <div className="row w-100 d-flex justify-content-between">
             {/* <span></span> */}
@@ -136,7 +137,14 @@ export default function ProjectOperation(props: ProjectOperationProps) {
 
             <a
               className="btn btn-success"
-              onClick={() => k3sConfigRef?.current?.onSubmit?.()}
+              onClick={() =>
+                k3sConfigRef?.current
+                  ?.onSubmit?.()
+                  .then((res) => {
+                    console.log(res);
+                  })
+                  .catch((err) => console.log(err))
+              }
             >
               <FontAwesomeIcon className="text-light" icon={faPlay} />
             </a>

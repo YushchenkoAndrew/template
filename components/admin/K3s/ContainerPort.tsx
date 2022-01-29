@@ -24,7 +24,15 @@ export default React.forwardRef((props: ContainerPortProps, ref) => {
   });
 
   useImperativeHandle<unknown, ContainerPortRef>(ref, () => ({
-    getValue: () => ({ ...port }),
+    getValue: () =>
+      Object.entries({
+        ...port,
+        containerPort: Number(port.containerPort),
+        hostPort: Number(port.hostPort),
+      } as Port).reduce(
+        (acc, [key, item]) => (item ? { ...acc, [key]: item } : acc),
+        {} as Port
+      ),
   }));
 
   function onChange({ target: { name, value } }: Event) {
@@ -41,7 +49,6 @@ export default React.forwardRef((props: ContainerPortProps, ref) => {
         <InputName
           char="@"
           name="name"
-          required
           value={port.name ?? ""}
           placeholder="void-port"
           onChange={onChange}
@@ -66,7 +73,8 @@ export default React.forwardRef((props: ContainerPortProps, ref) => {
             <InputValue
               name="containerPort"
               className="rounded"
-              value={port.containerPort ?? ""}
+              required
+              value={`${port.containerPort ?? ""}`}
               placeholder="8000"
               onChange={onChange}
               // onBlur={onDataCache}
@@ -79,7 +87,7 @@ export default React.forwardRef((props: ContainerPortProps, ref) => {
             <InputValue
               name="hostPort"
               className="rounded"
-              value={port.hostPort ?? ""}
+              value={`${port.hostPort ?? ""}`}
               placeholder="8000"
               onChange={onChange}
               // onBlur={onDataCache}

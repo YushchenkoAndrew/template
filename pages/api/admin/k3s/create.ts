@@ -17,33 +17,41 @@ export default withIronSession(
       return res.status(405).send({ status: "ERR", message: "Unknown method" });
     }
 
-    if (!req.query.type) {
+    if (
+      !req.query.type ||
+      !process.env.K3S_ALLOWED_TYPES?.includes?.(req.query.type as string)
+    ) {
       return res.status(400).send({
         status: "ERR",
         message: "This request is too bad to be a true one",
       });
     }
 
+    console.dir(req.body, { depth: null });
     const { status, send } = await new Promise<FullResponse>(
       (resolve, reject) => {
         ApiAuth()
           .then((access) => {
-            fetch(`${apiUrl}/k3s/${req.query.type}`, {
+            // FIXME: Some requests to API are required to have namespace field !!!
+            fetch(`${apiUrl}/k3s/${req.query.type}/test`, {
               method: "POST",
               headers: {
-                "content-type": "text/plain",
+                "content-type": "application/json",
                 Authorization: `Bear ${access}`,
               },
-
-              body: YAML.stringify(req.body),
+              body: JSON.stringify(req.body),
             })
-              .then((res) => res.json)
-              .then((result) =>
+              .then((res) => res.json())
+              .then((result: DefaultRes) => {
                 resolve({
-                  status: 200,
-                  send: { status: "OK", message: "Success!!", result },
-                })
-              )
+                  status: result.status == "OK" ? 200 : 500,
+                  send: {
+                    status: result.status,
+                    message: result.message,
+                    result,
+                  },
+                });
+              })
               .catch((err) =>
                 resolve({
                   status: 500,

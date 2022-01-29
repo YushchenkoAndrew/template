@@ -40,6 +40,13 @@ module.exports = {
     NEXT_PUBLIC_VOID_URL: process.env.NEXT_PUBLIC_VOID_URL,
     NEXT_PUBLIC_RECAPTCHA_INVISIBLE_SITE_KEY:
       process.env.RECAPTCHA_INVISIBLE_SITE_KEY,
+    K3S_ALLOWED_TYPES: [
+      "deployment",
+      "service",
+      "ingress",
+      "pods",
+      "namespace",
+    ],
   },
 
   publicRuntimeConfig: {

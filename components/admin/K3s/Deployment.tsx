@@ -71,6 +71,7 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
         ...deployment,
         spec: {
           ...deployment.spec,
+          replicas: Number(deployment.spec?.replicas ?? 1),
           selector: { matchLabels: { ...labels } },
           template: {
             ...deployment.spec?.template,
@@ -172,7 +173,7 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
                   char="$"
                   name="replicas"
                   required
-                  value={deployment.spec?.replicas ?? ""}
+                  value={`${deployment.spec?.replicas ?? ""}`}
                   placeholder="1"
                   onChange={({ target: { name, value } }) => {
                     onDeploymentChange({

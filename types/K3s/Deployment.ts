@@ -22,7 +22,7 @@ export class Spec {
   "minReadySeconds"?: number;
   "paused"?: boolean;
   "progressDeadlineSeconds"?: number;
-  "replicas"?: string;
+  "replicas"?: number | string;
   "revisionHistoryLimit"?: number;
   "selector": { matchLabels: { [key: string]: string } };
   "strategy"?: { type: string };
@@ -84,9 +84,9 @@ export class Container {
 }
 
 export class Port {
-  "containerPort": string;
+  "containerPort": number | string;
   "hostIP"?: string;
-  "hostPort"?: string;
+  "hostPort"?: number | string;
   "name"?: string;
   "protocol"?: string;
 }

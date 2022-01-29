@@ -5,7 +5,10 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { toast } from "react-toastify";
 import { basePath } from "../../../config";
+import { ToastDefault } from "../../../config/alert";
+import { DefaultRes, Stat } from "../../../types/request";
 import Deployment, { DeploymentRef } from "../K3s/Deployment";
 import Ingress, { IngressRef } from "../K3s/Ingress";
 import K3sField from "../K3s/K3sField";
@@ -78,20 +81,45 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
 
   useImperativeHandle<unknown, K3sConfigRef>(ref, () => ({
     onSubmit() {
+      function toastRes(id: React.ReactText, status: Stat, name: string) {
+        toast.update(id, {
+          render: status === "OK" ? `Created ${name}` : `${name}: Server Error`,
+          type: status === "OK" ? "success" : "error",
+          isLoading: false,
+          ...ToastDefault,
+        });
+      }
+
       return Promise.all([
         ...namespaceRef
           .filter((item) => item?.current)
           .map(
             (item) =>
               new Promise((resolve, reject) => {
+                const value = item.current?.getValue();
+                const toastId = toast.loading("Please wait...");
                 fetch(`${basePath}/api/admin/k3s/create?type=namespace`, {
                   method: "POST",
                   headers: { "content-type": "application/json" },
-                  body: JSON.stringify(item.current?.getValue()),
+                  body: JSON.stringify(value),
                 })
                   .then((res) => res.json())
-                  .then((data) => resolve(resolve))
-                  .catch((err) => reject(err));
+                  .then((data: DefaultRes) => {
+                    toastRes(
+                      toastId,
+                      data.status,
+                      `Namespace [${value?.metadata?.name ?? ""}]`
+                    );
+                    resolve(data);
+                  })
+                  .catch((err) => {
+                    toastRes(
+                      toastId,
+                      "ERR",
+                      `Namespace [${value?.metadata?.name ?? ""}]`
+                    );
+                    reject(err);
+                  });
               })
           ),
         ...deploymentRef
@@ -99,14 +127,30 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
           .map(
             (item) =>
               new Promise((resolve, reject) => {
+                const value = item.current?.getValue();
+                const toastId = toast.loading("Please wait...");
                 fetch(`${basePath}/api/admin/k3s/create?type=deployment`, {
                   method: "POST",
                   headers: { "content-type": "application/json" },
-                  body: JSON.stringify(item.current?.getValue()),
+                  body: JSON.stringify(value),
                 })
                   .then((res) => res.json())
-                  .then((data) => resolve(resolve))
-                  .catch((err) => reject(err));
+                  .then((data) => {
+                    toastRes(
+                      toastId,
+                      data.status,
+                      `Deployment [${value?.metadata?.name ?? ""}]`
+                    );
+                    resolve(data);
+                  })
+                  .catch((err) => {
+                    toastRes(
+                      toastId,
+                      "ERR",
+                      `Deployment [${value?.metadata?.name ?? ""}]`
+                    );
+                    reject(err);
+                  });
               })
           ),
         ...serviceRef
@@ -114,14 +158,30 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
           .map(
             (item) =>
               new Promise((resolve, reject) => {
+                const value = item.current?.getValue();
+                const toastId = toast.loading("Please wait...");
                 fetch(`${basePath}/api/admin/k3s/create?type=service`, {
                   method: "POST",
                   headers: { "content-type": "application/json" },
-                  body: JSON.stringify(item.current?.getValue()),
+                  body: JSON.stringify(value),
                 })
                   .then((res) => res.json())
-                  .then((data) => resolve(resolve))
-                  .catch((err) => reject(err));
+                  .then((data) => {
+                    toastRes(
+                      toastId,
+                      data.status,
+                      `Service [${value?.metadata?.name ?? ""}]`
+                    );
+                    resolve(data);
+                  })
+                  .catch((err) => {
+                    toastRes(
+                      toastId,
+                      "ERR",
+                      `Service [${value?.metadata?.name ?? ""}]`
+                    );
+                    reject(err);
+                  });
               })
           ),
         ...ingressRef
@@ -129,14 +189,30 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
           .map(
             (item) =>
               new Promise((resolve, reject) => {
+                const value = item.current?.getValue();
+                const toastId = toast.loading("Please wait...");
                 fetch(`${basePath}/api/admin/k3s/create?type=ingress`, {
                   method: "POST",
                   headers: { "content-type": "application/json" },
-                  body: JSON.stringify(item.current?.getValue()),
+                  body: JSON.stringify(value),
                 })
                   .then((res) => res.json())
-                  .then((data) => resolve(resolve))
-                  .catch((err) => reject(err));
+                  .then((data) => {
+                    toastRes(
+                      toastId,
+                      data.status,
+                      `Ingress [${value?.metadata?.name ?? ""}]`
+                    );
+                    resolve(data);
+                  })
+                  .catch((err) => {
+                    toastRes(
+                      toastId,
+                      "ERR",
+                      `Ingress [${value?.metadata?.name ?? ""}]`
+                    );
+                    reject(err);
+                  });
               })
           ),
       ]);
