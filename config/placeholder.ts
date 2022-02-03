@@ -37,6 +37,7 @@ export const treePlaceholder = {
       type: "text/html",
     } as FileData,
   },
+  kubernetes: {},
 } as TreeObj;
 
 export const HtmlMarkers = {

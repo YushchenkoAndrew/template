@@ -213,7 +213,7 @@ export default React.forwardRef((props: CodeViewProps, ref) => {
           <InputTemplate label="Role">
             <InputRadio
               name="role"
-              options={["assets", "src", "styles"]}
+              options={["assets", "src", "styles", "kubernetes"]}
               onChange={onFileInfoChange}
             />
           </InputTemplate>

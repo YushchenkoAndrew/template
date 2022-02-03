@@ -11,6 +11,7 @@ import { DefaultRes } from "../../../types/request";
 import Card from "../../Card";
 import DefaultFooter from "../../default/DefaultFooter";
 import DefaultProjectInfo from "../../default/DefaultProjectInfo";
+import InputDouble from "../../Inputs/InputDouble";
 import InputList from "../../Inputs/InputDoubleList";
 import InputFile from "../../Inputs/InputFile";
 import InputName from "../../Inputs/InputName";
@@ -23,6 +24,7 @@ import { CodeViewRef } from "./CodeView";
 
 export interface PreviewProps {
   type: string;
+  tag?: { 0: string; 1: string };
   codeViewRef: React.RefObject<CodeViewRef>;
   formData: ProjectData;
   links: { [name: string]: LinkData };
@@ -32,6 +34,7 @@ export interface PreviewProps {
 export interface PreviewRef {
   formData: ProjectData;
   links: { [name: string]: LinkData };
+  tag: { 0: string; 1: string };
   onSubmit: () => Promise<ProjectData>;
   onLinkSubmit: (data: ProjectData | undefined) => Promise<boolean>;
 }
@@ -39,11 +42,13 @@ export interface PreviewRef {
 export default React.forwardRef((props: PreviewProps, ref) => {
   const [img, setImg] = useState(ProjectInfo.img.url);
   const [links, onLinksChange] = useState(props.links);
+  const [tag, onTagChange] = useState(props.tag ?? { 0: "", 1: "" });
   const [formData, onFormChange] = useState(props.formData);
 
   useImperativeHandle<unknown, PreviewRef>(ref, () => ({
     formData,
     links,
+    tag,
     onSubmit() {
       const toastId = toast.loading("Please wait...");
       return new Promise<ProjectData>((resolve, reject) => {
@@ -79,7 +84,7 @@ export default React.forwardRef((props: PreviewProps, ref) => {
       if (!data) return new Promise((resolve, reject) => reject(null));
 
       const id = data.id || formData.id;
-      return new Promise((resolve, reject) => {
+      return new Promise<boolean>((resolve, reject) => {
         const toastId = toast.loading("Please wait...");
         fetch(`${basePath}/api/link/add?id=${id}`, {
           method: "POST",
@@ -88,6 +93,7 @@ export default React.forwardRef((props: PreviewProps, ref) => {
         })
           .then((res) => res.json())
           .then((data: DefaultRes) => {
+            resolve(true);
             toast.update(toastId, {
               render: `Link: ${data.message}`,
               type: data.status === "OK" ? "success" : "error",
@@ -277,6 +283,20 @@ export default React.forwardRef((props: PreviewProps, ref) => {
                 onBlur={onDataCache}
               />
             </InputTemplate>
+
+            {formData.flag === "Docker" ? (
+              <InputTemplate label="Link">
+                <InputDouble
+                  char={["$", ":"]}
+                  name={["0", "1"]}
+                  value={tag}
+                  placeholder={["grimreapermortis/demo", "demo"]}
+                  onChange={({ target: { name, value } }: Event) =>
+                    onTagChange({ ...tag, [name]: value })
+                  }
+                />
+              </InputTemplate>
+            ) : null}
           </div>
         </div>
       ) : (

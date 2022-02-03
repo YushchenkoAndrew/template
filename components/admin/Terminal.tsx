@@ -7,7 +7,7 @@ export interface TerminalProps {
 }
 
 export interface TerminalRef {
-  runCommand: (command: string) => void;
+  runCommand: (command: string, result?: string) => void;
 }
 
 export default React.forwardRef((props: TerminalProps, ref) => {
@@ -17,22 +17,25 @@ export default React.forwardRef((props: TerminalProps, ref) => {
   const [history, setHistory] = useState<string[]>([]);
 
   useImperativeHandle<unknown, TerminalRef>(ref, () => ({
-    runCommand(command: string) {
-      fetch(`${basePath}/api/admin/exec`, {
-        method: "POST",
-        headers: { "content-type": "text/plain" },
-        body: command,
-      })
-        .then((res) => res.text())
-        .then((data) => setHistory([...history, command + "\n" + data]))
-        .catch((err) => setHistory([...history, command + "\n" + err]))
-        .finally(() => {
-          cmdRef?.current?.scrollTo({
-            top: cmdRef?.current?.scrollHeight,
+    runCommand(command: string, result?: string) {
+      if (!result) {
+        return fetch(`${basePath}/api/k3s/exec`, {
+          method: "POST",
+          headers: { "content-type": "text/plain" },
+          body: command,
+        })
+          .then((res) => res.text())
+          .then((data) => setHistory([...history, command + "\n" + data]))
+          .catch((err) => setHistory([...history, command + "\n" + err]))
+          .finally(() => {
+            cmdRef?.current?.scrollTo({
+              top: cmdRef?.current?.scrollHeight,
+            });
+            cmdLineRef?.current?.focus();
           });
-        });
+      }
 
-      cmdLineRef?.current?.focus();
+      setHistory([...history, command + "\n" + result]);
     },
   }));
 

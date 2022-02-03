@@ -44,7 +44,6 @@ export interface ProjectOperationProps {
 }
 
 export default function ProjectOperation(props: ProjectOperationProps) {
-  const [type, onSetType] = useState("GUI");
   const [config, onSetConfig] = useState("Preview");
   const [validated, setValidated] = useState(false);
 
@@ -52,16 +51,6 @@ export default function ProjectOperation(props: ProjectOperationProps) {
   const previewRef = useRef<PreviewRef>(null);
   const codeViewRef = useRef<CodeViewRef>(null);
   const k3sConfigRef = useRef<K3sConfigRef>(null);
-
-  // FIXME:
-  // useEffect(() => {
-  //   // fetch(`${basePath}/api/admin/k3s/namespace/create`, {
-  //   //   method: "POST",
-  //   // })
-  //   //   .then((res) => res.json())
-  //   //   .then((data) => console.log(data))
-  //   //   .catch((err) => console.log(err));
-  // }, []);
 
   const onSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event?.preventDefault();
@@ -120,22 +109,11 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           draggable
         />
 
-        {/* FIXME: */}
         <div className="container mb-3">
           <div className="row w-100 d-flex justify-content-between">
-            {/* <span></span> */}
-            <div>
-              <InputRadio
-                name="flag"
-                className="btn-group btn-group-sm btn-group-toggle"
-                placeholder={type}
-                options={["GUI", "RAW"]}
-                label="btn-outline-secondary"
-                onChange={(event) => onSetType(event.target.value)}
-              />
-            </div>
-
-            <a
+            <span></span>
+            {/* FIXME: */}
+            {/* <a
               className="btn btn-success"
               onClick={() =>
                 k3sConfigRef?.current
@@ -147,7 +125,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
               }
             >
               <FontAwesomeIcon className="text-light" icon={faPlay} />
-            </a>
+            </a> */}
 
             <div className="row">
               <div>
@@ -176,6 +154,8 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           codeViewRef={codeViewRef}
           type={props.type}
           links={props.links}
+          // FIXME:
+          // tag={props.links}
           formData={props.formData}
           show={config === "Preview"}
         />
@@ -188,7 +168,11 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           show={config === "Code"}
         />
 
-        <K3sConfig ref={k3sConfigRef} show={config === "Config"} />
+        <K3sConfig
+          ref={k3sConfigRef}
+          previewRef={previewRef}
+          show={config === "Config"}
+        />
       </form>
     </>
   );

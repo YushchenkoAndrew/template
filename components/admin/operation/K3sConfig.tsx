@@ -15,14 +15,18 @@ import K3sField from "../K3s/K3sField";
 import Namespace, { NamespaceRef } from "../K3s/Namespace";
 import Service, { ServiceRef } from "../K3s/Service";
 import Terminal, { TerminalRef } from "../Terminal";
+import { PreviewRef } from "./Preview";
 
 export interface K3sConfigProps {
   show?: boolean;
+  previewRef: React.RefObject<PreviewRef>;
 }
 
 export interface K3sConfigRef {
   onSubmit: () => Promise<any>;
 }
+
+type K3sRef = NamespaceRef | DeploymentRef | ServiceRef | IngressRef;
 
 export default React.forwardRef((props: K3sConfigProps, ref) => {
   const [minimized, onMinimize] = useState({
@@ -78,9 +82,8 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
   }, [ingress.length]);
 
   const terminalRef = useRef<TerminalRef>(null);
-
   useImperativeHandle<unknown, K3sConfigRef>(ref, () => ({
-    onSubmit() {
+    async onSubmit() {
       function toastRes(id: React.ReactText, status: Stat, name: string) {
         toast.update(id, {
           render: status === "OK" ? `Created ${name}` : `${name}: Server Error`,
@@ -90,132 +93,87 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
         });
       }
 
-      return Promise.all([
-        ...namespaceRef
+      function resolvePromise(name: string, promise: Promise<Response>) {
+        return new Promise((resolve, reject) => {
+          const toastId = toast.loading("Please wait...");
+          promise
+            .then((res) => res.json())
+            .then((data: DefaultRes) => {
+              toastRes(toastId, data.status, name);
+              resolve(data);
+            })
+            .catch((err) => {
+              toastRes(toastId, "ERR", name);
+              reject(err);
+            });
+        });
+      }
+
+      function sendAll(
+        name: string,
+        ref: React.RefObject<K3sRef>[]
+      ): Promise<unknown>[] {
+        return ref
           .filter((item) => item?.current)
-          .map(
-            (item) =>
-              new Promise((resolve, reject) => {
-                const value = item.current?.getValue();
-                const toastId = toast.loading("Please wait...");
-                fetch(`${basePath}/api/admin/k3s/create?type=namespace`, {
+          .map((item) => {
+            const value = item.current?.getValue();
+            const namespace = value?.metadata?.namespace ?? "";
+            return resolvePromise(
+              `${name} [${value?.metadata?.name ?? ""}]`,
+              fetch(
+                `${basePath}/api/k3s/create?type=${name}` +
+                  (namespace ? `&namespace=${namespace}` : ""),
+                {
                   method: "POST",
                   headers: { "content-type": "application/json" },
                   body: JSON.stringify(value),
-                })
-                  .then((res) => res.json())
-                  .then((data: DefaultRes) => {
-                    toastRes(
-                      toastId,
-                      data.status,
-                      `Namespace [${value?.metadata?.name ?? ""}]`
-                    );
-                    resolve(data);
-                  })
-                  .catch((err) => {
-                    toastRes(
-                      toastId,
-                      "ERR",
-                      `Namespace [${value?.metadata?.name ?? ""}]`
-                    );
-                    reject(err);
-                  });
-              })
-          ),
-        ...deploymentRef
-          .filter((item) => item?.current)
-          .map(
-            (item) =>
-              new Promise((resolve, reject) => {
-                const value = item.current?.getValue();
-                const toastId = toast.loading("Please wait...");
-                fetch(`${basePath}/api/admin/k3s/create?type=deployment`, {
-                  method: "POST",
-                  headers: { "content-type": "application/json" },
-                  body: JSON.stringify(value),
-                })
-                  .then((res) => res.json())
-                  .then((data) => {
-                    toastRes(
-                      toastId,
-                      data.status,
-                      `Deployment [${value?.metadata?.name ?? ""}]`
-                    );
-                    resolve(data);
-                  })
-                  .catch((err) => {
-                    toastRes(
-                      toastId,
-                      "ERR",
-                      `Deployment [${value?.metadata?.name ?? ""}]`
-                    );
-                    reject(err);
-                  });
-              })
-          ),
-        ...serviceRef
-          .filter((item) => item?.current)
-          .map(
-            (item) =>
-              new Promise((resolve, reject) => {
-                const value = item.current?.getValue();
-                const toastId = toast.loading("Please wait...");
-                fetch(`${basePath}/api/admin/k3s/create?type=service`, {
-                  method: "POST",
-                  headers: { "content-type": "application/json" },
-                  body: JSON.stringify(value),
-                })
-                  .then((res) => res.json())
-                  .then((data) => {
-                    toastRes(
-                      toastId,
-                      data.status,
-                      `Service [${value?.metadata?.name ?? ""}]`
-                    );
-                    resolve(data);
-                  })
-                  .catch((err) => {
-                    toastRes(
-                      toastId,
-                      "ERR",
-                      `Service [${value?.metadata?.name ?? ""}]`
-                    );
-                    reject(err);
-                  });
-              })
-          ),
-        ...ingressRef
-          .filter((item) => item?.current)
-          .map(
-            (item) =>
-              new Promise((resolve, reject) => {
-                const value = item.current?.getValue();
-                const toastId = toast.loading("Please wait...");
-                fetch(`${basePath}/api/admin/k3s/create?type=ingress`, {
-                  method: "POST",
-                  headers: { "content-type": "application/json" },
-                  body: JSON.stringify(value),
-                })
-                  .then((res) => res.json())
-                  .then((data) => {
-                    toastRes(
-                      toastId,
-                      data.status,
-                      `Ingress [${value?.metadata?.name ?? ""}]`
-                    );
-                    resolve(data);
-                  })
-                  .catch((err) => {
-                    toastRes(
-                      toastId,
-                      "ERR",
-                      `Ingress [${value?.metadata?.name ?? ""}]`
-                    );
-                    reject(err);
-                  });
-              })
-          ),
-      ]);
+                }
+              )
+            );
+          });
+      }
+
+      try {
+        const tag = props.previewRef?.current?.tag ?? "";
+        if (!tag) return;
+
+        await new Promise<void>((resolve) => {
+          const toastId = toast.loading("Please wait...");
+          fetch(
+            `${basePath}/api/docker/build?tag=${tag}&path=/${
+              props.previewRef?.current?.formData?.name ?? ""
+            }`,
+            {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+            }
+          )
+            .then((res) => res.text())
+            .then((data) => {
+              resolve();
+              toastRes(toastId, "OK", "Docker image was created successfully");
+              terminalRef.current?.runCommand?.(
+                `docker build . -t ${tag}`,
+                data
+              );
+            })
+            .catch((err) => {
+              resolve();
+              toastRes(toastId, "ERR", "Error with Docker image creation");
+              terminalRef.current?.runCommand?.(
+                `docker build . -t ${tag}`,
+                err
+              );
+            });
+        });
+
+        await Promise.all(sendAll("namespace", namespaceRef));
+        await Promise.all(sendAll("deployment", deploymentRef));
+        await Promise.all(sendAll("service", serviceRef));
+        await Promise.all(sendAll("ingress", ingressRef));
+      } catch (err) {
+        console.log(err);
+      }
     },
   }));
 
@@ -230,7 +188,7 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
             onMinimize({ ...minimized, namespace: !minimized.namespace })
           }
         >
-          {namespace.map((item, index) => (
+          {namespace.map((_, index) => (
             <Namespace
               key={`deployment-${index}`}
               ref={namespaceRef[index]}
@@ -247,7 +205,7 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
             onMinimize({ ...minimized, deployment: !minimized.deployment })
           }
         >
-          {deployment.map((item, index) => (
+          {deployment.map((_, index) => (
             <Deployment
               ref={deploymentRef[index]}
               key={`deployment-${index}`}
@@ -264,7 +222,7 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
             onMinimize({ ...minimized, service: !minimized.service })
           }
         >
-          {service.map((item, index) => (
+          {service.map((_, index) => (
             <Service
               ref={serviceRef[index]}
               key={index}
