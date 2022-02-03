@@ -8,6 +8,7 @@ import { ApiRes, ApiError, ProjectData } from "../../../types/api";
 import { DefaultRes, FullResponse } from "../../../types/request";
 import getConfig from "next/config";
 import { FlushValue } from "../../../config/redis";
+import { GetParam } from "../../../lib/api/query";
 const { serverRuntimeConfig } = getConfig();
 
 function VoidDelFile(path: string) {
@@ -100,8 +101,8 @@ export default withIronSession(async function (
     return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
-  const project = req.query["project"] as string;
-  const flag = req.query["flag"] as string;
+  const project = GetParam(req.query.project);
+  const flag = GetParam(req.query.flag);
   if (!project || !flag) {
     return res
       .status(400)

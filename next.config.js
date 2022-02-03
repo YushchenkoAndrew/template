@@ -79,7 +79,6 @@ module.exports = {
 
     VOID_URL: process.env.VOID_URL,
     VOID_AUTH: process.env.VOID_AUTH,
-    VOID_AUTH: process.env.VOID_AUTH,
 
     RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,
     RECAPTCHA_INVISIBLE_SECRET_KEY: process.env.RECAPTCHA_INVISIBLE_SECRET_KEY,
@@ -90,12 +89,8 @@ module.exports = {
 
     SESSION_TTL: process.env.SESSION_TTL,
 
-    K3S_CLUSTER: process.env.K3S_CLUSTER,
-    K3S_SERVER: process.env.K3S_SERVER,
-    K3S_CA_DATA: process.env.K3S_CA_DATA,
-    K3S_USER: process.env.K3S_USER,
-    K3S_CERT_DATA: process.env.K3S_CERT_DATA,
-    K3S_KEY_DATA: process.env.K3S_KEY_DATA,
-    K3S_CONTEXT: process.env.K3S_CONTEXT,
+    DOCKER_USER: process.env.DOCKER_USER,
+    DOCKER_PASS: process.env.DOCKER_PASS,
+    DOCKER_EMAIL: process.env.DOCKER_EMAIL,
   },
 };

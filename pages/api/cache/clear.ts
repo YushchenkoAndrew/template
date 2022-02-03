@@ -4,12 +4,13 @@ import { PassValidate } from "../../../lib/api/auth";
 import { sendLogs } from "../../../lib/api/bot";
 import getConfig from "next/config";
 import md5 from "../../../lib/md5";
+import { GetParam } from "../../../lib/api/query";
 
 const { serverRuntimeConfig } = getConfig();
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).send("");
 
-  const key = (req.query.key as string) || "";
+  const key = GetParam(req.query.key);
   const salt = req.headers["x-custom-header"] || "";
   if (
     !PassValidate(

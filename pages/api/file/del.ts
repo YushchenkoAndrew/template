@@ -4,7 +4,7 @@ import sessionConfig from "../../../config/session";
 import { DefaultRes, FullResponse } from "../../../types/request";
 import { apiUrl, localVoidUrl } from "../../../config";
 import { sendLogs } from "../../../lib/api/bot";
-import { createQuery } from "../../../lib/api/query";
+import { createQuery, GetParam } from "../../../lib/api/query";
 import { ApiAuth } from "../../../lib/api/auth";
 import { ApiError, ApiRes, FileData } from "../../../types/api";
 import getConfig from "next/config";
@@ -179,9 +179,9 @@ export default withIronSession(async function (
     return res.status(405).send({ stat: "ERR", message: "Unknown method" });
   }
 
-  const id = Number((req.query["id"] as string) || 0);
-  const project = req.query["project"] as string;
-  const projectId = Number(req.query["project_id"] as string);
+  const id = Number(GetParam(req.query.id));
+  const project = GetParam(req.query.project);
+  const projectId = Number(GetParam(req.query.project_id));
   if (isNaN(projectId) || !project) {
     return res.status(400).send({
       stat: "ERR",

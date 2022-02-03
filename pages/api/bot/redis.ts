@@ -5,6 +5,7 @@ import { sendLogs } from "../../../lib/api/bot";
 import getConfig from "next/config";
 import md5 from "../../../lib/md5";
 import { FullResponse } from "../../../types/request";
+import { GetParam } from "../../../lib/api/query";
 
 const { serverRuntimeConfig } = getConfig();
 export default async function handler(
@@ -13,7 +14,7 @@ export default async function handler(
 ) {
   if (req.method !== "POST") return res.status(405).send("");
 
-  const key = (req.query.key as string) || "";
+  const key = GetParam(req.query.key);
   const salt = req.headers["x-custom-header"] || "";
   if (
     !PassValidate(

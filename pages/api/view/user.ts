@@ -2,7 +2,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { freeMutex, waitMutex } from "../../../lib/api/mutex";
 import redis from "../../../config/redis";
 import { apiUrl } from "../../../config";
-import { ApiRes, GeoIpLocationData, WorldData } from "../../../types/api";
+import {
+  ApiError,
+  ApiRes,
+  GeoIpLocationData,
+  WorldData,
+} from "../../../types/api";
 import { sendLogs } from "../../../lib/api/bot";
 import md5 from "../../../lib/md5";
 import { FullResponse } from "../../../types/request";
@@ -15,8 +20,8 @@ function finalValue(key: string) {
 
       fetch(`${apiUrl}/world?page=-1`)
         .then((res) => res.json())
-        .then((res: ApiRes<WorldData[]>) => {
-          if (!res.items || res.status == "ERR")
+        .then((res: ApiRes<WorldData[]> | ApiError) => {
+          if (res.status == "ERR" || !res.items)
             return reject("Idk something wrong happened at then backend");
 
           // Need this just to decrease space usage in RAM
@@ -54,7 +59,7 @@ export default async function handler(
 
         fetch(`${apiUrl}/trace/${ip}`)
           .then((res) => res.json())
-          .then((data: ApiRes<GeoIpLocationData[]>) => {
+          .then((data: ApiRes<GeoIpLocationData[]> | ApiError) => {
             if (data.status === "ERR") {
               return resolve({
                 status: 500,

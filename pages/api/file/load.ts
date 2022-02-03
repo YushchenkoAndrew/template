@@ -3,7 +3,7 @@ import { Session } from "next-iron-session";
 import { apiUrl, localVoidUrl } from "../../../config";
 import redis from "../../../config/redis";
 import { formPath } from "../../../lib/public/files";
-import { createQuery } from "../../../lib/api/query";
+import { createQuery, GetParam } from "../../../lib/api/query";
 import { ApiError, ApiRes, FileData, ProjectData } from "../../../types/api";
 import { DefaultRes, FullResponse } from "../../../types/request";
 
@@ -73,8 +73,8 @@ export default async function (
     return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
-  const project = req.query["project"] as string;
-  const role = req.query["role"] as string;
+  const project = GetParam(req.query.project);
+  const role = GetParam(req.query.role);
 
   if (!project) {
     return res

@@ -5,6 +5,7 @@ import redis, { FlushValue } from "../../../config/redis";
 import sessionConfig from "../../../config/session";
 import { ApiAuth } from "../../../lib/api/auth";
 import { sendLogs } from "../../../lib/api/bot";
+import { GetParam } from "../../../lib/api/query";
 import { ApiRes, ApiError, ProjectData } from "../../../types/api";
 import { DefaultRes, FullResponse } from "../../../types/request";
 
@@ -61,8 +62,8 @@ export default withIronSession(async function (
     return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
-  let id = req.query["id"] as string;
-  let { name, flag, title, desc, note } = req.body as ProjectData;
+  const id = GetParam(req.query.id);
+  const { name, flag, title, desc, note } = req.body as ProjectData;
   if (!name || !flag || !title || !desc || (flag !== "Link" && !note)) {
     return res
       .status(400)

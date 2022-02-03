@@ -5,6 +5,7 @@ import { checkCaptcha } from "../../lib/api/captcha";
 import { createTransport } from "nodemailer";
 import { DefaultRes, FullResponse } from "../../types/request";
 import { sendLogs } from "../../lib/api/bot";
+import { GetParam } from "../../lib/api/query";
 const { serverRuntimeConfig } = getConfig();
 
 export type EmailRequest = {
@@ -42,7 +43,7 @@ export default async function handler(
     return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
-  let id = req.query["id"] as string;
+  let id = GetParam(req.query["id"]);
   let { email, text, captcha } = req.body as EmailRequest;
 
   if (!email || !text || !captcha || !id) {

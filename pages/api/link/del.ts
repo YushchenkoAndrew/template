@@ -6,7 +6,7 @@ import { apiUrl } from "../../../config";
 import { sendLogs } from "../../../lib/api/bot";
 import { ApiAuth } from "../../../lib/api/auth";
 import { ApiError, ApiRes, FileData } from "../../../types/api";
-import { createQuery } from "../../../lib/api/query";
+import { createQuery, GetParam } from "../../../lib/api/query";
 import { FlushValue } from "../../../config/redis";
 
 type ArgsType = {
@@ -77,8 +77,8 @@ export default withIronSession(async function (
     return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
-  const id = Number((req.query["id"] as string) || 0);
-  const projectId = Number(req.query["project_id"] as string);
+  const id = Number(GetParam(req.query.id));
+  const projectId = Number(GetParam(req.query.project_id));
   if (isNaN(projectId)) {
     return res.status(400).send({
       status: "ERR",

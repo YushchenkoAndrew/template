@@ -1,12 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../../config/redis";
-import { ApiRes, InfoData, WorldData } from "../../../types/api";
+import { ApiError, ApiRes, InfoData, WorldData } from "../../../types/api";
 import { Country, DayStat } from "../../../types/info";
 import { DefaultRes, StatisticData } from "../../../types/request";
 import { apiUrl } from "../../../config";
 import { formatDate } from "../../info";
 import { sendLogs } from "../../../lib/api/bot";
 import { freeMutex, waitMutex } from "../../../lib/api/mutex";
+import { GetParam } from "../../../lib/api/query";
 
 type QueryParams = { date: string };
 export default async function handler(
@@ -19,7 +20,7 @@ export default async function handler(
       .json({ status: "ERR", message: "Request handler not found" });
   }
 
-  let { date } = req.query as QueryParams;
+  const date = GetParam(req.query.date);
   if (!date) {
     return res
       .status(400)
@@ -45,7 +46,7 @@ export default async function handler(
 
             fetch(`${apiUrl}/info?created_at=${date}`)
               .then((res) => res.json())
-              .then((res: ApiRes<InfoData[]>) => {
+              .then((res: ApiRes<InfoData[]> | ApiError) => {
                 if (res.status == "ERR") {
                   return reject("Idk something wrong happened at the backend");
                 }
@@ -98,7 +99,7 @@ export default async function handler(
 
             fetch(`${apiUrl}/info?created_at=${formatDate(yesterday)}`)
               .then((res) => res.json())
-              .then((res: ApiRes<InfoData[]>) => {
+              .then((res: ApiRes<InfoData[]> | ApiError) => {
                 if (res.status == "ERR") {
                   return reject("Idk something wrong happened at the backend");
                 }
@@ -135,8 +136,8 @@ export default async function handler(
             // NOTE: This will run only in the case where none of users were identified
             fetch(`${apiUrl}/world?page=-1`)
               .then((res) => res.json())
-              .then((res: ApiRes<WorldData[]>) => {
-                if (!res.items || res.status == "ERR")
+              .then((res: ApiRes<WorldData[]> | ApiError) => {
+                if (res.status == "ERR" || !res.items)
                   return reject("Idk something wrong happened at then backend");
 
                 // Need this just to decrease space usage in RAM

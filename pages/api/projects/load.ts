@@ -3,7 +3,7 @@ import { Session } from "next-iron-session";
 import { apiUrl, localVoidUrl } from "../../../config";
 import redis from "../../../config/redis";
 import { formPath } from "../../../lib/public/files";
-import { createQuery } from "../../../lib/api/query";
+import { createQuery, GetParam } from "../../../lib/api/query";
 import { ApiError, ApiRes, FileData, ProjectData } from "../../../types/api";
 import { DefaultRes, FullResponse } from "../../../types/request";
 
@@ -72,9 +72,9 @@ export default async function (
     return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
-  let role = req.query["role"] as string;
-  let id = Number(req.query["id"] as string);
-  let page = Number(req.query["page"] as string);
+  const role = GetParam(req.query.role);
+  const id = Number(GetParam(req.query.id));
+  const page = Number(GetParam(req.query.page));
 
   if (isNaN(page) && isNaN(id)) {
     return res.status(400).send({ status: "ERR", message: "Bad 'page' param" });

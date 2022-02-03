@@ -6,8 +6,8 @@ export function loadProjectsThumbnail(page: number) {
     fetch(`${basePath}/api/projects/load?page=${page}&role=thumbnail`)
       .then((res) => res.json())
       .then((data: ApiRes<ProjectData[]> | ApiError) => {
-        if (data.status === "ERR" || !data.result.length) reject();
-        return resolve((data as ApiRes<ProjectData[]>).result);
+        if (data.status === "ERR" || !data.result.length) return reject();
+        resolve(data.result);
       })
       .catch((err) => reject());
   });

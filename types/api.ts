@@ -1,13 +1,13 @@
 import { Stat } from "./request";
 
 export type ApiError = {
-  status: Stat;
+  status: "ERR";
   result: string[];
   message: string;
 };
 
 export type ApiTokens = {
-  status: Stat;
+  status: "OK";
   access_token: string;
   refresh_token: string;
 };
@@ -17,7 +17,7 @@ export type ApiResult = InfoSum | InfoData | WorldData | ProjectData | FileData;
 export type ApiRes<Type> = {
   items: number;
   result: Type;
-  status: Stat;
+  status: "OK";
   totalItems: number;
 };
 

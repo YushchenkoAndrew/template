@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Session, withIronSession } from "next-iron-session";
 import redis from "../../../config/redis";
 import sessionConfig from "../../../config/session";
+import { GetParam } from "../../../lib/api/query";
 import { FullResponse } from "../../../types/request";
 
 function GetData(id: string) {
@@ -44,7 +45,7 @@ export default withIronSession(async function (
     return res.status(405).send({ stat: "ERR", message: "Unknown method" });
   }
 
-  let id = req.query["id"] as string;
+  const id = GetParam(req.query.id);
   if (!id) {
     return res.status(400).send({
       stat: "ERR",

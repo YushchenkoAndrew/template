@@ -8,6 +8,7 @@ import { LoginRequest } from "../../../types/admin";
 import { DefaultRes, FullResponse } from "../../../types/request";
 import getConfig from "next/config";
 import { checkCaptcha } from "../../../lib/api/captcha";
+import { GetParam } from "../../../lib/api/query";
 
 const { serverRuntimeConfig } = getConfig();
 function checkUserInfo(id: string, salt: string, user: string, pass: string) {
@@ -79,7 +80,7 @@ export default withIronSession(
       return res.status(405).send({ status: "ERR", message: "Unknown method" });
     }
 
-    let id = req.query["id"] as string;
+    let id = GetParam(req.query["id"]);
     let { salt, user, pass, captcha } = req.body as LoginRequest;
     if (!salt || !user || !pass || !captcha || !id) {
       return res.status(400).send({

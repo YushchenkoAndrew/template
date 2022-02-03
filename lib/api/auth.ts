@@ -59,8 +59,8 @@ export function ApiAuth() {
                   .catch((err) => reject(err));
               }
 
-              UpdateTokens(data as ApiTokens);
-              resolve((data as ApiTokens).access_token);
+              UpdateTokens(data);
+              resolve(data.access_token);
             })
             .catch((err) => reject(err));
         }
@@ -86,10 +86,10 @@ export function ApiAuth() {
         })
           .then((res) => res.json())
           .then((data: ApiTokens | ApiError) => {
-            if (data.status == "ERR") return reject("Incorrect user or pass");
+            if (data.status === "ERR") return reject("Incorrect user or pass");
 
-            UpdateTokens(data as ApiTokens);
-            resolve((data as ApiTokens).access_token);
+            UpdateTokens(data);
+            resolve(data.access_token);
           })
           .catch((err) => reject(err));
       });

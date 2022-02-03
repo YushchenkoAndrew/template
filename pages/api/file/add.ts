@@ -8,11 +8,12 @@ import { DefaultRes, FullResponse } from "../../../types/request";
 import { apiUrl, localVoidUrl } from "../../../config";
 import { sendLogs } from "../../../lib/api/bot";
 import md5 from "../../../lib/md5";
-import { ApiAuth, DeleteTokens } from "../../../lib/api/auth";
+import { ApiAuth } from "../../../lib/api/auth";
 import { ApiError, ApiRes, FileData } from "../../../types/api";
 import getConfig from "next/config";
 import { DelFileRecord } from "./del";
 import { FlushValue } from "../../../config/redis";
+import { GetParam } from "../../../lib/api/query";
 
 const { serverRuntimeConfig } = getConfig();
 type ArgsType = {
@@ -115,7 +116,7 @@ function UploadFile(file: File, args: ArgsType) {
 }
 
 function SendFile(req: NextApiRequest & { session: Session }, args: ArgsType) {
-  return new Promise<FullResponse>((resolve, reject) => {
+  return new Promise<FullResponse>((resolve) => {
     const form = new IncomingForm({
       multiples: false,
     });
@@ -141,7 +142,7 @@ function SendFile(req: NextApiRequest & { session: Session }, args: ArgsType) {
                 `?project_id=${args.id}&name=${(files.file as File).name}`
               );
             })
-            .catch((err) => {
+            .catch(() => {
               resolve({
                 status: 500,
                 send: {
@@ -151,7 +152,7 @@ function SendFile(req: NextApiRequest & { session: Session }, args: ArgsType) {
               });
             });
         })
-        .catch((err) => {
+        .catch(() => {
           resolve({
             status: 500,
             send: {
@@ -178,10 +179,10 @@ export default withIronSession(async function (
     return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
-  const id = Number(req.query["id"] as string);
-  const project = req.query["project"] as string;
-  const role = req.query["role"] as string;
-  const path = (req.query["path"] as string) ?? "";
+  const id = Number(GetParam(req.query.id));
+  const project = GetParam(req.query.project);
+  const role = GetParam(req.query.role);
+  const path = GetParam(req.query.path);
   if (!role || !project || isNaN(id)) {
     return res.status(400).send({
       status: "ERR",
@@ -194,9 +195,7 @@ export default withIronSession(async function (
     project,
     path,
     role,
-    fileId: req.query["file_id"]
-      ? Number(req.query["file_id"] as string)
-      : null,
+    fileId: req.query.file_id ? Number(GetParam(req.query.file_id)) : null,
   });
 
   if (send.status == "OK") FlushValue("Project");

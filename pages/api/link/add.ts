@@ -7,6 +7,7 @@ import { sendLogs } from "../../../lib/api/bot";
 import { ApiAuth } from "../../../lib/api/auth";
 import { ApiError, ApiRes, FileData, LinkData } from "../../../types/api";
 import { FlushValue } from "../../../config/redis";
+import { GetParam } from "../../../lib/api/query";
 
 type ArgsType = { id: number; links: { add: LinkData[]; edit: LinkData[] } };
 
@@ -112,7 +113,7 @@ export default withIronSession(async function (
     return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
-  const id = Number(req.query["id"] as string);
+  const id = Number(GetParam(req.query.id));
   const body = req.body as { [name: string]: LinkData };
   if (isNaN(id) || !body) {
     return res.status(400).send({

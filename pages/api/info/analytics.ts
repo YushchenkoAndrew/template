@@ -1,12 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import redis from "../../../config/redis";
 import { formatDate } from "../../info";
-import { ApiRes, InfoData, InfoSum } from "../../../types/api";
+import { ApiError, ApiRes, InfoData, InfoSum } from "../../../types/api";
 import { AnalyticsData, DefaultRes } from "../../../types/request";
 import { apiUrl } from "../../../config";
 import { Analytics } from "../../../types/info";
 import { sendLogs } from "../../../lib/api/bot";
 import { freeMutex, waitMutex } from "../../../lib/api/mutex";
+import { GetParam } from "../../../lib/api/query";
 
 type QueryParams = { date: string };
 
@@ -14,7 +15,7 @@ type TimeLine = { time: string; value: number };
 
 function FormData(doughnut: Analytics, lineData: TimeLine[]): AnalyticsData {
   return {
-    stat: "OK",
+    status: "OK",
     doughnut,
     line: lineData.map((item) => item.value),
     days: lineData.map((item) => item.time),
@@ -31,7 +32,7 @@ export default async function handler(
       .json({ status: "ERR", message: "Request handler not found" });
   }
 
-  let { date } = req.query as QueryParams;
+  const date = GetParam(req.query.date);
   if (!date) {
     return res
       .status(400)
@@ -49,7 +50,7 @@ export default async function handler(
 
             fetch(`${apiUrl}/info/sum`)
               .then((res) => res.json())
-              .then((res: ApiRes<InfoData[]>) => {
+              .then((res: ApiRes<InfoData[]> | ApiError) => {
                 if (res.status == "ERR")
                   return reject("Idk something wrong happened at the backend");
 
@@ -95,8 +96,8 @@ export default async function handler(
               )}&orderBy=CreatedAt`
             )
               .then((res) => res.json())
-              .then((res: ApiRes<InfoData[]>) => {
-                if (!res.items || res.status == "ERR")
+              .then((res: ApiRes<InfoData[]> | ApiError) => {
+                if (res.status == "ERR" || !res.items)
                   return reject("Idk something wrong happened at the backend");
 
                 // Need this just to decrease space usage in RAM
