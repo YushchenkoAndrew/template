@@ -135,9 +135,12 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
 
       try {
         const tag = props.previewRef?.current?.tag ?? "";
-        if (!tag) return;
 
         await new Promise<void>((resolve) => {
+          // NOTE: If tag was not setted then just don't build a project
+          // because it's doesn't contains anything except of thumbnail img
+          if (!tag) return resolve();
+
           const toastId = toast.loading("Please wait...");
           fetch(
             `${basePath}/api/docker/build?tag=${tag}&path=/${

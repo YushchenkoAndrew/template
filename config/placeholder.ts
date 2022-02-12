@@ -2,44 +2,6 @@ import { basePath } from ".";
 import { FileData, ProjectData } from "../types/api";
 import { TreeObj } from "../types/tree";
 
-export const ProjectInfo = {
-  name: "CodeRain",
-  title: "Code Rain",
-  flag: "JS",
-  img: {
-    name: "CodeRain.webp",
-    type: "webp",
-    role: "thumbnail",
-    url: `${basePath}/img/CodeRain.webp`,
-  },
-  desc: "Take the blue pill and the site will close, or take the red pill and I show how deep the rabbit hole goes",
-  note: "Creating a 'Code Rain' effect from Matrix. As funny joke you can put any text to display at the end.",
-  link: "github.com/YushchenkoAndrew/template/tree/master/JS/CodeRain",
-};
-
-export const formPlaceholder = {
-  name: "",
-  flag: "JS",
-  title: "",
-  desc: "",
-  note: "",
-} as ProjectData;
-
-export const treePlaceholder = {
-  assets: {},
-  src: {},
-  thumbnail: {},
-  styles: {},
-  template: {
-    "index.html": {
-      name: "index.html",
-      role: "template",
-      type: "text/html",
-    } as FileData,
-  },
-  kubernetes: {},
-} as TreeObj;
-
 export const HtmlMarkers = {
   HEADER: "HEADER",
   BODY: "BODY",
@@ -52,8 +14,10 @@ export const HtmlMarkers = {
 export const codeTemplate = {
   JS: {
     name: "index.html",
+    path: "",
     type: "text/html",
-    code: `<!DOCTYPE html>
+    role: "template",
+    content: `<!DOCTYPE html>
 <html>
   <body>
     <div id="${HtmlMarkers.HEADER}">
@@ -71,8 +35,10 @@ export const codeTemplate = {
 
   Markdown: {
     name: "index.md",
+    path: "",
     type: "text/markdown",
-    code: `# Project name
+    role: "template",
+    content: `# Project name
 
 Article text...
 
@@ -82,10 +48,46 @@ Article text...
 
   Docker: {
     name: "Dockerfile",
+    path: "",
     type: "text/dockerfile",
-    code: `FROM ubuntu:18.04
+    role: "",
+    content: `FROM ubuntu:18.04
 COPY . /app
 RUN make /app
 CMD python /app/app.py`,
   },
 };
+
+export const ProjectInfo = {
+  name: "CodeRain",
+  title: "Code Rain",
+  flag: "JS",
+  img: {
+    name: "CodeRain.webp",
+    type: "webp",
+    role: "thumbnail",
+    url: `${basePath}/img/CodeRain.webp`,
+  },
+  desc: "Take the blue pill and the site will close, or take the red pill and I show how deep the rabbit hole goes",
+  note: "Creating a 'Code Rain' effect from Matrix. As funny joke you can put any text to display at the end.",
+  link: "github.com/YushchenkoAndrew/template/tree/master/JS/CodeRain",
+};
+
+export const treePlaceholder = {
+  assets: {},
+  src: {},
+  thumbnail: {},
+  styles: {},
+  template: {
+    "index.html": codeTemplate.JS as FileData,
+  },
+  kubernetes: {},
+} as TreeObj;
+
+export const formPlaceholder = {
+  name: "",
+  flag: "JS",
+  title: "",
+  desc: "",
+  note: "",
+} as ProjectData;

@@ -183,7 +183,7 @@ export default withIronSession(async function (
   const project = GetParam(req.query.project);
   const role = GetParam(req.query.role);
   const path = GetParam(req.query.path);
-  if (!role || !project || isNaN(id)) {
+  if (!project || isNaN(id)) {
     return res.status(400).send({
       status: "ERR",
       message: "This request is too bad to be a true one",

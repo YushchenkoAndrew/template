@@ -47,17 +47,24 @@ export default function InputFile(props: InputFileProps) {
             });
           }
 
-          (function ReadFiles(i: number) {
-            return new Promise((resolve, reject) => {
-              let reader = new FileReader();
-              reader.readAsDataURL(files[i].file || new Blob());
-              reader.onloadend = (e) => {
-                files[i].url = String(reader.result);
-                if (++i == files.length) return resolve(true);
-                return ReadFiles(i).finally(() => resolve(true));
-              };
-            });
-          })(0).finally(() => {
+          function CreateReader(param: string, func: string) {
+            return function ReadFiles(i: number) {
+              return new Promise((resolve) => {
+                let reader = new FileReader();
+                reader[func](files[i].file || new Blob());
+                reader.onloadend = (e) => {
+                  files[i][param] = String(reader.result);
+                  if (++i == files.length) return resolve(true);
+                  return ReadFiles(i).finally(() => resolve(true));
+                };
+              });
+            };
+          }
+
+          Promise.all([
+            CreateReader("url", "readAsDataURL")(0),
+            CreateReader("content", "readAsText")(0),
+          ]).finally(() => {
             props.onChange({
               target: {
                 name: props.name,

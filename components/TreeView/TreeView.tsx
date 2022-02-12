@@ -44,7 +44,7 @@ export interface TreeViewProps {
   role: string;
   dir?: string;
   projectTree: TreeObj;
-  onFileSelect: (key: string) => void;
+  onFileSelect: (key: string[]) => void;
 }
 
 //
@@ -82,7 +82,11 @@ export default function TreeView(props: TreeViewProps) {
               [key]: !showNode[key],
             });
           }}
-          onSelect={() => props.onFileSelect(path.slice(1) + "/" + name)}
+          onSelect={() =>
+            props.onFileSelect(
+              [...path.split("/"), name].filter((item) => item)
+            )
+          }
         >
           {value.name
             ? null

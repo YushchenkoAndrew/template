@@ -55,6 +55,7 @@ export type FileData = {
   project_id?: number;
 
   file?: File;
+  content?: string;
   url?: string;
 };
 

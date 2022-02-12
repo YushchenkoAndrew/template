@@ -235,22 +235,9 @@ export default React.forwardRef((props: PreviewProps, ref) => {
                     });
                   }
 
-                  props.codeViewRef.current.onFileAdd({
-                    ...props.codeViewRef.current.treeStructure,
-                    template: {
-                      [codeTemplate[event.target.value].name]: {
-                        ...(Object.values(
-                          props.codeViewRef.current.treeStructure.template ?? {}
-                        )[0] ?? {}),
-                        name: codeTemplate[event.target.value].name,
-                        type: codeTemplate[event.target.value].type,
-                        role: "template",
-                      } as FileData,
-                    },
-                  });
-
-                  props.codeViewRef.current.setCode(
-                    codeTemplate[event.target.value].code
+                  // FIXME: DELETE previous file
+                  props.codeViewRef.current.setFile(
+                    codeTemplate[event.target.value]
                   );
                 }}
               />

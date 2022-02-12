@@ -4,7 +4,7 @@ import DefaultHead from "../../../components/default/DefaultHead";
 import { checkIfUserExist } from "../../../lib/api/session";
 import { TreeObj } from "../../../types/tree";
 import { basePath, voidUrl } from "../../../config";
-import { LinkData, ProjectData } from "../../../types/api";
+import { FileData, LinkData, ProjectData } from "../../../types/api";
 import { withIronSession } from "next-iron-session";
 import { NextSessionArgs } from "../../../types/session";
 import sessionConfig from "../../../config/session";
@@ -39,7 +39,7 @@ export interface ProjectOperationProps {
   type: string;
   formData: ProjectData;
   treeStructure: TreeObj;
-  template: string;
+  template: FileData;
   links: { [name: string]: LinkData };
 }
 
@@ -63,11 +63,13 @@ export default function ProjectOperation(props: ProjectOperationProps) {
       const data = await previewRef?.current?.onSubmit?.();
       await codeViewRef?.current?.onSubmit?.(data);
       await previewRef?.current?.onLinkSubmit?.(data);
+      await k3sConfigRef?.current?.onSubmit?.();
 
-      setTimeout(
-        () => (window.location.href = basePath + "/admin/projects/"),
-        2000
-      );
+      // FIXME: Was commented only for debug propose
+      // setTimeout(
+      //   () => (window.location.href = basePath + "/admin/projects/"),
+      //   2000
+      // );
     } catch (err: any) {
       if (!err) return;
       toast.update(err.id, {
@@ -162,7 +164,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
 
         <CodeView
           ref={codeViewRef}
-          code={props.template}
+          file={props.template}
           previewRef={previewRef}
           treeStructure={props.treeStructure}
           show={config === "Code"}
@@ -242,7 +244,7 @@ export const getServerSideProps = withIronSession(async function ({
       type,
       formData: formPlaceholder,
       treeStructure: treePlaceholder,
-      template: codeTemplate.JS.code,
+      template: codeTemplate.JS,
       links: { main: { name: "main", link: "" } },
     } as ProjectOperationProps,
   };

@@ -64,7 +64,14 @@ export default withIronSession(async function (
 
   const id = GetParam(req.query.id);
   const { name, flag, title, desc, note } = req.body as ProjectData;
-  if (!name || !flag || !title || !desc || (flag !== "Link" && !note)) {
+
+  if (
+    !name ||
+    !flag ||
+    !title ||
+    !desc ||
+    (flag !== "Link" && flag !== "Docker" && !note)
+  ) {
     return res
       .status(400)
       .send({ status: "ERR", message: "Not all required fields are setted" });
