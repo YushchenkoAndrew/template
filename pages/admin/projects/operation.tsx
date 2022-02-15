@@ -30,8 +30,6 @@ import { ToastDefault } from "../../../config/alert";
 import K3sConfig, {
   K3sConfigRef,
 } from "../../../components/admin/operation/K3sConfig";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay } from "@fortawesome/free-solid-svg-icons";
 
 export type Event = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
 
@@ -63,7 +61,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
       const data = await previewRef?.current?.onSubmit?.();
       await codeViewRef?.current?.onSubmit?.(data);
       await previewRef?.current?.onLinkSubmit?.(data);
-      await k3sConfigRef?.current?.onSubmit?.();
+      await k3sConfigRef?.current?.onSubmit?.(data);
 
       // FIXME: Was commented only for debug propose
       // setTimeout(
@@ -111,7 +109,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
           draggable
         />
 
-        <div className="container mb-3">
+        <div className="container mb-1">
           <div className="row w-100 d-flex justify-content-between">
             <span></span>
             {/* FIXME: */}
@@ -133,7 +131,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
               <div>
                 <InputRadio
                   name="flag"
-                  className="btn-group btn-group-sm btn-group-toggle"
+                  className="btn-group btn-group-sm btn-group-toggle mb-2"
                   placeholder={config}
                   options={["Preview", "Code", "Config"]}
                   label="btn-outline-dark"
@@ -143,7 +141,7 @@ export default function ProjectOperation(props: ProjectOperationProps) {
 
               <button
                 type="submit"
-                className="btn btn-sm btn-outline-success ml-4"
+                className="btn btn-sm btn-outline-success mb-2 ml-4"
               >
                 Submit
               </button>

@@ -87,6 +87,8 @@ function UploadFile(file: File, args: ArgsType) {
     })
       .then((res) => res.json())
       .then((data) => {
+        console.log(data);
+
         resolve({
           status: 200,
           send: {

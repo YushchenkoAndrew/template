@@ -118,9 +118,14 @@ export default function AdminProjects(props: AdminProjectsProps) {
                 key={i}
                 id={item.id || 0}
                 title={item.title}
+                flag={item.flag as FlagType}
                 href={`/projects/${item.name}`}
                 img={`${voidUrl}/${item.name}${formPath(item.files[0])}`}
+                desc={item.desc}
                 event={{
+                  metrics: {
+                    href: `${basePath}/admin/projects/metrics?name=${item.name}`,
+                  },
                   modify: {
                     href: `${basePath}/admin/projects/operation?type=edit&name=${item.name}`,
                   },
@@ -149,8 +154,6 @@ export default function AdminProjects(props: AdminProjectsProps) {
                     },
                   },
                 }}
-                flag={item.flag as FlagType}
-                desc={item.desc}
               />
             );
           })}

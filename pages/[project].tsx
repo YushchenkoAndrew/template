@@ -58,7 +58,7 @@ export const getServerSideProps = async (
   const { send } = await LoadProjects({ name });
   if (send.status === "ERR" || !send.result?.length) return { notFound: true };
   const project = send.result[0] as ProjectData;
-  if (project.flag === "Link") {
+  if (project.flag === "Link" || project.flag === "Docker") {
     return {
       redirect: {
         basePath: false,

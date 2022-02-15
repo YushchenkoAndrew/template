@@ -191,28 +191,13 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
               const namespace = value?.metadata?.namespace ?? "";
               return (value?.spec?.template?.spec?.containers ?? []).map(
                 (item) =>
-                  new Promise<void>((resolve, reject) => {
+                  resolvePromise(
+                    `metrics [${item.name}]`,
                     fetch(
-                      `${basePath}/api/k3s/read?prefix=${item.name}&namespace=${namespace}`
+                      `${basePath}/api/k3s/metrics/create?prefix=${item.name}&namespace=${namespace}&id=${id}`,
+                      { method: "POST" }
                     )
-                      .then((res) => res.json())
-                      // FIXME: Change any type to Pod type
-                      .then((data: DefaultRes<any[]>) => {
-                        Promise.all(
-                          (data.result ?? []).map((item) =>
-                            resolvePromise(
-                              `metrics [${item.name}]`,
-                              fetch(
-                                `${basePath}/api/k3s/metrics/create&namespace=${namespace}&name=${item.name}&id=${id}`
-                              )
-                            )
-                          )
-                        )
-                          .then(() => resolve())
-                          .catch((err) => reject(err));
-                      })
-                      .catch((err) => reject(err));
-                  })
+                  )
               );
             })
         );

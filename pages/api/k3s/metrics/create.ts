@@ -14,23 +14,21 @@ export default withIronSession(async function (
     return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
-  const name = GetParam(req.query.name);
-  const namespace = GetParam(req.query.name);
+  const prefix = GetParam(req.query.prefix);
+  const namespace = GetParam(req.query.namespace);
   const projectId = GetParam(req.query.id);
-  if (!name || !namespace || !projectId) {
-    return res
-      .status(400)
-      .send({
-        status: "ERR",
-        message: "This request is too bad to be a true one",
-      });
+  if (!prefix || !namespace || !projectId) {
+    return res.status(400).send({
+      status: "ERR",
+      message: "This request is too bad to be a true one",
+    });
   }
 
   const { status, send } = await new Promise<FullResponse>((resolve) => {
     ApiAuth()
       .then((access) => {
         fetch(
-          `${apiUrl}/subscription?name=${name}&namespace=${namespace}&id=${projectId}`,
+          `${apiUrl}/subscription?prefix=${prefix}&namespace=${namespace}&id=${projectId}`,
           {
             method: "POST",
             headers: {
@@ -39,7 +37,7 @@ export default withIronSession(async function (
             },
             body: JSON.stringify({
               cron_time: "*/10 * * * * *",
-              operation: "metrics",
+              operation: "metrics-all",
             }),
           }
         )

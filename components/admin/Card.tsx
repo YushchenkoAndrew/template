@@ -4,16 +4,12 @@ import { FlagType } from "../../types/flag";
 import SimpleButton from "../SimpleButton";
 import styles from "./Card.module.css";
 import Flag from "./Flag";
+import { Event } from "../../components/SimpleButton";
 
 export type EventLinks = {
-  modify: {
-    href?: string;
-    onClick?: () => void;
-  };
-  delete: {
-    href?: string;
-    onClick?: () => void;
-  };
+  metrics?: Event;
+  modify: Event;
+  delete: Event;
 };
 export interface CardProps {
   id: number;
@@ -62,6 +58,14 @@ export default function Card(props: CardProps) {
           <div className="d-flex justify-content-between mt-3 mb-2">
             <span />
             <div className="row mr-2 mb-2">
+              {props.flag === "Docker" ? (
+                <SimpleButton
+                  className="btn btn-sm btn-outline-secondary mr-2"
+                  event={props.event.metrics ?? {}}
+                >
+                  Metrics
+                </SimpleButton>
+              ) : null}
               <SimpleButton
                 className="btn btn-sm btn-outline-info mr-2"
                 event={props.event.modify}

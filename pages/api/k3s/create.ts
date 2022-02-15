@@ -16,7 +16,11 @@ export default withIronSession(async function (
 
   const type = GetParam(req.query.type);
   const namespace = GetParam(req.query.namespace ?? "");
-  if (!type || !namespace || !process.env.K3S_ALLOWED_TYPES?.includes?.(type)) {
+  if (
+    !type ||
+    (type !== "namespace" && !namespace) ||
+    !process.env.K3S_ALLOWED_TYPES?.includes?.(type)
+  ) {
     return res.status(400).send({
       status: "ERR",
       message: "This request is too bad to be a true one",

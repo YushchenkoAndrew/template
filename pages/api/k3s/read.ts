@@ -16,6 +16,7 @@ export default withIronSession(async function (
 
   const type = GetParam(req.query.type);
   const namespace = GetParam(req.query.namespace ?? "");
+  const prefix = GetParam(req.query.prefix ?? "");
   if (!type || !namespace || !process.env.K3S_ALLOWED_TYPES?.includes?.(type)) {
     return res.status(400).send({
       status: "ERR",
@@ -26,23 +27,26 @@ export default withIronSession(async function (
   const { status, send } = await new Promise<FullResponse>((resolve) => {
     ApiAuth()
       .then((access) => {
-        fetch(`${apiUrl}/k3s/${type}/${namespace}`, {
-          method: "GET",
-          headers: {
-            "content-type": "application/json",
-            Authorization: `Bear ${access}`,
-          },
-          body: JSON.stringify(req.body),
-        })
+        fetch(
+          `${apiUrl}/k3s/${type}/${namespace}` +
+            (prefix ? `?prefix=${prefix}` : ""),
+          {
+            method: "GET",
+            headers: {
+              "content-type": "application/json",
+              Authorization: `Bear ${access}`,
+            },
+          }
+        )
           .then((res) => res.json())
-          .then((result: DefaultRes) => {
-            console.log(result);
+          .then((data: DefaultRes) => {
+            console.dir(data, { depth: null });
             resolve({
-              status: result.status == "OK" ? 200 : 500,
+              status: data.status == "OK" ? 200 : 500,
               send: {
-                status: result.status,
-                message: result.message,
-                result,
+                status: data.status,
+                message: data.message,
+                result: data.result?.items ?? [],
               },
             });
           })
