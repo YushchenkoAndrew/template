@@ -12,7 +12,6 @@ import React, {
   useState,
 } from "react";
 import { Ingress } from "../../../types/K3s/Ingress";
-import { Metadata } from "../../../types/K3s/Metadata";
 import InputName from "../../Inputs/InputName";
 import InputTemplate from "../../Inputs/InputTemplate";
 import InputValue from "../../Inputs/InputValue";
@@ -62,13 +61,9 @@ export default React.forwardRef((props: IngressProps, ref) => {
   }));
 
   return (
-    <div
-      className={`card col-12 col-md-8 col-lg-5 p-3 m-3 ${
-        props.show ? "" : "d-none"
-      }`}
-    >
+    <div className={`card px-1 py-3 ${props.show ? "" : "d-none"}`}>
       <InputTemplate
-        labelClassName="font-weight-bold ml-2"
+        labelClassName="font-weight-bold mx-2"
         label={[
           "Metadata ",
           <FontAwesomeIcon
@@ -80,7 +75,7 @@ export default React.forwardRef((props: IngressProps, ref) => {
         }
       >
         <div
-          className={`row border rounded mx-1 py-2 ${
+          className={`row border rounded px-1 mx-1 py-2 ${
             minimized.metadata ? "" : "d-none"
           }`}
         >
@@ -128,7 +123,8 @@ export default React.forwardRef((props: IngressProps, ref) => {
       </InputTemplate>
 
       <InputTemplate
-        labelClassName="font-weight-bold ml-2"
+        className="mx-1"
+        labelClassName="font-weight-bold mx-1"
         label={[
           "Rules ",
           <FontAwesomeIcon
@@ -138,7 +134,7 @@ export default React.forwardRef((props: IngressProps, ref) => {
         onClick={() => onMinimize({ ...minimized, rules: !minimized.rules })}
       >
         <div
-          className={`container border rounded py-2 ${
+          className={`border rounded px-1 py-2 ${
             minimized.rules ? "" : "d-none"
           }`}
         >

@@ -32,11 +32,7 @@ export default React.forwardRef((props: PathProps, ref) => {
   }));
 
   return (
-    <div
-      className={`container border rounded mx-1 py-2 ${
-        props.show ? "" : "d-none"
-      }`}
-    >
+    <div className={`border rounded p-2 ${props.show ? "" : "d-none"}`}>
       <InputTemplate label="Path">
         <InputName
           name="path"

@@ -79,8 +79,10 @@ export default React.forwardRef((props: ContainerProps, ref) => {
   }));
 
   return (
-    <div className={`border rounded mx-1 py-2 ${props.show ? "" : "d-none"}`}>
-      <InputTemplate className="mx-3" label="Name">
+    <div
+      className={`border rounded mx-1 px-1 py-2 ${props.show ? "" : "d-none"}`}
+    >
+      <InputTemplate className="mx-1" label="Name">
         <div className="input-group">
           <InputName
             char="#"
@@ -93,7 +95,7 @@ export default React.forwardRef((props: ContainerProps, ref) => {
           />
         </div>
       </InputTemplate>
-      <InputTemplate className="mx-3" label="Image">
+      <InputTemplate className="mx-1" label="Image">
         <div className="input-group">
           <InputName
             char="#"
@@ -107,19 +109,23 @@ export default React.forwardRef((props: ContainerProps, ref) => {
         </div>
       </InputTemplate>
 
-      <InputTemplate className="mx-3" label="ImagePullPolicy">
+      <InputTemplate className="mx-2" label="ImagePullPolicy">
         <InputRadio
           name="imagePullPolicy"
           placeholder="Always"
           className="btn-group btn-group-sm btn-group-toggle"
           options={["IfNotPresent", "Always", "Never"]}
+          overflow={{
+            on: { className: "d-block d-sm-none", len: 6 },
+            off: { className: "d-none d-sm-block", len: 0 },
+          }}
           label="btn-outline-info"
           onChange={onChange}
         />
       </InputTemplate>
 
       <InputTemplate
-        className="container"
+        className="px-1"
         label={[
           "Ports ",
           <FontAwesomeIcon
@@ -129,7 +135,7 @@ export default React.forwardRef((props: ContainerProps, ref) => {
         onClick={() => onMinimize({ ...minimized, ports: !minimized.ports })}
       >
         <div
-          className={`container border rounded py-2 ${
+          className={`border rounded px-1 py-2 ${
             minimized.ports ? "" : "d-none"
           }`}
         >
@@ -182,8 +188,7 @@ export default React.forwardRef((props: ContainerProps, ref) => {
       </InputTemplate>
 
       <InputTemplate
-        className="mx-2"
-        labelClassName="ml-2 mt-1"
+        labelClassName="mx-1 mt-1"
         label={[
           "Resources ",
           <FontAwesomeIcon
@@ -198,7 +203,7 @@ export default React.forwardRef((props: ContainerProps, ref) => {
         }
       >
         <div
-          className={`row border rounded mx-2 py-2 ${
+          className={`row border rounded mx-1 py-2 ${
             minimized.resources ? "" : "d-none"
           }`}
         >
@@ -252,8 +257,8 @@ export default React.forwardRef((props: ContainerProps, ref) => {
       </InputTemplate>
 
       <InputTemplate
-        className="mx-2 mt-1"
-        labelClassName="ml-2"
+        className="mt-1"
+        labelClassName="mx-1"
         label={[
           "env ",
           <FontAwesomeIcon
@@ -268,11 +273,11 @@ export default React.forwardRef((props: ContainerProps, ref) => {
         }
       >
         <div
-          className={`border rounded mx-2 py-2 ${
+          className={`border rounded mx-1 py-2 ${
             minimized.env ? "" : "d-none"
           }`}
         >
-          <div className="mb-3 mx-3">
+          <div className="mb-2 mx-3">
             <InputList
               char={["var", "="]}
               name={["name", "value"]}

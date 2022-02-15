@@ -34,8 +34,8 @@ export default function K3sField(props: K3sFieldProps) {
       <div className="row justify-content-center">{props.children}</div> */}
 
       <hr className="mb-4" />
-      <div className={`container ${styles["el-index-2"]}`}>
-        <div className="row">
+      <div className={`container ${styles["el-index-2"]} px-0 px-sm-3`}>
+        <div className="row px-3">
           <span className="row mr-auto" onClick={props.onHide}>
             <h4 className="mr-2">{props.name}</h4>
             <FontAwesomeIcon
@@ -79,7 +79,10 @@ export default function K3sField(props: K3sFieldProps) {
           </div>
         </div>
 
-        <div className="row justify-content-center">{props.children}</div>
+        <div className="row justify-content-center mb-2">
+          {props.children}
+          {/* </div> */}
+        </div>
       </div>
     </>
   );

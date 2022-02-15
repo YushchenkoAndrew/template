@@ -10,7 +10,7 @@ export interface InputTemplateProps {
 
 export default function InputTemplate(props: InputTemplateProps) {
   return (
-    <div className={`mb-3 ${props.className ?? ""}`}>
+    <div className={`mb-2 ${props.className ?? ""}`}>
       <label
         className={`mr-3 ${props.labelClassName ?? ""}`}
         onClick={props.onClick}

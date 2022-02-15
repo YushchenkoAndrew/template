@@ -53,7 +53,7 @@ export default React.forwardRef((props: RulesProps, ref) => {
 
   return (
     <div className={`border rounded mx-1 py-2 ${props.show ? "" : "d-none"}`}>
-      <InputTemplate className="mx-3" label="Host">
+      <InputTemplate className="mx-2" label="Host">
         <InputName
           name="host"
           char="http://"
@@ -67,21 +67,17 @@ export default React.forwardRef((props: RulesProps, ref) => {
       </InputTemplate>
 
       <InputTemplate
-        labelClassName="font-weight-bold ml-2"
+        className="mx-1"
+        labelClassName="font-weight-bold mx-1"
         label={[
           "Path ",
           <FontAwesomeIcon icon={minimized ? faChevronDown : faChevronRight} />,
         ]}
         onClick={() => onMinimize(!minimized)}
       >
-        <div
-          className={`mx-3 border rounded py-2 ${minimized ? "" : "d-none"}`}
-        >
+        <div className={`border rounded mx-1 p-2 ${minimized ? "" : "d-none"}`}>
           {paths.map((show, index) => (
-            <div
-              key={index}
-              className={`mb-3 container w-100 ${styles["el-index"]}`}
-            >
+            <div key={index} className={`mb-3 w-100 ${styles["el-index"]}`}>
               <div className="row mx-1">
                 <label
                   className="ml-1 mr-auto"

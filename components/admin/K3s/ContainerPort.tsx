@@ -41,9 +41,7 @@ export default React.forwardRef((props: ContainerPortProps, ref) => {
 
   return (
     <div
-      className={`container border rounded mx-1 py-2 ${
-        props.show ? "" : "d-none"
-      }`}
+      className={`border rounded mx-1 px-2 py-2 ${props.show ? "" : "d-none"}`}
     >
       <InputTemplate label="Name">
         <InputName
@@ -68,7 +66,7 @@ export default React.forwardRef((props: ContainerPortProps, ref) => {
       </InputTemplate>
 
       <div className="row w-100">
-        <InputTemplate className="col-6" label="Container Port">
+        <InputTemplate className="col-6" label="Port">
           <div className="input-group">
             <InputValue
               name="containerPort"

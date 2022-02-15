@@ -71,9 +71,9 @@ export default React.forwardRef((props: ServiceProps, ref) => {
   }));
 
   return (
-    <div className={`card col-lg-6 p-3 m-3 ${props.show ? "" : "d-none"}`}>
+    <div className={`card px-1 py-3 ${props.show ? "" : "d-none"}`}>
       <InputTemplate
-        labelClassName="font-weight-bold ml-2"
+        labelClassName="font-weight-bold mx-2"
         label={[
           "Metadata ",
           <FontAwesomeIcon
@@ -134,7 +134,8 @@ export default React.forwardRef((props: ServiceProps, ref) => {
       </InputTemplate>
 
       <InputTemplate
-        labelClassName="font-weight-bold ml-2"
+        className="mx-1"
+        labelClassName="font-weight-bold mx-1"
         label={[
           "Spec ",
           <FontAwesomeIcon
@@ -143,11 +144,7 @@ export default React.forwardRef((props: ServiceProps, ref) => {
         ]}
         onClick={() => onMinimize({ ...minimized, spec: !minimized.spec })}
       >
-        <div
-          className={`container border rounded mx-1 py-2 ${
-            minimized.spec ? "" : "d-none"
-          }`}
-        >
+        <div className={`border rounded p-2 ${minimized.spec ? "" : "d-none"}`}>
           <InputTemplate label="Cluster IP">
             <InputName
               char="$"
@@ -178,6 +175,10 @@ export default React.forwardRef((props: ServiceProps, ref) => {
                 "LoadBalancer",
                 "ExternalName",
               ]}
+              overflow={{
+                on: { className: "d-block d-sm-none", len: 6 },
+                off: { className: "d-none d-sm-block", len: 0 },
+              }}
               label="btn-outline-info"
               onChange={({ target: { name, value } }) => {
                 onServiceChange({
@@ -249,7 +250,8 @@ export default React.forwardRef((props: ServiceProps, ref) => {
       </InputTemplate>
 
       <InputTemplate
-        labelClassName="font-weight-bold ml-2"
+        className="mx-1"
+        labelClassName="font-weight-bold mx-1"
         label={[
           "Ports ",
           <FontAwesomeIcon
@@ -259,7 +261,7 @@ export default React.forwardRef((props: ServiceProps, ref) => {
         onClick={() => onMinimize({ ...minimized, ports: !minimized.ports })}
       >
         <div
-          className={`container border rounded py-2 ${
+          className={`border rounded px-1 py-2 ${
             minimized.ports ? "" : "d-none"
           }`}
         >
@@ -270,7 +272,7 @@ export default React.forwardRef((props: ServiceProps, ref) => {
             >
               <div className="row mx-1">
                 <label
-                  className="ml-1 mr-auto"
+                  className="mx-1 mr-auto"
                   onClick={() => {
                     onPortChange({ ...ports, [index]: !ports[index] });
                   }}

@@ -98,7 +98,7 @@ export interface CodeViewRef {
   onUpload: (event: ProjectElement) => void;
   setFile: (value: FileData) => void;
   onFileAdd: (value: TreeObj) => void;
-  onSubmit: (data: ProjectData | undefined) => Promise<boolean>;
+  onSubmit: (data: ProjectData | undefined) => Promise<void>;
 }
 
 export default React.forwardRef((props: CodeViewProps, ref) => {
@@ -133,9 +133,8 @@ export default React.forwardRef((props: CodeViewProps, ref) => {
     onSubmit(data: ProjectData | undefined) {
       const formData = props.previewRef?.current?.formData;
       if (!formData || !data) {
-        return new Promise((resolve, reject) => reject(null));
+        return new Promise((_, reject) => reject(null));
       }
-      console.log(data);
 
       const id = data.id || formData.id;
 
@@ -161,15 +160,14 @@ export default React.forwardRef((props: CodeViewProps, ref) => {
       }
 
       return (function parseTree(tree: TreeObj | FileData | null) {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<void>(async (resolve, reject) => {
           // Check if obj is FileData and if File not exist then break
-          console.log(tree);
           if (!tree?.name || !tree.file) {
-            if (tree && tree.name) return resolve(true);
+            if (tree && tree.name) return resolve();
             for (let [_, value] of Object.entries(tree || {})) {
               await parseTree(value);
             }
-            return resolve(true);
+            return resolve();
           }
 
           const toastId = toast.loading("Please wait...");
@@ -189,7 +187,7 @@ export default React.forwardRef((props: CodeViewProps, ref) => {
           )
             .then((res) => res.json())
             .then((data: DefaultRes) => {
-              resolve(true);
+              resolve();
               toast.update(toastId, {
                 render: `File [${tree.name}]: ${data.message}`,
                 type: data.status === "OK" ? "success" : "error",

@@ -41,11 +41,7 @@ export default React.forwardRef((props: PortProps, ref) => {
   }
 
   return (
-    <div
-      className={`container border rounded mx-1 py-2 ${
-        props.show ? "" : "d-none"
-      }`}
-    >
+    <div className={`border rounded mx-1 p-2 ${props.show ? "" : "d-none"}`}>
       <InputTemplate label="Name">
         <InputName
           char="@"

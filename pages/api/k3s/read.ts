@@ -10,7 +10,7 @@ export default withIronSession(async function (
   req: NextApiRequest & { session: Session },
   res: NextApiResponse<DefaultRes>
 ) {
-  if (req.method !== "POST") {
+  if (req.method !== "GET") {
     return res.status(405).send({ status: "ERR", message: "Unknown method" });
   }
 
@@ -27,7 +27,7 @@ export default withIronSession(async function (
     ApiAuth()
       .then((access) => {
         fetch(`${apiUrl}/k3s/${type}/${namespace}`, {
-          method: "POST",
+          method: "GET",
           headers: {
             "content-type": "application/json",
             Authorization: `Bear ${access}`,
@@ -36,6 +36,7 @@ export default withIronSession(async function (
         })
           .then((res) => res.json())
           .then((result: DefaultRes) => {
+            console.log(result);
             resolve({
               status: result.status == "OK" ? 200 : 500,
               send: {
@@ -52,7 +53,7 @@ export default withIronSession(async function (
             })
           );
       })
-      .catch((err) =>
+      .catch(() =>
         resolve({
           status: 500,
           send: { status: "ERR", message: "API Auth error" },

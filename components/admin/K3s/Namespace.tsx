@@ -31,20 +31,16 @@ export default React.forwardRef((props: NamespaceProps, ref) => {
   }));
 
   return (
-    <div className={`card col-lg-6 p-3 m-3 ${props.show ? "" : "d-none"}`}>
+    <div className={`card px-1 py-3 ${props.show ? "" : "d-none"}`}>
       <InputTemplate
-        labelClassName="font-weight-bold ml-2"
+        labelClassName="font-weight-bold mx-2"
         label={[
           "Metadata ",
           <FontAwesomeIcon icon={minimized ? faChevronDown : faChevronRight} />,
         ]}
         onClick={() => onMinimized(!minimized)}
       >
-        <div
-          className={`container border rounded mx-1 py-2 ${
-            minimized ? "" : "d-none"
-          }`}
-        >
+        <div className={`border rounded mx-1 p-2 ${minimized ? "" : "d-none"}`}>
           <InputTemplate className="w-100" label="Name">
             <InputName
               char="@"

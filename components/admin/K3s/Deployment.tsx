@@ -90,7 +90,7 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
   }));
 
   return (
-    <div className={`card col-lg-6 p-3 m-3 ${props.show ? "" : "d-none"}`}>
+    <div className={`card px-1 py-3 ${props.show ? "" : "d-none"}`}>
       <InputTemplate
         labelClassName="font-weight-bold ml-2"
         label={[
@@ -152,6 +152,7 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
       </InputTemplate>
 
       <InputTemplate
+        className="mt-1"
         labelClassName="font-weight-bold ml-2"
         label={[
           "Spec ",
@@ -162,7 +163,7 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
         onClick={() => onMinimize({ ...minimized, spec: !minimized.spec })}
       >
         <div
-          className={`container border rounded mx-1 py-2 ${
+          className={`border rounded mx-1 px-2 py-2 ${
             minimized.spec ? "" : "d-none"
           }`}
         >
@@ -196,6 +197,10 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
                 className="btn-group btn-group-sm btn-group-toggle"
                 options={["RollingUpdate", "Recreate"]}
                 label="btn-outline-info"
+                overflow={{
+                  on: { className: "d-block d-sm-none", len: 6 },
+                  off: { className: "d-none d-sm-block", len: 0 },
+                }}
                 onChange={({ target: { name, value } }) => {
                   onDeploymentChange({
                     ...deployment,
@@ -225,11 +230,11 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
             }
           >
             <div
-              className={`border rounded py-2 ${
+              className={`border rounded px-2 py-2 ${
                 minimized.matchLabels ? "" : "d-none"
               }`}
             >
-              <div className="container">
+              <div className="container px-2">
                 <InputList
                   char={["var", "="]}
                   name={["name", "value"]}
@@ -267,6 +272,7 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
       </InputTemplate>
 
       <InputTemplate
+        className="mt-1"
         labelClassName="font-weight-bold ml-2"
         label={[
           "Containers ",
@@ -279,7 +285,7 @@ export default React.forwardRef((props: DeploymentProps, ref) => {
         }
       >
         <div
-          className={`container border rounded py-2 ${
+          className={`border rounded px-1 py-2 mx-1 ${
             minimized.containers ? "" : "d-none"
           }`}
         >

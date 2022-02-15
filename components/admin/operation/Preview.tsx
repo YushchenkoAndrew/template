@@ -166,7 +166,7 @@ export default React.forwardRef((props: PreviewProps, ref) => {
         </div>
         <div className="col-md-7 order-md-1">
           <h4 className="font-weight-bold mb-3">Thumbnail</h4>
-          <InputTemplate label="Name">
+          <InputTemplate className="mb-3" label="Name">
             <InputName
               char="@"
               name="name"
@@ -181,7 +181,7 @@ export default React.forwardRef((props: PreviewProps, ref) => {
             />
           </InputTemplate>
 
-          <InputTemplate label="Title">
+          <InputTemplate className="mb-3" label="Title">
             <div className="input-group">
               <InputValue
                 name="title"
@@ -195,7 +195,7 @@ export default React.forwardRef((props: PreviewProps, ref) => {
             </div>
           </InputTemplate>
 
-          <InputTemplate label="Description">
+          <InputTemplate className="mb-3" label="Description">
             <InputText
               name="desc"
               required
@@ -207,7 +207,7 @@ export default React.forwardRef((props: PreviewProps, ref) => {
           </InputTemplate>
 
           <div className="input-group d-flex justify-content-between">
-            <InputTemplate label="Image">
+            <InputTemplate className="mb-3" label="Image">
               <InputFile
                 name="file"
                 role="thumbnail"
@@ -219,11 +219,15 @@ export default React.forwardRef((props: PreviewProps, ref) => {
               />
             </InputTemplate>
 
-            <InputTemplate label="Flag">
+            <InputTemplate className="mb-3" label="Flag">
               <InputRadio
                 name="flag"
                 placeholder={formData.flag}
                 options={["JS", "Markdown", "Link", "Docker"]}
+                overflow={{
+                  on: { className: "d-block d-sm-none", len: 4 },
+                  off: { className: "d-none d-sm-block", len: 0 },
+                }}
                 label="btn-outline-secondary"
                 onChange={(event) => {
                   onThumbnailChange(event);
@@ -251,7 +255,7 @@ export default React.forwardRef((props: PreviewProps, ref) => {
         <div className="d-flex justify-content-center mb-3">
           <div className="w-100">
             <h4 className="font-weight-bold mb-3">Redirect</h4>
-            <InputTemplate label="Link">
+            <InputTemplate className="mb-3" label="Link">
               <InputName
                 char="http://"
                 name="link"
@@ -272,7 +276,7 @@ export default React.forwardRef((props: PreviewProps, ref) => {
             </InputTemplate>
 
             {formData.flag === "Docker" ? (
-              <InputTemplate label="Link">
+              <InputTemplate className="mb-3" label="Link">
                 <InputDouble
                   char={["$", ":"]}
                   name={["0", "1"]}
@@ -290,7 +294,7 @@ export default React.forwardRef((props: PreviewProps, ref) => {
         <div className="d-flex justify-content-center mb-3">
           <div className="w-100">
             <h4 className="font-weight-bold mb-3">Footer</h4>
-            <InputTemplate label="Note">
+            <InputTemplate className="mb-3" label="Note">
               <InputText
                 name="note"
                 required
@@ -301,7 +305,7 @@ export default React.forwardRef((props: PreviewProps, ref) => {
               />
             </InputTemplate>
 
-            <InputTemplate label="Link">
+            <InputTemplate className="mb-3" label="Link">
               <InputName
                 char="http://"
                 name="link"
@@ -321,7 +325,7 @@ export default React.forwardRef((props: PreviewProps, ref) => {
               />
             </InputTemplate>
 
-            <InputTemplate label="Additional Links">
+            <InputTemplate className="mb-3" label="Additional Links">
               <InputList
                 char={["http://", "@"]}
                 name={["link", "name"]}

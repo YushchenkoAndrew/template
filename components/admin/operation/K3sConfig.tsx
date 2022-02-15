@@ -8,6 +8,7 @@ import React, {
 import { toast } from "react-toastify";
 import { basePath } from "../../../config";
 import { ToastDefault } from "../../../config/alert";
+import { ProjectData } from "../../../types/api";
 import { DefaultRes, Stat } from "../../../types/request";
 import Deployment, { DeploymentRef } from "../K3s/Deployment";
 import Ingress, { IngressRef } from "../K3s/Ingress";
@@ -23,7 +24,7 @@ export interface K3sConfigProps {
 }
 
 export interface K3sConfigRef {
-  onSubmit: () => Promise<any>;
+  onSubmit: (data: ProjectData | undefined) => Promise<any>;
 }
 
 type K3sRef = NamespaceRef | DeploymentRef | ServiceRef | IngressRef;
@@ -83,7 +84,12 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
 
   const terminalRef = useRef<TerminalRef>(null);
   useImperativeHandle<unknown, K3sConfigRef>(ref, () => ({
-    async onSubmit() {
+    async onSubmit(data: ProjectData | undefined) {
+      const formData = props.previewRef?.current?.formData;
+      if (!formData || !data) {
+        return new Promise((_, reject) => reject(null));
+      }
+
       function toastRes(id: React.ReactText, status: Stat, name: string) {
         toast.update(id, {
           render: status === "OK" ? `Created ${name}` : `${name}: Server Error`,
@@ -174,6 +180,42 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
         await Promise.all(sendAll("deployment", deploymentRef));
         await Promise.all(sendAll("service", serviceRef));
         await Promise.all(sendAll("ingress", ingressRef));
+
+        // Create Metrics ....
+        await Promise.all(
+          deploymentRef
+            .filter((item) => item?.current)
+            .map((item) => {
+              const id = data.id || formData.id;
+              const value = item.current?.getValue();
+              const namespace = value?.metadata?.namespace ?? "";
+              return (value?.spec?.template?.spec?.containers ?? []).map(
+                (item) =>
+                  new Promise<void>((resolve, reject) => {
+                    fetch(
+                      `${basePath}/api/k3s/read?prefix=${item.name}&namespace=${namespace}`
+                    )
+                      .then((res) => res.json())
+                      // FIXME: Change any type to Pod type
+                      .then((data: DefaultRes<any[]>) => {
+                        Promise.all(
+                          (data.result ?? []).map((item) =>
+                            resolvePromise(
+                              `metrics [${item.name}]`,
+                              fetch(
+                                `${basePath}/api/k3s/metrics/create&namespace=${namespace}&name=${item.name}&id=${id}`
+                              )
+                            )
+                          )
+                        )
+                          .then(() => resolve())
+                          .catch((err) => reject(err));
+                      })
+                      .catch((err) => reject(err));
+                  })
+              );
+            })
+        );
       } catch (err) {
         console.log(err);
       }
@@ -181,7 +223,7 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
   }));
 
   return (
-    <div className={props.show ? "" : "d-none"}>
+    <div className={`${props.show ? "" : "d-none"}`}>
       <div className="container mb-5">
         <K3sField
           name="Namespace"
@@ -192,11 +234,13 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
           }
         >
           {namespace.map((_, index) => (
-            <Namespace
-              key={`deployment-${index}`}
-              ref={namespaceRef[index]}
-              show={minimized.namespace}
-            />
+            <div className="col-12 col-sm-11 col-md-8 col-lg-6 col-xl-5 p-0 p-md-2">
+              <Namespace
+                key={`deployment-${index}`}
+                ref={namespaceRef[index]}
+                show={minimized.namespace}
+              />
+            </div>
           ))}
         </K3sField>
 
@@ -209,11 +253,13 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
           }
         >
           {deployment.map((_, index) => (
-            <Deployment
-              ref={deploymentRef[index]}
-              key={`deployment-${index}`}
-              show={minimized.deployment}
-            />
+            <div className="col-12 col-sm-11 col-md-8 col-lg-6 col-xl-5 p-0 p-md-2">
+              <Deployment
+                ref={deploymentRef[index]}
+                key={`deployment-${index}`}
+                show={minimized.deployment}
+              />
+            </div>
           ))}
         </K3sField>
 
@@ -226,11 +272,13 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
           }
         >
           {service.map((_, index) => (
-            <Service
-              ref={serviceRef[index]}
-              key={index}
-              show={minimized.service}
-            />
+            <div className="col-12 col-sm-11 col-md-8 col-lg-6 col-xl-5 p-0 p-md-2">
+              <Service
+                ref={serviceRef[index]}
+                key={index}
+                show={minimized.service}
+              />
+            </div>
           ))}
         </K3sField>
 
@@ -243,11 +291,13 @@ export default React.forwardRef((props: K3sConfigProps, ref) => {
           }
         >
           {ingress.map((item, index) => (
-            <Ingress
-              ref={ingressRef[index]}
-              key={index}
-              show={minimized.ingress}
-            />
+            <div className="col-12 col-sm-11 col-md-8 col-lg-6 col-xl-5 p-0 p-md-2">
+              <Ingress
+                ref={ingressRef[index]}
+                key={index}
+                show={minimized.ingress}
+              />
+            </div>
           ))}
         </K3sField>
 
