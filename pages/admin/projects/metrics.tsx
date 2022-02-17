@@ -157,14 +157,14 @@ export default function Metrics(props: MetricsProps) {
                 }),
                 datasets: props.containers.data.map((data, i) => ({
                   label: data.name,
-                  // data: data.cpu.map(
-                  //   (item) => item / Math.pow(10, data.cpu_scale)
-                  // ),
                   data: data.cpu.map(
-                    (item) =>
-                      (item + i * Math.random() * 100000) /
-                      Math.pow(10, data.cpu_scale)
+                    (item) => item / Math.pow(10, data.cpu_scale)
                   ),
+                  // data: data.cpu.map(
+                  //   (item) =>
+                  //     (item + i * Math.random() * 100000) /
+                  //     Math.pow(10, data.cpu_scale)
+                  // ),
                   fill: i ? i - 1 : true,
                   backgroundColor: `rgba(${COLORS[i].join(",")},0.4)`,
                   borderColor: `rgb(${COLORS[i].join(",")})`,
@@ -203,14 +203,14 @@ export default function Metrics(props: MetricsProps) {
                 }),
                 datasets: props.containers.data.map((data, i) => ({
                   label: data.name,
-                  // data: data.cpu.map(
-                  //   (item) => item / Math.pow(10, data.cpu_scale)
-                  // ),
-                  data: data.memory.map(
-                    (item) =>
-                      (item + i * Math.random() * 100000) /
-                      Math.pow(10, data.memory_scale)
+                  data: data.cpu.map(
+                    (item) => item / Math.pow(10, data.cpu_scale)
                   ),
+                  // data: data.memory.map(
+                  //   (item) =>
+                  //     (item + i * Math.random() * 100000) /
+                  //     Math.pow(10, data.memory_scale)
+                  // ),
                   fill: i ? i - 1 : true,
                   backgroundColor: `rgba(${COLORS[i + 3].join(",")},0.4)`,
                   borderColor: `rgb(${COLORS[i + 3].join(",")})`,
