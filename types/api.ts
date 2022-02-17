@@ -88,3 +88,16 @@ export type GeoIpLocationData = {
   country_name: string;
   is_in_european_union: boolean;
 };
+
+export type MetricsData = {
+  id: number;
+  created_at: string;
+  name: string;
+  namespace: string;
+  container_name: string;
+  cpu: number;
+  cpu_scale: number;
+  memory: number;
+  memory_scale: number;
+  project_id: number;
+};
