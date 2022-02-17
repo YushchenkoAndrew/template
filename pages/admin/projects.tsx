@@ -124,7 +124,7 @@ export default function AdminProjects(props: AdminProjectsProps) {
                 desc={item.desc}
                 event={{
                   metrics: {
-                    href: `${basePath}/admin/projects/metrics?name=${item.name}`,
+                    href: `${basePath}/admin/projects/metrics?id=${item.id}`,
                   },
                   modify: {
                     href: `${basePath}/admin/projects/operation?type=edit&name=${item.name}`,

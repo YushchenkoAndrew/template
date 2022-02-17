@@ -111,7 +111,7 @@ export default function Info() {
         onMapLoad(data.map);
         onInfoLoad(data.info);
       })
-      .catch((err) => {});
+      .catch((err) => console.log(err));
   }
 
   function loadAnalyticsData(date: Date) {
@@ -139,7 +139,7 @@ export default function Info() {
           data.doughnut.cr_projects,
         ]);
       })
-      .catch((err) => {});
+      .catch((err) => console.log(err));
   }
 
   return (
@@ -247,7 +247,7 @@ export default function Info() {
                     {
                       data: doughnutData,
                       backgroundColor: ["#ff6384", "#007bff", "#ffce56"],
-                      hoverBackgroundColor: ["#ff6384", "#007bff", "#ffce56"],
+                      hoverBackgroundColor: ["#ff2e5b", "#0063cc", "#febb20"],
                     },
                   ],
                 }}
