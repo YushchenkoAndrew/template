@@ -1,4 +1,3 @@
-
 -- Init Object
 JSON = {
 	file = nil,
@@ -12,23 +11,21 @@ JSON = {
 -- Skip Functions
 function JSON:SkipComma()
 	if (JSON.cCurr ~= ",") then JSON.error = true; return false end
-		JSON.cCurr = JSON.file:read(1)
+	JSON.cCurr = JSON.file:read(1)
 	return true
 end
 
 function JSON:SkipColon()
 	if (JSON.cCurr ~= ":") then JSON.error = true; return false end
-		JSON.cCurr = JSON.file:read(1)
+	JSON.cCurr = JSON.file:read(1)
 	return true
 end
-
 
 function JSON:SkipBlanks()
 	while (JSON.cCurr == " " or JSON.cCurr == "\n" or JSON.cCurr == "\t" or JSON.cCurr == "\r") do
 		JSON.cCurr = JSON.file:read(1)
 	end
 end
-
 
 -- Basic Parsers
 function JSON:ParseString()
@@ -142,7 +139,6 @@ function JSON:ParseValue()
 	return value
 end
 
-
 function JSON:Parse(path)
 	JSON.file = io.open(path, "r")
 	if not JSON.file then
@@ -154,7 +150,6 @@ function JSON:Parse(path)
 
 	return JSON.ParseValue()
 end
-
 
 function JSON:RepeatStr(str, n)
 	local result = ""
@@ -170,11 +165,10 @@ function JSON:Stringify(json, i)
 			print(JSON:RepeatStr("  ", i) .. key .. " => ")
 			JSON:Stringify(value, i + 1)
 		else
-			print(JSON:RepeatStr("  ", i) ..  key .. " => " .. tostring(value))
+			print(JSON:RepeatStr("  ", i) .. key .. " => " .. tostring(value))
 		end
 	end
 end
-
 
 -- Test
 -- JSON:Stringify(JSON:Parse("../../assets/Menu.json"), 0)

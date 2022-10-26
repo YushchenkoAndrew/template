@@ -36,40 +36,40 @@ public:
 	template<class T>
 	T GetValue(const char* var = nullptr);
 
-	template<>
-	int32_t GetValue(const char* var) {
-		if (var != nullptr) lua_getglobal(L, var);
-		if (!lua_isinteger(L, -1)) return 0;
-		return (int32_t)lua_tointeger(L, -1);
-	}
+	// template<>
+	// int32_t GetValue(const char* var) {
+	// 	if (var != nullptr) lua_getglobal(L, var);
+	// 	if (!lua_isinteger(L, -1)) return 0;
+	// 	return (int32_t)lua_tointeger(L, -1);
+	// }
 
-	template<>
-	float GetValue(const char* var) {
-		if (var != nullptr) lua_getglobal(L, var);
-		if (!lua_isnumber(L, -1)) return 0.0f;
-		return (float)lua_tonumber(L, -1);
-	}
+	// template<>
+	// float GetValue(const char* var) {
+	// 	if (var != nullptr) lua_getglobal(L, var);
+	// 	if (!lua_isnumber(L, -1)) return 0.0f;
+	// 	return (float)lua_tonumber(L, -1);
+	// }
 
-	template<>
-	std::string GetValue(const char* var) {
-		if (var != nullptr) lua_getglobal(L, var);
-		if (!lua_isstring(L, -1)) return "";
-		return lua_tostring(L, -1);
-	}
+	// template<>
+	// std::string GetValue(const char* var) {
+	// 	if (var != nullptr) lua_getglobal(L, var);
+	// 	if (!lua_isstring(L, -1)) return "";
+	// 	return lua_tostring(L, -1);
+	// }
 
-	template<>
-	const char* GetValue(const char* var) {
-		if (var != nullptr) lua_getglobal(L, var);
-		if (!lua_isstring(L, -1)) return "";
-		return lua_tostring(L, -1);
-	}
+	// template<>
+	// const char* GetValue(const char* var) {
+	// 	if (var != nullptr) lua_getglobal(L, var);
+	// 	if (!lua_isstring(L, -1)) return "";
+	// 	return lua_tostring(L, -1);
+	// }
 
-	template<>
-	bool GetValue(const char* var) {
-		if (var != nullptr) lua_getglobal(L, var);
-		if (!lua_isboolean(L, -1)) return false;
-		return lua_toboolean(L, -1);
-	}
+	// template<>
+	// bool GetValue(const char* var) {
+	// 	if (var != nullptr) lua_getglobal(L, var);
+	// 	if (!lua_isboolean(L, -1)) return false;
+	// 	return lua_toboolean(L, -1);
+	// }
 
 	bool GetTable(const char* table) {
 		if (table != nullptr) {
@@ -149,11 +149,11 @@ public:
 	void Pop(int32_t n = 1) { lua_pop(L, n); }
 
 	template <class T> int32_t Push(T value) { return 0; }
-	template<> int32_t Push(int32_t value) { lua_pushinteger(L, value);  return 1; }
-	template<> int32_t Push(float value) { lua_pushnumber(L, value); return 1; }
-	template<> int32_t Push(std::string value) { lua_pushstring(L, value.c_str()); return 1; }
-	template<> int32_t Push(const char* value) { lua_pushstring(L, value); return 1; }
-	template<> int32_t Push(bool value) { lua_pushboolean(L, value); return 1; }
+	// template<> int32_t Push(int32_t value) { lua_pushinteger(L, value);  return 1; }
+	// template<> int32_t Push(float value) { lua_pushnumber(L, value); return 1; }
+	// template<> int32_t Push(std::string value) { lua_pushstring(L, value.c_str()); return 1; }
+	// template<> int32_t Push(const char* value) { lua_pushstring(L, value); return 1; }
+	// template<> int32_t Push(bool value) { lua_pushboolean(L, value); return 1; }
 
 	template<class T> int32_t Push(const std::initializer_list<T> list) { 
 		for (auto& value : list) Push(value);

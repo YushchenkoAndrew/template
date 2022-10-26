@@ -61,9 +61,9 @@ void Camera::LookAt(olc::PixelGameEngine &GameEngine) {
 
 
 	vLookDir = { 
-		cosf(funcToRadians(fYaw)) * cos(funcToRadians(fPitch)),
+		cosf(funcToRadians(fYaw)) * (float)cos(funcToRadians(fPitch)),
 		sinf(funcToRadians(fPitch)),
-		sinf(funcToRadians(fYaw)) * cos(funcToRadians(fPitch)),
+		sinf(funcToRadians(fYaw)) * (float)cos(funcToRadians(fPitch)),
 	};
 
 	vLookDir = sPoint3D::normalize(vLookDir);

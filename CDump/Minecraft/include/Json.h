@@ -5,6 +5,7 @@
 #include <fstream>
 #include <map>
 #include <vector>
+#include <memory>
 #include "include/Typelist.h"
 
 #define KEYWORDS_SIZE 3

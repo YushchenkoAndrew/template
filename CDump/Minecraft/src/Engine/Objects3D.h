@@ -141,7 +141,7 @@ struct sPoint3D {
 
 	static inline sPoint3D normalize(const sPoint3D& p) { return p / sPoint3D::length(p); }
 	static inline float length(const sPoint3D& p) { return sqrtf(p.x * p.x + p.y * p.y + p.z * p.z); }
-	static inline sPoint3D abs(const sPoint3D& p) { return { fabs(p.x), fabs(p.y), fabs(p.z) }; }
+	static inline sPoint3D abs(const sPoint3D& p) { return { fabsf(p.x), fabsf(p.y), fabsf(p.z) }; }
 	static inline float dot(const sPoint3D& right, const sPoint3D& left) { return right.x * left.x + right.y * left.y + right.z * left.z; }
 	static inline float Avg(const sPoint3D& p) { return (p.x + p.y + p.z) / 3.0f; }
 

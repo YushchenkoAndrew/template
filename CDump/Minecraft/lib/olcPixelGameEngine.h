@@ -4778,6 +4778,8 @@ namespace olc
 
 		virtual olc::rcode LockMousePos(const int32_t& x, const int32_t& y) override 
 		{
+			ptrPGE->olc_UpdateLockedMouse(x, y);
+			XWarpPointer(olc_Display, None, olc_Window, 0, 0, 0, 0, x, y);
 			return olc::rcode::OK;
 		}
 

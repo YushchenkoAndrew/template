@@ -47,7 +47,7 @@ void MenuManager::OnConfirm() {
 
 void MenuManager::OnMove(olc::PixelGameEngine& GameEngine) {
 	// Functions: Go back and Open Menu
-	if (GameEngine.GetKey(olc::X).bPressed) {
+	if (GameEngine.GetKey(olc::X).bPressed || GameEngine.GetKey(olc::ESCAPE).bPressed) {
 		if (stMenu.empty()) Open(&cMenu);
 		else stMenu.pop_back();
 	}
@@ -55,11 +55,11 @@ void MenuManager::OnMove(olc::PixelGameEngine& GameEngine) {
 	if (stMenu.empty()) { isInUse = false; return; }
 
 	// Move though menu
-	if (GameEngine.GetKey(olc::W).bPressed) stMenu.back()->OnMove({  0, -1  });
-	if (GameEngine.GetKey(olc::S).bPressed) stMenu.back()->OnMove({  0,  1  });
-	if (GameEngine.GetKey(olc::A).bPressed) stMenu.back()->OnMove({ -1,  0  });
-	if (GameEngine.GetKey(olc::D).bPressed) stMenu.back()->OnMove({  1,  0  });
-	if (GameEngine.GetKey(olc::Z).bPressed) OnConfirm();
+	if (GameEngine.GetKey(olc::K).bPressed) stMenu.back()->OnMove({  0, -1  });
+	if (GameEngine.GetKey(olc::J).bPressed) stMenu.back()->OnMove({  0,  1  });
+	if (GameEngine.GetKey(olc::H).bPressed) stMenu.back()->OnMove({ -1,  0  });
+	if (GameEngine.GetKey(olc::L).bPressed) stMenu.back()->OnMove({  1,  0  });
+	if (GameEngine.GetKey(olc::ENTER).bPressed) OnConfirm();
 }
 
 void MenuManager::Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, const float& fTime) {

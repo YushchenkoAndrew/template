@@ -16,8 +16,6 @@ public:
 
     bool OnUserCreate() override {
         mMinecraft.Init(ScreenHeight(), ScreenWidth(), luaConfig);
-
-
         return true;
     }
 
