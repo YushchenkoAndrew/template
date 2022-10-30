@@ -1,16 +1,36 @@
+--[[
+	This is simple custom YAML parser (MIT)
+
+	Grammar:
+	expr      -> 	offset | array
+	offset    -> 	(" ")? offset | type colon
+	array     -> 	"-" " " offset
+	colon     -> 	(" ")? colon | ":" " " value
+	value     -> 	(" ")? value | val
+	val       -> 	full_type | new_line
+	new_line  -> 	"/n" expr
+	list      -> 	"[" (full_type ("," full_type)* | "]")
+	obj       -> 	"{" (map ("," map)* | "}")
+	map       -> 	type ":" full_type  FIXME:
+	type      -> 	STRING | NUMBER | INDENTIFIER | TRUE | FALSE | YES | NO
+	full_type -> 	type | list | obj
+
+
+]]
+
 TokenType = {
 	-- Sing char tokens
 	LEFT_BRACE = 0, RIGHT_BRACE = 1, LEFT_SQUARE_BRACE = 2, RIGHT_SQUARE_BRACE = 3,
 	COMMA = 4, DOT = 5, MINUS = 6, PLUS = 7, COLON = 8, HASH = 9, QUOTE = 10,
-	DOUBLE_QUOTE = 11, SPACE = 12, TAB = 13,
+	DOUBLE_QUOTE = 11, SPACE = 12, TAB = 13, NEW_LINE = 14,
 
 	-- Literals
-	INDENTIFIER = 14, STIRNG = 15, NUMBER = 16,
+	INDENTIFIER = 15, STIRNG = 16, NUMBER = 17,
 
 	-- Key words
-	TRUE = 17, FALSE = 18, YES = 19, NO = 20,
+	TRUE = 18, FALSE = 19, YES = 20, NO = 21, NULL = 22,
 
-	EOF = 21
+	EOF = 23
 }
 
 
@@ -41,8 +61,11 @@ function Token:new(type, lexem, literal, line)
 end
 
 function Token:print()
+	local lexem = self.lexem or "nil"
+	if lexem == "\n" then lexem = "\\n" end
+
 	print("type=" .. (TokenType:key(self.type) or "nil") .. " " ..
-		"lexem='" .. (self.lexem or "nil") .. "' " ..
+		"lexem='" .. lexem .. "' " ..
 		"literal='" .. (self.literal or "nil") .. "'")
 end
 
@@ -82,9 +105,13 @@ function Lexer:new(src)
 		["\t"] = function() obj:addToken(TokenType.TAB) end,
 		["#"] = function() while obj:peek() ~= "\n" and not obj:isAtEnd() do obj:advance() end end,
 		["\r"] = function() end,
-		["\n"] = function() obj.line = obj.line + 1 end,
 		["\""] = function() obj:string("\"") end,
 		["'"] = function() obj:string("'") end,
+
+		["\n"] = function()
+			obj:addToken(TokenType.NEW_LINE)
+			obj.line = obj.line + 1
+		end,
 
 		[":"] = function()
 			obj:addToken(TokenType.COLON)
@@ -106,6 +133,7 @@ function Lexer:new(src)
 		["No"] = TokenType.NO,
 		["true"] = TokenType.TRUE,
 		["false"] = TokenType.FALSE,
+		["null"] = TokenType.NULL,
 	}
 
 	return obj
@@ -214,28 +242,326 @@ function Lexer:indentifier()
 	self:addToken(type)
 end
 
--- Init Object
-YAML = {
-	lexer = nil
+function Lexer:print()
+	print("LEXER:")
+
+	for _, token in ipairs(self.tokens) do
+		token:print()
+	end
+
+	print()
+end
+
+ExprType = {
+	LIST = "list", OBJ = "obj", LITERAL = "literal", OFFSET = "offset"
 }
 
+ExprList = {
+	curr = nil,
+	next = nil,
 
-function YAML:Parse(path)
+	type = ExprType.LIST
+}
+
+function ExprList:new(curr, next)
+	local obj = {}
+	setmetatable(obj, self)
+	self.__index = self
+
+	obj.curr = curr or nil
+	obj.next = next or nil
+	return obj
+end
+
+ExprObj = {
+	key = nil,
+	value = nil,
+	next = nil,
+
+	type = ExprType.OBJ
+}
+
+function ExprObj:new(key, value, next)
+	local obj = {}
+	setmetatable(obj, self)
+	self.__index = self
+
+	obj.key = key or nil
+	obj.value = value or nil
+	obj.next = next or nil
+	return obj
+end
+
+ExprLiteral = {
+	value = nil,
+
+	type = ExprType.LITERAL
+}
+
+function ExprLiteral:new(value)
+	local obj = {}
+	setmetatable(obj, self)
+	self.__index = self
+
+	obj.value = value
+	return obj
+end
+
+ExprOffset = {
+	expr = nil,
+	next = nil,
+
+	depth = 0, -- Offset befor the next key word
+
+	type = ExprType.OFFSET
+}
+
+function ExprOffset:new(expr, next)
+	local obj = {}
+	setmetatable(obj, self)
+	self.__index = self
+
+	obj.expr = expr
+	obj.next = next
+	if not expr or type(expr) ~= "table" then return obj end
+
+	if expr.type == ExprType.OFFSET then obj.depth = (expr.depth or 0) + 1
+	elseif expr.type == ExprType.LIST then obj.depth = 2 end
+	return obj;
+end
+
+Parser = {
+	tokens = {},
+
+	curr = 1, -- index of the token, that points at the curr token
+
+	error = nil -- error message
+}
+
+function Parser:new(tokens)
+	local obj = {}
+	setmetatable(obj, self)
+	self.__index = self
+
+	obj.tokens = tokens or {}
+	return obj
+end
+
+function Parser:match(...)
+	for _, v in ipairs(arg) do
+		if (self:check()) then self:advance() return true end
+	end
+
+	return false
+end
+
+function Parser:check(...)
+	if (self:isAtEnd()) then return false end
+	for _, v in ipairs(arg) do
+		if self:peek() == type then return true end
+	end
+
+	return false
+end
+
+function Parser:advance()
+	if (not self:isAtEnd()) then self.curr = self.curr + 1 end
+	return self:prev()
+end
+
+function Parser:peek()
+	return self.tokens[self.curr]
+end
+
+function Parser:prev()
+	return self.tokens[self.curr]
+end
+
+function Parser:isAtEnd()
+	return self:peek() == TokenType.EOF
+end
+
+function Parser:consume(type, message)
+	if self:check(type) then return self:advance() end
+
+	local token = self:peek()
+	self.error = token.line .. "at " ..
+			"'" .. (token.lexem or "") .. "' " ..
+			(message or "")
+end
+
+-- expr -> obj | array | new_line
+function Parser:expr()
+	if self.error then return nil end
+
+	if self:check(TokenType.NEW_LINE) then return self:new_line() end
+
+	if self:check(TokenType.MINUS) then return self:array() end
+
+	return self:obj()
+end
+
+-- new_line -> "\n" expr
+function Parser:new_line()
+	if self.error then return nil end
+
+	self:consume(TokenType.MINUS, "Expect '\n' at end of the line")
+	return ExprOffset:new(self:expr())
+end
+
+-- offset -> " " offset | obj | array
+function Parser:offset()
+	if self.error then return nil end
+
+	if self:check(TokenType.MINUS) then return self:array() end
+	if self:match(TokenType.SPACE, TokenType.TAB) then return ExprOffset:new(self:offset()) end
+
+	return self:obj()
+end
+
+-- array -> offset | type (" ")* ":" " " (" ")* full_type new_line
+function Parser:obj()
+	if self.error then return nil end
+
+	if self:check(TokenType.SPACE, TokenType.TAB) then return self:offset() end
+
+	local key = self:type()
+	while self:match(TokenType.SPACE, TokenType.TAB) do end
+
+	self:consume(TokenType.COLON, "Expect ':' at the end of indentifier")
+	if not self:match(TokenType.SPACE, TokenType.TAB) then self.error = "Expect ' ' to create an offset" end
+
+	while self:match(TokenType.SPACE, TokenType.TAB) do end
+
+
+	return ExprOffset:new(ExprObj:new(key, self:full_type()), self:new_line())
+end
+
+-- array -> offset | "-" " " (" ")* full_type new_line
+function Parser:array()
+	if self.error then return nil end
+
+	if self:check(TokenType.SPACE, TokenType.TAB) then return self:offset() end
+
+
+	self:consume(TokenType.MINUS, "Expect '-' at the start of array")
+	if not self:match(TokenType.SPACE, TokenType.TAB) then self.error = "Expect ' ' to create an offset" end
+
+	while self:match(TokenType.SPACE, TokenType.TAB) do end
+
+
+	return ExprOffset:new(ExprList:new(self:full_type()), self:new_line())
+end
+
+-- type -> STRING | NUMBER | INDENTIFIER | TRUE | FALSE | YES | NO
+function Parser:type()
+	if self.error then return nil end
+
+	if self:match(TokenType.YES, TokenType.TRUE) then return ExprLiteral:new(true) end
+	if self:match(TokenType.NO, TokenType.FALSE) then return ExprLiteral:new(false) end
+	if self:match(TokenType.NULL) then return ExprLiteral:new(nil) end
+
+
+	if self:match(TokenType.STIRNG, TokenType.NUMBER, TokenType.INDENTIFIER) then
+		return ExprLiteral:new(self:prev().literal)
+	end
+end
+
+-- full_type -> (type | list | json) (" ")*
+function Parser:full_type()
+	if self.error then return nil end
+
+	local expr = nil
+
+	if self:match(TokenType.LEFT_SQUARE_BRACE) then
+		expr = self:list()
+	end
+
+	if self:match(TokenType.LEFT_BRACE) then
+		expr = self:json()
+	end
+
+	expr = self:type()
+
+	while self:match(TokenType.SPACE, TokenType.TAB) do end
+	return expr
+end
+
+-- list -> "[" (" ")* (full_type ("," (" ")* full_type)* | "]")
+function Parser:list()
+	if self.error then return nil end
+	while self:match(TokenType.SPACE, TokenType.TAB) do end
+
+	if self:match(TokenType.RIGHT_SQUARE_BRACE) then return ExprList:new() end
+	local expr = ExprList:new(self:full_type())
+	while self:match(TokenType.COMMA) do
+		while self:match(TokenType.SPACE, TokenType.TAB) do end
+		expr = ExprList:new(expr, self:full_type())
+	end
+
+	self:consume(TokenType.RIGHT_SQUARE_BRACE, "Expect ']' at the end of list")
+
+	if self.error then return nil end
+	return expr
+end
+
+-- json -> "{" (" ")* (map ("," map)* | "}")
+function Parser:json()
+	if self.error then return nil end
+
+	while self:match(TokenType.SPACE, TokenType.TAB) do end
+
+	if self:match(TokenType.RIGHT_SQUARE_BRACE) then return ExprObj:new() end
+	local expr = self:map()
+	if not expr then return nil end
+
+	while self:match(TokenType.COMMA) do
+		while self:match(TokenType.SPACE, TokenType.TAB) do end
+
+		expr.next = self:map()
+		expr = expr.next
+	end
+
+	return expr
+end
+
+-- map -> type (" ")* ":" " " (" ")* full_type
+function Parser:map()
+	if self.error then return nil end
+
+	local key = self:type()
+	while self:match(TokenType.SPACE, TokenType.TAB) do end
+
+	self:consume(TokenType.COLON, "Expect ':' at the end of indentifier")
+	if not self:match(TokenType.SPACE, TokenType.TAB) then self.error = "Expect ' ' to create an offset" end
+
+	while self:match(TokenType.SPACE, TokenType.TAB) do end
+
+	return ExprObj:new(key, self:full_type())
+end
+
+-- Init Object
+YAML = {}
+
+function YAML:Parse(path, debug)
 	local file = io.open(path, "r")
 	if not file then return print("Unable to open file") or nil end
 
-	self.lexer = Lexer:new(file:read("a"))
-	self.lexer:scan()
+	local lexer = Lexer:new(file:read("a"))
+	lexer:scan()
+
+	if lexer.error then return print(lexer.error) end
+	if debug then lexer:print() end
+
+	local parser = Parser:new(lexer.tokens)
+	local expr = parser:expr()
+	if parser.error then return print(parser.error) end
 
 
-	-- if self.lexer.error then return
-	print(self.lexer.error)
 
-	for _, token in ipairs(self.lexer.tokens) do
-		token:print()
-	end
+	print(expr)
 end
 
 -- Test
 -- YAML:Stringify(
-YAML:Parse("../../assets/Config.yaml")
+YAML:Parse("../../assets/Config.yaml", true)
