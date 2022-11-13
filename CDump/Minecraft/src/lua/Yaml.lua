@@ -239,7 +239,7 @@ function Lexer:indentifier()
 	local word = self.src:sub(self.start, self.curr - 1)
 	local type = self.keywords[word]
 	if type == nil then type = TokenType.INDENTIFIER end
-	self:addToken(type)
+	self:addToken(type, word)
 end
 
 function Lexer:print()
@@ -273,6 +273,13 @@ function ExprList:new(curr, next)
 	return obj
 end
 
+function ExprList:print(offset)
+	offset = offset or 0
+	print(string.rep(" ", offset) .. "Expr[" .. self.type .. "]")
+	self.curr:print(offset + 2)
+	if self.next then self.next:print(offset) end
+end
+
 ExprObj = {
 	key = nil,
 	value = nil,
@@ -281,15 +288,22 @@ ExprObj = {
 	type = ExprType.OBJ
 }
 
-function ExprObj:new(key, value, next)
+function ExprObj:new(key, value)
 	local obj = {}
 	setmetatable(obj, self)
 	self.__index = self
 
 	obj.key = key or nil
 	obj.value = value or nil
-	obj.next = next or nil
 	return obj
+end
+
+function ExprObj:print(offset)
+	offset = offset or 0
+	print(string.rep(" ", offset) .. "Expr[" .. self.type .. "]")
+	self.key:print(offset + 2)
+	self.value:print(offset + 2)
+	if self.next then self.next:print(offset) end
 end
 
 ExprLiteral = {
@@ -305,6 +319,14 @@ function ExprLiteral:new(value)
 
 	obj.value = value
 	return obj
+end
+
+function ExprLiteral:print(offset)
+	offset = offset or 0
+	print(string.rep(" ", offset) ..
+		"Expr[" .. self.type .. "]" ..
+		" val = '" .. self.value .. "'"
+	)
 end
 
 ExprOffset = {
@@ -325,9 +347,22 @@ function ExprOffset:new(expr, next)
 	obj.next = next
 	if not expr or type(expr) ~= "table" then return obj end
 
-	if expr.type == ExprType.OFFSET then obj.depth = (expr.depth or 0) + 1
-	elseif expr.type == ExprType.LIST then obj.depth = 2 end
+	if expr.type == ExprType.OFFSET then obj.expr:shift() end
+	-- if expr.type == ExprType.OFFSET then obj.depth = (expr.depth or 0) + 1
+	-- elseif expr.type == ExprType.LIST then obj.depth = 2 end
 	return obj;
+end
+
+function ExprOffset:shift()
+	self.depth = (self.depth or 0) + 1
+	if not self.expr then return end
+	if self.expr.type == ExprType.OFFSET then self.expr:shift() end
+end
+
+function ExprOffset:print(offset)
+	print(string.rep(" ", self.depth) .. "Expr[" .. self.type .. "]")
+	if self.expr then self.expr:print(self.depth + 1) end
+	if self.next then self.next:print(self.depth + 1) end
 end
 
 Parser = {
@@ -348,8 +383,8 @@ function Parser:new(tokens)
 end
 
 function Parser:match(...)
-	for _, v in ipairs(arg) do
-		if (self:check()) then self:advance() return true end
+	for _, v in ipairs({ ... }) do
+		if self:check(v) then self:advance() return true end
 	end
 
 	return false
@@ -357,8 +392,8 @@ end
 
 function Parser:check(...)
 	if (self:isAtEnd()) then return false end
-	for _, v in ipairs(arg) do
-		if self:peek() == type then return true end
+	for _, v in ipairs({ ... }) do
+		if self:peek().type == v then return true end
 	end
 
 	return false
@@ -374,7 +409,8 @@ function Parser:peek()
 end
 
 function Parser:prev()
-	return self.tokens[self.curr]
+	if self.curr == 1 then return nil end
+	return self.tokens[self.curr - 1]
 end
 
 function Parser:isAtEnd()
@@ -385,14 +421,19 @@ function Parser:consume(type, message)
 	if self:check(type) then return self:advance() end
 
 	local token = self:peek()
-	self.error = token.line .. "at " ..
-			"'" .. (token.lexem or "") .. "' " ..
+	local lexem = token.lexem or "nil"
+	if lexem == "\n" then lexem = "\\n" end
+
+	self.error = "At line " .. token.line ..
+			" '" .. lexem .. "' " ..
 			(message or "")
 end
 
--- expr -> obj | array | new_line
+-- expr -> obj | array | new_line | EOF
 function Parser:expr()
 	if self.error then return nil end
+
+	if self:match(TokenType.EOF) then return nil end
 
 	if self:check(TokenType.NEW_LINE) then return self:new_line() end
 
@@ -401,25 +442,28 @@ function Parser:expr()
 	return self:obj()
 end
 
--- new_line -> "\n" expr
+-- new_line -> EOF | "\n" ("\n")* expr
 function Parser:new_line()
 	if self.error then return nil end
+	if self:match(TokenType.EOF) then return nil end
 
-	self:consume(TokenType.MINUS, "Expect '\n' at end of the line")
-	return ExprOffset:new(self:expr())
+	self:consume(TokenType.NEW_LINE, "Expect '\\n' at end of the line")
+	while self:match(TokenType.NEW_LINE) do end
+
+	-- return ExprOffset:new(self:expr())
+	return self:expr()
 end
 
 -- offset -> " " offset | obj | array
 function Parser:offset()
 	if self.error then return nil end
-
 	if self:check(TokenType.MINUS) then return self:array() end
 	if self:match(TokenType.SPACE, TokenType.TAB) then return ExprOffset:new(self:offset()) end
 
 	return self:obj()
 end
 
--- array -> offset | type (" ")* ":" " " (" ")* full_type new_line
+-- obj -> offset | type (" ")* value
 function Parser:obj()
 	if self.error then return nil end
 
@@ -427,17 +471,24 @@ function Parser:obj()
 
 	local key = self:type()
 	while self:match(TokenType.SPACE, TokenType.TAB) do end
+	return ExprOffset:new(self:value(key))
+end
+
+-- value -> ":" (" " (" ")* full_type new_line | new_line)
+function Parser:value(key)
+	if self.error then return nil end
 
 	self:consume(TokenType.COLON, "Expect ':' at the end of indentifier")
+	if self:check(TokenType.NEW_LINE) then return ExprObj:new(key, self:new_line()) end
 	if not self:match(TokenType.SPACE, TokenType.TAB) then self.error = "Expect ' ' to create an offset" end
 
 	while self:match(TokenType.SPACE, TokenType.TAB) do end
 
 
-	return ExprOffset:new(ExprObj:new(key, self:full_type()), self:new_line())
+	return ExprObj:new(key, self:full_type()), self:new_line()
 end
 
--- array -> offset | "-" " " (" ")* full_type new_line
+-- array -> offset | "-" " " (" ")* full_type value
 function Parser:array()
 	if self.error then return nil end
 
@@ -449,17 +500,36 @@ function Parser:array()
 
 	while self:match(TokenType.SPACE, TokenType.TAB) do end
 
+	local key = self:full_type()
 
-	return ExprOffset:new(ExprList:new(self:full_type()), self:new_line())
+	while self:match(TokenType.SPACE, TokenType.TAB) do end
+	if not self:check(TokenType.COLON) then return ExprOffset:new(ExprList:new(key), self:new_line()) end
+
+	return ExprOffset:new(ExprOffset:new(ExprOffset:new(ExprList:new(self:value(key)))))
 end
 
--- type -> STRING | NUMBER | INDENTIFIER | TRUE | FALSE | YES | NO
+-- number -> (MINUS | PLUS)? NUMBER
+function Parser:number()
+	if self.error then return nil end
+
+	local sign = ""
+
+	if self:match(TokenType.MINUS) then sign = "-" end
+	if self:match(TokenType.PLUS) then sign = "+" end
+
+	self:consume(TokenType.NUMBER, "Expected number")
+
+	return ExprLiteral:new(sign .. self:prev().literal)
+end
+
+-- type -> number | STRING | INDENTIFIER | TRUE | FALSE | YES | NO
 function Parser:type()
 	if self.error then return nil end
 
 	if self:match(TokenType.YES, TokenType.TRUE) then return ExprLiteral:new(true) end
 	if self:match(TokenType.NO, TokenType.FALSE) then return ExprLiteral:new(false) end
 	if self:match(TokenType.NULL) then return ExprLiteral:new(nil) end
+	if self:check(TokenType.MINUS, TokenType.PLUS, TokenType.NUMBER) then return self:number() end
 
 
 	if self:match(TokenType.STIRNG, TokenType.NUMBER, TokenType.INDENTIFIER) then
@@ -481,22 +551,24 @@ function Parser:full_type()
 		expr = self:json()
 	end
 
-	expr = self:type()
+	expr = expr or self:type()
 
 	while self:match(TokenType.SPACE, TokenType.TAB) do end
 	return expr
 end
 
--- list -> "[" (" ")* (full_type ("," (" ")* full_type)* | "]")
+-- list -> "[" (" ")* (full_type ("," (" ")* full_type)* "]" | "]")
 function Parser:list()
 	if self.error then return nil end
 	while self:match(TokenType.SPACE, TokenType.TAB) do end
 
 	if self:match(TokenType.RIGHT_SQUARE_BRACE) then return ExprList:new() end
 	local expr = ExprList:new(self:full_type())
+	local curr = expr
 	while self:match(TokenType.COMMA) do
 		while self:match(TokenType.SPACE, TokenType.TAB) do end
-		expr = ExprList:new(expr, self:full_type())
+		curr.next = ExprList:new(self:full_type())
+		curr = curr.next
 	end
 
 	self:consume(TokenType.RIGHT_SQUARE_BRACE, "Expect ']' at the end of list")
@@ -505,22 +577,24 @@ function Parser:list()
 	return expr
 end
 
--- json -> "{" (" ")* (map ("," map)* | "}")
+-- json -> "{" (" ")* (map ("," map)* "}" | "}")
 function Parser:json()
 	if self.error then return nil end
 
 	while self:match(TokenType.SPACE, TokenType.TAB) do end
 
-	if self:match(TokenType.RIGHT_SQUARE_BRACE) then return ExprObj:new() end
+	if self:match(TokenType.RIGHT_BRACE) then return ExprObj:new() end
 	local expr = self:map()
 	if not expr then return nil end
-
+	local curr = expr
 	while self:match(TokenType.COMMA) do
 		while self:match(TokenType.SPACE, TokenType.TAB) do end
 
-		expr.next = self:map()
-		expr = expr.next
+		curr.next = self:map()
+		curr = curr.next
 	end
+
+	self:consume(TokenType.RIGHT_BRACE, "Expect '}' at the end of list")
 
 	return expr
 end
@@ -556,12 +630,11 @@ function YAML:Parse(path, debug)
 	local parser = Parser:new(lexer.tokens)
 	local expr = parser:expr()
 	if parser.error then return print(parser.error) end
+	-- if debug then expr:print() end
 
-
-
-	print(expr)
 end
 
 -- Test
 -- YAML:Stringify(
 YAML:Parse("../../assets/Config.yaml", true)
+-- YAML:Parse("../../assets/Menu.yaml", true)
