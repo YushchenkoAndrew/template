@@ -203,13 +203,13 @@ end
 
 function Lexer:string(c)
 	if not c then
-		while self:peek() ~= "\n" and not self:isAtEnd() do self:advance() end
+		while self:peek() ~= "\n" and self:peek() ~= "\r" and not self:isAtEnd() do self:advance() end
 		self:addToken(TokenType.STIRNG, self.src:sub(self.start, self.curr - 1))
 		return
 	end
 
 	while self:peek() ~= c and not self:isAtEnd() do
-		if self:peek() == "\n" then self.line = self.line + 1 end
+		if self:peek() == "\n" or self:peek() == "\r" then self.line = self.line + 1 end
 		self:advance()
 	end
 
@@ -280,6 +280,9 @@ function ExprList:print(offset)
 	if self.next then self.next:print(offset) end
 end
 
+function ExprList:synchronize()
+end
+
 ExprObj = {
 	key = nil,
 	value = nil,
@@ -306,6 +309,44 @@ function ExprObj:print(offset)
 	if self.next then self.next:print(offset) end
 end
 
+function ExprObj:synchronize(offset)
+	offset = offset or 0
+
+	print(offset)
+
+
+	-- if self.value.type == ExprType.OFFSET then
+
+	print(self.key.value)
+	print(self.value:synchronize(offset))
+
+	print(offset)
+
+	-- 	local prev = { next = self.value }
+	-- 	repeat
+	-- 		local curr = prev.next
+	-- 		prev = nil
+
+	-- 		while curr and curr.type == ExprType.OFFSET do
+	-- 			prev = curr
+	-- 			curr = curr.expr
+	-- 		end
+
+	-- 		if not prev or prev.depth % 2 ~= 0 then return end
+
+	-- 		self.value = curr
+
+	-- 	until not prev or not prev.next
+
+	-- self.value.next =
+	-- if prev.next then print(prev.next.type) end
+
+	-- end
+
+	-- if self.next then print(self.next.type) end
+	if self.next then print(self.next:synchronize(offset)) end
+end
+
 ExprLiteral = {
 	value = nil,
 
@@ -327,6 +368,10 @@ function ExprLiteral:print(offset)
 		"Expr[" .. self.type .. "]" ..
 		" val = '" .. self.value .. "'"
 	)
+end
+
+function ExprLiteral:synchronize(offset)
+	return offset or 0
 end
 
 ExprOffset = {
@@ -363,6 +408,11 @@ function ExprOffset:print(offset)
 	print(string.rep(" ", self.depth) .. "Expr[" .. self.type .. "]")
 	if self.expr then self.expr:print(self.depth + 1) end
 	if self.next then self.next:print(self.depth + 1) end
+end
+
+function ExprOffset:synchronize(offset)
+	if self.expr then return self.expr:synchronize(self.depth + 1) end
+	if self.next then return self.next:synchronize(self.depth + 1) end
 end
 
 Parser = {
@@ -630,8 +680,11 @@ function YAML:Parse(path, debug)
 	local parser = Parser:new(lexer.tokens)
 	local expr = parser:expr()
 	if parser.error then return print(parser.error) end
-	-- if debug then expr:print() end
+	if debug then expr:print() end
 
+	expr:synchronize()
+
+	-- if debug then expr:print() end
 end
 
 -- Test
