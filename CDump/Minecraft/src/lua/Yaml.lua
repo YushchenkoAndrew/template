@@ -103,6 +103,7 @@ function Lexer:new(src)
 		["+"] = function() obj:addToken(TokenType.PLUS) end,
 		[" "] = function() obj:addToken(TokenType.SPACE) end,
 		["\t"] = function() obj:addToken(TokenType.TAB) end,
+		-- FIXME: Fix bug with commets that are located in the middle of the line, need to delete execess Spaces
 		["#"] = function() while obj:peek() ~= "\n" and not obj:isAtEnd() do obj:advance() end end,
 		["\r"] = function() end,
 		["\""] = function() obj:string("\"") end,
@@ -280,7 +281,15 @@ function ExprList:print(offset)
 	if self.next then self.next:print(offset) end
 end
 
-function ExprList:synchronize()
+function ExprList:synchronize(offset)
+
+	local res = {}
+	if self.next then res, _ = self.next:synchronize(offset) end
+
+	local value, remaind = self.curr:synchronize(offset)
+
+	table.insert(res, 1, value)
+	return res, remaind
 end
 
 ExprObj = {
@@ -312,39 +321,16 @@ end
 function ExprObj:synchronize(offset)
 	offset = offset or 0
 
-	print(offset)
+	local res = {}
+	if self.next then res, _ = self.next:synchronize(offset) end
 
+	local value, _ = self.value:synchronize(offset)
+	if self.value.type ~= ExprType.OFFSET then res[self.key.value] = value; return res, nil end
 
-	-- if self.value.type == ExprType.OFFSET then
+	res[self.key.value] = value[offset + 1]
+	value[offset + 1] = nil
 
-	print(self.key.value)
-	print(self.value:synchronize(offset))
-
-	print(offset)
-
-	-- 	local prev = { next = self.value }
-	-- 	repeat
-	-- 		local curr = prev.next
-	-- 		prev = nil
-
-	-- 		while curr and curr.type == ExprType.OFFSET do
-	-- 			prev = curr
-	-- 			curr = curr.expr
-	-- 		end
-
-	-- 		if not prev or prev.depth % 2 ~= 0 then return end
-
-	-- 		self.value = curr
-
-	-- 	until not prev or not prev.next
-
-	-- self.value.next =
-	-- if prev.next then print(prev.next.type) end
-
-	-- end
-
-	-- if self.next then print(self.next.type) end
-	if self.next then print(self.next:synchronize(offset)) end
+	return res, value
 end
 
 ExprLiteral = {
@@ -370,8 +356,8 @@ function ExprLiteral:print(offset)
 	)
 end
 
-function ExprLiteral:synchronize(offset)
-	return offset or 0
+function ExprLiteral:synchronize()
+	return self.value, nil
 end
 
 ExprOffset = {
@@ -405,14 +391,41 @@ function ExprOffset:shift()
 end
 
 function ExprOffset:print(offset)
-	print(string.rep(" ", self.depth) .. "Expr[" .. self.type .. "]")
+	print(string.rep(" ", self.depth) .. "Expr[" .. self.type .. "]" .. ((self.next and " +next") or ""))
 	if self.expr then self.expr:print(self.depth + 1) end
 	if self.next then self.next:print(self.depth + 1) end
 end
 
-function ExprOffset:synchronize(offset)
-	if self.expr then return self.expr:synchronize(self.depth + 1) end
-	if self.next then return self.next:synchronize(self.depth + 1) end
+function ExprOffset:last(curr)
+	if not curr then return self:last(self) end
+	if curr.type ~= ExprType.OFFSET then return nil end
+	return self:last(curr.expr) or curr
+end
+
+function ExprOffset:synchronize()
+	local copy = function(src, dst) for k, v in pairs(src) do dst[k] = v end end
+	local synchronize = function(expr, res)
+		res = res or {}
+		if not expr then return res end
+		local depth = (self:last(expr) or self).depth
+		local obj, remaind = expr:synchronize(self.depth + 1)
+
+		if remaind then copy(remaind, res) end
+		if expr.type == ExprType.LIST and expr.curr.type == ExprType.OBJ and not expr.next then depth = depth - 2 end
+
+		for k, v in pairs(obj) do
+			if expr.type == ExprType.OFFSET then res[k] = res[k] or {}; copy(v, res[k]) else
+				res[depth] = res[depth] or {}
+				if expr.type ~= ExprType.LIST then res[depth][k] = v
+				else table.insert(res[depth], 1, v) end
+			end
+		end
+
+		return res
+	end
+
+	return synchronize(self.expr, synchronize(self.next)), nil
+
 end
 
 Parser = {
@@ -667,6 +680,7 @@ end
 -- Init Object
 YAML = {}
 
+
 function YAML:Parse(path, debug)
 	local file = io.open(path, "r")
 	if not file then return print("Unable to open file") or nil end
@@ -680,14 +694,13 @@ function YAML:Parse(path, debug)
 	local parser = Parser:new(lexer.tokens)
 	local expr = parser:expr()
 	if parser.error then return print(parser.error) end
-	if debug then expr:print() end
+	if debug then expr:print(); print() end
 
-	expr:synchronize()
-
-	-- if debug then expr:print() end
+	return expr:synchronize()[0]
 end
 
 -- Test
--- YAML:Stringify(
-YAML:Parse("../../assets/Config.yaml", true)
--- YAML:Parse("../../assets/Menu.yaml", true)
+require("Json")
+
+JSON:stringify(YAML:Parse("../../assets/Config.yaml", true))
+-- JSON:stringifyYAML:Parse("../../assets/Menu.yaml", true))
