@@ -174,6 +174,7 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 
 				for (auto& trClipped : listClippedTr) {
 					if (mManager.GetState(eMenuStates::COLOR_EN).bHeld) {
+						// FIXME: Use GPU for this !!
 						cDraw.FillTriangle(GameEngine,
 							(int32_t)trClipped[0].x, (int32_t)trClipped[0].y, trClipped[0].z,
 							(int32_t)trClipped[1].x, (int32_t)trClipped[1].y, trClipped[1].z,

@@ -4,6 +4,7 @@
 #include "include/Noise.h"
 
 #define CHUNK_SIZE 24
+#define CHUNK_STEP 0.05f
 #define CHUNK_INDEX(X, Y, Z) ((Y) + (X) * CHUNK_SIZE + (Z) * CHUNK_SIZE * CHUNK_SIZE)
 
 class sChunk {
@@ -17,7 +18,7 @@ public:
 		for (int32_t z = 0; z < CHUNK_SIZE; z++) {
 			for (int32_t x = 0; x < CHUNK_SIZE; x++) {
 				// Maybe just send the vector of Hight for each point
-				int32_t yLevel = (int32_t)(T::Noise((float)x + vOffset.x, (float)z + vOffset.z) * CHUNK_SIZE);
+				int32_t yLevel = (int32_t)(T::Noise((float)x + vOffset.x, (float)z + vOffset.z, CHUNK_STEP) * CHUNK_SIZE);
 
 				for (int32_t y = 0; y < CHUNK_SIZE; y++) {
 
@@ -113,7 +114,8 @@ private:
 		for (int32_t x = 0; x < nMapSize; x++) {
 			for (int32_t z = 0; z < nMapSize; z++) {
 				vChunk[MapIndex(x, z)].Init<T>(
-					{ (float)x * CHUNK_SIZE + vWorldStart.x, 0.0f, (float)z * CHUNK_SIZE + vWorldStart.z }, bOutline,
+					{ (float)x * CHUNK_SIZE + vWorldStart.x, 0.0f, (float)z * CHUNK_SIZE + vWorldStart.z },
+					bOutline,
 					x == nMapSize - 1, z == nMapSize - 1,
 					x ? &vChunk[MapIndex(x - 1, z)] : nullptr,
 					z ? &vChunk[MapIndex(x, z - 1)] : nullptr
@@ -139,13 +141,14 @@ private:
 	int32_t nMapSize = 1;
 	int32_t nMapLoadRange = 1;
 	int32_t nNoiseSize = 0;
+	float fNoiseStep = 1.0f;
 
 	sPoint3D vWorldStart;
 
 	std::vector<sChunk> vChunk;
 	GraphicsEngine cEngine3D;
 
-    MenuManager mManager;
-    std::unique_ptr<olc::Sprite> sprMenu;
-    std::unique_ptr<olc::Decal> decMenu;
+  MenuManager mManager;
+  std::unique_ptr<olc::Sprite> sprMenu;
+  std::unique_ptr<olc::Decal> decMenu;
 };

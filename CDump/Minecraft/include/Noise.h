@@ -26,7 +26,7 @@ public:
 	// Perlin Noise
 	// https://gpfault.net/posts/perlin-noise.txt.html
 	static float PerlinNoise(const sPoint2D& p) {
-		sPoint2D p0{ floorf(p.x), floorf(p.y) };
+		sPoint2D p0 { floorf(p.x), floorf(p.y) };
 		sPoint2D p1 = p0 + sPoint2D{ 1.0f, 0.0f };
 		sPoint2D p2 = p0 + sPoint2D{ 0.0f, 1.0f };
 		sPoint2D p3 = p0 + sPoint2D{ 1.0f, 1.0f };
@@ -52,10 +52,11 @@ public:
 	static float FractalNoise(float x, float y) {
 		sPoint2D p{ x, y };
 		return
-			PerlinNoise(p / 64.0f) * 1.0f +
-			PerlinNoise(p / 32.0f) * 0.5f +
-			PerlinNoise(p / 16.0f) * 0.25f +
-			PerlinNoise(p / 8.0f) * 0.125f;
+			PerlinNoise(p) +
+			PerlinNoise(p * 2.0f) * 0.5f +
+			PerlinNoise(p * 4.0f) * 0.25f +
+			PerlinNoise(p * 8.0f) * 0.125f +
+			PerlinNoise(p * 16.0f) * 0.0625f;
 	}
 
 
@@ -77,13 +78,13 @@ private:
 
 // Some envelopes
 struct TrueNoise {
-	static inline float Noise(float, float) { return 1.0f; }
+	static inline float Noise(float, float, float) { return 1.0f; }
 };
 
 struct PerlinNoise {
-	static inline float Noise(float x, float y) { return (Noise::PerlinNoise(x, y) + 1.0f) / 2.0f; }
+	static inline float Noise(float x, float y, float ratio) { return (Noise::PerlinNoise(x * ratio, y * ratio) + 1.0f) / 2.0f; }
 };
 
 struct FractalNoise {
-	static inline float Noise(float x, float y) { return (Noise::FractalNoise(x, y) + 1.0f) / 2.0f; }
+	static inline float Noise(float x, float y, float ratio) { return (Noise::FractalNoise(x * ratio, y * ratio) + 1.0f) / 2.0f; }
 };

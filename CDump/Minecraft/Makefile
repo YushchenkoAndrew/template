@@ -42,7 +42,7 @@ init:
 
 debug:
 	if [ ! -d "./build" ]; then mkdir $(OUTPUT_GCC); fi
-	$(GCC) $(TARGET) $(INCLUDE) $(LIB) $(CFLAGS_GCC) $(LUA_FLAG) -O0 -ggdb $(EM_LDFALGS_GCC) -o $(OUTPUT_GCC)/$(OUT_NAME_GCC)
+	$(GCC) $(TARGET) $(INCLUDE) $(LIB) $(CFLAGS_GCC) $(LUA_FLAG) -O1 -ggdb $(EM_LDFALGS_GCC) -o $(OUTPUT_GCC)/$(OUT_NAME_GCC)
 
 dev:
 	if [ ! -d "./web" ]; then mkdir $(OUTPUT_EM); fi

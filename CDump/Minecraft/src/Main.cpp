@@ -35,8 +35,8 @@ private:
 
 int main() {
     LuaScript luaConfig;
-    if (!luaConfig.Init("src/lua/Json.lua")) return 0;
-    luaConfig.CallMethod("JSON", "Parse", { "assets/Config.json" }, 1);
+    if (!luaConfig.Init("src/lua/Yaml.lua")) return 0;
+    luaConfig.CallMethod("YAML", "Parse", { "assets/Config.yaml"  }, 1);
 
     int32_t nPixel = luaConfig.GetTableValue<int32_t>(nullptr, "nPixel");
 

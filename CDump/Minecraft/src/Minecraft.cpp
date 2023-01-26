@@ -2,6 +2,7 @@
 
 void sChunk::LoadMap(std::vector<sBlock*>& vpBlock) {
 	for (auto& block : vBlock) {
+		if (!block.HasMask()) continue;
 		block.Update();
 		//if (IS_EXIST(block.bStatus)) vpBlock.push_back(std::make_unique<sBlock>(block));
 		vpBlock.push_back(&block);
@@ -91,18 +92,23 @@ sBlock* const sChunk::GetBlock(int32_t x, int32_t y, int32_t z) {
 void Minecraft::Init(int32_t iHeight, int32_t iWidth, LuaScript& luaConfig) {
 	nMapSize = luaConfig.GetTableValue<int32_t>(nullptr, "nMapSize");
 	nMapLoadRange = luaConfig.GetTableValue<int32_t>(nullptr, "nMapLoadRange");
-	nNoiseSize = luaConfig.GetTableValue<int32_t>(nullptr, "nNoiseSize");
+
+	// Load Noise info
+	luaConfig.GetTableValue<bool>(nullptr, "sNoise"),
+	nNoiseSize = luaConfig.GetTableValue<int32_t>(nullptr, "nSize");
+	fNoiseStep = luaConfig.GetTableValue<float>(nullptr, "fStep");
+	luaConfig.Pop();
 
 	// Init Menu
 	mManager.Init(luaConfig.GetTableValue<std::string>(nullptr, "sMenuConfig"), luaConfig);
-    sprMenu = std::make_unique<olc::Sprite>(luaConfig.GetTableValue<std::string>(nullptr, "sMenuSprite"));
-    decMenu = std::make_unique<olc::Decal>(sprMenu.get());
+  sprMenu = std::make_unique<olc::Sprite>(luaConfig.GetTableValue<std::string>(nullptr, "sMenuSprite"));
+  decMenu = std::make_unique<olc::Decal>(sprMenu.get());
 
 	vChunk.assign(nMapSize * nMapSize, {}); 
 	cEngine3D.Init(iHeight, iWidth, luaConfig);
 
 	vWorldStart = cEngine3D.cCamera.GetPos() - (float)nMapSize * CHUNK_SIZE * 0.5f;
-	InitMap(Type2Type<FractalNoise>());
+	InitMap(Type2Type<PerlinNoise>());
 }
 
 void Minecraft::Update(olc::PixelGameEngine& GameEngine, const float& fElapsedTime) {
@@ -122,10 +128,11 @@ void Minecraft::Update(olc::PixelGameEngine& GameEngine, const float& fElapsedTi
 	sPoint3D vMapRange = (cEngine3D.cCamera.GetPos() - vWorldStart - (float)nMapSize * CHUNK_SIZE * 0.5f);
 	const float fLength = (float)(nMapLoadRange - nMapSize * 0.5f) * CHUNK_SIZE;
 
-	if (vMapRange.z < fLength || vMapRange.x < fLength || vMapRange.z > -fLength || vMapRange.x > -fLength) {
-		vWorldStart = vWorldStart + sPoint3D::normalize(vMapRange) * CHUNK_SIZE;
-		InitMap(Type2Type<FractalNoise>());
-	}
+	// FIXME:
+	// if (vMapRange.z < fLength || vMapRange.x < fLength || vMapRange.z > -fLength || vMapRange.x > -fLength) {
+	// 	vWorldStart = vWorldStart + sPoint3D::normalize(vMapRange) * CHUNK_SIZE;
+	// 	InitMap(Type2Type<PerlinNoise>());
+	// }
 
 
 	//// TEMP:
@@ -171,7 +178,7 @@ void Minecraft::Draw(olc::PixelGameEngine& GameEngine, const float& fElapsedTime
 void Minecraft::DrawNoise(olc::PixelGameEngine& GameEngine) {
 	for (int32_t x = 0; x < nNoiseSize; x++) {
 		for (int32_t y = 0; y < nNoiseSize; y++) {
-			int32_t color = (int32_t)(FractalNoise::Noise((float)x, (float)y) * 255.0f);
+			int32_t color = (int32_t)(PerlinNoise::Noise((float)x, (float)y, fNoiseStep) * 255.0f);
 			GameEngine.Draw(x, y, olc::Pixel(color, color, color));
 		}
 	}

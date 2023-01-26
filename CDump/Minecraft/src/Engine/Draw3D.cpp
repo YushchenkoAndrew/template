@@ -87,7 +87,7 @@ void Draw3D::DrawTriangle(olc::PixelGameEngine& GameEngine, int32_t x1, int32_t 
 	DrawLine(GameEngine, x2, y2, z2, x3, y3, z3, p);
 }
 
-// Using this implementation of  Bresenham method
+// Using this implementation of Bresenham method
 // http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html#pointintrianglearticle
 // https://www.scratchapixel.com/lessons/3d-basic-rendering/rasterization-practical-implementation/visibility-problem-depth-buffer-depth-interpolation
 void Draw3D::FillTriangle(olc::PixelGameEngine& GameEngine, int32_t x1, int32_t y1, float z1, int32_t x2, int32_t y2, float z2, int32_t x3, int32_t y3, float z3, olc::Pixel p) {

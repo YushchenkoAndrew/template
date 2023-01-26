@@ -9,7 +9,7 @@
 #define TRIANGLE_OUTSIDE	12u
 #define TRIANGLE_INSIDE		3u
 #define TRIANGLE_SMALL		9u
-#define TRIANGLE_QAUD		6u
+#define TRIANGLE_QAUD			6u
 
 
 class Minecraft;

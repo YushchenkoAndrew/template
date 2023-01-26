@@ -582,7 +582,7 @@ function Parser:number()
 
 	self:consume(TokenType.NUMBER, "Expected number")
 
-	return ExprLiteral:new(sign .. self:prev().literal)
+	return ExprLiteral:new(tonumber(sign .. self:prev().literal))
 end
 
 -- type -> number | STRING | INDENTIFIER | TRUE | FALSE | YES | NO
@@ -682,6 +682,7 @@ YAML = {}
 
 
 function YAML:Parse(path, debug)
+	print("here")
 	local file = io.open(path, "r")
 	if not file then return print("Unable to open file") or nil end
 
@@ -700,7 +701,7 @@ function YAML:Parse(path, debug)
 end
 
 -- Test
-require("Json")
+-- require("Json")
 
-JSON:stringify(YAML:Parse("../../assets/Config.yaml", true))
--- JSON:stringifyYAML:Parse("../../assets/Menu.yaml", true))
+-- JSON:Stringify(YAML:Parse("../../assets/Config.yaml", true))
+-- JSON:StringifyYAML:Parse("../../assets/Menu.yaml", true))

@@ -234,6 +234,7 @@ struct sBlock {
 	inline uint8_t GetBlue() { return (uint8_t)((nColor & 0xFF)); }
 
 	inline void SetMask(uint8_t nMask, bool bSet = true) { bStatus = bSet ? (bStatus | nMask) : (bStatus & ~nMask); }
+	inline bool HasMask() { return (bool)(~IS_EXIST(bStatus) & (IS_NORTH_N(bStatus) | IS_SOUTH_N(bStatus) | IS_EAST_N(bStatus) | IS_WEST_N(bStatus) | IS_UP_N(bStatus) | IS_DOWN_N(bStatus) )); }
 
 	template <class T>
 	bool IsCollide(sPoint3D& vPos) {
