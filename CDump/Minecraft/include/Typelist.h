@@ -20,26 +20,64 @@ struct TypeList {
 };
 
 
-/*	~ How to USE AnyType:
-*   AnyType<const char*>::GetValue() = "Test";
-*   AnyType<int32_t>::GetValue() = 2;
-*   luaJson.CallFunction("Test", TypeList<AnyType<const char *>, TypeList<AnyType<int32_t>, NullType>>(), 1);
-*
-*
-*	~ Initialize several values with the same type simultaneously
-*   AnyType<std::initializer_list<const char*>>::GetValue() = {"TEMP", "HELLO WORLD"};
-*	
-* 
-*	~ But be aware of that you can't initialize the same type twice
-*	because it will return already initialized one
-*/
-
-template<class T>
+template<int32_t T, class U>
 struct AnyType {
-	static inline T& GetValue() {
-		static T value;
+
+	#pragma always_inline
+	static inline U& GetValue() __attribute__((always_inline)) {
+		static U value;
 		return value;
 	}
 };
 
+template<int32_t T>
+struct AnyType<T, int32_t> {
+	static inline int32_t& GetValue() __attribute__((always_inline)) {
+		static int32_t value = 0;
+		return value;
+	}
+
+	template<int32_t U>
+	static inline bool Compare() {
+		return GetValue() == AnyType<U, int32_t>::GetValue();
+	}
+};
+
+template<int32_t T>
+struct AnyType<T, std::string> {
+
+	#pragma always_inline
+	static inline std::string& GetValue() __attribute__((always_inline)) {
+		static std::string value;
+		return value;
+	}
+
+	template<int32_t U>
+	static inline bool Compare() {
+		return GetValue().compare(AnyType<U, std::string>::GetValue()) == 0;
+	}
+};
+
+
 struct NullType {};
+
+template<class T, class U>
+struct AnyListType {}; 
+
+template<int32_t T, class U, class L, class F>
+struct AnyListType<TypeList<AnyType<T, U>, L>, F> {
+
+	#pragma always_inline
+	static inline F& GetValue() __attribute__((always_inline)) {
+		return L::GetValue();
+	}
+};
+
+template<int32_t T, class U>
+struct AnyListType<TypeList<AnyType<T, U>, NullType>, U> {
+
+	#pragma always_inline
+	static inline U& GetValue() __attribute__((always_inline)) {
+		return AnyType<T, U>::GetValue();
+	}
+};

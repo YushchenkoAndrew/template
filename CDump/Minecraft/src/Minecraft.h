@@ -99,7 +99,8 @@ public:
 	void SetBlock(int32_t x, int32_t y, int32_t z);
 	void ResetBlock(int32_t x, int32_t y, int32_t z);
 
-	bool IsFinished() { return !mManager.GetState(eMenuStates::EXIT).bPressed; }
+	// bool IsFinished() { return !mManager.GetState(eMenuStates::EXIT).bPressed; }
+	bool IsFinished() { return true; }
 
 private:
 	void DrawNoise(olc::PixelGameEngine& GameEngine);
@@ -109,7 +110,8 @@ private:
 	template <class T>
 	void InitMap(Type2Type<T>) {
 		cEngine3D.vpBlocks.clear();
-		bool& bOutline = mManager.GetState(eMenuStates::DRAW_OUTLINE).bHeld;
+		// bool& bOutline = mManager.GetState(eMenuStates::DRAW_OUTLINE).bHeld;
+		bool bOutline = false;
 
 		for (int32_t x = 0; x < nMapSize; x++) {
 			for (int32_t z = 0; z < nMapSize; z++) {

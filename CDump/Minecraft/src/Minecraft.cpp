@@ -115,15 +115,16 @@ void Minecraft::Update(olc::PixelGameEngine& GameEngine, const float& fElapsedTi
 	mManager.Update(GameEngine);
 	cEngine3D.Update(GameEngine, mManager, fElapsedTime);
 
-	if (mManager.GetState(eMenuStates::TRUE_NOISE).bPressed) InitMap(Type2Type<TrueNoise>());
-	if (mManager.GetState(eMenuStates::PERLIN_NOISE).bPressed) InitMap(Type2Type<PerlinNoise>());
-	if (mManager.GetState(eMenuStates::FRACTAL_NOISE).bPressed) InitMap(Type2Type<FractalNoise>());
+	//  FIXME:
+	// if (mManager.GetState(eMenuStates::TRUE_NOISE).bPressed) InitMap(Type2Type<TrueNoise>());
+	// if (mManager.GetState(eMenuStates::PERLIN_NOISE).bPressed) InitMap(Type2Type<PerlinNoise>());
+	// if (mManager.GetState(eMenuStates::FRACTAL_NOISE).bPressed) InitMap(Type2Type<FractalNoise>());
 
-	if (mManager.GetState(eMenuStates::DRAW_OUTLINE).bPressed || mManager.GetState(eMenuStates::DRAW_OUTLINE).bRealeased) {
-		if (mManager.GetState(eMenuStates::TRUE_NOISE).bHeld) InitMap(Type2Type<TrueNoise>());
-		if (mManager.GetState(eMenuStates::PERLIN_NOISE).bHeld) InitMap(Type2Type<PerlinNoise>());
-		if (mManager.GetState(eMenuStates::FRACTAL_NOISE).bHeld) InitMap(Type2Type<FractalNoise>());
-	}
+	// if (mManager.GetState(eMenuStates::DRAW_OUTLINE).bPressed || mManager.GetState(eMenuStates::DRAW_OUTLINE).bRealeased) {
+	// 	if (mManager.GetState(eMenuStates::TRUE_NOISE).bHeld) InitMap(Type2Type<TrueNoise>());
+	// 	if (mManager.GetState(eMenuStates::PERLIN_NOISE).bHeld) InitMap(Type2Type<PerlinNoise>());
+	// 	if (mManager.GetState(eMenuStates::FRACTAL_NOISE).bHeld) InitMap(Type2Type<FractalNoise>());
+	// }
 
 	sPoint3D vMapRange = (cEngine3D.cCamera.GetPos() - vWorldStart - (float)nMapSize * CHUNK_SIZE * 0.5f);
 	const float fLength = (float)(nMapLoadRange - nMapSize * 0.5f) * CHUNK_SIZE;
@@ -162,14 +163,15 @@ void Minecraft::Draw(olc::PixelGameEngine& GameEngine, const float& fElapsedTime
 	bool bFreeToDraw = true;
     mManager.Draw(GameEngine, decMenu, fElapsedTime);
 
-	if (mManager.GetState(eMenuStates::DRAW_NOISE_YES).bHeld) { DrawNoise(GameEngine); bFreeToDraw = false; }
+	//  FIXME:
+	// if (mManager.GetState(eMenuStates::DRAW_NOISE_YES).bHeld) { DrawNoise(GameEngine); bFreeToDraw = false; }
 
 	// Collision
-	if (mManager.GetState(eMenuStates::DRAW_RECTANGLE_COLLISION).bHeld) { DrawCollision<sRectanleCollision>(GameEngine); bFreeToDraw = false; }
-	if (mManager.GetState(eMenuStates::DRAW_DIAGONAL_COLLISION).bHeld) { DrawCollision<sDiagonalCollision>(GameEngine); bFreeToDraw = false; }
-	if (mManager.GetState(eMenuStates::DRAW_DIAGONAL_STAT_COLLISION).bHeld) { DrawCollision<sDiagonalStaticCollision>(GameEngine); bFreeToDraw = false; }
-	if (mManager.GetState(eMenuStates::DRAW_AXIS_COLLISION).bHeld) { DrawCollision<sSeparatedAxisCollision>(GameEngine); bFreeToDraw = false; }
-	if (mManager.GetState(eMenuStates::DRAW_AXIS_STAT_COLLISION).bHeld) { DrawCollision<sSeparatedAxisStaticCollision>(GameEngine); bFreeToDraw = false; }
+	// if (mManager.GetState(eMenuStates::DRAW_RECTANGLE_COLLISION).bHeld) { DrawCollision<sRectanleCollision>(GameEngine); bFreeToDraw = false; }
+	// if (mManager.GetState(eMenuStates::DRAW_DIAGONAL_COLLISION).bHeld) { DrawCollision<sDiagonalCollision>(GameEngine); bFreeToDraw = false; }
+	// if (mManager.GetState(eMenuStates::DRAW_DIAGONAL_STAT_COLLISION).bHeld) { DrawCollision<sDiagonalStaticCollision>(GameEngine); bFreeToDraw = false; }
+	// if (mManager.GetState(eMenuStates::DRAW_AXIS_COLLISION).bHeld) { DrawCollision<sSeparatedAxisCollision>(GameEngine); bFreeToDraw = false; }
+	// if (mManager.GetState(eMenuStates::DRAW_AXIS_STAT_COLLISION).bHeld) { DrawCollision<sSeparatedAxisStaticCollision>(GameEngine); bFreeToDraw = false; }
 
 
 	if (bFreeToDraw) cEngine3D.Draw(GameEngine, mManager);

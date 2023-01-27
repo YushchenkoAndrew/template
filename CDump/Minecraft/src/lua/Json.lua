@@ -151,21 +151,16 @@ function JSON:Parse(path)
 	return JSON.ParseValue()
 end
 
-function JSON:RepeatStr(str, n)
-	local result = ""
-	for i = 1, n, 1 do result = result .. str end
-	return result
-end
-
 function JSON:Stringify(json, i)
+	i = i or 0
 	if (json == nil) then return end
 
 	for key, value in pairs(json) do
 		if (type(value) == "table") then
-			print(JSON:RepeatStr("  ", i) .. key .. " => ")
+			print(string.rep("  ", i) .. key .. " => ")
 			JSON:Stringify(value, i + 1)
 		else
-			print(JSON:RepeatStr("  ", i) .. key .. " => " .. tostring(value))
+			print(string.rep("  ", i) .. key .. " => " .. tostring(value))
 		end
 	end
 end

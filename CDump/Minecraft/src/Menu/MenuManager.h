@@ -1,32 +1,6 @@
 #pragma once
 #include "Menu.h"
 
-namespace eMenuStates {
-	enum {
-		EDGE_EN = 17,
-		EDGE_DIS = 19,
-		SHADOW_EN = 33,
-		SHADOW_DIS = 35,
-		COLOR_EN = 49,
-		COLOR_DIS = 51,
-		DISTRIBUTE_EN = 65,
-		DISTRIBUTE_DIS = 67,
-		DRAW_NOISE_YES = 97,
-		DRAW_NOISE_NO = 99,
-		TRUE_NOISE = 113,
-		PERLIN_NOISE = 115,
-		FRACTAL_NOISE = 117,
-		DRAW_RECTANGLE_COLLISION = 129,
-		DRAW_DIAGONAL_COLLISION = 131,
-		DRAW_DIAGONAL_STAT_COLLISION = 133,
-		DRAW_AXIS_COLLISION = 135,
-		DRAW_AXIS_STAT_COLLISION = 137,
-		DRAW_OUTLINE = 161,
-		FOLLOW_CAMERA = 177,
-		EXIT = 80
-	};
-}
-
 class MenuManager {
 public:
 	MenuManager(): vOffset({ 10, 10 }) {}
@@ -38,7 +12,10 @@ public:
 	void Update(olc::PixelGameEngine& GameEngine);
 	void Draw(olc::PixelGameEngine& GameEngine, std::unique_ptr<olc::Decal>& decMenu, const float& fTime);
 
-	sMenuState& GetState(int32_t nId) { return mMenuState[STATE_GROUP(nId)][STATE_INDEX(nId)]; }
+	// sMenuState& GetState() { return mMenuState[STATE_GROUP(nId)][STATE_INDEX(nId)]; }
+
+ 	template<class T>
+	sMenuState& GetState() { return AnyListType<T, sMenuState>::GetValue(); }
 	bool InUse() { return isInUse; }
 
 private:
@@ -49,7 +26,7 @@ private:
 	Menu cMenu;
 	LuaScript luaAnimated;
 	std::list<Menu*> stMenu;
-	menustate_t mMenuState;
+	// menustate_t mMenuState;
 	const olc::vi2d vOffset;
 
 	int32_t nId = -1;

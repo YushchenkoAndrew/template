@@ -409,6 +409,7 @@ function ExprOffset:synchronize()
 		if not expr then return res end
 		local depth = (self:last(expr) or self).depth
 		local obj, remaind = expr:synchronize(self.depth + 1)
+		-- FIXME: Bug with list of objects
 
 		if remaind then copy(remaind, res) end
 		if expr.type == ExprType.LIST and expr.curr.type == ExprType.OBJ and not expr.next then depth = depth - 2 end
@@ -682,7 +683,7 @@ YAML = {}
 
 
 function YAML:Parse(path, debug)
-	print("here")
+	print(path)
 	local file = io.open(path, "r")
 	if not file then return print("Unable to open file") or nil end
 
@@ -703,5 +704,5 @@ end
 -- Test
 -- require("Json")
 
--- JSON:Stringify(YAML:Parse("../../assets/Config.yaml", true))
--- JSON:StringifyYAML:Parse("../../assets/Menu.yaml", true))
+-- -- JSON:Stringify(YAML:Parse("../../assets/Config.yaml", true))
+-- JSON:Stringify(YAML:Parse("../../assets/Menu.yaml", true))

@@ -125,7 +125,7 @@ void GraphicsEngine::Update(olc::PixelGameEngine& GameEngine, MenuManager& mMana
 	cDraw.Update();
 	cCamera.Update(GameEngine, fElapsedTime);
 
-	if (mManager.GetState(eMenuStates::FOLLOW_CAMERA).bHeld) lightSrc->Update(cCamera.vPos);
+	// if (mManager.GetState(eMenuStates::FOLLOW_CAMERA).bHeld) lightSrc->Update(cCamera.vPos);
 }
 
 void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManager) {
@@ -147,7 +147,8 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 			normal = sPoint3D::normalize(vect1.cross(vect2));
 
 			if (normal.dot(trTranslated.p[0] - cCamera.vPos) > 0.0f) continue;
-			float brightness = lightSrc->GetBrightness(tr.Avg(), normal, mManager.GetState(eMenuStates::DISTRIBUTE_EN).bHeld);
+			// float brightness = lightSrc->GetBrightness(tr.Avg(), normal, mManager.GetState(eMenuStates::DISTRIBUTE_EN).bHeld);
+			float brightness = lightSrc->GetBrightness(tr.Avg(), normal, false);
 
 
 			trView[0] = trTranslated[0] * cCamera.mView;
@@ -173,25 +174,26 @@ void GraphicsEngine::Draw(olc::PixelGameEngine &GameEngine, MenuManager& mManage
 				ClipByScreenEdge(listClippedTr);
 
 				for (auto& trClipped : listClippedTr) {
-					if (mManager.GetState(eMenuStates::COLOR_EN).bHeld) {
+					// if (mManager.GetState(eMenuStates::COLOR_EN).bHeld) {
 						// FIXME: Use GPU for this !!
 						cDraw.FillTriangle(GameEngine,
 							(int32_t)trClipped[0].x, (int32_t)trClipped[0].y, trClipped[0].z,
 							(int32_t)trClipped[1].x, (int32_t)trClipped[1].y, trClipped[1].z,
 							(int32_t)trClipped[2].x, (int32_t)trClipped[2].y, trClipped[2].z,
-							mManager.GetState(eMenuStates::SHADOW_EN).bHeld ? block->GetColor(brightness) : block->GetColor()
+							// mManager.GetState(eMenuStates::SHADOW_EN).bHeld ? block->GetColor(brightness) : block->GetColor()
+							 block->GetColor(brightness)
 						);
-					}
+					// }
 
-					if (mManager.GetState(eMenuStates::EDGE_EN).bHeld) {
-						//GameEngine.DrawTriangle(
-						cDraw.DrawTriangle(GameEngine,
-							(int32_t)trClipped[0].x, (int32_t)trClipped[0].y, trClipped[0].z,
-							(int32_t)trClipped[1].x, (int32_t)trClipped[1].y, trClipped[1].z,
-							(int32_t)trClipped[2].x, (int32_t)trClipped[2].y, trClipped[2].z,
-							mManager.GetState(eMenuStates::COLOR_DIS).bHeld ? olc::WHITE : olc::BLACK
-						);
-					}
+					// if (mManager.GetState(eMenuStates::EDGE_EN).bHeld) {
+					// 	//GameEngine.DrawTriangle(
+					// 	cDraw.DrawTriangle(GameEngine,
+					// 		(int32_t)trClipped[0].x, (int32_t)trClipped[0].y, trClipped[0].z,
+					// 		(int32_t)trClipped[1].x, (int32_t)trClipped[1].y, trClipped[1].z,
+					// 		(int32_t)trClipped[2].x, (int32_t)trClipped[2].y, trClipped[2].z,
+					// 		mManager.GetState(eMenuStates::COLOR_DIS).bHeld ? olc::WHITE : olc::BLACK
+					// 	);
+					// }
 				}
 			}
 		}

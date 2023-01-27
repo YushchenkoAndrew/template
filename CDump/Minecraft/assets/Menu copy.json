@@ -1,0 +1,221 @@
+{
+  "name": "root",
+  "size": [1, 2],
+  "items": [
+    {
+      "name": "Debug",
+      "size": [1, 2],
+      "items": [
+        {
+          "name": "Draw",
+          "size": [1, 4],
+          "items": [
+            {
+              "name": "Edges",
+              "size": [2, 1],
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": false,
+                  "id": 17
+                },
+                {
+                  "name": "No",
+                  "enable": true,
+                  "id": 19
+                }
+              ]
+            },
+            {
+              "name": "Shadow",
+              "size": [1, 2],
+              "items": [
+                {
+                  "name": "Shadow",
+                  "size": [2, 1],
+                  "items": [
+                    {
+                      "name": "Yes",
+                      "enable": true,
+                      "id": 33
+                    },
+                    {
+                      "name": "No",
+                      "enable": false,
+                      "id": 35
+                    }
+                  ]
+                },
+                {
+                  "name": "Distribute",
+                  "size": [2, 1],
+                  "items": [
+                    {
+                      "name": "Yes",
+                      "enable": false,
+                      "id": 65
+                    },
+                    {
+                      "name": "No",
+                      "enable": true,
+                      "id": 67
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Color",
+              "size": [2, 1],
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": true,
+                  "id": 49
+                },
+                {
+                  "name": "No",
+                  "enable": false,
+                  "id": 51
+                }
+              ]
+            },
+            {
+              "name": "Noise",
+              "size": [2, 1],
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": false,
+                  "id": 97
+                },
+                {
+                  "name": "No",
+                  "enable": true,
+                  "id": 99
+                }
+              ]
+            },
+            {
+              "name": "Collision",
+              "size": [1, 3],
+              "items": [
+                {
+                  "name": "Rectangle",
+                  "id": 129,
+                  "enable": false
+                },
+                {
+                  "name": "Diagonal",
+                  "id": 131,
+                  "enable": false
+                },
+                {
+                  "name": "Axis",
+                  "id": 135,
+                  "enable": false
+                },
+                {
+                  "name": "Static",
+                  "size": [1, 3],
+                  "items": [
+                    {
+                      "name": "Diagonal",
+                      "id": 133,
+                      "enable": false
+                    },
+                    {
+                      "name": "Axis",
+                      "id": 137,
+                      "enable": false
+                    }
+                  ]
+                },
+                {
+                  "name": "Inaff",
+                  "id": 141,
+                  "enable": false
+                }
+              ]
+            },
+            {
+              "name": "Outline",
+              "size": [2, 1],
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": false,
+                  "id": 161
+                },
+                {
+                  "name": "No",
+                  "enable": true,
+                  "id": 163
+                }
+              ]
+            },
+            {
+              "name": "Follow",
+              "size": [2, 1],
+              "items": [
+                {
+                  "name": "Yes",
+                  "enable": true,
+                  "id": 177
+                },
+                {
+                  "name": "No",
+                  "enable": false,
+                  "id": 179
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Alg",
+          "size": [1, 4],
+          "items": [
+            {
+              "name": "Rand",
+              "size": [1, 3],
+              "items": [
+                {
+                  "name": "TrueNoise",
+                  "id": 113,
+                  "enable": false
+                },
+                {
+                  "name": "PerlinNoise",
+                  "id": 115,
+                  "enable": false
+                },
+                {
+                  "name": "FractalNoise",
+                  "id": 117,
+                  "enable": true
+                }
+              ]
+            },
+            {
+              "name": "Collision",
+              "size": [1, 3],
+              "items": [
+                {
+                  "name": "Diagonal",
+                  "id": -1,
+                  "enable": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Exit",
+      "id": 80,
+      "enable": false
+    }
+  ]
+}

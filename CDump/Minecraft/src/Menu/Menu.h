@@ -2,6 +2,8 @@
 #include "lib/olcPixelGameEngine.h"
 #include "include/LuaScript.h"
 #include "include/Typelist.h"
+#include "include/Foreach.h"
+#include "Defs.h"
 
 #define PATCH_SIZE 8
 #define STATE_GROUP(id)	(int32_t)((id) & ~(int32_t)0x0F)
@@ -36,7 +38,7 @@ public:
 	void InitStates(menustate_t& mMenuState);
 
 protected:
-	void Build(LuaScript& luaJson);
+	void Build(LuaScript&, int32_t);
 
 public:
 
