@@ -6,4 +6,4 @@ When I created this repo it was like a toy project where I would put my realizat
 
 ### Links
 
-- [My Website](https://mortis-grimreaper.ddns.net/projects)
+- [My Website](https://www.mortis-grimreaper.net/projects)
