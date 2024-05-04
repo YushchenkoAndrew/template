@@ -4,7 +4,7 @@ metadata:
   name: web-deployment
   namespace: template
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: webserver
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: webserver
-          image: grimreapermortis/webserver:1.0.6
+          image: grimreapermortis/webserver:1.0.9
           ports:
             - containerPort: 8000
           imagePullPolicy: Always

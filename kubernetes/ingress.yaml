@@ -1,22 +1,51 @@
-apiVersion: extensions/v1beta1
+# apiVersion: extensions/v1beta1
+# kind: Ingress
+# metadata:
+#   name: web-ingress
+#   namespace: template
+#   annotations:
+#     kubernetes.io/ingress.class: "nginx"
+#     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+#     nginx.ingress.kubernetes.io/proxy-body-size:  "50m"
+# spec:
+#   tls:
+#   - hosts: 
+#     - mortis-grimreaper.ddns.net
+#     secretName: mortis-tls
+#   rules:
+#   - host: mortis-grimreaper.ddns.net
+#     http:
+#       paths:
+#       - backend:
+#           serviceName: web-service
+#           servicePort: 8000
+#         path: /projects
+
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: web-ingress
   namespace: template
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    nginx.ingress.kubernetes.io/proxy-body-size:  "50m"
 spec:
+  ingressClassName: nginx
   tls:
   - hosts: 
-    - mortis-grimreaper.ddns.net
-    secretName: mortis-tls
+    - "192.168.0.106"
   rules:
-  - host: mortis-grimreaper.ddns.net
-    http:
-      paths:
-      - backend:
-          serviceName: web-service
-          servicePort: 8000
-        path: /projects
+    - http:
+        paths:
+          - pathType: Prefix
+            path: /projects
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 8000
+
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 8000
