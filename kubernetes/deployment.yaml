@@ -13,6 +13,8 @@ spec:
       labels:
         app: template
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: bannana
       containers:
         - name: template
           image: grimreapermortis/webserver:1.0.10
